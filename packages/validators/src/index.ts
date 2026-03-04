@@ -573,3 +573,18 @@ export const trackPageViewSchema = z.object({
 })
 
 export type TrackPageViewInput = z.infer<typeof trackPageViewSchema>
+
+// Phase 6: Seating Charts
+export * from './seating-charts'
+
+// Phase 7: Email Campaigns
+export * from './email-campaigns'
+
+// Phase 8: Vendors, Wedding Party, Events
+export * from './vendors'
+export * from './wedding-party'
+export * from './events'
+
+// Phase 9: Photos, Registry, Design
+export * from './photos'
+export * from './registry'

@@ -22,3 +22,52 @@ export { websiteSections, websiteSectionTypeEnum } from './website-sections'
 export { websitePhotos } from './website-photos'
 export { websitePageViews } from './website-analytics'
 export { guestbookEntries } from './guestbook-entries'
+
+// Phase 6: Seating Chart
+export {
+  seatingCharts,
+  seatingTables,
+  venueElements,
+  tableAssignments,
+  guestRelationships,
+  tableTypeEnum,
+  elementTypeEnum,
+  relationshipTypeEnum,
+} from './seating-charts'
+
+// Phase 7: Communication
+export {
+  emailCampaigns,
+  emailRecipients,
+  announcements,
+  emailTemplateTypeEnum,
+  campaignStatusEnum,
+} from './email-campaigns'
+
+// Phase 8: Vendors, Wedding Party, Events
+export {
+  vendors,
+  vendorCommunications,
+  vendorContracts,
+  vendorStatusEnum,
+  contractStatusEnum,
+} from './vendors'
+export {
+  weddingParty,
+  partyTasks,
+  partyGifts,
+  partyRoleEnum,
+  partySideEnum,
+} from './wedding-party'
+export { events, timelineEntries } from './events'
+
+// Phase 9: Photos, Registry, Design
+export { photos, photoModerationEnum, photoSourceEnum } from './photos'
+export {
+  registryLinks,
+  cashFunds,
+  cashFundContributions,
+  gifts,
+  moodBoards,
+  moodBoardItems,
+} from './registry'

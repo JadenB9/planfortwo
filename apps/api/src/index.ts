@@ -27,6 +27,13 @@ import { websitePhotosRoute } from './routes/website-photos.js'
 import { websitePublicRoute } from './routes/website-public.js'
 import { websiteAnalyticsRoute as websiteAnalyticsRouteHandler } from './routes/website-analytics.js'
 import { guestbookRoute } from './routes/guestbook.js'
+import { seatingChartsRoute } from './routes/seating-charts.js'
+import { emailCampaignsRoute, announcementsRoute } from './routes/email-campaigns.js'
+import { vendorsRoute } from './routes/vendors.js'
+import { weddingPartyRoute } from './routes/wedding-party.js'
+import { eventsRoute } from './routes/events.js'
+import { photoGalleryRoute } from './routes/photo-gallery.js'
+import { registryRoute } from './routes/registry.js'
 import { inngest } from './inngest/client.js'
 import { onPaymentReminder } from './inngest/functions/onPaymentReminder.js'
 
@@ -68,6 +75,14 @@ app.route('/website-photos', websitePhotosRoute)
 app.route('/website-public', websitePublicRoute)
 app.route('/website-analytics', websiteAnalyticsRouteHandler)
 app.route('/guestbook', guestbookRoute)
+app.route('/seating-charts', seatingChartsRoute)
+app.route('/email-campaigns', emailCampaignsRoute)
+app.route('/announcements', announcementsRoute)
+app.route('/vendors', vendorsRoute)
+app.route('/wedding-party', weddingPartyRoute)
+app.route('/events', eventsRoute)
+app.route('/photos', photoGalleryRoute)
+app.route('/registry', registryRoute)
 
 // ── Inngest ──
 app.on(['GET', 'PUT', 'POST'], '/api/inngest', inngestServe({
