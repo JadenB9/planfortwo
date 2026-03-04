@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "noEmit": true,
+    "noEmit": false,
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "moduleResolution": "bundler",
