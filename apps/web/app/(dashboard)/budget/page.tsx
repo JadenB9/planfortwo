@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from 'react'
 import { useAuth } from '@clerk/nextjs'
+import { motion } from 'framer-motion'
+import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
 import { useFeatures } from '@/hooks/use-features'
 import { useBudget } from '@/hooks/use-budget'
@@ -110,7 +112,7 @@ export default function BudgetPage() {
   // Free tier: show basic budget total with upgrade prompt
   if (features && features.tier === 'free') {
     return (
-      <div className="mx-auto max-w-4xl animate-fade-in">
+      <motion.div className="mx-auto max-w-4xl" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ...springSmooth }}>
         <div className="mb-8">
           <h1 className="font-serif text-3xl font-bold text-gray-900">Budget</h1>
           <p className="mt-1 text-sm text-gray-600">Track every dollar for your wedding.</p>
@@ -121,7 +123,7 @@ export default function BudgetPage() {
         <div className="mt-6">
           <UpgradePrompt message="Upgrade to unlock full budget tracking, expense management, analytics, and more" />
         </div>
-      </div>
+      </motion.div>
     )
   }
 
@@ -129,7 +131,12 @@ export default function BudgetPage() {
   const needsSetup = categories.length === 0
 
   return (
-    <div className="mx-auto max-w-6xl animate-fade-in">
+    <motion.div
+      className="mx-auto max-w-6xl"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ...springSmooth }}
+    >
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-serif text-3xl font-bold text-gray-900">Budget</h1>
@@ -327,6 +334,6 @@ export default function BudgetPage() {
           onClose={() => setShowSetupWizard(false)}
         />
       )}
-    </div>
+    </motion.div>
   )
 }

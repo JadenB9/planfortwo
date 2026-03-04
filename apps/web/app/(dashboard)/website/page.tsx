@@ -2,8 +2,10 @@
 
 import { useState, useCallback } from 'react'
 import { useAuth } from '@clerk/nextjs'
+import { motion } from 'framer-motion'
 import { useWebsite } from '@/hooks/use-website'
 import { useWedding } from '@/hooks/use-wedding'
+import { springSmooth } from '@/lib/animations'
 import { api } from '@/lib/api'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -106,18 +108,30 @@ export default function WebsitePage() {
 
   if (!config) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center px-4">
+      <motion.div
+        className="flex min-h-[60vh] flex-col items-center justify-center px-4"
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ...springSmooth }}
+      >
         <h1 className="font-serif text-3xl font-bold text-gray-900">Wedding Website</h1>
         <p className="mt-2 text-gray-600">Create your personalized wedding website</p>
-        <Button className="mt-6" onClick={handleCreate} disabled={!features?.canWebsiteBuilder}>
-          {features?.canWebsiteBuilder ? 'Create Website' : 'Upgrade to Create Website'}
-        </Button>
-      </div>
+        <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+          <Button className="mt-6" onClick={handleCreate} disabled={!features?.canWebsiteBuilder}>
+            {features?.canWebsiteBuilder ? 'Create Website' : 'Upgrade to Create Website'}
+          </Button>
+        </motion.div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <motion.div
+      className="space-y-6 p-6"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ...springSmooth }}
+    >
       <div className="flex items-center justify-between">
         <h1 className="font-serif text-2xl font-bold text-gray-900">Wedding Website</h1>
         <PublishToggle
@@ -172,6 +186,6 @@ export default function WebsitePage() {
           />
         </TabsContent>
       </Tabs>
-    </div>
+    </motion.div>
   )
 }

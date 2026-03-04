@@ -3,9 +3,11 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { OnboardingData } from '@planfortwo/types'
 import { onboardingSchema } from '@planfortwo/validators'
 import { api } from '@/lib/api'
+import { springSmooth } from '@/lib/animations'
 import { ProgressBar } from '@/components/onboarding/progress-bar'
 import { NamesStep } from '@/components/onboarding/names-step'
 import { DateStep } from '@/components/onboarding/date-step'
@@ -16,11 +18,24 @@ import { TimelineStep } from '@/components/onboarding/timeline-step'
 
 const TOTAL_STEPS = 6
 
+const stepVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 60 : -60,
+    opacity: 0,
+  }),
+  center: { x: 0, opacity: 1 },
+  exit: (direction: number) => ({
+    x: direction > 0 ? -60 : 60,
+    opacity: 0,
+  }),
+}
+
 export default function OnboardingPage() {
   const router = useRouter()
   const { getToken } = useAuth()
 
   const [step, setStep] = useState(0)
+  const [direction, setDirection] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<Partial<OnboardingData>>({
@@ -38,10 +53,12 @@ export default function OnboardingPage() {
   }, [])
 
   function handleNext() {
+    setDirection(1)
     setStep((prev) => Math.min(prev + 1, TOTAL_STEPS - 1))
   }
 
   function handleBack() {
+    setDirection(-1)
     setStep((prev) => Math.max(prev - 1, 0))
   }
 
@@ -77,46 +94,54 @@ export default function OnboardingPage() {
     }
   }
 
+  const steps = [
+    <NamesStep key="names" data={data} onUpdate={updateData} onNext={handleNext} />,
+    <DateStep key="date" data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />,
+    <GuestCountStep key="guests" data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />,
+    <BudgetStep key="budget" data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />,
+    <StyleStep key="style" data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />,
+    <TimelineStep key="timeline" data={data} onUpdate={updateData} onSubmit={handleSubmit} onBack={handleBack} isSubmitting={isSubmitting} />,
+  ]
+
   return (
     <>
-      <div className="mb-6 text-center">
+      <motion.div
+        className="mb-6 text-center"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <h1 className="font-serif text-2xl font-bold text-gray-900">
           Plan<span className="text-wedding-600">For</span>Two
         </h1>
-      </div>
+      </motion.div>
 
       <ProgressBar currentStep={step} totalSteps={TOTAL_STEPS} />
 
       {error && (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <motion.div
+          className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+        >
           {error}
-        </div>
+        </motion.div>
       )}
 
-      {step === 0 && (
-        <NamesStep data={data} onUpdate={updateData} onNext={handleNext} />
-      )}
-      {step === 1 && (
-        <DateStep data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />
-      )}
-      {step === 2 && (
-        <GuestCountStep data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />
-      )}
-      {step === 3 && (
-        <BudgetStep data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />
-      )}
-      {step === 4 && (
-        <StyleStep data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />
-      )}
-      {step === 5 && (
-        <TimelineStep
-          data={data}
-          onUpdate={updateData}
-          onSubmit={handleSubmit}
-          onBack={handleBack}
-          isSubmitting={isSubmitting}
-        />
-      )}
+      <AnimatePresence mode="wait" custom={direction}>
+        <motion.div
+          key={step}
+          custom={direction}
+          variants={stepVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.3, ...springSmooth }}
+        >
+          {steps[step]}
+        </motion.div>
+      </AnimatePresence>
     </>
   )
 }

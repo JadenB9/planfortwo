@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { staggerContainer, navItem, springSmooth } from '@/lib/animations'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', comingSoon: false },
@@ -22,33 +24,39 @@ export function Sidebar() {
         </Link>
       </div>
 
-      <nav className="mt-4 space-y-1 px-3">
+      <motion.nav
+        className="mt-4 space-y-1 px-3"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href
 
           return (
-            <Link
-              key={item.href}
-              href={item.comingSoon ? '#' : item.href}
-              className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-wedding-50 text-wedding-700'
-                  : item.comingSoon
-                    ? 'cursor-default text-gray-400'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-              onClick={item.comingSoon ? (e) => e.preventDefault() : undefined}
-            >
-              <span>{item.label}</span>
-              {item.comingSoon && (
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
-                  Soon
-                </span>
-              )}
-            </Link>
+            <motion.div key={item.href} variants={navItem} transition={{ duration: 0.3, ...springSmooth }}>
+              <Link
+                href={item.comingSoon ? '#' : item.href}
+                className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-wedding-50 text-wedding-700'
+                    : item.comingSoon
+                      ? 'cursor-default text-gray-400'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+                onClick={item.comingSoon ? (e) => e.preventDefault() : undefined}
+              >
+                <span>{item.label}</span>
+                {item.comingSoon && (
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+                    Soon
+                  </span>
+                )}
+              </Link>
+            </motion.div>
           )
         })}
-      </nav>
+      </motion.nav>
     </aside>
   )
 }

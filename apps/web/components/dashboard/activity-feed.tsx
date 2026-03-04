@@ -1,6 +1,8 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import type { ActivityLogEntry, ActivityAction } from '@planfortwo/types'
+import { staggerContainer, listItem, springSmooth } from '@/lib/animations'
 
 interface ActivityFeedProps {
   activities: ActivityLogEntry[]
@@ -69,13 +71,28 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
     <div className="rounded-2xl border border-gray-200 bg-white p-6">
       <h3 className="mb-4 font-serif text-lg font-semibold text-gray-900">Recent Activity</h3>
 
-      <div className="space-y-3">
+      <motion.div
+        className="space-y-3"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {activities.slice(0, 10).map((entry) => {
           const taskName = (entry.metadata as Record<string, unknown> | null)?.taskTitle as string | undefined
 
           return (
-            <div key={entry.id} className="flex items-start gap-3">
-              <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-wedding-400" />
+            <motion.div
+              key={entry.id}
+              className="flex items-start gap-3"
+              variants={listItem}
+              transition={{ duration: 0.3, ...springSmooth }}
+            >
+              <motion.div
+                className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-wedding-400"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-gray-700">
                   <span className="font-medium">{ACTION_LABELS[entry.action]}</span>
@@ -85,10 +102,10 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
                 </p>
                 <p className="mt-0.5 text-xs text-gray-400">{formatTimestamp(entry.createdAt)}</p>
               </div>
-            </div>
+            </motion.div>
           )
         })}
-      </div>
+      </motion.div>
     </div>
   )
 }

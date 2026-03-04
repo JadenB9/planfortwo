@@ -1,4 +1,7 @@
-import type { ReactNode } from 'react'
+'use client'
+
+import { type ReactNode } from 'react'
+import { motion } from 'framer-motion'
 
 interface StatCardProps {
   label: string
@@ -9,15 +12,30 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon, trend }: StatCardProps) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6">
+    <motion.div
+      className="rounded-2xl border border-gray-200 bg-white p-6"
+      whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+      transition={{ duration: 0.2 }}
+    >
       <div className="flex items-center justify-between">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-wedding-50 text-wedding-600">
+        <motion.div
+          className="flex h-10 w-10 items-center justify-center rounded-xl bg-wedding-50 text-wedding-600"
+          whileHover={{ rotate: 8, scale: 1.1 }}
+          transition={{ duration: 0.3 }}
+        >
           {icon}
-        </div>
+        </motion.div>
         {trend && <span className="text-xs font-medium text-sage-600">{trend}</span>}
       </div>
-      <p className="mt-4 text-2xl font-bold text-gray-900">{value}</p>
+      <motion.p
+        className="mt-4 text-2xl font-bold text-gray-900"
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        {value}
+      </motion.p>
       <p className="mt-1 text-sm text-gray-600">{label}</p>
-    </div>
+    </motion.div>
   )
 }

@@ -1,3 +1,4 @@
+import { resolve } from 'path'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
@@ -16,7 +17,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': '.',
+      '@': resolve(__dirname, '.'),
     },
   },
 })

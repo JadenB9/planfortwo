@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/nextjs'
+import { motion } from 'framer-motion'
 import type { DashboardData, DashboardStats, GuestStats } from '@planfortwo/types'
 import { api } from '@/lib/api'
+import { staggerGrid, fadeInUp, springSmooth } from '@/lib/animations'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { UpcomingTasks } from '@/components/dashboard/upcoming-tasks'
 import { ActivityFeed } from '@/components/dashboard/activity-feed'
@@ -81,18 +83,36 @@ export default function DashboardPage() {
   const showInvite = members.length < 2
 
   return (
-    <div className="mx-auto max-w-4xl animate-fade-in">
+    <motion.div
+      className="mx-auto max-w-4xl"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ...springSmooth }}
+    >
       {/* Welcome + Countdown */}
-      <div className="mb-8">
+      <motion.div
+        className="mb-8"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
         <h1 className="font-serif text-3xl font-bold text-gray-900">
           {wedding?.name ? `Welcome, ${wedding.name}` : 'Welcome'}
         </h1>
         {daysUntil !== null && daysUntil !== undefined && daysUntil > 0 && (
           <p className="mt-2 text-lg text-gray-600">
-            <span className="font-semibold text-wedding-600">{daysUntil}</span> days until the big day
+            <motion.span
+              className="font-semibold text-wedding-600"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              {daysUntil}
+            </motion.span>{' '}
+            days until the big day
           </p>
         )}
-      </div>
+      </motion.div>
 
       <div className="space-y-6">
         {/* Invite Partner Card */}
@@ -129,58 +149,76 @@ export default function DashboardPage() {
         )}
 
         {/* Quick Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label="Tasks"
-            value={stats ? `${stats.tasksCompleted}/${stats.tasksTotal}` : '0/0'}
-            icon={
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-            }
-            trend={stats && stats.tasksTotal > 0 ? `${Math.round((stats.tasksCompleted / stats.tasksTotal) * 100)}%` : undefined}
-          />
-          <StatCard
-            label="Guests"
-            value={guestStats ? `${guestStats.rsvpAccepted}/${guestStats.totalGuests}` : '0/0'}
-            icon={
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            }
-            trend={guestStats && guestStats.totalGuests > 0 ? `${guestStats.rsvpPending} pending` : undefined}
-          />
-          <StatCard
-            label="Budget"
-            value={
-              stats && stats.budgetTotal > 0
-                ? `$${Math.round(stats.budgetSpent / 1000)}k / $${Math.round(stats.budgetTotal / 1000)}k`
-                : 'Not Set'
-            }
-            icon={
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-            trend={stats && stats.budgetTotal > 0 ? `${Math.round((stats.budgetSpent / stats.budgetTotal) * 100)}% used` : undefined}
-          />
-          <StatCard
-            label="Website"
-            value="Coming Soon"
-            icon={
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-              </svg>
-            }
-          />
-        </div>
+        <motion.div
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          variants={staggerGrid}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+            <StatCard
+              label="Tasks"
+              value={stats ? `${stats.tasksCompleted}/${stats.tasksTotal}` : '0/0'}
+              icon={
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              }
+              trend={stats && stats.tasksTotal > 0 ? `${Math.round((stats.tasksCompleted / stats.tasksTotal) * 100)}%` : undefined}
+            />
+          </motion.div>
+          <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+            <StatCard
+              label="Guests"
+              value={guestStats ? `${guestStats.rsvpAccepted}/${guestStats.totalGuests}` : '0/0'}
+              icon={
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              }
+              trend={guestStats && guestStats.totalGuests > 0 ? `${guestStats.rsvpPending} pending` : undefined}
+            />
+          </motion.div>
+          <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+            <StatCard
+              label="Budget"
+              value={
+                stats && stats.budgetTotal > 0
+                  ? `$${Math.round(stats.budgetSpent / 1000)}k / $${Math.round(stats.budgetTotal / 1000)}k`
+                  : 'Not Set'
+              }
+              icon={
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
+              trend={stats && stats.budgetTotal > 0 ? `${Math.round((stats.budgetSpent / stats.budgetTotal) * 100)}% used` : undefined}
+            />
+          </motion.div>
+          <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+            <StatCard
+              label="Website"
+              value="Coming Soon"
+              icon={
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+              }
+            />
+          </motion.div>
+        </motion.div>
 
         {/* Upcoming Tasks + Activity Feed */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <motion.div
+          className="grid gap-6 lg:grid-cols-2"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4, ...springSmooth }}
+        >
           <UpcomingTasks tasks={stats?.upcomingTasks ?? []} />
           <ActivityFeed activities={stats?.recentActivity ?? []} />
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   )
 }

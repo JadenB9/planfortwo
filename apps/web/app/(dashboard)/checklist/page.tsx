@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/nextjs'
+import { motion } from 'framer-motion'
 import type { ChecklistTask, CategoryWithCount } from '@planfortwo/types'
 import { api } from '@/lib/api'
+import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
 import { useFeatures } from '@/hooks/use-features'
 import { ProgressBar } from '@/components/checklist/progress-bar'
@@ -98,7 +100,12 @@ export default function ChecklistPage() {
   const completedCount = tasks.filter((t) => t.completedAt !== null).length
 
   return (
-    <div className="mx-auto max-w-6xl animate-fade-in">
+    <motion.div
+      className="mx-auto max-w-6xl"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ...springSmooth }}
+    >
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-serif text-3xl font-bold text-gray-900">Checklist</h1>
@@ -206,6 +213,6 @@ export default function ChecklistPage() {
           onUpdated={() => void loadData()}
         />
       )}
-    </div>
+    </motion.div>
   )
 }

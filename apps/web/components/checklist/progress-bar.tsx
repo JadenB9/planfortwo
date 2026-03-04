@@ -1,5 +1,8 @@
 'use client'
 
+import { motion } from 'framer-motion'
+import { springSmooth } from '@/lib/animations'
+
 interface ProgressBarProps {
   completed: number
   total: number
@@ -15,12 +18,22 @@ export function ProgressBar({ completed, total, className = '' }: ProgressBarPro
         <span className="font-medium text-gray-700">
           {completed} of {total} tasks complete
         </span>
-        <span className="font-semibold text-wedding-600">{percentage}%</span>
+        <motion.span
+          className="font-semibold text-wedding-600"
+          key={percentage}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {percentage}%
+        </motion.span>
       </div>
       <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
-        <div
-          className="h-full rounded-full bg-wedding-600 transition-all duration-500 ease-out"
-          style={{ width: `${percentage}%` }}
+        <motion.div
+          className="h-full rounded-full bg-wedding-600"
+          initial={{ width: 0 }}
+          animate={{ width: `${percentage}%` }}
+          transition={{ duration: 0.8, ease: 'easeOut', ...springSmooth }}
         />
       </div>
     </div>

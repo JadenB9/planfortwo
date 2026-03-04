@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import type { ChecklistTask, FeatureGates } from '@planfortwo/types'
 
 interface TaskCardProps {
@@ -50,10 +51,15 @@ export function TaskCard({
   const dueDateInfo = getDueDateStyle(task.dueDate)
 
   return (
-    <div
+    <motion.div
       className={`group flex items-center gap-3 rounded-xl border bg-white px-4 py-3 transition-colors hover:border-wedding-200 ${
         isCompleted ? 'border-gray-100 opacity-70' : 'border-gray-200'
       }`}
+      layout
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: isCompleted ? 0.7 : 1, x: 0 }}
+      transition={{ duration: 0.25 }}
+      whileHover={{ x: 2 }}
     >
       {features.canReorderTasks && dragHandleProps && (
         <button
@@ -109,6 +115,6 @@ export function TaskCard({
           <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: categoryColor }} />
         </div>
       </button>
-    </div>
+    </motion.div>
   )
 }

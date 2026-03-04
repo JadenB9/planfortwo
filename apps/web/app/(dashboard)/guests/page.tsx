@@ -3,8 +3,10 @@
 import { useState, useCallback } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import type { GuestWithTags } from '@planfortwo/types'
 import { api } from '@/lib/api'
+import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
 import { useFeatures } from '@/hooks/use-features'
 import { useGuests } from '@/hooks/use-guests'
@@ -67,7 +69,12 @@ export default function GuestsPage() {
   const atGuestCap = features?.maxGuests !== null && features?.maxGuests !== undefined && stats !== null && stats.totalGuests >= features.maxGuests
 
   return (
-    <div className="mx-auto max-w-5xl animate-fade-in">
+    <motion.div
+      className="mx-auto max-w-5xl"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ...springSmooth }}
+    >
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -157,6 +164,6 @@ export default function GuestsPage() {
           onClose={() => setShowAddForm(false)}
         />
       )}
-    </div>
+    </motion.div>
   )
 }

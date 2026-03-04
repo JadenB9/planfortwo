@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import type { ChecklistTask } from '@planfortwo/types'
+import { staggerContainer, listItem, springSmooth } from '@/lib/animations'
 
 interface UpcomingTasksProps {
   tasks: ChecklistTask[]
@@ -43,9 +45,20 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
         </Link>
       </div>
 
-      <div className="space-y-3">
+      <motion.div
+        className="space-y-3"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {upcoming.map((task) => (
-          <div key={task.id} className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3">
+          <motion.div
+            key={task.id}
+            className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3"
+            variants={listItem}
+            transition={{ duration: 0.3, ...springSmooth }}
+            whileHover={{ x: 3, borderColor: 'rgb(var(--wedding-200))' }}
+          >
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-gray-900">{task.title}</p>
               {task.dueDate && (
@@ -57,9 +70,9 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
             <span className={`ml-3 flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}>
               {PRIORITY_LABELS[task.priority]}
             </span>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   )
 }
