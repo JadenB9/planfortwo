@@ -38,6 +38,7 @@ export const weddings = pgTable('weddings', {
   websitePublished: boolean('website_published').notNull().default(false),
   tier: pricingTierEnum('tier').notNull().default('free'),
   onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
+  rsvpDeadline: timestamp('rsvp_deadline', { withTimezone: true }),
   stripeCustomerId: text('stripe_customer_id'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
