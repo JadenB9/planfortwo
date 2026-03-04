@@ -588,3 +588,9 @@ export * from './events'
 // Phase 9: Photos, Registry, Design
 export * from './photos'
 export * from './registry'
+
+// Phase 10: Post-Wedding
+export * from './post-wedding'
+
+// Phase 11: Payments & Growth
+export * from './payments'

@@ -596,6 +596,97 @@ export interface WebsiteAnalyticsSummary {
   topReferrers: { referrer: string; count: number }[]
 }
 
+// ── Post-Wedding ──
+export type ThankYouStatus = 'not_started' | 'drafted' | 'sent'
+
+export interface ThankYouNote {
+  id: string
+  weddingId: string
+  guestId: string | null
+  giftId: string | null
+  recipientName: string
+  recipientEmail: string | null
+  recipientAddress: string | null
+  message: string | null
+  status: ThankYouStatus
+  sentAt: Date | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface NameChangeTask {
+  id: string
+  weddingId: string
+  institution: string
+  description: string | null
+  documentsRequired: string | null
+  isCompleted: boolean
+  completedAt: Date | null
+  sortOrder: number
+  createdAt: Date
+}
+
+export interface VendorReview {
+  id: string
+  weddingId: string
+  vendorId: string
+  rating: number
+  reviewText: string | null
+  isPublished: boolean
+  createdAt: Date
+}
+
+export interface NotificationPreference {
+  id: string
+  userId: string
+  weddingId: string
+  emailRsvp: boolean
+  emailPaymentReminder: boolean
+  emailTaskDue: boolean
+  emailWeeklySummary: boolean
+  digestFrequency: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+// ── Payments & Growth ──
+export type PurchaseStatus = 'pending' | 'completed' | 'refunded' | 'failed'
+
+export interface Purchase {
+  id: string
+  weddingId: string
+  userId: string
+  stripeSessionId: string | null
+  stripePaymentIntentId: string | null
+  amount: string
+  currency: string
+  status: PurchaseStatus
+  completedAt: Date | null
+  createdAt: Date
+}
+
+export interface Referral {
+  id: string
+  referrerUserId: string
+  referralCode: string
+  referredEmail: string | null
+  referredUserId: string | null
+  isConverted: boolean
+  convertedAt: Date | null
+  rewardGranted: boolean
+  createdAt: Date
+}
+
+export interface ContactSubmission {
+  id: string
+  name: string
+  email: string
+  subject: string
+  message: string
+  isRead: boolean
+  createdAt: Date
+}
+
 // ── Activity ──
 export type ActivityAction =
   | 'task_created'

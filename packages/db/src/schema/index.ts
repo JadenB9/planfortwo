@@ -71,3 +71,21 @@ export {
   moodBoards,
   moodBoardItems,
 } from './registry'
+
+// Phase 10: Post-Wedding
+export {
+  thankYouNotes,
+  nameChangeTasks,
+  vendorReviews,
+  notificationPreferences,
+  thankYouStatusEnum,
+} from './post-wedding'
+
+// Phase 11: Payments & Growth
+export {
+  purchases,
+  referrals,
+  contactSubmissions,
+  adminNotes,
+  purchaseStatusEnum,
+} from './payments'

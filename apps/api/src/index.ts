@@ -34,6 +34,8 @@ import { weddingPartyRoute } from './routes/wedding-party.js'
 import { eventsRoute } from './routes/events.js'
 import { photoGalleryRoute } from './routes/photo-gallery.js'
 import { registryRoute } from './routes/registry.js'
+import { thankYouRoute, nameChangeRoute, vendorReviewsRoute, notificationPrefsRoute } from './routes/post-wedding.js'
+import { purchasesRoute, referralsRoute, contactRoute } from './routes/payments.js'
 import { inngest } from './inngest/client.js'
 import { onPaymentReminder } from './inngest/functions/onPaymentReminder.js'
 
@@ -83,6 +85,13 @@ app.route('/wedding-party', weddingPartyRoute)
 app.route('/events', eventsRoute)
 app.route('/photos', photoGalleryRoute)
 app.route('/registry', registryRoute)
+app.route('/thank-you', thankYouRoute)
+app.route('/name-change', nameChangeRoute)
+app.route('/vendor-reviews', vendorReviewsRoute)
+app.route('/notification-prefs', notificationPrefsRoute)
+app.route('/purchases', purchasesRoute)
+app.route('/referrals', referralsRoute)
+app.route('/contact', contactRoute)
 
 // ── Inngest ──
 app.on(['GET', 'PUT', 'POST'], '/api/inngest', inngestServe({
