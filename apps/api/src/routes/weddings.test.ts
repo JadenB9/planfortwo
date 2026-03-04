@@ -38,6 +38,13 @@ vi.mock('../services/invitations.js', () => ({
   },
 }))
 
+vi.mock('../services/checklist.js', () => ({
+  checklistService: {
+    hasBeenSeeded: vi.fn().mockResolvedValue(true),
+    seedChecklist: vi.fn().mockResolvedValue(undefined),
+  },
+}))
+
 import { weddingsRoute } from './weddings.js'
 import { weddingService } from '../services/weddings.js'
 import { invitationService } from '../services/invitations.js'

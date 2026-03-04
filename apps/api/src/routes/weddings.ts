@@ -1,10 +1,12 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { onboardingSchema, invitePartnerSchema } from '@planfortwo/validators'
+import type { TimelineTemplate } from '@planfortwo/types'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { weddingService } from '../services/weddings.js'
 import { invitationService } from '../services/invitations.js'
+import { checklistService } from '../services/checklist.js'
 
 type Env = {
   Variables: {
@@ -91,6 +93,17 @@ weddingsRoute.post(
       return c.json(
         { error: 'Failed to complete onboarding', code: 'UPDATE_FAILED', statusCode: 500 },
         500,
+      )
+    }
+
+    // Seed checklist after successful onboarding
+    const seeded = await checklistService.hasBeenSeeded(weddingId)
+    if (!seeded) {
+      await checklistService.seedChecklist(
+        weddingId,
+        updated.timelineTemplate as TimelineTemplate,
+        updated.date ? new Date(updated.date) : null,
+        dbUserId,
       )
     }
 

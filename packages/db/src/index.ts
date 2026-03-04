@@ -14,3 +14,7 @@ export const db = drizzle(client, { schema })
 export type Database = typeof db
 
 export * from './schema/index.js'
+export { defaultCategories, getTemplateTasks } from './templates/index.js'
+export type { TemplateTask, TemplateCategory } from './templates/index.js'
+export { defaultGuestTags } from './templates/default-guest-tags.js'
+export type { DefaultGuestTag } from './templates/default-guest-tags.js'
