@@ -23,7 +23,7 @@
     "@planfortwo/types": "workspace:*",
     "@planfortwo/validators": "workspace:*",
     "drizzle-orm": "^0.36.0",
-    "next": "^15.1.0",
+    "next": "^15.5.12",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "svix": "^1.86.0"
