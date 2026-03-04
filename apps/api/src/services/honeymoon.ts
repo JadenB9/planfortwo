@@ -1,0 +1,84 @@
+import { eq, and, asc } from 'drizzle-orm'
+import { db, honeymoonPlans, honeymoonActivities } from '@planfortwo/db'
+import type {
+  CreateHoneymoonPlanInput,
+  UpdateHoneymoonPlanInput,
+  CreateHoneymoonActivityInput,
+  UpdateHoneymoonActivityInput,
+} from '@planfortwo/validators'
+
+export const honeymoonService = {
+  async listPlans(weddingId: string) {
+    return db
+      .select()
+      .from(honeymoonPlans)
+      .where(eq(honeymoonPlans.weddingId, weddingId))
+      .orderBy(asc(honeymoonPlans.createdAt))
+  },
+
+  async getPlan(id: string, weddingId: string) {
+    const [plan] = await db
+      .select()
+      .from(honeymoonPlans)
+      .where(and(eq(honeymoonPlans.id, id), eq(honeymoonPlans.weddingId, weddingId)))
+    if (!plan) return null
+    const activities = await db
+      .select()
+      .from(honeymoonActivities)
+      .where(eq(honeymoonActivities.planId, id))
+      .orderBy(asc(honeymoonActivities.dayNumber), asc(honeymoonActivities.sortOrder))
+    return { ...plan, activities }
+  },
+
+  async createPlan(data: CreateHoneymoonPlanInput) {
+    const values = {
+      ...data,
+      startDate: data.startDate ? new Date(data.startDate) : null,
+      endDate: data.endDate ? new Date(data.endDate) : null,
+    }
+    const [plan] = await db.insert(honeymoonPlans).values(values).returning()
+    return plan
+  },
+
+  async updatePlan(id: string, weddingId: string, data: UpdateHoneymoonPlanInput) {
+    const setData: Record<string, unknown> = { ...data }
+    if (data.startDate !== undefined) setData.startDate = data.startDate ? new Date(data.startDate) : null
+    if (data.endDate !== undefined) setData.endDate = data.endDate ? new Date(data.endDate) : null
+    const [updated] = await db
+      .update(honeymoonPlans)
+      .set(setData)
+      .where(and(eq(honeymoonPlans.id, id), eq(honeymoonPlans.weddingId, weddingId)))
+      .returning()
+    return updated ?? null
+  },
+
+  async deletePlan(id: string, weddingId: string) {
+    const [deleted] = await db
+      .delete(honeymoonPlans)
+      .where(and(eq(honeymoonPlans.id, id), eq(honeymoonPlans.weddingId, weddingId)))
+      .returning()
+    return deleted ?? null
+  },
+
+  async addActivity(data: CreateHoneymoonActivityInput) {
+    const [activity] = await db.insert(honeymoonActivities).values(data).returning()
+    return activity
+  },
+
+  async updateActivity(id: string, data: UpdateHoneymoonActivityInput) {
+    const [updated] = await db
+      .update(honeymoonActivities)
+      .set(data)
+      .where(eq(honeymoonActivities.id, id))
+      .returning()
+    return updated ?? null
+  },
+
+  async deleteActivity(id: string) {
+    const [deleted] = await db
+      .delete(honeymoonActivities)
+      .where(eq(honeymoonActivities.id, id))
+      .returning()
+    return deleted ?? null
+  },
+}

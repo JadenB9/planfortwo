@@ -36,6 +36,11 @@ import { photoGalleryRoute } from './routes/photo-gallery.js'
 import { registryRoute } from './routes/registry.js'
 import { thankYouRoute, nameChangeRoute, vendorReviewsRoute, notificationPrefsRoute } from './routes/post-wedding.js'
 import { purchasesRoute, referralsRoute, contactRoute } from './routes/payments.js'
+import { ceremonyRoute } from './routes/ceremony.js'
+import { playlistsRoute } from './routes/playlists.js'
+import { honeymoonRoute } from './routes/honeymoon.js'
+import { weatherRoute } from './routes/weather.js'
+import { rateLimit } from './middleware/rate-limit.js'
 import { inngest } from './inngest/client.js'
 import { onPaymentReminder } from './inngest/functions/onPaymentReminder.js'
 
@@ -92,6 +97,16 @@ app.route('/notification-prefs', notificationPrefsRoute)
 app.route('/purchases', purchasesRoute)
 app.route('/referrals', referralsRoute)
 app.route('/contact', contactRoute)
+app.route('/ceremony', ceremonyRoute)
+app.route('/playlists', playlistsRoute)
+app.route('/honeymoon', honeymoonRoute)
+app.route('/weather', weatherRoute)
+
+// ── Rate Limiting on Public Endpoints ──
+const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30 })
+app.use('/website-public/*', publicRateLimit)
+app.use('/guestbook/*', publicRateLimit)
+app.use('/rsvp/*', publicRateLimit)
 
 // ── Inngest ──
 app.on(['GET', 'PUT', 'POST'], '/api/inngest', inngestServe({

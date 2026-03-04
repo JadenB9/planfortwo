@@ -594,3 +594,8 @@ export * from './post-wedding'
 
 // Phase 11: Payments & Growth
 export * from './payments'
+
+// Phase 12: Ceremony, Music, Honeymoon
+export * from './ceremony'
+export * from './playlists'
+export * from './honeymoon'
