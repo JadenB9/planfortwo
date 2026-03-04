@@ -1,0 +1,44 @@
+{
+  "name": "@planfortwo/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=../../.env.local src/index.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@clerk/backend": "^3.0.0",
+    "@hono/node-server": "^1.13.0",
+    "@hono/zod-validator": "^0.4.0",
+    "@planfortwo/db": "workspace:*",
+    "@planfortwo/email": "workspace:^",
+    "@planfortwo/types": "workspace:*",
+    "@planfortwo/validators": "workspace:*",
+    "@react-email/components": "^0.0.25",
+    "dotenv": "^16.4.0",
+    "drizzle-orm": "^0.36.0",
+    "hono": "^4.6.0",
+    "resend": "^6.9.3",
+    "svix": "^1.86.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "tsc-alias": "^1.8.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}

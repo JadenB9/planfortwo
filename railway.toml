@@ -1,5 +1,5 @@
 [build]
-dockerfilePath = "Dockerfile.api"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @planfortwo/api... build"
 
 [deploy]
 startCommand = "node apps/api/dist/index.js"
