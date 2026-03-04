@@ -21,6 +21,12 @@ import { budgetCategoriesRoute } from './routes/budget-categories.js'
 import { budgetItemsRoute } from './routes/budget-items.js'
 import { paymentScheduleRoute } from './routes/payment-schedule.js'
 import { budgetAnalyticsRoute } from './routes/budget-analytics.js'
+import { websiteConfigRoute } from './routes/website-config.js'
+import { websiteSectionsRoute } from './routes/website-sections.js'
+import { websitePhotosRoute } from './routes/website-photos.js'
+import { websitePublicRoute } from './routes/website-public.js'
+import { websiteAnalyticsRoute as websiteAnalyticsRouteHandler } from './routes/website-analytics.js'
+import { guestbookRoute } from './routes/guestbook.js'
 import { inngest } from './inngest/client.js'
 import { onPaymentReminder } from './inngest/functions/onPaymentReminder.js'
 
@@ -56,6 +62,12 @@ app.route('/budget-categories', budgetCategoriesRoute)
 app.route('/budget-items', budgetItemsRoute)
 app.route('/payment-schedule', paymentScheduleRoute)
 app.route('/budget', budgetAnalyticsRoute)
+app.route('/website-config', websiteConfigRoute)
+app.route('/website-sections', websiteSectionsRoute)
+app.route('/website-photos', websitePhotosRoute)
+app.route('/website-public', websitePublicRoute)
+app.route('/website-analytics', websiteAnalyticsRouteHandler)
+app.route('/guestbook', guestbookRoute)
 
 // ── Inngest ──
 app.on(['GET', 'PUT', 'POST'], '/api/inngest', inngestServe({

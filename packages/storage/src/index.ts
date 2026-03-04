@@ -56,4 +56,14 @@ export const storageClient = {
     const ext = fileName.split('.').pop() ?? 'file'
     return `receipts/${weddingId}/${itemId}.${ext}`
   },
+
+  buildWebsitePhotoKey(weddingId: string, photoId: string, fileName: string): string {
+    const ext = fileName.split('.').pop() ?? 'file'
+    return `website-photos/${weddingId}/${photoId}.${ext}`
+  },
+
+  buildOgImageKey(weddingId: string, fileName: string): string {
+    const ext = fileName.split('.').pop() ?? 'file'
+    return `og-images/${weddingId}/${Date.now()}.${ext}`
+  },
 }

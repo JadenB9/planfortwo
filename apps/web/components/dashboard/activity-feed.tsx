@@ -32,6 +32,12 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   expense_deleted: 'deleted an expense',
   payment_scheduled: 'scheduled a payment',
   payment_completed: 'completed a payment',
+  website_created: 'created a wedding website',
+  website_published: 'published the wedding website',
+  website_unpublished: 'unpublished the wedding website',
+  website_section_updated: 'updated a website section',
+  website_template_changed: 'changed the website template',
+  guestbook_entry_created: 'left a guestbook message',
 }
 
 function formatTimestamp(date: Date): string {

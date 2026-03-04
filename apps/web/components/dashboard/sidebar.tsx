@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { href: '/checklist', label: 'Checklist', comingSoon: false },
   { href: '/guests', label: 'Guest List', comingSoon: false },
   { href: '/budget', label: 'Budget', comingSoon: false },
-  { href: '/website', label: 'Website', comingSoon: true },
+  { href: '/website', label: 'Website', comingSoon: false },
 ] as const
 
 export function Sidebar() {

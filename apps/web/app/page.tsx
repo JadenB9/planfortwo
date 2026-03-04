@@ -18,12 +18,12 @@ export default function HomePage() {
           >
             Get Started Free
           </Link>
-          <a
-            href="#features"
+          <Link
+            href="/features"
             className="text-sm font-semibold leading-6 text-gray-900 transition-colors hover:text-wedding-600"
           >
             See Features <span aria-hidden="true">&rarr;</span>
-          </a>
+          </Link>
         </div>
       </div>
     </main>

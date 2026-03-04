@@ -71,6 +71,9 @@ vi.mock('../services/features.js', () => ({
       canBudgetAnalytics: true,
       canBudgetExport: true,
       canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -109,6 +112,9 @@ const FULL_GATES = {
   canBudgetAnalytics: true,
   canBudgetExport: true,
   canPaymentSchedule: true,
+  canWebsiteBuilder: true,
+  canWebsiteAnalytics: true,
+  canWebsiteCustomSections: true,
 }
 
 const FREE_GATES = {
@@ -134,6 +140,9 @@ const FREE_GATES = {
   canBudgetAnalytics: false,
   canBudgetExport: false,
   canPaymentSchedule: false,
+  canWebsiteBuilder: false,
+  canWebsiteAnalytics: false,
+  canWebsiteCustomSections: false,
 }
 
 function createApp() {

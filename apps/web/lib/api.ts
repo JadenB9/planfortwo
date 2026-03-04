@@ -27,6 +27,12 @@ import type {
   BudgetAnalytics,
   TipSuggestion,
   SplitCostSummary,
+  WebsiteConfig,
+  WebsiteSection,
+  WebsitePhoto,
+  GuestbookEntry,
+  WebsiteAnalyticsSummary,
+  WebsiteWithSections,
 } from '@planfortwo/types'
 import type {
   CreateTaskInput,
@@ -47,6 +53,18 @@ import type {
   BudgetItemFiltersInput,
   CreatePaymentScheduleInput,
   UpdatePaymentScheduleInput,
+  CreateWebsiteConfigInput,
+  UpdateWebsiteConfigInput,
+  UpdateWebsiteSectionInput,
+  ReorderWebsiteSectionsInput,
+  CreateCustomSectionInput,
+  RequestPhotoUploadInput,
+  RegisterPhotoInput,
+  ReorderPhotosInput,
+  WebsitePasswordInput,
+  VerifyWebsitePasswordInput,
+  TrackPageViewInput,
+  CreateGuestbookEntryInput,
 } from '@planfortwo/validators'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
@@ -307,5 +325,126 @@ export const api = {
       if (!res.ok) throw new Error('Export failed')
       return res.blob()
     },
+  },
+  websiteConfig: {
+    get: (weddingId: string, token: string) =>
+      fetchApi<{ data: WebsiteConfig | null }>(`/website-config?weddingId=${weddingId}`, { token }),
+    create: (data: CreateWebsiteConfigInput, token: string) =>
+      fetchApi<{ data: WebsiteConfig }>('/website-config', { method: 'POST', body: JSON.stringify(data), token }),
+    update: (id: string, weddingId: string, data: UpdateWebsiteConfigInput, token: string) =>
+      fetchApi<{ data: WebsiteConfig }>(`/website-config/${id}?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        token,
+      }),
+    publish: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: WebsiteConfig }>(`/website-config/${id}/publish?weddingId=${weddingId}`, {
+        method: 'POST',
+        token,
+      }),
+    unpublish: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: WebsiteConfig }>(`/website-config/${id}/unpublish?weddingId=${weddingId}`, {
+        method: 'POST',
+        token,
+      }),
+    setPassword: (id: string, weddingId: string, data: WebsitePasswordInput, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(`/website-config/${id}/set-password?weddingId=${weddingId}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        token,
+      }),
+    checkSubdomain: (subdomain: string, token: string) =>
+      fetchApi<{ data: { available: boolean; reason?: string } }>(`/website-config/check-subdomain?subdomain=${encodeURIComponent(subdomain)}`, {
+        token,
+      }),
+  },
+  websiteSections: {
+    list: (weddingId: string, token: string) =>
+      fetchApi<{ data: WebsiteSection[] }>(`/website-sections?weddingId=${weddingId}`, { token }),
+    update: (id: string, weddingId: string, data: UpdateWebsiteSectionInput, token: string) =>
+      fetchApi<{ data: WebsiteSection }>(`/website-sections/${id}?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        token,
+      }),
+    reorder: (weddingId: string, data: ReorderWebsiteSectionsInput, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(`/website-sections/reorder?weddingId=${weddingId}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        token,
+      }),
+    createCustom: (data: CreateCustomSectionInput, token: string) =>
+      fetchApi<{ data: WebsiteSection }>('/website-sections', { method: 'POST', body: JSON.stringify(data), token }),
+    delete: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(`/website-sections/${id}?weddingId=${weddingId}`, {
+        method: 'DELETE',
+        token,
+      }),
+  },
+  websitePhotos: {
+    list: (weddingId: string, token: string, sectionId?: string) => {
+      const params = new URLSearchParams({ weddingId })
+      if (sectionId) params.set('sectionId', sectionId)
+      return fetchApi<{ data: WebsitePhoto[] }>(`/website-photos?${params}`, { token })
+    },
+    requestUpload: (data: RequestPhotoUploadInput, token: string) =>
+      fetchApi<{ data: { uploadUrl: string; r2Key: string; url: string; photoId: string } }>('/website-photos/upload-url', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        token,
+      }),
+    register: (data: RegisterPhotoInput, token: string) =>
+      fetchApi<{ data: WebsitePhoto }>('/website-photos', { method: 'POST', body: JSON.stringify(data), token }),
+    delete: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(`/website-photos/${id}?weddingId=${weddingId}`, {
+        method: 'DELETE',
+        token,
+      }),
+    reorder: (weddingId: string, data: ReorderPhotosInput, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(`/website-photos/reorder?weddingId=${weddingId}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        token,
+      }),
+  },
+  websiteAnalytics: {
+    getSummary: (weddingId: string, token: string) =>
+      fetchApi<{ data: WebsiteAnalyticsSummary }>(`/website-analytics?weddingId=${weddingId}`, { token }),
+  },
+  websitePublic: {
+    getBySlug: (slug: string) =>
+      fetchApi<{ data: WebsiteWithSections }>(`/website-public/${encodeURIComponent(slug)}`),
+    verifyPassword: (subdomain: string, data: VerifyWebsitePasswordInput) =>
+      fetchApi<{ data: { valid: boolean } }>('/website-config/verify-password', {
+        method: 'POST',
+        body: JSON.stringify({ subdomain, ...data }),
+      }),
+    trackView: (slug: string, data: TrackPageViewInput) =>
+      fetchApi<{ data: { success: boolean } }>(`/website-public/${encodeURIComponent(slug)}/track`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    getGuestbookEntries: (slug: string) =>
+      fetchApi<{ data: GuestbookEntry[] }>(`/website-public/${encodeURIComponent(slug)}/guestbook`),
+    submitGuestbookEntry: (data: CreateGuestbookEntryInput) =>
+      fetchApi<{ data: GuestbookEntry }>('/guestbook', { method: 'POST', body: JSON.stringify(data) }),
+  },
+  guestbook: {
+    list: (weddingId: string, token: string) =>
+      fetchApi<{ data: GuestbookEntry[] }>(`/guestbook?weddingId=${weddingId}`, { token }),
+    approve: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: GuestbookEntry }>(`/guestbook/${id}/approve?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ approved: true }),
+        token,
+      }),
+    reject: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: GuestbookEntry }>(`/guestbook/${id}/approve?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ approved: false }),
+        token,
+      }),
+    delete: (id: string, weddingId: string, token: string) =>
+      fetchApi<void>(`/guestbook/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
   },
 }

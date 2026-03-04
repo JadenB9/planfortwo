@@ -28,6 +28,12 @@ export const activityActionEnum = pgEnum('activity_action', [
   'expense_deleted',
   'payment_scheduled',
   'payment_completed',
+  'website_created',
+  'website_published',
+  'website_unpublished',
+  'website_section_updated',
+  'website_template_changed',
+  'guestbook_entry_created',
 ])
 
 export const entityTypeEnum = pgEnum('entity_type', [
@@ -40,6 +46,9 @@ export const entityTypeEnum = pgEnum('entity_type', [
   'budget_category',
   'budget_item',
   'payment',
+  'website',
+  'website_section',
+  'guestbook_entry',
 ])
 
 export const activityLog = pgTable('activity_log', {

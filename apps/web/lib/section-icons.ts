@@ -1,0 +1,49 @@
+import {
+  Heart,
+  BookOpen,
+  MapPin,
+  Users,
+  Image,
+  Plane,
+  Coffee,
+  Gift,
+  HelpCircle,
+  Mail,
+  Clock,
+  MessageSquare,
+  FileText,
+  type LucideIcon,
+} from 'lucide-react'
+import type { WebsiteSectionType } from '@planfortwo/types'
+
+export const sectionIcons: Record<WebsiteSectionType, LucideIcon> = {
+  hero: Heart,
+  our_story: BookOpen,
+  event_details: MapPin,
+  wedding_party: Users,
+  gallery: Image,
+  travel: Plane,
+  things_to_do: Coffee,
+  registry: Gift,
+  faq: HelpCircle,
+  rsvp: Mail,
+  schedule: Clock,
+  guestbook: MessageSquare,
+  custom: FileText,
+}
+
+export const sectionLabels: Record<WebsiteSectionType, string> = {
+  hero: 'Hero',
+  our_story: 'Our Story',
+  event_details: 'Event Details',
+  wedding_party: 'Wedding Party',
+  gallery: 'Gallery',
+  travel: 'Travel & Accommodation',
+  things_to_do: 'Things to Do',
+  registry: 'Registry',
+  faq: 'FAQ',
+  rsvp: 'RSVP',
+  schedule: 'Schedule',
+  guestbook: 'Guestbook',
+  custom: 'Custom Section',
+}

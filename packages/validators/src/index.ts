@@ -419,3 +419,157 @@ export const budgetSetupSchema = z.object({
 })
 
 export type BudgetSetupInput = z.infer<typeof budgetSetupSchema>
+
+// ── Website: Enums ──
+export const privacyModeZodEnum = z.enum(['public', 'password', 'unlisted'])
+export const websiteSectionTypeZodEnum = z.enum([
+  'hero', 'our_story', 'event_details', 'wedding_party', 'gallery',
+  'travel', 'things_to_do', 'registry', 'faq', 'rsvp', 'schedule',
+  'guestbook', 'custom',
+])
+export const fontPairZodEnum = z.enum([
+  'playfair-lato', 'cormorant-fira', 'great-vibes-montserrat',
+  'josefin-open-sans', 'libre-baskerville-source-sans', 'dancing-script-nunito',
+])
+export const templateIdZodEnum = z.enum([
+  'classic', 'modern', 'rustic', 'romantic', 'minimalist',
+  'bohemian', 'garden', 'beach', 'elegant', 'whimsical',
+])
+
+// ── Website: Custom Colors ──
+const hexColorRegex = /^#[0-9a-fA-F]{6}$/
+export const customColorsSchema = z.object({
+  primary: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
+  secondary: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
+  accent: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
+  background: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
+})
+
+export type CustomColorsInput = z.infer<typeof customColorsSchema>
+
+// ── Website: Subdomain ──
+export const subdomainSchema = z
+  .string()
+  .min(3)
+  .max(50)
+  .regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/, 'Lowercase alphanumeric and hyphens only, cannot start or end with a hyphen')
+
+// ── Website: Config ──
+export const createWebsiteConfigSchema = z.object({
+  weddingId: z.string().uuid(),
+  templateId: templateIdZodEnum.default('classic'),
+  subdomain: subdomainSchema,
+})
+
+export type CreateWebsiteConfigInput = z.infer<typeof createWebsiteConfigSchema>
+
+export const updateWebsiteConfigSchema = z.object({
+  templateId: templateIdZodEnum.optional(),
+  customColors: customColorsSchema.nullable().optional(),
+  fontPair: fontPairZodEnum.optional(),
+  privacyMode: privacyModeZodEnum.optional(),
+  subdomain: subdomainSchema.optional(),
+  customDomain: z.string().max(253).nullable().optional(),
+  metaTitle: z.string().max(200).nullable().optional(),
+  metaDescription: z.string().max(500).nullable().optional(),
+  ogImageUrl: z.string().url().nullable().optional(),
+  hashtag: z.string().max(100).nullable().optional(),
+})
+
+export type UpdateWebsiteConfigInput = z.infer<typeof updateWebsiteConfigSchema>
+
+// ── Website: Sections ──
+export const updateWebsiteSectionSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  content: z.record(z.unknown()).optional(),
+  isVisible: z.boolean().optional(),
+})
+
+export type UpdateWebsiteSectionInput = z.infer<typeof updateWebsiteSectionSchema>
+
+export const reorderWebsiteSectionsSchema = z.object({
+  sections: z.array(
+    z.object({
+      id: z.string().uuid(),
+      sortOrder: z.number().int().min(0),
+    }),
+  ).min(1).max(20),
+})
+
+export type ReorderWebsiteSectionsInput = z.infer<typeof reorderWebsiteSectionsSchema>
+
+export const createCustomSectionSchema = z.object({
+  weddingId: z.string().uuid(),
+  title: z.string().min(1).max(200),
+  content: z.record(z.unknown()).optional(),
+})
+
+export type CreateCustomSectionInput = z.infer<typeof createCustomSectionSchema>
+
+// ── Website: Photos ──
+export const requestPhotoUploadSchema = z.object({
+  weddingId: z.string().uuid(),
+  fileName: z.string().min(1).max(255),
+  mimeType: z.string().regex(/^image\/(jpeg|png|gif|webp|svg\+xml)$/, 'Must be a valid image type'),
+  fileSize: z.number().int().min(1).max(20_000_000),
+  sectionId: z.string().uuid().nullable().optional(),
+})
+
+export type RequestPhotoUploadInput = z.infer<typeof requestPhotoUploadSchema>
+
+export const registerPhotoSchema = z.object({
+  weddingId: z.string().uuid(),
+  sectionId: z.string().uuid().nullable().optional(),
+  r2Key: z.string().min(1),
+  url: z.string().url(),
+  fileName: z.string().min(1).max(255),
+  mimeType: z.string().min(1),
+  fileSize: z.number().int().min(1),
+  width: z.number().int().min(1).nullable().optional(),
+  height: z.number().int().min(1).nullable().optional(),
+  altText: z.string().max(500).nullable().optional(),
+})
+
+export type RegisterPhotoInput = z.infer<typeof registerPhotoSchema>
+
+export const reorderPhotosSchema = z.object({
+  photos: z.array(
+    z.object({
+      id: z.string().uuid(),
+      sortOrder: z.number().int().min(0),
+    }),
+  ).min(1).max(200),
+})
+
+export type ReorderPhotosInput = z.infer<typeof reorderPhotosSchema>
+
+// ── Website: Password ──
+export const websitePasswordSchema = z.object({
+  password: z.string().min(4).max(100),
+})
+
+export type WebsitePasswordInput = z.infer<typeof websitePasswordSchema>
+
+export const verifyWebsitePasswordSchema = z.object({
+  password: z.string().min(1),
+})
+
+export type VerifyWebsitePasswordInput = z.infer<typeof verifyWebsitePasswordSchema>
+
+// ── Guestbook ──
+export const createGuestbookEntrySchema = z.object({
+  weddingId: z.string().uuid(),
+  authorName: z.string().min(1).max(100),
+  message: z.string().min(1).max(2000),
+})
+
+export type CreateGuestbookEntryInput = z.infer<typeof createGuestbookEntrySchema>
+
+// ── Website: Analytics Track ──
+export const trackPageViewSchema = z.object({
+  path: z.string().max(500).default('/'),
+  sectionViewed: z.string().max(100).nullable().optional(),
+  referrer: z.string().max(2000).nullable().optional(),
+})
+
+export type TrackPageViewInput = z.infer<typeof trackPageViewSchema>

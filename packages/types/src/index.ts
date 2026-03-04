@@ -381,6 +381,221 @@ export interface BudgetExportData {
   analytics: BudgetAnalytics
 }
 
+// ── Website Builder ──
+export type PrivacyMode = 'public' | 'password' | 'unlisted'
+
+export type WebsiteSectionType =
+  | 'hero'
+  | 'our_story'
+  | 'event_details'
+  | 'wedding_party'
+  | 'gallery'
+  | 'travel'
+  | 'things_to_do'
+  | 'registry'
+  | 'faq'
+  | 'rsvp'
+  | 'schedule'
+  | 'guestbook'
+  | 'custom'
+
+export type FontPair =
+  | 'playfair-lato'
+  | 'cormorant-fira'
+  | 'great-vibes-montserrat'
+  | 'josefin-open-sans'
+  | 'libre-baskerville-source-sans'
+  | 'dancing-script-nunito'
+
+export interface CustomColors {
+  primary: string
+  secondary: string
+  accent: string
+  background: string
+}
+
+export interface WebsiteConfig {
+  id: string
+  weddingId: string
+  templateId: string
+  customColors: CustomColors | null
+  fontPair: string
+  privacyMode: PrivacyMode
+  passwordHash: string | null
+  subdomain: string | null
+  customDomain: string | null
+  domainVerified: boolean
+  metaTitle: string | null
+  metaDescription: string | null
+  ogImageUrl: string | null
+  hashtag: string | null
+  publishedAt: Date | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface WebsiteSection {
+  id: string
+  weddingId: string
+  sectionType: WebsiteSectionType
+  title: string
+  content: Record<string, unknown>
+  isVisible: boolean
+  sortOrder: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface WebsitePhoto {
+  id: string
+  weddingId: string
+  sectionId: string | null
+  r2Key: string
+  url: string
+  fileName: string
+  mimeType: string
+  fileSize: number
+  width: number | null
+  height: number | null
+  altText: string | null
+  sortOrder: number
+  createdAt: Date
+}
+
+export interface GuestbookEntry {
+  id: string
+  weddingId: string
+  authorName: string
+  message: string
+  isApproved: boolean
+  isVisible: boolean
+  createdAt: Date
+}
+
+// ── Section Content Interfaces ──
+export interface HeroContent {
+  headline: string
+  subheadline: string
+  backgroundImageUrl: string | null
+  showDate: boolean
+  showCountdown: boolean
+}
+
+export interface OurStoryContent {
+  body: string
+  timelineEvents: {
+    date: string
+    title: string
+    description: string
+    imageUrl?: string
+  }[]
+}
+
+export interface EventDetailsContent {
+  events: {
+    name: string
+    date: string | null
+    time: string | null
+    venue: string
+    address: string
+    description: string
+  }[]
+}
+
+export interface WeddingPartyContent {
+  members: {
+    name: string
+    role: string
+    imageUrl?: string
+    description?: string
+  }[]
+}
+
+export interface GalleryContent {
+  layout: 'grid' | 'masonry' | 'slideshow'
+  columns: number
+}
+
+export interface TravelContent {
+  accommodations: {
+    name: string
+    url?: string
+    address?: string
+    phone?: string
+    notes?: string
+    bookingCode?: string
+  }[]
+  directions: string
+  mapEmbed: string | null
+}
+
+export interface ThingsToDoContent {
+  activities: {
+    name: string
+    description?: string
+    url?: string
+    category?: string
+  }[]
+}
+
+export interface RegistryContent {
+  message: string
+  registries: {
+    name: string
+    url: string
+    logoUrl?: string
+  }[]
+}
+
+export interface FaqContent {
+  questions: {
+    question: string
+    answer: string
+  }[]
+}
+
+export interface RsvpSectionContent {
+  message: string
+  showMealChoice: boolean
+  showDietary: boolean
+  showSongRequest: boolean
+}
+
+export interface ScheduleContent {
+  items: {
+    time: string
+    title: string
+    description?: string
+    location?: string
+  }[]
+}
+
+export interface GuestbookSectionContent {
+  requireApproval: boolean
+  message: string
+}
+
+export interface CustomSectionContent {
+  slug?: string
+  body: string
+}
+
+export interface WebsiteWithSections extends WebsiteConfig {
+  sections: WebsiteSection[]
+  photos: WebsitePhoto[]
+  weddingName: string
+  weddingDate: Date | null
+}
+
+export interface WebsiteAnalyticsSummary {
+  totalViews: number
+  uniqueVisitors: number
+  viewsByDay: { date: string; count: number }[]
+  viewsBySection: { section: string; count: number }[]
+  viewsByCountry: { country: string; count: number }[]
+  topReferrers: { referrer: string; count: number }[]
+}
+
 // ── Activity ──
 export type ActivityAction =
   | 'task_created'
@@ -408,8 +623,14 @@ export type ActivityAction =
   | 'expense_deleted'
   | 'payment_scheduled'
   | 'payment_completed'
+  | 'website_created'
+  | 'website_published'
+  | 'website_unpublished'
+  | 'website_section_updated'
+  | 'website_template_changed'
+  | 'guestbook_entry_created'
 
-export type EntityType = 'task' | 'category' | 'note' | 'attachment' | 'guest' | 'household' | 'budget_category' | 'budget_item' | 'payment'
+export type EntityType = 'task' | 'category' | 'note' | 'attachment' | 'guest' | 'household' | 'budget_category' | 'budget_item' | 'payment' | 'website' | 'website_section' | 'guestbook_entry'
 
 export interface ActivityLogEntry {
   id: string
@@ -446,6 +667,9 @@ export interface FeatureGates {
   canBudgetAnalytics: boolean
   canBudgetExport: boolean
   canPaymentSchedule: boolean
+  canWebsiteBuilder: boolean
+  canWebsiteAnalytics: boolean
+  canWebsiteCustomSections: boolean
 }
 
 // ── Dashboard ──
