@@ -1,5 +1,5 @@
 [build]
-buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @planfortwo/api... build"
+buildCommand = "pnpm install --frozen-lockfile"
 
 [deploy]
-startCommand = "cd apps/api && node dist/index.js"
+startCommand = "cd apps/api && npx tsx src/index.ts"
