@@ -18,6 +18,15 @@ import type {
   GuestTag,
   CsvImportResult,
   Guest,
+  BudgetCategory,
+  BudgetItem,
+  BudgetItemWithCategory,
+  PaginatedResponse,
+  PaymentScheduleEntry,
+  PaymentScheduleWithItem,
+  BudgetAnalytics,
+  TipSuggestion,
+  SplitCostSummary,
 } from '@planfortwo/types'
 import type {
   CreateTaskInput,
@@ -31,6 +40,13 @@ import type {
   CreateHouseholdInput,
   UpdateHouseholdInput,
   CreateGuestTagInput,
+  CreateBudgetCategoryInput,
+  UpdateBudgetCategoryInput,
+  CreateBudgetItemInput,
+  UpdateBudgetItemInput,
+  BudgetItemFiltersInput,
+  CreatePaymentScheduleInput,
+  UpdatePaymentScheduleInput,
 } from '@planfortwo/validators'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
@@ -208,5 +224,88 @@ export const api = {
       fetchApi<{ data: GuestTag }>('/guest-tags', { method: 'POST', body: JSON.stringify(data), token }),
     delete: (id: string, weddingId: string, token: string) =>
       fetchApi<void>(`/guest-tags/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
+  },
+  budgetCategories: {
+    list: (weddingId: string, token: string) =>
+      fetchApi<{ data: BudgetCategory[] }>(`/budget-categories?weddingId=${weddingId}`, { token }),
+    create: (data: CreateBudgetCategoryInput, token: string) =>
+      fetchApi<{ data: BudgetCategory }>('/budget-categories', { method: 'POST', body: JSON.stringify(data), token }),
+    update: (id: string, weddingId: string, data: UpdateBudgetCategoryInput, token: string) =>
+      fetchApi<{ data: BudgetCategory }>(`/budget-categories/${id}?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        token,
+      }),
+    delete: (id: string, weddingId: string, token: string) =>
+      fetchApi<void>(`/budget-categories/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
+    seedDefaults: (weddingId: string, totalBudget: number | undefined, token: string) =>
+      fetchApi<{ data: { success: boolean } }>('/budget-categories/seed-defaults', {
+        method: 'POST',
+        body: JSON.stringify({ weddingId, totalBudget }),
+        token,
+      }),
+  },
+  budgetItems: {
+    list: (filters: BudgetItemFiltersInput, token: string) => {
+      const searchParams = new URLSearchParams()
+      for (const [k, v] of Object.entries(filters)) {
+        if (v !== undefined && v !== null && v !== '') searchParams.set(k, String(v))
+      }
+      return fetchApi<PaginatedResponse<BudgetItemWithCategory>>(`/budget-items?${searchParams}`, { token })
+    },
+    get: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: BudgetItemWithCategory }>(`/budget-items/${id}?weddingId=${weddingId}`, { token }),
+    create: (data: CreateBudgetItemInput, token: string) =>
+      fetchApi<{ data: BudgetItem }>('/budget-items', { method: 'POST', body: JSON.stringify(data), token }),
+    update: (id: string, weddingId: string, data: UpdateBudgetItemInput, token: string) =>
+      fetchApi<{ data: BudgetItem }>(`/budget-items/${id}?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        token,
+      }),
+    delete: (id: string, weddingId: string, token: string) =>
+      fetchApi<void>(`/budget-items/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
+    getUploadUrl: (id: string, weddingId: string, fileName: string, contentType: string, token: string) =>
+      fetchApi<{ data: { uploadUrl: string; receiptUrl: string } }>(`/budget-items/${id}/upload-url`, {
+        method: 'POST',
+        body: JSON.stringify({ weddingId, fileName, contentType }),
+        token,
+      }),
+  },
+  paymentSchedule: {
+    list: (weddingId: string, token: string, filter: string = 'all') =>
+      fetchApi<{ data: PaymentScheduleWithItem[] }>(`/payment-schedule?weddingId=${weddingId}&filter=${filter}`, { token }),
+    create: (data: CreatePaymentScheduleInput, token: string) =>
+      fetchApi<{ data: PaymentScheduleEntry }>('/payment-schedule', { method: 'POST', body: JSON.stringify(data), token }),
+    update: (id: string, weddingId: string, data: UpdatePaymentScheduleInput, token: string) =>
+      fetchApi<{ data: PaymentScheduleEntry }>(`/payment-schedule/${id}?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        token,
+      }),
+    delete: (id: string, weddingId: string, token: string) =>
+      fetchApi<void>(`/payment-schedule/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
+  },
+  budgetAnalytics: {
+    getAnalytics: (weddingId: string, token: string) =>
+      fetchApi<{ data: BudgetAnalytics }>(`/budget/analytics?weddingId=${weddingId}`, { token }),
+    getTips: (weddingId: string, token: string) =>
+      fetchApi<{ data: TipSuggestion[] }>(`/budget/tips?weddingId=${weddingId}`, { token }),
+    getSplits: (weddingId: string, token: string) =>
+      fetchApi<{ data: SplitCostSummary }>(`/budget/splits?weddingId=${weddingId}`, { token }),
+    exportCsv: async (weddingId: string, token: string) => {
+      const res = await fetch(`${API_URL}/budget/export/csv?weddingId=${weddingId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Export failed')
+      return res.text()
+    },
+    exportPdf: async (weddingId: string, token: string) => {
+      const res = await fetch(`${API_URL}/budget/export/pdf?weddingId=${weddingId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error('Export failed')
+      return res.blob()
+    },
   },
 }

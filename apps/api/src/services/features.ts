@@ -20,6 +20,11 @@ const FREE_GATES: FeatureGates = {
   canVendorManagement: false,
   canCustomDomain: false,
   canDataExport: false,
+  canBudgetCategories: false,
+  canBudgetExpenses: false,
+  canBudgetAnalytics: false,
+  canBudgetExport: false,
+  canPaymentSchedule: false,
 }
 
 const FULL_GATES: FeatureGates = {
@@ -40,6 +45,11 @@ const FULL_GATES: FeatureGates = {
   canVendorManagement: true,
   canCustomDomain: true,
   canDataExport: true,
+  canBudgetCategories: true,
+  canBudgetExpenses: true,
+  canBudgetAnalytics: true,
+  canBudgetExport: true,
+  canPaymentSchedule: true,
 }
 
 function gatesForTier(tier: PricingTier): FeatureGates {

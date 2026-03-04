@@ -25,6 +25,13 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   rsvp_submitted: 'submitted an RSVP',
   household_created: 'created a household',
   household_deleted: 'removed a household',
+  budget_category_created: 'created a budget category',
+  budget_category_deleted: 'deleted a budget category',
+  expense_created: 'added an expense',
+  expense_updated: 'updated an expense',
+  expense_deleted: 'deleted an expense',
+  payment_scheduled: 'scheduled a payment',
+  payment_completed: 'completed a payment',
 }
 
 function formatTimestamp(date: Date): string {

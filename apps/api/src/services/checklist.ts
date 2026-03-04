@@ -8,6 +8,8 @@ import {
   users,
   defaultCategories,
   getTemplateTasks,
+  budgetItems,
+  weddings,
 } from '@planfortwo/db'
 import type {
   TimelineTemplate,
@@ -524,12 +526,26 @@ export const checklistService = {
       completed: row.completed,
     }))
 
+    const [budgetTotals] = await db
+      .select({
+        spent: sql<string>`coalesce(sum(${budgetItems.amount}), '0')`,
+      })
+      .from(budgetItems)
+      .where(eq(budgetItems.weddingId, weddingId))
+
+    const [weddingBudget] = await db
+      .select({ budgetTotal: weddings.budgetTotal })
+      .from(weddings)
+      .where(eq(weddings.id, weddingId))
+
     return {
       tasksCompleted: taskCounts?.completed ?? 0,
       tasksTotal: taskCounts?.total ?? 0,
       upcomingTasks,
       recentActivity,
       tasksByCategory,
+      budgetSpent: Number(budgetTotals?.spent ?? 0),
+      budgetTotal: Number(weddingBudget?.budgetTotal ?? 0),
     }
   },
 }

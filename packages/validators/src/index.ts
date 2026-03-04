@@ -312,3 +312,110 @@ export const csvImportSchema = z.object({
 })
 
 export type CsvImportInput = z.infer<typeof csvImportSchema>
+
+// ── Budget: Enums ──
+export const payerZodEnum = z.enum(['couple', 'bride_family', 'groom_family', 'other'])
+export const paymentStatusZodEnum = z.enum(['unpaid', 'deposit', 'partial', 'paid'])
+
+// ── Budget: Categories ──
+export const createBudgetCategorySchema = z.object({
+  weddingId: z.string().uuid(),
+  name: z.string().min(1).max(100),
+  icon: z.string().min(1).max(50),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color'),
+  allocatedAmount: z.number().min(0).max(10_000_000).optional(),
+})
+
+export type CreateBudgetCategoryInput = z.infer<typeof createBudgetCategorySchema>
+
+export const updateBudgetCategorySchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  icon: z.string().min(1).max(50).optional(),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color').optional(),
+  allocatedAmount: z.number().min(0).max(10_000_000).optional(),
+})
+
+export type UpdateBudgetCategoryInput = z.infer<typeof updateBudgetCategorySchema>
+
+// ── Budget: Items ──
+export const createBudgetItemSchema = z.object({
+  weddingId: z.string().uuid(),
+  categoryId: z.string().uuid(),
+  vendorName: z.string().max(200).nullable().optional(),
+  description: z.string().min(1).max(500),
+  amount: z.number().min(0).max(10_000_000),
+  paidAmount: z.number().min(0).max(10_000_000).optional(),
+  paymentStatus: paymentStatusZodEnum.optional(),
+  payer: payerZodEnum.optional(),
+  dueDate: z.string().datetime().nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
+})
+
+export type CreateBudgetItemInput = z.infer<typeof createBudgetItemSchema>
+
+export const updateBudgetItemSchema = z.object({
+  categoryId: z.string().uuid().optional(),
+  vendorName: z.string().max(200).nullable().optional(),
+  description: z.string().min(1).max(500).optional(),
+  amount: z.number().min(0).max(10_000_000).optional(),
+  paidAmount: z.number().min(0).max(10_000_000).optional(),
+  paymentStatus: paymentStatusZodEnum.optional(),
+  payer: payerZodEnum.optional(),
+  dueDate: z.string().datetime().nullable().optional(),
+  paidDate: z.string().datetime().nullable().optional(),
+  receiptUrl: z.string().url().nullable().optional(),
+  receiptFileName: z.string().max(255).nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
+})
+
+export type UpdateBudgetItemInput = z.infer<typeof updateBudgetItemSchema>
+
+export const budgetItemFiltersSchema = z.object({
+  weddingId: z.string().uuid(),
+  categoryId: z.string().uuid().optional(),
+  paymentStatus: paymentStatusZodEnum.optional(),
+  payer: payerZodEnum.optional(),
+  search: z.string().max(200).optional(),
+  sortBy: z.enum(['amount', 'dueDate', 'createdAt', 'sortOrder']).default('sortOrder'),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+})
+
+export type BudgetItemFiltersInput = z.infer<typeof budgetItemFiltersSchema>
+
+// ── Budget: Payment Schedule ──
+export const createPaymentScheduleSchema = z.object({
+  weddingId: z.string().uuid(),
+  budgetItemId: z.string().uuid(),
+  title: z.string().min(1).max(200),
+  amount: z.number().min(0).max(10_000_000),
+  dueDate: z.string().datetime(),
+  notes: z.string().max(2000).nullable().optional(),
+})
+
+export type CreatePaymentScheduleInput = z.infer<typeof createPaymentScheduleSchema>
+
+export const updatePaymentScheduleSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  amount: z.number().min(0).max(10_000_000).optional(),
+  dueDate: z.string().datetime().optional(),
+  isPaid: z.boolean().optional(),
+  paidDate: z.string().datetime().nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
+})
+
+export type UpdatePaymentScheduleInput = z.infer<typeof updatePaymentScheduleSchema>
+
+// ── Budget: Setup ──
+export const budgetSetupSchema = z.object({
+  weddingId: z.string().uuid(),
+  totalBudget: z.number().min(0).max(10_000_000),
+  categoryAllocations: z.array(z.object({
+    name: z.string().min(1).max(100),
+    icon: z.string().min(1).max(50),
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+    allocatedAmount: z.number().min(0),
+  })).optional(),
+})
+
+export type BudgetSetupInput = z.infer<typeof budgetSetupSchema>

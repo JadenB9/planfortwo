@@ -7,7 +7,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', comingSoon: false },
   { href: '/checklist', label: 'Checklist', comingSoon: false },
   { href: '/guests', label: 'Guest List', comingSoon: false },
-  { href: '/budget', label: 'Budget', comingSoon: true },
+  { href: '/budget', label: 'Budget', comingSoon: false },
   { href: '/website', label: 'Website', comingSoon: true },
 ] as const
 

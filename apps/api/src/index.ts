@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { secureHeaders } from 'hono/secure-headers'
+import { serve as inngestServe } from 'inngest/hono'
 
 import { healthRoute } from './routes/health.js'
 import { usersRoute } from './routes/users.js'
@@ -16,6 +17,12 @@ import { rsvpRoute } from './routes/rsvp.js'
 import { guestsRoute } from './routes/guests.js'
 import { householdsRoute } from './routes/households.js'
 import { guestTagsRoute } from './routes/guest-tags.js'
+import { budgetCategoriesRoute } from './routes/budget-categories.js'
+import { budgetItemsRoute } from './routes/budget-items.js'
+import { paymentScheduleRoute } from './routes/payment-schedule.js'
+import { budgetAnalyticsRoute } from './routes/budget-analytics.js'
+import { inngest } from './inngest/client.js'
+import { onPaymentReminder } from './inngest/functions/onPaymentReminder.js'
 
 const app = new Hono()
 
@@ -45,6 +52,16 @@ app.route('/rsvp', rsvpRoute)
 app.route('/guests', guestsRoute)
 app.route('/households', householdsRoute)
 app.route('/guest-tags', guestTagsRoute)
+app.route('/budget-categories', budgetCategoriesRoute)
+app.route('/budget-items', budgetItemsRoute)
+app.route('/payment-schedule', paymentScheduleRoute)
+app.route('/budget', budgetAnalyticsRoute)
+
+// ── Inngest ──
+app.on(['GET', 'PUT', 'POST'], '/api/inngest', inngestServe({
+  client: inngest,
+  functions: [onPaymentReminder],
+}))
 
 // ── 404 Handler ──
 app.notFound((c) => {

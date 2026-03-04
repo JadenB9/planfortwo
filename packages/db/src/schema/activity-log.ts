@@ -21,6 +21,13 @@ export const activityActionEnum = pgEnum('activity_action', [
   'rsvp_submitted',
   'household_created',
   'household_deleted',
+  'budget_category_created',
+  'budget_category_deleted',
+  'expense_created',
+  'expense_updated',
+  'expense_deleted',
+  'payment_scheduled',
+  'payment_completed',
 ])
 
 export const entityTypeEnum = pgEnum('entity_type', [
@@ -30,6 +37,9 @@ export const entityTypeEnum = pgEnum('entity_type', [
   'attachment',
   'guest',
   'household',
+  'budget_category',
+  'budget_item',
+  'payment',
 ])
 
 export const activityLog = pgTable('activity_log', {

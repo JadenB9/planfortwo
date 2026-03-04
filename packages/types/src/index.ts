@@ -270,6 +270,117 @@ export interface CsvImportResult {
   errors: string[]
 }
 
+// ── Budget ──
+export type Payer = 'couple' | 'bride_family' | 'groom_family' | 'other'
+
+export type PaymentStatus = 'unpaid' | 'deposit' | 'partial' | 'paid'
+
+export interface BudgetCategory {
+  id: string
+  weddingId: string
+  name: string
+  icon: string
+  color: string
+  allocatedAmount: number
+  sortOrder: number
+  isDefault: boolean
+  createdAt: Date
+}
+
+export interface BudgetItem {
+  id: string
+  weddingId: string
+  categoryId: string
+  vendorName: string | null
+  description: string
+  amount: number
+  paidAmount: number
+  paymentStatus: PaymentStatus
+  payer: Payer
+  dueDate: Date | null
+  paidDate: Date | null
+  receiptUrl: string | null
+  receiptFileName: string | null
+  notes: string | null
+  sortOrder: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface BudgetItemWithCategory extends BudgetItem {
+  category: BudgetCategory
+}
+
+export interface PaymentScheduleEntry {
+  id: string
+  weddingId: string
+  budgetItemId: string
+  title: string
+  amount: number
+  dueDate: Date
+  paidDate: Date | null
+  isPaid: boolean
+  reminderSent7d: boolean
+  reminderSent1d: boolean
+  notes: string | null
+  createdAt: Date
+}
+
+export interface PaymentScheduleWithItem extends PaymentScheduleEntry {
+  budgetItem: BudgetItem
+}
+
+export interface BudgetAnalytics {
+  totalBudget: number
+  totalAllocated: number
+  totalSpent: number
+  totalPaid: number
+  totalUnpaid: number
+  burnRate: number
+  perGuestCost: number
+  projectedTotal: number
+  categoryBreakdown: CategoryBreakdown[]
+  monthlySpending: MonthlySpending[]
+}
+
+export interface CategoryBreakdown {
+  categoryId: string
+  name: string
+  color: string
+  allocated: number
+  spent: number
+  remaining: number
+  percentUsed: number
+}
+
+export interface MonthlySpending {
+  month: string
+  amount: number
+}
+
+export interface TipSuggestion {
+  vendorType: string
+  suggestedAmount: number
+  suggestedPercent: number
+  min: number
+  max: number
+}
+
+export interface SplitCostSummary {
+  couple: { total: number; percentage: number }
+  brideFamily: { total: number; percentage: number }
+  groomFamily: { total: number; percentage: number }
+  other: { total: number; percentage: number }
+}
+
+export interface BudgetExportData {
+  weddingName: string
+  totalBudget: number
+  categories: CategoryBreakdown[]
+  items: BudgetItemWithCategory[]
+  analytics: BudgetAnalytics
+}
+
 // ── Activity ──
 export type ActivityAction =
   | 'task_created'
@@ -290,8 +401,15 @@ export type ActivityAction =
   | 'rsvp_submitted'
   | 'household_created'
   | 'household_deleted'
+  | 'budget_category_created'
+  | 'budget_category_deleted'
+  | 'expense_created'
+  | 'expense_updated'
+  | 'expense_deleted'
+  | 'payment_scheduled'
+  | 'payment_completed'
 
-export type EntityType = 'task' | 'category' | 'note' | 'attachment' | 'guest' | 'household'
+export type EntityType = 'task' | 'category' | 'note' | 'attachment' | 'guest' | 'household' | 'budget_category' | 'budget_item' | 'payment'
 
 export interface ActivityLogEntry {
   id: string
@@ -323,6 +441,11 @@ export interface FeatureGates {
   canVendorManagement: boolean
   canCustomDomain: boolean
   canDataExport: boolean
+  canBudgetCategories: boolean
+  canBudgetExpenses: boolean
+  canBudgetAnalytics: boolean
+  canBudgetExport: boolean
+  canPaymentSchedule: boolean
 }
 
 // ── Dashboard ──
@@ -340,6 +463,8 @@ export interface DashboardStats {
   upcomingTasks: ChecklistTask[]
   recentActivity: ActivityLogEntry[]
   tasksByCategory: TasksByCategory[]
+  budgetSpent: number
+  budgetTotal: number
 }
 
 export interface DashboardData {
