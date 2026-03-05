@@ -10,6 +10,8 @@ COPY packages/db/package.json ./packages/db/
 COPY packages/types/package.json ./packages/types/
 COPY packages/validators/package.json ./packages/validators/
 COPY packages/config/package.json ./packages/config/
+COPY packages/email/package.json ./packages/email/
+COPY packages/storage/package.json ./packages/storage/
 RUN pnpm install --frozen-lockfile
 
 # Build
