@@ -42,7 +42,10 @@ export function useBudget({ weddingId, initialFilters }: UseBudgetOptions) {
   const [filters, setFilters] = useState<BudgetFilterState>(initialFilters ?? {})
 
   const loadData = useCallback(async () => {
-    if (!weddingId) return
+    if (!weddingId) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
     try {
       const token = await getToken()

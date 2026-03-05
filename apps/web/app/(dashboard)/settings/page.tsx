@@ -63,16 +63,12 @@ export default function SettingsPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.weddings.completeOnboarding(
+      await api.weddings.update(
         weddingId,
         {
-          partnerFirstName: '',
-          partnerLastName: '',
-          weddingDate: weddingForm.date ? new Date(weddingForm.date).toISOString() : null,
-          guestCountEstimate: wedding?.guestCountEstimate ?? null,
-          budgetTotal: wedding?.budgetTotal ?? null,
-          style: wedding?.style ?? null,
-          timelineTemplate: wedding?.timelineTemplate ?? '12-month',
+          name: weddingForm.name,
+          date: weddingForm.date ? new Date(weddingForm.date).toISOString() : null,
+          venue: weddingForm.venue || null,
         },
         token,
       )
@@ -82,7 +78,7 @@ export default function SettingsPage() {
     } finally {
       setSaving(false)
     }
-  }, [weddingId, getToken, weddingForm, wedding, loadData])
+  }, [weddingId, getToken, weddingForm, loadData])
 
   const handleUpdateNotif = useCallback(
     async (key: string, value: boolean | string) => {

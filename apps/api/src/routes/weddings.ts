@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { onboardingSchema, invitePartnerSchema } from '@planfortwo/validators'
+import { onboardingSchema, invitePartnerSchema, updateWeddingSchema } from '@planfortwo/validators'
 import type { TimelineTemplate } from '@planfortwo/types'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
@@ -48,6 +48,48 @@ weddingsRoute.get('/mine', async (c) => {
     },
   })
 })
+
+// PUT /weddings/:id -- update wedding details
+weddingsRoute.put(
+  '/:id',
+  zValidator('json', updateWeddingSchema, (result, c) => {
+    if (!result.success) {
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    }
+  }),
+  async (c) => {
+    const weddingId = c.req.param('id')
+    const dbUserId = c.get('dbUserId')
+
+    const membership = await weddingService.verifyMembership(weddingId, dbUserId)
+    if (!membership) {
+      return c.json(
+        { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+        403,
+      )
+    }
+
+    const data = c.req.valid('json')
+    const updateData: Record<string, unknown> = {}
+    if (data.name !== undefined) updateData.name = data.name
+    if (data.date !== undefined) updateData.date = data.date ? new Date(data.date) : null
+    if (data.venue !== undefined) updateData.venue = data.venue
+    if (data.city !== undefined) updateData.city = data.city
+    if (data.state !== undefined) updateData.state = data.state
+    if (data.country !== undefined) updateData.country = data.country
+    if (data.guestCountEstimate !== undefined) updateData.guestCountEstimate = data.guestCountEstimate
+    if (data.budgetTotal !== undefined) updateData.budgetTotal = data.budgetTotal != null ? String(data.budgetTotal) : null
+    if (data.style !== undefined) updateData.style = data.style
+
+    const updated = await weddingService.update(weddingId, updateData)
+
+    if (!updated) {
+      return c.json({ error: 'No fields to update', code: 'NO_CHANGES', statusCode: 400 }, 400)
+    }
+
+    return c.json({ data: updated })
+  },
+)
 
 // POST /weddings/:id/onboarding -- complete the onboarding wizard
 weddingsRoute.post(

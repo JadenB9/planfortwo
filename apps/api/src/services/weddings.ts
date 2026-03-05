@@ -48,6 +48,29 @@ export const weddingService = {
     return updated ?? null
   },
 
+  async update(weddingId: string, data: Partial<OnboardingData>) {
+    const updateData: Record<string, unknown> = {}
+    if (data.name !== undefined) updateData.name = data.name
+    if (data.date !== undefined) updateData.date = data.date
+    if (data.venue !== undefined) updateData.venue = data.venue
+    if (data.city !== undefined) updateData.city = data.city
+    if (data.state !== undefined) updateData.state = data.state
+    if (data.country !== undefined) updateData.country = data.country
+    if (data.guestCountEstimate !== undefined) updateData.guestCountEstimate = data.guestCountEstimate
+    if (data.budgetTotal !== undefined) updateData.budgetTotal = data.budgetTotal
+    if (data.style !== undefined) updateData.style = data.style
+
+    if (Object.keys(updateData).length === 0) return null
+
+    const [updated] = await db
+      .update(weddings)
+      .set(updateData)
+      .where(eq(weddings.id, weddingId))
+      .returning()
+
+    return updated ?? null
+  },
+
   async verifyMembership(weddingId: string, userId: string) {
     const results = await db
       .select()

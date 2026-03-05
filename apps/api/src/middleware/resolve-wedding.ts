@@ -10,7 +10,21 @@ type WeddingEnv = {
 }
 
 export const resolveWeddingMiddleware = createMiddleware<WeddingEnv>(async (c, next) => {
-  const weddingId = c.req.query('weddingId') ?? c.req.param('weddingId')
+  let weddingId = c.req.query('weddingId') ?? c.req.param('weddingId')
+
+  // For POST/PUT/PATCH with JSON body, also check body for weddingId
+  if (!weddingId) {
+    const method = c.req.method.toUpperCase()
+    const contentType = c.req.header('content-type') ?? ''
+    if (['POST', 'PUT', 'PATCH'].includes(method) && contentType.includes('application/json')) {
+      try {
+        const body = await c.req.json()
+        weddingId = body?.weddingId
+      } catch {
+        // body parse failed — fall through to missing ID error
+      }
+    }
+  }
 
   if (!weddingId) {
     return c.json(

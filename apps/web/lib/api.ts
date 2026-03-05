@@ -128,6 +128,12 @@ export const api = {
   },
   weddings: {
     mine: (token: string) => fetchApi<{ data: DashboardData }>('/weddings/mine', { token }),
+    update: (weddingId: string, data: Record<string, unknown>, token: string) =>
+      fetchApi<{ data: Wedding }>(`/weddings/${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        token,
+      }),
     completeOnboarding: (weddingId: string, data: OnboardingData, token: string) =>
       fetchApi<{ data: Wedding }>(`/weddings/${weddingId}/onboarding`, {
         method: 'POST',

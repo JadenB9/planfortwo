@@ -42,6 +42,20 @@ export const createWeddingSchema = z.object({
 
 export type CreateWeddingInput = z.infer<typeof createWeddingSchema>
 
+export const updateWeddingSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  date: z.string().datetime().nullable().optional(),
+  venue: z.string().max(200).nullable().optional(),
+  city: z.string().max(100).nullable().optional(),
+  state: z.string().max(100).nullable().optional(),
+  country: z.string().max(100).optional(),
+  guestCountEstimate: z.number().int().min(1).max(2000).nullable().optional(),
+  budgetTotal: z.number().min(0).max(10_000_000).nullable().optional(),
+  style: weddingStyleEnum.nullable().optional(),
+})
+
+export type UpdateWeddingInput = z.infer<typeof updateWeddingSchema>
+
 // ── Onboarding ──
 export const onboardingSchema = z.object({
   partnerFirstName: z.string().min(1).max(100),

@@ -12,7 +12,10 @@ export function useFeatures(weddingId: string | null) {
   const [error, setError] = useState<string | null>(null)
 
   const loadFeatures = useCallback(async () => {
-    if (!weddingId) return
+    if (!weddingId) {
+      setLoading(false)
+      return
+    }
     try {
       setError(null)
       const token = await getToken()
