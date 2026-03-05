@@ -32,10 +32,7 @@ budgetItemsRoute.get(
   resolveWeddingMiddleware,
   zValidator('query', budgetItemFiltersSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -53,10 +50,7 @@ budgetItemsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const item = await budgetItemService.get(itemId, weddingId)
 
   if (!item) {
-    return c.json(
-      { error: 'Budget item not found', code: 'ITEM_NOT_FOUND', statusCode: 404 },
-      404,
-    )
+    return c.json({ error: 'Budget item not found', code: 'ITEM_NOT_FOUND', statusCode: 404 }, 404)
   }
 
   return c.json({ data: item })
@@ -68,10 +62,7 @@ budgetItemsRoute.post(
   requireFeature('canBudgetExpenses'),
   zValidator('json', createBudgetItemSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -90,10 +81,7 @@ budgetItemsRoute.put(
   requireFeature('canBudgetExpenses'),
   zValidator('json', updateBudgetItemSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -130,10 +118,7 @@ budgetItemsRoute.delete(
       return c.json({ data: { success: true } })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json(
-        { error: message, code: 'DELETE_FAILED', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
     }
   },
 )
@@ -143,18 +128,22 @@ budgetItemsRoute.post(
   '/:id/upload-url',
   resolveWeddingMiddleware,
   requireFeature('canBudgetExpenses'),
-  zValidator('json', z.object({
-    weddingId: z.string().uuid(),
-    fileName: z.string().min(1).max(255),
-    contentType: z.string().min(1).max(100),
-  }), (result, c) => {
-    if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
-    }
-  }),
+  zValidator(
+    'json',
+    z.object({
+      weddingId: z.string().uuid(),
+      fileName: z.string().min(1).max(255),
+      contentType: z.string().regex(/^(image\/(jpeg|png|gif|webp)|application\/pdf)$/, 'Must be an image or PDF'),
+    }),
+    (result, c) => {
+      if (!result.success) {
+        return c.json(
+          { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
+          400,
+        )
+      }
+    },
+  ),
   async (c) => {
     const itemId = c.req.param('id')
     const weddingId = c.get('weddingId')

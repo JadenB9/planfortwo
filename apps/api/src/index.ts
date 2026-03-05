@@ -34,7 +34,12 @@ import { weddingPartyRoute } from './routes/wedding-party.js'
 import { eventsRoute } from './routes/events.js'
 import { photoGalleryRoute } from './routes/photo-gallery.js'
 import { registryRoute } from './routes/registry.js'
-import { thankYouRoute, nameChangeRoute, vendorReviewsRoute, notificationPrefsRoute } from './routes/post-wedding.js'
+import {
+  thankYouRoute,
+  nameChangeRoute,
+  vendorReviewsRoute,
+  notificationPrefsRoute,
+} from './routes/post-wedding.js'
 import { purchasesRoute, referralsRoute, contactRoute } from './routes/payments.js'
 import { ceremonyRoute } from './routes/ceremony.js'
 import { playlistsRoute } from './routes/playlists.js'
@@ -62,12 +67,21 @@ const allowedOrigins = [
 app.use(
   '*',
   cors({
-    origin: (origin) => allowedOrigins.includes(origin) ? origin : undefined,
+    origin: (origin) => (allowedOrigins.includes(origin) ? origin : undefined),
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   }),
 )
+
+// ── Rate Limiting (must be registered BEFORE routes) ──
+const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30 })
+const strictRateLimit = rateLimit({ windowMs: 60_000, max: 10 })
+app.use('/website-public/*', publicRateLimit)
+app.use('/guestbook/*', publicRateLimit)
+app.use('/rsvp/*', publicRateLimit)
+app.use('/contact/*', publicRateLimit)
+app.use('/website-config/verify-password', strictRateLimit)
 
 // ── Routes ──
 app.route('/health', healthRoute)
@@ -113,17 +127,15 @@ app.route('/honeymoon', honeymoonRoute)
 app.route('/weather', weatherRoute)
 app.route('/progress', progressRoute)
 
-// ── Rate Limiting on Public Endpoints ──
-const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30 })
-app.use('/website-public/*', publicRateLimit)
-app.use('/guestbook/*', publicRateLimit)
-app.use('/rsvp/*', publicRateLimit)
-
 // ── Inngest ──
-app.on(['GET', 'PUT', 'POST'], '/api/inngest', inngestServe({
-  client: inngest,
-  functions: [onPaymentReminder],
-}))
+app.on(
+  ['GET', 'PUT', 'POST'],
+  '/api/inngest',
+  inngestServe({
+    client: inngest,
+    functions: [onPaymentReminder],
+  }),
+)
 
 // ── 404 Handler ──
 app.notFound((c) => {
@@ -133,10 +145,7 @@ app.notFound((c) => {
 // ── Error Handler ──
 app.onError((err, c) => {
   console.error('Unhandled error:', err)
-  return c.json(
-    { error: 'Internal Server Error', code: 'INTERNAL_ERROR', statusCode: 500 },
-    500,
-  )
+  return c.json({ error: 'Internal Server Error', code: 'INTERNAL_ERROR', statusCode: 500 }, 500)
 })
 
 // ── Server ──

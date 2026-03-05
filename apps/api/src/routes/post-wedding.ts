@@ -5,11 +5,17 @@ import {
   updateThankYouNoteSchema,
   createVendorReviewSchema,
   updateNotificationPreferencesSchema,
+  createNameChangeTaskSchema,
 } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
-import { thankYouService, nameChangeService, vendorReviewService, notificationPrefService } from '../services/post-wedding.js'
+import {
+  thankYouService,
+  nameChangeService,
+  vendorReviewService,
+  notificationPrefService,
+} from '../services/post-wedding.js'
 
 type Env = {
   Variables: {
@@ -46,7 +52,8 @@ thankYouRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 thankYouRoute.post(
   '/',
   zValidator('json', createThankYouNoteSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -59,14 +66,16 @@ thankYouRoute.put(
   '/:id',
   resolveWeddingMiddleware,
   zValidator('json', updateThankYouNoteSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const noteId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await thankYouService.update(noteId, weddingId, data)
-    if (!updated) return c.json({ error: 'Note not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Note not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
@@ -88,13 +97,25 @@ nameChangeRoute.get('/', resolveWeddingMiddleware, async (c) => {
   return c.json({ data: tasks })
 })
 
-nameChangeRoute.post('/', resolveWeddingMiddleware, async (c) => {
-  const weddingId = c.get('weddingId')
-  const body = await c.req.json<{ institution: string; description?: string; documentsRequired?: string }>()
-  if (!body.institution) return c.json({ error: 'Institution required', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
-  const task = await nameChangeService.create(weddingId, body.institution, body.description, body.documentsRequired)
-  return c.json({ data: task }, 201)
-})
+nameChangeRoute.post(
+  '/',
+  resolveWeddingMiddleware,
+  zValidator('json', createNameChangeTaskSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const weddingId = c.get('weddingId')
+    const { institution, description, documentsRequired } = c.req.valid('json')
+    const task = await nameChangeService.create(
+      weddingId,
+      institution,
+      description ?? undefined,
+      documentsRequired ?? undefined,
+    )
+    return c.json({ data: task }, 201)
+  },
+)
 
 nameChangeRoute.put('/:id/toggle', resolveWeddingMiddleware, async (c) => {
   const taskId = c.req.param('id')
@@ -124,7 +145,8 @@ vendorReviewsRoute.get('/', resolveWeddingMiddleware, async (c) => {
 vendorReviewsRoute.post(
   '/',
   zValidator('json', createVendorReviewSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -137,7 +159,8 @@ vendorReviewsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const reviewId = c.req.param('id')
   const weddingId = c.get('weddingId')
   const deleted = await vendorReviewService.delete(reviewId, weddingId)
-  if (!deleted) return c.json({ error: 'Review not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  if (!deleted)
+    return c.json({ error: 'Review not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
 
@@ -155,7 +178,8 @@ notificationPrefsRoute.put(
   '/',
   resolveWeddingMiddleware,
   zValidator('json', updateNotificationPreferencesSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const userId = c.get('dbUserId')

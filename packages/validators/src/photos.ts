@@ -25,3 +25,8 @@ export const updatePhotoSchema = z.object({
   caption: z.string().max(500).nullable().optional(),
 })
 export type UpdatePhotoInput = z.infer<typeof updatePhotoSchema>
+
+export const moderatePhotoSchema = z.object({
+  status: z.enum(['approved', 'rejected']),
+})
+export type ModeratePhotoInput = z.infer<typeof moderatePhotoSchema>

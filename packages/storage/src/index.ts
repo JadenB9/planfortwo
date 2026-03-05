@@ -1,4 +1,9 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 function getR2Client(): S3Client {
@@ -46,24 +51,29 @@ export const storageClient = {
 
   async deleteObject(key: string): Promise<void> {
     const client = getR2Client()
-    await client.send(new DeleteObjectCommand({
-      Bucket: getBucket(),
-      Key: key,
-    }))
+    await client.send(
+      new DeleteObjectCommand({
+        Bucket: getBucket(),
+        Key: key,
+      }),
+    )
   },
 
   buildReceiptKey(weddingId: string, itemId: string, fileName: string): string {
-    const ext = fileName.split('.').pop() ?? 'file'
+    const sanitized = fileName.replace(/[^a-zA-Z0-9._-]/g, '')
+    const ext = sanitized.split('.').pop() ?? 'file'
     return `receipts/${weddingId}/${itemId}.${ext}`
   },
 
   buildWebsitePhotoKey(weddingId: string, photoId: string, fileName: string): string {
-    const ext = fileName.split('.').pop() ?? 'file'
+    const sanitized = fileName.replace(/[^a-zA-Z0-9._-]/g, '')
+    const ext = sanitized.split('.').pop() ?? 'file'
     return `website-photos/${weddingId}/${photoId}.${ext}`
   },
 
   buildOgImageKey(weddingId: string, fileName: string): string {
-    const ext = fileName.split('.').pop() ?? 'file'
+    const sanitized = fileName.replace(/[^a-zA-Z0-9._-]/g, '')
+    const ext = sanitized.split('.').pop() ?? 'file'
     return `og-images/${weddingId}/${Date.now()}.${ext}`
   },
 }

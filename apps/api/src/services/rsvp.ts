@@ -5,11 +5,7 @@ import type { RsvpSubmissionInput } from '@planfortwo/validators'
 
 export const rsvpService = {
   async lookupByToken(token: string): Promise<RsvpLookupResult | null> {
-    const [guest] = await db
-      .select()
-      .from(guests)
-      .where(eq(guests.rsvpToken, token))
-      .limit(1)
+    const [guest] = await db.select().from(guests).where(eq(guests.rsvpToken, token)).limit(1)
 
     if (!guest) return null
 
@@ -54,11 +50,7 @@ export const rsvpService = {
     }
   },
 
-  async lookupByName(
-    weddingId: string,
-    firstName: string,
-    lastName: string,
-  ): Promise<Guest[]> {
+  async lookupByName(weddingId: string, firstName: string, lastName: string): Promise<Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[]> {
     const results = await db
       .select()
       .from(guests)
@@ -70,13 +62,10 @@ export const rsvpService = {
         ),
       )
 
-    return results as Guest[]
+    return results.map(({ email: _e, phone: _p, rsvpToken: _t, ...rest }) => rest) as Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[]
   },
 
-  async submitRsvp(
-    submission: RsvpSubmissionInput,
-    weddingId: string,
-  ): Promise<Guest> {
+  async submitRsvp(submission: RsvpSubmissionInput, weddingId: string): Promise<Guest> {
     const expired = await this.isDeadlinePassed(weddingId)
     if (expired) {
       throw new Error('RSVP deadline has passed')
@@ -106,10 +95,7 @@ export const rsvpService = {
     return updated as Guest
   },
 
-  async submitBatchRsvp(
-    submissions: RsvpSubmissionInput[],
-    weddingId: string,
-  ): Promise<Guest[]> {
+  async submitBatchRsvp(submissions: RsvpSubmissionInput[], weddingId: string): Promise<Guest[]> {
     const expired = await this.isDeadlinePassed(weddingId)
     if (expired) {
       throw new Error('RSVP deadline has passed')
@@ -183,10 +169,7 @@ export const rsvpService = {
       household = hh ?? null
 
       if (household) {
-        const hhGuests = await db
-          .select()
-          .from(guests)
-          .where(eq(guests.householdId, household.id))
+        const hhGuests = await db.select().from(guests).where(eq(guests.householdId, household.id))
 
         householdGuests = hhGuests as Guest[]
       }

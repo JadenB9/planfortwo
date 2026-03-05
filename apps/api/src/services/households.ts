@@ -1,3 +1,4 @@
+import { randomInt } from 'node:crypto'
 import { eq } from 'drizzle-orm'
 import { db, households, guests } from '@planfortwo/db'
 import type { CreateHouseholdInput, UpdateHouseholdInput } from '@planfortwo/validators'
@@ -18,10 +19,7 @@ export const householdService = {
       .where(eq(households.weddingId, weddingId))
       .orderBy(households.createdAt)
 
-    const allGuests = await db
-      .select()
-      .from(guests)
-      .where(eq(guests.weddingId, weddingId))
+    const allGuests = await db.select().from(guests).where(eq(guests.weddingId, weddingId))
 
     return allHouseholds.map((h) => ({
       ...h,
@@ -30,17 +28,11 @@ export const householdService = {
   },
 
   async getHousehold(id: string) {
-    const [household] = await db
-      .select()
-      .from(households)
-      .where(eq(households.id, id))
+    const [household] = await db.select().from(households).where(eq(households.id, id))
 
     if (!household) return null
 
-    const householdGuests = await db
-      .select()
-      .from(guests)
-      .where(eq(guests.householdId, id))
+    const householdGuests = await db.select().from(guests).where(eq(guests.householdId, id))
 
     return {
       ...household,
@@ -61,7 +53,7 @@ export const householdService = {
 
       if (!existing) break
 
-      const rand = Math.floor(Math.random() * 1000)
+      const rand = randomInt(1000)
         .toString()
         .padStart(3, '0')
       rsvpCode = `${generateRsvpCode(input.name)}${rand}`
@@ -126,10 +118,7 @@ export const householdService = {
     }
 
     // Nullify guest householdIds first
-    await db
-      .update(guests)
-      .set({ householdId: null })
-      .where(eq(guests.householdId, id))
+    await db.update(guests).set({ householdId: null }).where(eq(guests.householdId, id))
 
     await db.delete(households).where(eq(households.id, id))
 

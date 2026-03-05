@@ -35,3 +35,10 @@ export const updateNotificationPreferencesSchema = z.object({
   digestFrequency: z.enum(['instant', 'daily', 'weekly']).optional(),
 })
 export type UpdateNotificationPreferencesInput = z.infer<typeof updateNotificationPreferencesSchema>
+
+export const createNameChangeTaskSchema = z.object({
+  institution: z.string().min(1).max(200),
+  description: z.string().max(2000).nullable().optional(),
+  documentsRequired: z.string().max(2000).nullable().optional(),
+})
+export type CreateNameChangeTaskInput = z.infer<typeof createNameChangeTaskSchema>

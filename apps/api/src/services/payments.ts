@@ -8,26 +8,40 @@ export const purchaseService = {
   },
 
   async getById(purchaseId: string, weddingId: string) {
-    const [purchase] = await db.select().from(purchases).where(and(eq(purchases.id, purchaseId), eq(purchases.weddingId, weddingId)))
+    const [purchase] = await db
+      .select()
+      .from(purchases)
+      .where(and(eq(purchases.id, purchaseId), eq(purchases.weddingId, weddingId)))
     return purchase ?? null
   },
 
   async create(weddingId: string, userId: string, amount: string, currency: string) {
-    const [purchase] = await db.insert(purchases).values({
-      weddingId,
-      userId,
-      amount,
-      currency,
-    }).returning()
+    const [purchase] = await db
+      .insert(purchases)
+      .values({
+        weddingId,
+        userId,
+        amount,
+        currency,
+      })
+      .returning()
     return purchase!
   },
 
-  async updateStatus(purchaseId: string, status: 'pending' | 'completed' | 'refunded' | 'failed', stripePaymentIntentId?: string) {
+  async updateStatus(
+    purchaseId: string,
+    status: 'pending' | 'completed' | 'refunded' | 'failed',
+    stripePaymentIntentId?: string,
+  ) {
     const updateData: Record<string, unknown> = { status }
     if (stripePaymentIntentId) updateData.stripePaymentIntentId = stripePaymentIntentId
     if (status === 'completed') updateData.completedAt = new Date()
 
-    const [updated] = await db.update(purchases).set(updateData).where(eq(purchases.id, purchaseId)).returning()
+    const [updated] = await db
+      .update(purchases)
+      .set(updateData)
+      .where(eq(purchases.id, purchaseId))
+      .returning()
     return updated ?? null
   },
 }
@@ -39,10 +53,13 @@ export const referralService = {
   },
 
   async create(userId: string, code: string) {
-    const [ref] = await db.insert(referrals).values({
-      referrerUserId: userId,
-      referralCode: code,
-    }).returning()
+    const [ref] = await db
+      .insert(referrals)
+      .values({
+        referrerUserId: userId,
+        referralCode: code,
+      })
+      .returning()
     return ref!
   },
 
@@ -51,15 +68,16 @@ export const referralService = {
   },
 
   async redeem(code: string, referredUserId: string, referredEmail: string) {
-    const existing = await this.getByCode(code)
-    if (!existing || existing.isConverted) return null
-
-    const [updated] = await db.update(referrals).set({
-      referredUserId,
-      referredEmail: referredEmail,
-      isConverted: true,
-      convertedAt: new Date(),
-    }).where(eq(referrals.id, existing.id)).returning()
+    const [updated] = await db
+      .update(referrals)
+      .set({
+        referredUserId,
+        referredEmail: referredEmail,
+        isConverted: true,
+        convertedAt: new Date(),
+      })
+      .where(and(eq(referrals.referralCode, code), eq(referrals.isConverted, false)))
+      .returning()
     return updated ?? null
   },
 }
@@ -70,17 +88,24 @@ export const contactService = {
   },
 
   async create(data: CreateContactSubmissionInput) {
-    const [submission] = await db.insert(contactSubmissions).values({
-      name: data.name,
-      email: data.email,
-      subject: data.subject,
-      message: data.message,
-    }).returning()
+    const [submission] = await db
+      .insert(contactSubmissions)
+      .values({
+        name: data.name,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+      })
+      .returning()
     return submission!
   },
 
   async markRead(submissionId: string) {
-    const [updated] = await db.update(contactSubmissions).set({ isRead: true }).where(eq(contactSubmissions.id, submissionId)).returning()
+    const [updated] = await db
+      .update(contactSubmissions)
+      .set({ isRead: true })
+      .where(eq(contactSubmissions.id, submissionId))
+      .returning()
     return updated ?? null
   },
 }

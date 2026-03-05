@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { createPhotoSchema, updatePhotoSchema } from '@planfortwo/validators'
+import { createPhotoSchema, updatePhotoSchema, moderatePhotoSchema } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -37,7 +37,8 @@ photoGalleryRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 photoGalleryRoute.post(
   '/',
   zValidator('json', createPhotoSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -48,35 +49,44 @@ photoGalleryRoute.post(
 
 photoGalleryRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   zValidator('json', updatePhotoSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const photoId = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await photoGalleryService.update(photoId, weddingId, data)
-    if (!updated) return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
 
-photoGalleryRoute.delete('/:id', async (c) => {
+photoGalleryRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const photoId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   const deleted = await photoGalleryService.delete(photoId, weddingId)
   if (!deleted) return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
 
-photoGalleryRoute.post('/:id/moderate', async (c) => {
-  const photoId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
-  const body = await c.req.json<{ status: 'approved' | 'rejected' }>()
-  const updated = await photoGalleryService.moderate(photoId, weddingId, body.status)
-  if (!updated) return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-  return c.json({ data: updated })
-})
+photoGalleryRoute.post(
+  '/:id/moderate',
+  resolveWeddingMiddleware,
+  zValidator('json', moderatePhotoSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const photoId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const { status } = c.req.valid('json')
+    const updated = await photoGalleryService.moderate(photoId, weddingId, status)
+    if (!updated)
+      return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    return c.json({ data: updated })
+  },
+)
