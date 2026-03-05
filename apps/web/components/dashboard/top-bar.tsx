@@ -4,14 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
-
-const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', comingSoon: false },
-  { href: '/checklist', label: 'Checklist', comingSoon: false },
-  { href: '/guests', label: 'Guest List', comingSoon: false },
-  { href: '/budget', label: 'Budget', comingSoon: true },
-  { href: '/website', label: 'Website', comingSoon: true },
-] as const
+import { NAV_ITEMS } from '@/lib/navigation'
 
 export function TopBar() {
   const [menuOpen, setMenuOpen] = useState(false)

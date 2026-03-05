@@ -1,0 +1,17 @@
+export const NAV_ITEMS = [
+  { href: '/dashboard', label: 'Dashboard', comingSoon: false },
+  { href: '/checklist', label: 'Checklist', comingSoon: false },
+  { href: '/guests', label: 'Guest List', comingSoon: false },
+  { href: '/budget', label: 'Budget', comingSoon: false },
+  { href: '/website', label: 'Website', comingSoon: false },
+  { href: '/seating', label: 'Seating Chart', comingSoon: false },
+  { href: '/vendors', label: 'Vendors', comingSoon: false },
+  { href: '/events', label: 'Events', comingSoon: false },
+  { href: '/photos', label: 'Photos', comingSoon: false },
+  { href: '/registry', label: 'Registry', comingSoon: false },
+  { href: '/ceremony', label: 'Ceremony', comingSoon: false },
+  { href: '/music', label: 'Music', comingSoon: false },
+  { href: '/honeymoon', label: 'Honeymoon', comingSoon: false },
+  { href: '/communication', label: 'Communication', comingSoon: false },
+  { href: '/settings', label: 'Settings', comingSoon: false },
+] as const

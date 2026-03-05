@@ -53,7 +53,7 @@ export function RsvpSection({ title, content, rsvpSlug }: RsvpSectionProps) {
             </a>
           ) : (
             <p className={`text-sm ${fontPair.bodyClass}`} style={{ color: `${colors.primary}99` }}>
-              RSVP link coming soon
+              RSVP details will be available shortly
             </p>
           )}
         </motion.div>

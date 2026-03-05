@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="flBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fefdfb"/>
+      <stop offset="100%" stop-color="#f4f7f4"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="12" fill="url(#flBg)"/>
+  <!-- stems -->
+  <path d="M200 280 Q195 220 180 180" fill="none" stroke="#7a9a7d" stroke-width="2" opacity="0.5"/>
+  <path d="M200 280 Q205 230 230 190" fill="none" stroke="#7a9a7d" stroke-width="2" opacity="0.5"/>
+  <path d="M200 280 Q200 220 200 160" fill="none" stroke="#7a9a7d" stroke-width="2.5" opacity="0.5"/>
+  <!-- leaves -->
+  <ellipse cx="188" cy="230" rx="15" ry="6" fill="#a3baa5" opacity="0.4" transform="rotate(-30 188 230)"/>
+  <ellipse cx="215" cy="240" rx="15" ry="6" fill="#a3baa5" opacity="0.4" transform="rotate(25 215 240)"/>
+  <!-- flower 1 center -->
+  <circle cx="180" cy="155" r="25" fill="#e9bea5" opacity="0.3"/>
+  <circle cx="172" cy="142" r="14" fill="#f3d9cc" opacity="0.5"/>
+  <circle cx="192" cy="142" r="14" fill="#f3d9cc" opacity="0.45"/>
+  <circle cx="168" cy="158" r="14" fill="#f3d9cc" opacity="0.4"/>
+  <circle cx="195" cy="158" r="14" fill="#f3d9cc" opacity="0.42"/>
+  <circle cx="180" cy="170" r="14" fill="#f3d9cc" opacity="0.38"/>
+  <circle cx="180" cy="155" r="8" fill="#c2674a" opacity="0.35"/>
+  <!-- flower 2 -->
+  <circle cx="230" cy="165" r="20" fill="#c9d7ca" opacity="0.3"/>
+  <circle cx="224" cy="155" r="11" fill="#e4ebe4" opacity="0.5"/>
+  <circle cx="238" cy="155" r="11" fill="#e4ebe4" opacity="0.45"/>
+  <circle cx="222" cy="168" r="11" fill="#e4ebe4" opacity="0.4"/>
+  <circle cx="240" cy="168" r="11" fill="#e4ebe4" opacity="0.42"/>
+  <circle cx="230" cy="177" r="11" fill="#e4ebe4" opacity="0.38"/>
+  <circle cx="230" cy="165" r="6" fill="#5a7d5d" opacity="0.35"/>
+  <!-- flower 3 small -->
+  <circle cx="200" cy="130" r="18" fill="#f9ede7" opacity="0.35"/>
+  <circle cx="194" cy="120" r="10" fill="#f3d9cc" opacity="0.4"/>
+  <circle cx="208" cy="120" r="10" fill="#f3d9cc" opacity="0.38"/>
+  <circle cx="192" cy="133" r="10" fill="#f3d9cc" opacity="0.35"/>
+  <circle cx="210" cy="133" r="10" fill="#f3d9cc" opacity="0.33"/>
+  <circle cx="200" cy="130" r="5" fill="#dca050" opacity="0.4"/>
+  <!-- vase -->
+  <path d="M185 270 Q180 290 190 295 L210 295 Q220 290 215 270 Z" fill="#c9d7ca" opacity="0.3" stroke="#7a9a7d" stroke-width="1" stroke-opacity="0.3"/>
+</svg>

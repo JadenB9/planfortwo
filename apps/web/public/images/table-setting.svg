@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="tsBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf8f6"/>
+      <stop offset="100%" stop-color="#fefdfb"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="12" fill="url(#tsBg)"/>
+  <!-- tablecloth -->
+  <rect x="40" y="120" width="320" height="160" rx="8" fill="#fefdfb" stroke="#e9bea5" stroke-width="1" opacity="0.6"/>
+  <!-- plate -->
+  <circle cx="200" cy="190" r="55" fill="none" stroke="#c9d7ca" stroke-width="2" opacity="0.5"/>
+  <circle cx="200" cy="190" r="45" fill="none" stroke="#e9bea5" stroke-width="1" opacity="0.4"/>
+  <circle cx="200" cy="190" r="48" fill="#fefdfb" opacity="0.3"/>
+  <!-- napkin left -->
+  <rect x="90" y="165" width="35" height="50" rx="4" fill="#f3d9cc" opacity="0.35"/>
+  <line x1="97" y1="175" x2="97" y2="205" stroke="#c2674a" stroke-width="0.5" opacity="0.3"/>
+  <!-- napkin fold -->
+  <path d="M90 165 L107 165 L90 185 Z" fill="#e9bea5" opacity="0.2"/>
+  <!-- fork -->
+  <line x1="80" y1="160" x2="80" y2="230" stroke="#a3baa5" stroke-width="2" opacity="0.4"/>
+  <line x1="76" y1="160" x2="76" y2="180" stroke="#a3baa5" stroke-width="1" opacity="0.3"/>
+  <line x1="84" y1="160" x2="84" y2="180" stroke="#a3baa5" stroke-width="1" opacity="0.3"/>
+  <!-- knife -->
+  <line x1="280" y1="160" x2="280" y2="230" stroke="#a3baa5" stroke-width="2" opacity="0.4"/>
+  <!-- spoon -->
+  <line x1="295" y1="168" x2="295" y2="230" stroke="#a3baa5" stroke-width="2" opacity="0.35"/>
+  <ellipse cx="295" cy="163" rx="5" ry="7" fill="none" stroke="#a3baa5" stroke-width="1.5" opacity="0.35"/>
+  <!-- wine glass -->
+  <ellipse cx="310" cy="140" rx="12" ry="8" fill="none" stroke="#c2674a" stroke-width="1" opacity="0.3"/>
+  <line x1="310" y1="148" x2="310" y2="165" stroke="#c2674a" stroke-width="1" opacity="0.3"/>
+  <line x1="303" y1="165" x2="317" y2="165" stroke="#c2674a" stroke-width="1" opacity="0.3"/>
+  <!-- small flowers on plate -->
+  <circle cx="195" cy="182" r="4" fill="#f3d9cc" opacity="0.5"/>
+  <circle cx="205" cy="185" r="3.5" fill="#c9d7ca" opacity="0.45"/>
+  <circle cx="200" cy="195" r="3" fill="#f3d9cc" opacity="0.4"/>
+  <!-- candle -->
+  <rect x="335" y="130" width="8" height="30" rx="3" fill="#faf0db" opacity="0.5" stroke="#e5b96e" stroke-width="0.5" stroke-opacity="0.3"/>
+  <ellipse cx="339" cy="128" rx="3" ry="5" fill="#e5b96e" opacity="0.4"/>
+</svg>

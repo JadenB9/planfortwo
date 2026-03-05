@@ -822,6 +822,193 @@ export interface PaginatedResponse<T> {
   hasMore: boolean
 }
 
+// ── Seating Chart ──
+export type SeatingChartStatus = 'draft' | 'final'
+export type TableShape = 'round' | 'rectangle' | 'square' | 'oval' | 'custom'
+
+export interface SeatingChart {
+  id: string
+  weddingId: string
+  name: string
+  status: SeatingChartStatus
+  venueWidth: number | null
+  venueHeight: number | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface SeatingTable {
+  id: string
+  chartId: string
+  label: string
+  shape: TableShape
+  capacity: number
+  posX: number
+  posY: number
+  rotation: number
+  createdAt: Date
+}
+
+export interface SeatingAssignment {
+  id: string
+  tableId: string
+  guestId: string
+  seatNumber: number | null
+  createdAt: Date
+}
+
+export interface SeatingTableWithAssignments extends SeatingTable {
+  assignments: SeatingAssignment[]
+}
+
+export interface SeatingChartWithTables extends SeatingChart {
+  tables: SeatingTableWithAssignments[]
+}
+
+// ── Vendors ──
+export type VendorCategory =
+  | 'venue'
+  | 'catering'
+  | 'photography'
+  | 'videography'
+  | 'dj'
+  | 'band'
+  | 'florist'
+  | 'cake'
+  | 'officiant'
+  | 'hair_makeup'
+  | 'transportation'
+  | 'stationery'
+  | 'rentals'
+  | 'lighting'
+  | 'planner'
+  | 'other'
+
+export type VendorStatus = 'researching' | 'contacted' | 'booked' | 'confirmed' | 'declined'
+
+export interface Vendor {
+  id: string
+  weddingId: string
+  name: string
+  category: VendorCategory
+  status: VendorStatus
+  contactName: string | null
+  email: string | null
+  phone: string | null
+  website: string | null
+  address: string | null
+  cost: number | null
+  depositPaid: number | null
+  notes: string | null
+  rating: number | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface VendorCommunication {
+  id: string
+  vendorId: string
+  type: string
+  subject: string | null
+  body: string | null
+  date: Date
+  createdAt: Date
+}
+
+// ── Events ──
+export type EventType = 'ceremony' | 'reception' | 'rehearsal_dinner' | 'bridal_shower' | 'bachelor_party' | 'bachelorette_party' | 'engagement_party' | 'brunch' | 'other'
+
+export interface WeddingEvent {
+  id: string
+  weddingId: string
+  name: string
+  type: EventType
+  date: Date | null
+  startTime: string | null
+  endTime: string | null
+  venue: string | null
+  address: string | null
+  description: string | null
+  dressCode: string | null
+  sortOrder: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface TimelineEntry {
+  id: string
+  eventId: string
+  time: string
+  title: string
+  description: string | null
+  duration: number | null
+  sortOrder: number
+  createdAt: Date
+}
+
+// ── Photo Gallery ──
+export type PhotoModerationStatus = 'pending' | 'approved' | 'rejected'
+
+export interface GalleryPhoto {
+  id: string
+  weddingId: string
+  uploadedBy: string | null
+  url: string
+  thumbnailUrl: string | null
+  caption: string | null
+  isFavorite: boolean
+  moderationStatus: PhotoModerationStatus
+  sortOrder: number
+  createdAt: Date
+}
+
+// ── Registry ──
+export interface RegistryLink {
+  id: string
+  weddingId: string
+  storeName: string
+  url: string
+  logoUrl: string | null
+  sortOrder: number
+  clickCount: number
+  createdAt: Date
+}
+
+export interface CashFund {
+  id: string
+  weddingId: string
+  name: string
+  description: string | null
+  goalAmount: number
+  currentAmount: number
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CashFundContribution {
+  id: string
+  fundId: string
+  guestName: string
+  amount: number
+  message: string | null
+  createdAt: Date
+}
+
+export interface Gift {
+  id: string
+  weddingId: string
+  guestName: string | null
+  description: string
+  estimatedValue: number | null
+  thankYouStatus: ThankYouStatus
+  thankYouSentAt: Date | null
+  receivedAt: Date | null
+  notes: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 // ── Health Check ──
 export interface HealthCheck {
   status: 'ok' | 'error'

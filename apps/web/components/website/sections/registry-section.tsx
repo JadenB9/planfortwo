@@ -50,8 +50,8 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
               transition={{ delay: i * 0.1 }}
               className="flex items-center gap-3 rounded-2xl bg-white px-6 py-4 shadow-sm transition-shadow hover:shadow-md"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               {registry.logoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={registry.logoUrl} alt={registry.name} className="h-8 w-8 object-contain" />
               )}
               <span className={`font-medium ${fontPair.bodyClass}`} style={{ color: colors.primary }}>
