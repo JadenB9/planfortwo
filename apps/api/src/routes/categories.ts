@@ -31,6 +31,7 @@ categoriesRoute.get('/', resolveWeddingMiddleware, async (c) => {
 // POST /categories — create category (gated)
 categoriesRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canCustomizeCategories'),
   zValidator('json', createCategorySchema, (result, c) => {
     if (!result.success) {
@@ -49,6 +50,7 @@ categoriesRoute.post(
 // PUT /categories/:id — update category (gated)
 categoriesRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canCustomizeCategories'),
   zValidator('json', updateCategorySchema, (result, c) => {
     if (!result.success) {
@@ -73,17 +75,14 @@ categoriesRoute.put(
 )
 
 // DELETE /categories/:id — delete category (gated)
-categoriesRoute.delete('/:id', requireFeature('canCustomizeCategories'), async (c) => {
+categoriesRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canCustomizeCategories'),
+  async (c) => {
   const categoryId = c.req.param('id')
   const dbUserId = c.get('dbUserId')
-  const weddingId = c.req.query('weddingId')
-
-  if (!weddingId) {
-    return c.json(
-      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-      400,
-    )
-  }
+  const weddingId = c.get('weddingId')
 
   try {
     await checklistService.deleteCategory(categoryId, dbUserId, weddingId)

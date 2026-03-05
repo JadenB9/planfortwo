@@ -43,6 +43,7 @@ websiteConfigRoute.post(
   '/',
   authMiddleware,
   resolveUserMiddleware,
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   zValidator('json', createWebsiteConfigSchema, (result, c) => {
     if (!result.success) {

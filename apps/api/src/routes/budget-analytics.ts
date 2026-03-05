@@ -22,8 +22,8 @@ budgetAnalyticsRoute.use('*', authMiddleware, resolveUserMiddleware)
 // GET /budget/analytics?weddingId=X — full budget analytics
 budgetAnalyticsRoute.get(
   '/analytics',
-  requireFeature('canBudgetAnalytics'),
   resolveWeddingMiddleware,
+  requireFeature('canBudgetAnalytics'),
   async (c) => {
     const weddingId = c.get('weddingId')
     const analytics = await budgetAnalyticsService.getAnalytics(weddingId)
@@ -34,8 +34,8 @@ budgetAnalyticsRoute.get(
 // GET /budget/tips?weddingId=X — tip suggestions
 budgetAnalyticsRoute.get(
   '/tips',
-  requireFeature('canBudgetAnalytics'),
   resolveWeddingMiddleware,
+  requireFeature('canBudgetAnalytics'),
   async (c) => {
     const weddingId = c.get('weddingId')
     const tips = await budgetAnalyticsService.getTipSuggestions(weddingId)
@@ -46,8 +46,8 @@ budgetAnalyticsRoute.get(
 // GET /budget/splits?weddingId=X — cost split summary
 budgetAnalyticsRoute.get(
   '/splits',
-  requireFeature('canBudgetAnalytics'),
   resolveWeddingMiddleware,
+  requireFeature('canBudgetAnalytics'),
   async (c) => {
     const weddingId = c.get('weddingId')
     const splits = await budgetAnalyticsService.getSplitSummary(weddingId)
@@ -58,8 +58,8 @@ budgetAnalyticsRoute.get(
 // GET /budget/export/csv?weddingId=X — CSV export
 budgetAnalyticsRoute.get(
   '/export/csv',
-  requireFeature('canBudgetExport'),
   resolveWeddingMiddleware,
+  requireFeature('canBudgetExport'),
   async (c) => {
     const weddingId = c.get('weddingId')
     const csv = await budgetAnalyticsService.exportCsv(weddingId)
@@ -76,8 +76,8 @@ budgetAnalyticsRoute.get(
 // GET /budget/export/pdf?weddingId=X — PDF export
 budgetAnalyticsRoute.get(
   '/export/pdf',
-  requireFeature('canBudgetExport'),
   resolveWeddingMiddleware,
+  requireFeature('canBudgetExport'),
   async (c) => {
     const weddingId = c.get('weddingId')
     const pdfBuffer = await budgetAnalyticsService.exportPdf(weddingId)

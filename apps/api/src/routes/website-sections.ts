@@ -47,6 +47,7 @@ websiteSectionsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 // PUT /website-sections/:id?weddingId=X
 websiteSectionsRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   zValidator('json', updateWebsiteSectionSchema, (result, c) => {
     if (!result.success) {
@@ -55,13 +56,7 @@ websiteSectionsRoute.put(
   }),
   async (c) => {
     const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const data = c.req.valid('json')
     const updated = await websiteSectionService.update(id, weddingId, data, c.get('dbUserId'))
@@ -76,19 +71,14 @@ websiteSectionsRoute.put(
 // POST /website-sections/reorder?weddingId=X
 websiteSectionsRoute.post(
   '/reorder',
+  resolveWeddingMiddleware,
   zValidator('json', reorderWebsiteSectionsSchema, (result, c) => {
     if (!result.success) {
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const { sections } = c.req.valid('json')
     await websiteSectionService.reorder(weddingId, sections)
@@ -99,6 +89,7 @@ websiteSectionsRoute.post(
 // POST /website-sections (custom section, gated)
 websiteSectionsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteCustomSections'),
   zValidator('json', createCustomSectionSchema, (result, c) => {
     if (!result.success) {
@@ -118,15 +109,13 @@ websiteSectionsRoute.post(
 )
 
 // DELETE /website-sections/:id?weddingId=X (custom only, gated)
-websiteSectionsRoute.delete('/:id', requireFeature('canWebsiteCustomSections'), async (c) => {
+websiteSectionsRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canWebsiteCustomSections'),
+  async (c) => {
   const id = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) {
-    return c.json(
-      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-      400,
-    )
-  }
+  const weddingId = c.get('weddingId')
 
   try {
     await websiteSectionService.deleteCustom(id, weddingId)

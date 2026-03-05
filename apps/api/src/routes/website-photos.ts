@@ -7,6 +7,7 @@ import {
 } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
+import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
 import { requireFeature } from '../middleware/require-feature.js'
 import { websitePhotoService } from '../services/website-photos.js'
 
@@ -27,6 +28,7 @@ websitePhotosRoute.use('*', authMiddleware, resolveUserMiddleware)
 // POST /website-photos/upload-url — get presigned upload URL
 websitePhotosRoute.post(
   '/upload-url',
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   zValidator('json', requestPhotoUploadSchema, (result, c) => {
     if (!result.success) {
@@ -43,6 +45,7 @@ websitePhotosRoute.post(
 // POST /website-photos — register uploaded photo
 websitePhotosRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   zValidator('json', registerPhotoSchema, (result, c) => {
     if (!result.success) {
@@ -57,15 +60,13 @@ websitePhotosRoute.post(
 )
 
 // DELETE /website-photos/:id?weddingId=X
-websitePhotosRoute.delete('/:id', requireFeature('canWebsiteBuilder'), async (c) => {
+websitePhotosRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canWebsiteBuilder'),
+  async (c) => {
   const id = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) {
-    return c.json(
-      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-      400,
-    )
-  }
+  const weddingId = c.get('weddingId')
 
   try {
     await websitePhotoService.delete(id, weddingId)
@@ -79,6 +80,7 @@ websitePhotosRoute.delete('/:id', requireFeature('canWebsiteBuilder'), async (c)
 // POST /website-photos/reorder
 websitePhotosRoute.post(
   '/reorder',
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   zValidator('json', reorderPhotosSchema, (result, c) => {
     if (!result.success) {
@@ -87,13 +89,7 @@ websitePhotosRoute.post(
   }),
   async (c) => {
     const { photos } = c.req.valid('json')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     await websitePhotoService.reorder(weddingId, photos)
     return c.json({ data: { success: true } })

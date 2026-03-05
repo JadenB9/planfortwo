@@ -79,6 +79,7 @@ tasksRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 // POST /tasks — create task (gated)
 tasksRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canAddTasks'),
   zValidator('json', createTaskSchema, (result, c) => {
     if (!result.success) {

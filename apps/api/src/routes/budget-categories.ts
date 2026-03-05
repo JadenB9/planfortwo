@@ -32,6 +32,7 @@ budgetCategoriesRoute.get('/', resolveWeddingMiddleware, async (c) => {
 // POST /budget-categories — create category (gated)
 budgetCategoriesRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canBudgetCategories'),
   zValidator('json', createBudgetCategorySchema, (result, c) => {
     if (!result.success) {
@@ -50,6 +51,7 @@ budgetCategoriesRoute.post(
 // POST /budget-categories/seed-defaults — seed default categories (gated)
 budgetCategoriesRoute.post(
   '/seed-defaults',
+  resolveWeddingMiddleware,
   requireFeature('canBudgetCategories'),
   zValidator(
     'json',

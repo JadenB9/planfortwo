@@ -59,6 +59,7 @@ budgetItemsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 // POST /budget-items — create item (gated)
 budgetItemsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canBudgetExpenses'),
   zValidator('json', createBudgetItemSchema, (result, c) => {
     if (!result.success) {

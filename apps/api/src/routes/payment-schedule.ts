@@ -51,6 +51,7 @@ paymentScheduleRoute.get(
 // POST /payment-schedule — create payment (gated)
 paymentScheduleRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canPaymentSchedule'),
   zValidator('json', createPaymentScheduleSchema, (result, c) => {
     if (!result.success) {
@@ -69,6 +70,7 @@ paymentScheduleRoute.post(
 // PUT /payment-schedule/:id — update payment (gated)
 paymentScheduleRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canPaymentSchedule'),
   zValidator('json', updatePaymentScheduleSchema, (result, c) => {
     if (!result.success) {
@@ -79,14 +81,7 @@ paymentScheduleRoute.put(
     const paymentId = c.req.param('id')
     const data = c.req.valid('json')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const updated = await paymentScheduleService.update(paymentId, weddingId, data, dbUserId)
 
@@ -99,17 +94,14 @@ paymentScheduleRoute.put(
 )
 
 // DELETE /payment-schedule/:id — delete payment (gated)
-paymentScheduleRoute.delete('/:id', requireFeature('canPaymentSchedule'), async (c) => {
+paymentScheduleRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canPaymentSchedule'),
+  async (c) => {
   const paymentId = c.req.param('id')
   const dbUserId = c.get('dbUserId')
-  const weddingId = c.req.query('weddingId')
-
-  if (!weddingId) {
-    return c.json(
-      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-      400,
-    )
-  }
+  const weddingId = c.get('weddingId')
 
   try {
     await paymentScheduleService.delete(paymentId, weddingId, dbUserId)
