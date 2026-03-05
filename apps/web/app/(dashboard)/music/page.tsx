@@ -178,6 +178,7 @@ export default function MusicPage() {
           artist: songForm.artist,
           category: (songForm.category || undefined) as 'other' | undefined,
         },
+        weddingId!,
         token,
       )
       setShowSongDialog(false)
@@ -193,7 +194,7 @@ export default function MusicPage() {
       try {
         const token = await getToken()
         if (!token) return
-        await api.playlists.deleteSong(songId, token)
+        await api.playlists.deleteSong(songId, weddingId!, token)
         if (selectedPlaylist) void loadPlaylistSongs(selectedPlaylist)
       } catch {
         /* silent */
@@ -207,7 +208,7 @@ export default function MusicPage() {
       try {
         const token = await getToken()
         if (!token) return
-        await api.playlists.approveRequest(id, token)
+        await api.playlists.approveRequest(id, weddingId!, token)
         void loadData()
       } catch {
         /* silent */
@@ -221,7 +222,7 @@ export default function MusicPage() {
       try {
         const token = await getToken()
         if (!token) return
-        await api.playlists.deleteRequest(id, token)
+        await api.playlists.deleteRequest(id, weddingId!, token)
         void loadData()
       } catch {
         /* silent */

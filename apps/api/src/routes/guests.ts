@@ -75,6 +75,7 @@ guestsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 // POST /guests — create guest (limit check)
 guestsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireGuestLimit,
   zValidator('json', createGuestSchema, (result, c) => {
     if (!result.success) {
@@ -139,6 +140,7 @@ guestsRoute.delete(
 // POST /guests/bulk-import — CSV import (gated)
 guestsRoute.post(
   '/bulk-import',
+  resolveWeddingMiddleware,
   requireFeature('canBulkImport'),
   requireGuestLimit,
   zValidator(

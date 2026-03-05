@@ -57,11 +57,12 @@ websitePublicRoute.get('/:slug', async (c) => {
     headers['X-Robots-Tag'] = 'noindex'
   }
 
+  const { passwordHash: _, ...safeConfig } = config
+
   return c.json(
     {
       data: {
-        ...config,
-        passwordHash: undefined,
+        ...safeConfig,
         sections,
         photos,
         weddingName: wedding?.name ?? '',

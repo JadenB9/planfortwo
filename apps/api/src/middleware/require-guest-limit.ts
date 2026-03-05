@@ -10,10 +10,12 @@ type GuestLimitEnv = {
 }
 
 export const requireGuestLimit = createMiddleware<GuestLimitEnv>(async (c, next) => {
+  // Prefer weddingId from context (set by resolveWeddingMiddleware), then query/param.
+  // Never read from body — it consumes the stream and breaks downstream validators.
   const weddingId =
+    (c.get('weddingId' as never) as string | undefined) ??
     c.req.query('weddingId') ??
-    c.req.param('weddingId') ??
-    (await c.req.json().catch(() => ({}) as Record<string, unknown>)).weddingId
+    c.req.param('weddingId')
 
   if (!weddingId || typeof weddingId !== 'string') {
     return c.json(

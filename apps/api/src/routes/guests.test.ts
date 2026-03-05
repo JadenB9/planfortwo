@@ -188,6 +188,7 @@ describe('Guest Routes', () => {
       role: 'owner',
       joinedAt: new Date(),
     })
+    mockedFeatureService.getFeatures.mockResolvedValue(FULL_GATES)
     mockedGuestService.getGuest.mockResolvedValue({
       id: GUEST_ID,
       weddingId: WEDDING_ID,
@@ -364,7 +365,7 @@ describe('Guest Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request('/guests', {
+      const res = await app.request(`/guests?weddingId=${WEDDING_ID}`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify(validBody),
@@ -401,7 +402,7 @@ describe('Guest Routes', () => {
       })
 
       const app = createApp()
-      const res = await app.request('/guests', {
+      const res = await app.request(`/guests?weddingId=${WEDDING_ID}`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify(validBody),
@@ -489,7 +490,7 @@ describe('Guest Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request('/guests/bulk-import', {
+      const res = await app.request(`/guests/bulk-import?weddingId=${WEDDING_ID}`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -507,7 +508,7 @@ describe('Guest Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request('/guests/bulk-import', {
+      const res = await app.request(`/guests/bulk-import?weddingId=${WEDDING_ID}`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({

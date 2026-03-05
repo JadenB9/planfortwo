@@ -71,6 +71,7 @@ websiteConfigRoute.put(
   '/:id',
   authMiddleware,
   resolveUserMiddleware,
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   zValidator('json', updateWebsiteConfigSchema, (result, c) => {
     if (!result.success) {
@@ -79,13 +80,7 @@ websiteConfigRoute.put(
   }),
   async (c) => {
     const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const data = c.req.valid('json')
     const updated = await websiteConfigService.update(id, weddingId, data)
@@ -103,16 +98,11 @@ websiteConfigRoute.post(
   '/:id/publish',
   authMiddleware,
   resolveUserMiddleware,
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   async (c) => {
     const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const updated = await websiteConfigService.publish(id, weddingId, c.get('dbUserId'))
     if (!updated) {
@@ -127,16 +117,11 @@ websiteConfigRoute.post(
   '/:id/unpublish',
   authMiddleware,
   resolveUserMiddleware,
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   async (c) => {
     const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const updated = await websiteConfigService.unpublish(id, weddingId, c.get('dbUserId'))
     if (!updated) {
@@ -151,6 +136,7 @@ websiteConfigRoute.post(
   '/:id/set-password',
   authMiddleware,
   resolveUserMiddleware,
+  resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   zValidator('json', websitePasswordSchema, (result, c) => {
     if (!result.success) {
@@ -159,13 +145,7 @@ websiteConfigRoute.post(
   }),
   async (c) => {
     const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const { password } = c.req.valid('json')
     const updated = await websiteConfigService.setPassword(id, weddingId, password)

@@ -78,6 +78,7 @@ budgetCategoriesRoute.post(
 // PUT /budget-categories/:id — update category (gated)
 budgetCategoriesRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canBudgetCategories'),
   zValidator('json', updateBudgetCategorySchema, (result, c) => {
     if (!result.success) {
@@ -87,14 +88,7 @@ budgetCategoriesRoute.put(
   async (c) => {
     const categoryId = c.req.param('id')
     const data = c.req.valid('json')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const updated = await budgetCategoryService.update(categoryId, weddingId, data)
 
@@ -110,23 +104,21 @@ budgetCategoriesRoute.put(
 )
 
 // DELETE /budget-categories/:id — delete category (gated)
-budgetCategoriesRoute.delete('/:id', requireFeature('canBudgetCategories'), async (c) => {
-  const categoryId = c.req.param('id')
-  const dbUserId = c.get('dbUserId')
-  const weddingId = c.req.query('weddingId')
+budgetCategoriesRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canBudgetCategories'),
+  async (c) => {
+    const categoryId = c.req.param('id')
+    const dbUserId = c.get('dbUserId')
+    const weddingId = c.get('weddingId')
 
-  if (!weddingId) {
-    return c.json(
-      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-      400,
-    )
-  }
-
-  try {
-    await budgetCategoryService.delete(categoryId, weddingId, dbUserId)
-    return c.json({ data: { success: true } })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Delete failed'
-    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
-  }
-})
+    try {
+      await budgetCategoryService.delete(categoryId, weddingId, dbUserId)
+      return c.json({ data: { success: true } })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Delete failed'
+      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+    }
+  },
+)

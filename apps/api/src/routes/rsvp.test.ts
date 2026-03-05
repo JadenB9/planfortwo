@@ -218,12 +218,12 @@ describe('RSVP Routes', () => {
   })
 
   describe('POST /rsvp/submit (public)', () => {
-    it('should submit RSVP', async () => {
-      // Mock db.select chain for guest lookup in route handler
+    it('should submit RSVP with valid token', async () => {
+      // Mock db.select chain for guest lookup — now returns rsvpToken
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID }]),
+            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN }]),
           }),
         }),
       })
@@ -236,7 +236,7 @@ describe('RSVP Routes', () => {
       mockedRsvpService.submitRsvp.mockResolvedValue(mockUpdated as never)
 
       const app = createApp()
-      const res = await app.request('/rsvp/submit', {
+      const res = await app.request(`/rsvp/submit?token=${RSVP_TOKEN}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -251,11 +251,35 @@ describe('RSVP Routes', () => {
       expect(body.data.rsvpStatus).toBe('accepted')
     })
 
+    it('should return 403 without rsvp token', async () => {
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN }]),
+          }),
+        }),
+      })
+
+      const app = createApp()
+      const res = await app.request('/rsvp/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guestId: GUEST_ID,
+          rsvpStatus: 'accepted',
+        }),
+      })
+
+      expect(res.status).toBe(403)
+      const body = await res.json()
+      expect(body.code).toBe('UNAUTHORIZED')
+    })
+
     it('should return 410 when deadline passed', async () => {
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID }]),
+            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN }]),
           }),
         }),
       })
@@ -263,7 +287,7 @@ describe('RSVP Routes', () => {
       mockedRsvpService.submitRsvp.mockRejectedValue(new Error('RSVP deadline has passed'))
 
       const app = createApp()
-      const res = await app.request('/rsvp/submit', {
+      const res = await app.request(`/rsvp/submit?token=${RSVP_TOKEN}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -287,7 +311,7 @@ describe('RSVP Routes', () => {
       })
 
       const app = createApp()
-      const res = await app.request('/rsvp/submit', {
+      const res = await app.request(`/rsvp/submit?token=${RSVP_TOKEN}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -303,11 +327,11 @@ describe('RSVP Routes', () => {
   })
 
   describe('POST /rsvp/submit-batch (public)', () => {
-    it('should batch submit RSVPs', async () => {
+    it('should batch submit RSVPs with valid token', async () => {
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID }]),
+            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN, householdId: 'h-1' }]),
           }),
         }),
       })
@@ -319,7 +343,7 @@ describe('RSVP Routes', () => {
       mockedRsvpService.submitBatchRsvp.mockResolvedValue(mockUpdated as never)
 
       const app = createApp()
-      const res = await app.request('/rsvp/submit-batch', {
+      const res = await app.request(`/rsvp/submit-batch?token=${RSVP_TOKEN}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -339,7 +363,7 @@ describe('RSVP Routes', () => {
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID }]),
+            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN, householdId: null }]),
           }),
         }),
       })
@@ -347,7 +371,7 @@ describe('RSVP Routes', () => {
       mockedRsvpService.submitBatchRsvp.mockRejectedValue(new Error('RSVP deadline has passed'))
 
       const app = createApp()
-      const res = await app.request('/rsvp/submit-batch', {
+      const res = await app.request(`/rsvp/submit-batch?token=${RSVP_TOKEN}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

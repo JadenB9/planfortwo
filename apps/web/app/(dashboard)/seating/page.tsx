@@ -118,7 +118,7 @@ export default function SeatingPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.seatingCharts.deleteTable(tableId, token)
+      await api.seatingCharts.deleteTable(tableId, weddingId!, token)
       void loadChartDetail(selectedChart.id)
     } catch {
       /* silent */

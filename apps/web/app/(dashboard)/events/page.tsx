@@ -75,7 +75,7 @@ export default function EventsPage() {
       try {
         const token = await getToken()
         if (!token) return
-        const { data } = await api.events.listTimeline(eventId, token)
+        const { data } = await api.events.listTimeline(eventId, weddingId!, token)
         setTimeline(data)
       } catch {
         /* silent */
@@ -174,7 +174,7 @@ export default function EventsPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.events.deleteTimelineEntry(entryId, token)
+      await api.events.deleteTimelineEntry(entryId, weddingId!, token)
       void loadTimeline(selectedEvent.id)
     } catch {
       /* silent */

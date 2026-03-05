@@ -40,9 +40,9 @@ export const rsvpService = {
     const isExpired = await this.isDeadlinePassed(wedding.id)
 
     return {
-      guest: primaryGuest as Guest,
+      guest: this.stripSensitiveFields(primaryGuest) as Guest,
       household,
-      householdGuests: householdGuests as Guest[],
+      householdGuests: householdGuests.map((g) => this.stripSensitiveFields(g)) as Guest[],
       weddingName: wedding.name,
       weddingDate: wedding.date,
       rsvpDeadline: wedding.rsvpDeadline,
@@ -152,6 +152,13 @@ export const rsvpService = {
     return new Date() > new Date(wedding.rsvpDeadline)
   },
 
+  stripSensitiveFields(
+    guest: typeof guests.$inferSelect,
+  ): Omit<Guest, 'email' | 'phone' | 'rsvpToken'> {
+    const { email: _e, phone: _p, rsvpToken: _t, ...safe } = guest
+    return safe as Omit<Guest, 'email' | 'phone' | 'rsvpToken'>
+  },
+
   async buildLookupResult(guest: typeof guests.$inferSelect): Promise<RsvpLookupResult> {
     const [wedding] = await db
       .select()
@@ -164,7 +171,7 @@ export const rsvpService = {
     }
 
     let household = null
-    let householdGuests: Guest[] = []
+    let householdGuests: Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[] = []
 
     if (guest.householdId) {
       const [hh] = await db
@@ -178,16 +185,16 @@ export const rsvpService = {
       if (household) {
         const hhGuests = await db.select().from(guests).where(eq(guests.householdId, household.id))
 
-        householdGuests = hhGuests as Guest[]
+        householdGuests = hhGuests.map((g) => this.stripSensitiveFields(g))
       }
     }
 
     const isExpired = await this.isDeadlinePassed(wedding.id)
 
     return {
-      guest: guest as Guest,
+      guest: this.stripSensitiveFields(guest) as Guest,
       household,
-      householdGuests,
+      householdGuests: householdGuests as Guest[],
       weddingName: wedding.name,
       weddingDate: wedding.date,
       rsvpDeadline: wedding.rsvpDeadline,

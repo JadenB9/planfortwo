@@ -47,7 +47,7 @@ export function TaskDetail({
     try {
       const token = await getToken()
       if (!token) return
-      const { data } = await api.tasks.get(taskId, token)
+      const { data } = await api.tasks.get(taskId, weddingId, token)
       setTask(data)
       setEditTitle(data.title)
       setEditDescription(data.description ?? '')

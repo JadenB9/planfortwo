@@ -84,14 +84,21 @@ rsvpRoute.post(
   async (c) => {
     const submission = c.req.valid('json')
 
+    // Verify the guest exists and the rsvpToken matches to prevent unauthorized modifications
     const [guest] = await db
-      .select({ weddingId: guests.weddingId })
+      .select({ weddingId: guests.weddingId, rsvpToken: guests.rsvpToken })
       .from(guests)
       .where(eq(guests.id, submission.guestId))
       .limit(1)
 
     if (!guest) {
       return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    // Require rsvpToken to prevent unauthenticated RSVP modifications
+    const token = c.req.query('token')
+    if (!token || token !== guest.rsvpToken) {
+      return c.json({ error: 'Invalid or missing RSVP token', code: 'UNAUTHORIZED', statusCode: 403 }, 403)
     }
 
     try {
@@ -118,14 +125,21 @@ rsvpRoute.post(
   async (c) => {
     const { submissions } = c.req.valid('json')
 
+    // Verify the first guest exists and the rsvpToken matches
     const [firstGuest] = await db
-      .select({ weddingId: guests.weddingId })
+      .select({ weddingId: guests.weddingId, rsvpToken: guests.rsvpToken, householdId: guests.householdId })
       .from(guests)
       .where(eq(guests.id, submissions[0]!.guestId))
       .limit(1)
 
     if (!firstGuest) {
       return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    // Require rsvpToken to prevent unauthenticated batch modifications
+    const token = c.req.query('token')
+    if (!token || token !== firstGuest.rsvpToken) {
+      return c.json({ error: 'Invalid or missing RSVP token', code: 'UNAUTHORIZED', statusCode: 403 }, 403)
     }
 
     try {
@@ -152,7 +166,17 @@ rsvpRoute.get(
   async (c) => {
     const weddingId = c.get('weddingId')
 
-    const allGuests = await db.select().from(guests).where(eq(guests.weddingId, weddingId))
+    const allGuests = await db
+      .select({
+        isChild: guests.isChild,
+        hasPlusOne: guests.hasPlusOne,
+        plusOneConfirmed: guests.plusOneConfirmed,
+        rsvpStatus: guests.rsvpStatus,
+        dietary: guests.dietary,
+        mealChoice: guests.mealChoice,
+      })
+      .from(guests)
+      .where(eq(guests.weddingId, weddingId))
 
     const totalGuests = allGuests.length
     const adults = allGuests.filter((g) => !g.isChild).length
