@@ -51,6 +51,7 @@ thankYouRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 
 thankYouRoute.post(
   '/',
+  resolveWeddingMiddleware,
   zValidator('json', createThankYouNoteSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -144,6 +145,7 @@ vendorReviewsRoute.get('/', resolveWeddingMiddleware, async (c) => {
 
 vendorReviewsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   zValidator('json', createVendorReviewSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)

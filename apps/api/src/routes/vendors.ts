@@ -43,6 +43,7 @@ vendorsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 
 vendorsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canVendorManagement'),
   zValidator('json', createVendorSchema, (result, c) => {
     if (!result.success)

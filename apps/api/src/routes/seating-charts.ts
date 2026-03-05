@@ -46,6 +46,7 @@ seatingChartsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 
 seatingChartsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   zValidator('json', createSeatingChartSchema, (result, c) => {
     if (!result.success)

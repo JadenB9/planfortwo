@@ -41,6 +41,7 @@ eventsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 
 eventsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   zValidator('json', createEventSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)

@@ -42,6 +42,7 @@ emailCampaignsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 
 emailCampaignsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   zValidator('json', createEmailCampaignSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -103,6 +104,7 @@ announcementsRoute.get('/', resolveWeddingMiddleware, async (c) => {
 
 announcementsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   zValidator('json', createAnnouncementSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)

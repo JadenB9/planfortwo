@@ -42,6 +42,7 @@ weddingPartyRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 
 weddingPartyRoute.post(
   '/',
+  resolveWeddingMiddleware,
   zValidator('json', createPartyMemberSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)

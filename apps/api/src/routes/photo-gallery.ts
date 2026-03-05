@@ -36,6 +36,7 @@ photoGalleryRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 
 photoGalleryRoute.post(
   '/',
+  resolveWeddingMiddleware,
   zValidator('json', createPhotoSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)

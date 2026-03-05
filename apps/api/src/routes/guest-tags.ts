@@ -30,6 +30,7 @@ guestTagsRoute.get('/', resolveWeddingMiddleware, async (c) => {
 // POST /guest-tags — create tag
 guestTagsRoute.post(
   '/',
+  resolveWeddingMiddleware,
   zValidator('json', createGuestTagSchema, (result, c) => {
     if (!result.success) {
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)

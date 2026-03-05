@@ -47,7 +47,7 @@ guestsRoute.get('/stats', resolveWeddingMiddleware, async (c) => {
 })
 
 // GET /guests/export?weddingId=X — CSV export (gated)
-guestsRoute.get('/export', requireFeature('canDataExport'), resolveWeddingMiddleware, async (c) => {
+guestsRoute.get('/export', resolveWeddingMiddleware, requireFeature('canDataExport'), async (c) => {
   const weddingId = c.get('weddingId')
   const csv = await guestService.exportCsv(weddingId)
   return new Response(csv, {

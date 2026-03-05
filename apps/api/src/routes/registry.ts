@@ -38,6 +38,7 @@ registryRoute.get('/links', resolveWeddingMiddleware, async (c) => {
 
 registryRoute.post(
   '/links',
+  resolveWeddingMiddleware,
   zValidator('json', createRegistryLinkSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -71,6 +72,7 @@ registryRoute.get('/funds', resolveWeddingMiddleware, async (c) => {
 
 registryRoute.post(
   '/funds',
+  resolveWeddingMiddleware,
   zValidator('json', createCashFundSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -129,6 +131,7 @@ registryRoute.get('/gifts', resolveWeddingMiddleware, async (c) => {
 
 registryRoute.post(
   '/gifts',
+  resolveWeddingMiddleware,
   zValidator('json', createGiftSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -174,6 +177,7 @@ registryRoute.get('/mood-boards', resolveWeddingMiddleware, async (c) => {
 
 registryRoute.post(
   '/mood-boards',
+  resolveWeddingMiddleware,
   zValidator('json', createMoodBoardSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
