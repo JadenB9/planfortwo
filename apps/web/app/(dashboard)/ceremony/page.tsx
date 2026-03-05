@@ -74,7 +74,12 @@ export default function CeremonyPage() {
 
   const [showOutlineDialog, setShowOutlineDialog] = useState(false)
   const [editingOutline, setEditingOutline] = useState<OutlineItem | null>(null)
-  const [outlineForm, setOutlineForm] = useState({ moment: 'welcome', title: '', description: '', duration: '' })
+  const [outlineForm, setOutlineForm] = useState({
+    moment: 'welcome',
+    title: '',
+    description: '',
+    duration: '',
+  })
 
   const [showProcessionalDialog, setShowProcessionalDialog] = useState(false)
   const [processionalForm, setProcessionalForm] = useState({ name: '', role: '' })
@@ -102,7 +107,9 @@ export default function CeremonyPage() {
     }
   }, [getToken])
 
-  useEffect(() => { void loadData() }, [loadData])
+  useEffect(() => {
+    void loadData()
+  }, [loadData])
 
   const handleSaveOutline = useCallback(async () => {
     if (!weddingId) return
@@ -110,37 +117,52 @@ export default function CeremonyPage() {
       const token = await getToken()
       if (!token) return
       if (editingOutline) {
-        await api.ceremony.updateOutline(editingOutline.id, weddingId, {
-          moment: outlineForm.moment as 'welcome',
-          title: outlineForm.title,
-          description: outlineForm.description || null,
-          duration: outlineForm.duration ? parseInt(outlineForm.duration) : null,
-        }, token)
-      } else {
-        await api.ceremony.createOutline({
+        await api.ceremony.updateOutline(
+          editingOutline.id,
           weddingId,
-          moment: outlineForm.moment as 'welcome',
-          title: outlineForm.title,
-          description: outlineForm.description || null,
-          duration: outlineForm.duration ? parseInt(outlineForm.duration) : null,
-        }, token)
+          {
+            moment: outlineForm.moment as 'welcome',
+            title: outlineForm.title,
+            description: outlineForm.description || null,
+            duration: outlineForm.duration ? parseInt(outlineForm.duration) : null,
+          },
+          token,
+        )
+      } else {
+        await api.ceremony.createOutline(
+          {
+            weddingId,
+            moment: outlineForm.moment as 'welcome',
+            title: outlineForm.title,
+            description: outlineForm.description || null,
+            duration: outlineForm.duration ? parseInt(outlineForm.duration) : null,
+          },
+          token,
+        )
       }
       setShowOutlineDialog(false)
       setEditingOutline(null)
       setOutlineForm({ moment: 'welcome', title: '', description: '', duration: '' })
       void loadData()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }, [weddingId, getToken, editingOutline, outlineForm, loadData])
 
-  const handleDeleteOutline = useCallback(async (id: string) => {
-    if (!weddingId) return
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.ceremony.deleteOutline(id, weddingId, token)
-      void loadData()
-    } catch { /* silent */ }
-  }, [weddingId, getToken, loadData])
+  const handleDeleteOutline = useCallback(
+    async (id: string) => {
+      if (!weddingId) return
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.ceremony.deleteOutline(id, weddingId, token)
+        void loadData()
+      } catch {
+        /* silent */
+      }
+    },
+    [weddingId, getToken, loadData],
+  )
 
   const handleSaveVow = useCallback(async () => {
     if (!weddingId) return
@@ -149,8 +171,11 @@ export default function CeremonyPage() {
       const token = await getToken()
       if (!token) return
       await api.ceremony.upsertVow(weddingId, { content: vowContent }, token)
-    } catch { /* silent */ }
-    finally { setVowSaving(false) }
+    } catch {
+      /* silent */
+    } finally {
+      setVowSaving(false)
+    }
   }, [weddingId, getToken, vowContent])
 
   const handleSaveProcessional = useCallback(async () => {
@@ -158,31 +183,41 @@ export default function CeremonyPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.ceremony.createProcessional({
-        weddingId,
-        name: processionalForm.name,
-        role: processionalForm.role || null,
-      }, token)
+      await api.ceremony.createProcessional(
+        {
+          weddingId,
+          name: processionalForm.name,
+          role: processionalForm.role || null,
+        },
+        token,
+      )
       setShowProcessionalDialog(false)
       setProcessionalForm({ name: '', role: '' })
       void loadData()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }, [weddingId, getToken, processionalForm, loadData])
 
-  const handleDeleteProcessional = useCallback(async (id: string) => {
-    if (!weddingId) return
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.ceremony.deleteProcessional(id, weddingId, token)
-      void loadData()
-    } catch { /* silent */ }
-  }, [weddingId, getToken, loadData])
+  const handleDeleteProcessional = useCallback(
+    async (id: string) => {
+      if (!weddingId) return
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.ceremony.deleteProcessional(id, weddingId, token)
+        void loadData()
+      } catch {
+        /* silent */
+      }
+    },
+    [weddingId, getToken, loadData],
+  )
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -196,7 +231,9 @@ export default function CeremonyPage() {
     >
       <div className="mb-8">
         <h1 className="font-serif text-3xl font-bold text-gray-900">Ceremony</h1>
-        <p className="mt-1 text-sm text-gray-600">Plan your ceremony outline, write your vows, and organize the processional.</p>
+        <p className="mt-1 text-sm text-gray-600">
+          Plan your ceremony outline, write your vows, and organize the processional.
+        </p>
       </div>
 
       <div className="border-b border-gray-200">
@@ -222,57 +259,81 @@ export default function CeremonyPage() {
           <div>
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-serif text-lg font-semibold text-gray-900">Ceremony Moments</h2>
-              <Button onClick={() => {
-                setEditingOutline(null)
-                setOutlineForm({ moment: 'welcome', title: '', description: '', duration: '' })
-                setShowOutlineDialog(true)
-              }}>
+              <Button
+                onClick={() => {
+                  setEditingOutline(null)
+                  setOutlineForm({ moment: 'welcome', title: '', description: '', duration: '' })
+                  setShowOutlineDialog(true)
+                }}
+              >
                 Add Moment
               </Button>
             </div>
             {outlines.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
-                  <p className="text-sm text-gray-500">No ceremony moments yet. Add your first one to start building your outline.</p>
+                  <p className="text-sm text-gray-500">
+                    No ceremony moments yet. Add your first one to start building your outline.
+                  </p>
                 </CardContent>
               </Card>
             ) : (
-              <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" animate="visible">
-                {outlines.sort((a, b) => a.sortOrder - b.sortOrder).map((item) => (
-                  <motion.div key={item.id} variants={fadeInUp}>
-                    <Card>
-                      <CardContent className="flex items-center justify-between py-4">
-                        <div className="flex items-center gap-4">
-                          <Badge variant="secondary">{MOMENT_LABELS[item.moment] ?? item.moment}</Badge>
-                          <div>
-                            <p className="font-medium text-gray-900">{item.title}</p>
-                            {item.description && <p className="mt-0.5 text-sm text-gray-500">{item.description}</p>}
+              <motion.div
+                className="space-y-3"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                {outlines
+                  .sort((a, b) => a.sortOrder - b.sortOrder)
+                  .map((item) => (
+                    <motion.div key={item.id} variants={fadeInUp}>
+                      <Card>
+                        <CardContent className="flex items-center justify-between py-4">
+                          <div className="flex items-center gap-4">
+                            <Badge variant="secondary">
+                              {MOMENT_LABELS[item.moment] ?? item.moment}
+                            </Badge>
+                            <div>
+                              <p className="font-medium text-gray-900">{item.title}</p>
+                              {item.description && (
+                                <p className="mt-0.5 text-sm text-gray-500">{item.description}</p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {item.duration && (
-                            <span className="text-xs text-gray-400">{item.duration} min</span>
-                          )}
-                          <Button variant="ghost" size="sm" onClick={() => {
-                            setEditingOutline(item)
-                            setOutlineForm({
-                              moment: item.moment,
-                              title: item.title,
-                              description: item.description ?? '',
-                              duration: item.duration?.toString() ?? '',
-                            })
-                            setShowOutlineDialog(true)
-                          }}>
-                            Edit
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteOutline(item.id)}>
-                            Delete
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+                          <div className="flex items-center gap-2">
+                            {item.duration && (
+                              <span className="text-xs text-gray-400">{item.duration} min</span>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingOutline(item)
+                                setOutlineForm({
+                                  moment: item.moment,
+                                  title: item.title,
+                                  description: item.description ?? '',
+                                  duration: item.duration?.toString() ?? '',
+                                })
+                                setShowOutlineDialog(true)
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => handleDeleteOutline(item.id)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
               </motion.div>
             )}
           </div>
@@ -284,7 +345,10 @@ export default function CeremonyPage() {
               <CardTitle>Your Vows</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="mb-4 text-sm text-gray-500">Write and refine your wedding vows here. Only you can see this until you choose to reveal them.</p>
+              <p className="mb-4 text-sm text-gray-500">
+                Write and refine your wedding vows here. Only you can see this until you choose to
+                reveal them.
+              </p>
               <Textarea
                 rows={12}
                 value={vowContent}
@@ -306,39 +370,57 @@ export default function CeremonyPage() {
           <div>
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-serif text-lg font-semibold text-gray-900">Processional Order</h2>
-              <Button onClick={() => {
-                setProcessionalForm({ name: '', role: '' })
-                setShowProcessionalDialog(true)
-              }}>
+              <Button
+                onClick={() => {
+                  setProcessionalForm({ name: '', role: '' })
+                  setShowProcessionalDialog(true)
+                }}
+              >
                 Add Entry
               </Button>
             </div>
             {processional.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
-                  <p className="text-sm text-gray-500">No processional entries yet. Add who walks down the aisle and in what order.</p>
+                  <p className="text-sm text-gray-500">
+                    No processional entries yet. Add who walks down the aisle and in what order.
+                  </p>
                 </CardContent>
               </Card>
             ) : (
-              <motion.div className="space-y-2" variants={staggerContainer} initial="hidden" animate="visible">
-                {processional.sort((a, b) => a.sortOrder - b.sortOrder).map((entry, idx) => (
-                  <motion.div key={entry.id} variants={fadeInUp}>
-                    <Card>
-                      <CardContent className="flex items-center justify-between py-3">
-                        <div className="flex items-center gap-3">
-                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-wedding-100 text-xs font-semibold text-wedding-700">{idx + 1}</span>
-                          <div>
-                            <p className="font-medium text-gray-900">{entry.name}</p>
-                            {entry.role && <p className="text-xs text-gray-500">{entry.role}</p>}
+              <motion.div
+                className="space-y-2"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                {processional
+                  .sort((a, b) => a.sortOrder - b.sortOrder)
+                  .map((entry, idx) => (
+                    <motion.div key={entry.id} variants={fadeInUp}>
+                      <Card>
+                        <CardContent className="flex items-center justify-between py-3">
+                          <div className="flex items-center gap-3">
+                            <span className="bg-wedding-100 text-wedding-700 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold">
+                              {idx + 1}
+                            </span>
+                            <div>
+                              <p className="font-medium text-gray-900">{entry.name}</p>
+                              {entry.role && <p className="text-xs text-gray-500">{entry.role}</p>}
+                            </div>
                           </div>
-                        </div>
-                        <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteProcessional(entry.id)}>
-                          Remove
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-500 hover:text-red-700"
+                            onClick={() => handleDeleteProcessional(entry.id)}
+                          >
+                            Remove
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
               </motion.div>
             )}
           </div>
@@ -359,26 +441,46 @@ export default function CeremonyPage() {
                 className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
               >
                 {MOMENT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
               <Label>Title</Label>
-              <Input value={outlineForm.title} onChange={(e) => setOutlineForm({ ...outlineForm, title: e.target.value })} placeholder="e.g. Bride's Entrance" />
+              <Input
+                value={outlineForm.title}
+                onChange={(e) => setOutlineForm({ ...outlineForm, title: e.target.value })}
+                placeholder="e.g. Bride's Entrance"
+              />
             </div>
             <div>
               <Label>Description</Label>
-              <Textarea value={outlineForm.description} onChange={(e) => setOutlineForm({ ...outlineForm, description: e.target.value })} placeholder="Optional notes..." rows={3} />
+              <Textarea
+                value={outlineForm.description}
+                onChange={(e) => setOutlineForm({ ...outlineForm, description: e.target.value })}
+                placeholder="Optional notes..."
+                rows={3}
+              />
             </div>
             <div>
               <Label>Duration (minutes)</Label>
-              <Input type="number" value={outlineForm.duration} onChange={(e) => setOutlineForm({ ...outlineForm, duration: e.target.value })} placeholder="5" />
+              <Input
+                type="number"
+                value={outlineForm.duration}
+                onChange={(e) => setOutlineForm({ ...outlineForm, duration: e.target.value })}
+                placeholder="5"
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowOutlineDialog(false)}>Cancel</Button>
-            <Button onClick={handleSaveOutline} disabled={!outlineForm.title}>{editingOutline ? 'Update' : 'Add'}</Button>
+            <Button variant="outline" onClick={() => setShowOutlineDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveOutline} disabled={!outlineForm.title}>
+              {editingOutline ? 'Update' : 'Add'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -391,16 +493,28 @@ export default function CeremonyPage() {
           <div className="space-y-4">
             <div>
               <Label>Name</Label>
-              <Input value={processionalForm.name} onChange={(e) => setProcessionalForm({ ...processionalForm, name: e.target.value })} placeholder="e.g. Flower Girl" />
+              <Input
+                value={processionalForm.name}
+                onChange={(e) => setProcessionalForm({ ...processionalForm, name: e.target.value })}
+                placeholder="e.g. Flower Girl"
+              />
             </div>
             <div>
               <Label>Role</Label>
-              <Input value={processionalForm.role} onChange={(e) => setProcessionalForm({ ...processionalForm, role: e.target.value })} placeholder="e.g. Maid of Honor" />
+              <Input
+                value={processionalForm.role}
+                onChange={(e) => setProcessionalForm({ ...processionalForm, role: e.target.value })}
+                placeholder="e.g. Maid of Honor"
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowProcessionalDialog(false)}>Cancel</Button>
-            <Button onClick={handleSaveProcessional} disabled={!processionalForm.name}>Add</Button>
+            <Button variant="outline" onClick={() => setShowProcessionalDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveProcessional} disabled={!processionalForm.name}>
+              Add
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

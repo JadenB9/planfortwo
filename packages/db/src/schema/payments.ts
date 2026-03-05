@@ -1,7 +1,12 @@
 import { boolean, numeric, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { weddings } from './weddings'
 
-export const purchaseStatusEnum = pgEnum('purchase_status', ['pending', 'completed', 'refunded', 'failed'])
+export const purchaseStatusEnum = pgEnum('purchase_status', [
+  'pending',
+  'completed',
+  'refunded',
+  'failed',
+])
 
 export const purchases = pgTable('purchases', {
   id: uuid('id').primaryKey().defaultRandom(),

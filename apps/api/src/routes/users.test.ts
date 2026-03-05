@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,14 +25,31 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
-      tier: 'full', canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-      canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-      canAddAttachments: true, maxGuests: null, canEditGuests: true,
-      canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-      canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      tier: 'full',
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))

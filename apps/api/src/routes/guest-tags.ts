@@ -21,25 +21,18 @@ export const guestTagsRoute = new Hono<Env>()
 guestTagsRoute.use('*', authMiddleware, resolveUserMiddleware)
 
 // GET /guest-tags?weddingId=X — list all tags for wedding
-guestTagsRoute.get(
-  '/',
-  resolveWeddingMiddleware,
-  async (c) => {
-    const weddingId = c.get('weddingId')
-    const tags = await guestTagService.listTags(weddingId)
-    return c.json({ data: tags })
-  },
-)
+guestTagsRoute.get('/', resolveWeddingMiddleware, async (c) => {
+  const weddingId = c.get('weddingId')
+  const tags = await guestTagService.listTags(weddingId)
+  return c.json({ data: tags })
+})
 
 // POST /guest-tags — create tag
 guestTagsRoute.post(
   '/',
   zValidator('json', createGuestTagSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -56,10 +49,7 @@ guestTagsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
 
   const tag = await guestTagService.getTag(id)
   if (!tag || tag.weddingId !== weddingId) {
-    return c.json(
-      { error: 'Tag not found', code: 'NOT_FOUND', statusCode: 404 },
-      404,
-    )
+    return c.json({ error: 'Tag not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   }
 
   try {
@@ -67,9 +57,6 @@ guestTagsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
     return c.json({ data: { success: true } })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Delete failed'
-    return c.json(
-      { error: message, code: 'DELETE_FAILED', statusCode: 404 },
-      404,
-    )
+    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
   }
 })

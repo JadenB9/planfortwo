@@ -62,7 +62,11 @@ export function Sidebar() {
                     const Icon = item.icon
 
                     return (
-                      <motion.div key={item.href} variants={navItem} transition={{ duration: 0.3, ...springSmooth }}>
+                      <motion.div
+                        key={item.href}
+                        variants={navItem}
+                        transition={{ duration: 0.3, ...springSmooth }}
+                      >
                         <Link
                           href={item.comingSoon ? '#' : item.href}
                           className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
@@ -74,7 +78,9 @@ export function Sidebar() {
                           }`}
                           onClick={item.comingSoon ? (e) => e.preventDefault() : undefined}
                         >
-                          <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-wedding-600' : 'text-gray-400'}`} />
+                          <Icon
+                            className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-wedding-600' : 'text-gray-400'}`}
+                          />
                           <span>{item.label}</span>
                           {item.comingSoon && (
                             <span className="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
@@ -93,10 +99,10 @@ export function Sidebar() {
       </motion.nav>
 
       {/* Bottom section */}
-      <div className="mt-auto border-t border-gray-200 p-3 space-y-2">
+      <div className="mt-auto space-y-2 border-t border-gray-200 p-3">
         <Link
           href="/upgrade"
-          className="flex items-center justify-center gap-2 rounded-xl bg-wedding-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+          className="bg-wedding-600 hover:bg-wedding-700 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
         >
           <Sparkles className="h-4 w-4" />
           Upgrade Plan

@@ -6,11 +6,19 @@ interface PaymentCalendarProps {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount)
 }
 
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 
 function isOverdue(date: Date): boolean {
@@ -37,9 +45,7 @@ export function PaymentCalendar({ payments, onMarkPaid }: PaymentCalendarProps) 
     <div className="rounded-2xl border border-gray-200 bg-white p-6">
       <h3 className="mb-4 text-sm font-semibold text-gray-900">Upcoming Payments</h3>
 
-      {sorted.length === 0 && (
-        <p className="text-sm text-gray-500">All payments are up to date.</p>
-      )}
+      {sorted.length === 0 && <p className="text-sm text-gray-500">All payments are up to date.</p>}
 
       <div className="space-y-2">
         {sorted.map((payment) => {
@@ -62,10 +68,14 @@ export function PaymentCalendar({ payments, onMarkPaid }: PaymentCalendarProps) 
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <p className={`text-sm font-medium ${overdue ? 'text-red-700' : 'text-gray-900'}`}>
+                  <p
+                    className={`text-sm font-medium ${overdue ? 'text-red-700' : 'text-gray-900'}`}
+                  >
                     {formatCurrency(payment.amount)}
                   </p>
-                  <p className={`text-xs ${overdue ? 'font-medium text-red-600' : 'text-gray-500'}`}>
+                  <p
+                    className={`text-xs ${overdue ? 'font-medium text-red-600' : 'text-gray-500'}`}
+                  >
                     {overdue ? 'Overdue' : ''} {formatDate(payment.dueDate)}
                   </p>
                 </div>

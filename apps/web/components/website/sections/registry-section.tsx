@@ -52,9 +52,16 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
             >
               {registry.logoUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={registry.logoUrl} alt={registry.name} className="h-8 w-8 object-contain" />
+                <img
+                  src={registry.logoUrl}
+                  alt={registry.name}
+                  className="h-8 w-8 object-contain"
+                />
               )}
-              <span className={`font-medium ${fontPair.bodyClass}`} style={{ color: colors.primary }}>
+              <span
+                className={`font-medium ${fontPair.bodyClass}`}
+                style={{ color: colors.primary }}
+              >
                 {registry.name}
               </span>
               <ExternalLink className="h-4 w-4" style={{ color: colors.accent }} />

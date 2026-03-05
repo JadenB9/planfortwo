@@ -11,11 +11,7 @@ import {
   budgetItems,
   weddings,
 } from '@planfortwo/db'
-import type {
-  TimelineTemplate,
-  DashboardStats,
-  TasksByCategory,
-} from '@planfortwo/types'
+import type { TimelineTemplate, DashboardStats, TasksByCategory } from '@planfortwo/types'
 import type {
   CreateTaskInput,
   UpdateTaskInput,
@@ -25,10 +21,7 @@ import type {
 } from '@planfortwo/validators'
 import { activityService } from './activity.js'
 
-function calculateDueDate(
-  weddingDate: Date | null,
-  monthsBefore: number,
-): Date | null {
+function calculateDueDate(weddingDate: Date | null, monthsBefore: number): Date | null {
   if (!weddingDate) return null
   const due = new Date(weddingDate)
   due.setMonth(due.getMonth() - monthsBefore)
@@ -94,20 +87,21 @@ export const checklistService = {
 
         sortOrder++
       }
-
     })
 
     // Log outside transaction for simplicity
-    await activityService.log({
-      weddingId,
-      userId,
-      action: 'checklist_seeded',
-      entityType: 'category',
-      entityId: weddingId,
-      metadata: { template },
-    }).catch(() => {
-      // activity logging is non-critical during seeding
-    })
+    await activityService
+      .log({
+        weddingId,
+        userId,
+        action: 'checklist_seeded',
+        entityType: 'category',
+        entityId: weddingId,
+        metadata: { template },
+      })
+      .catch(() => {
+        // activity logging is non-critical during seeding
+      })
   },
 
   async listCategories(weddingId: string) {
@@ -118,10 +112,7 @@ export const checklistService = {
         completedCount: sql<number>`cast(count(${checklistTasks.completedAt}) as int)`,
       })
       .from(checklistCategories)
-      .leftJoin(
-        checklistTasks,
-        eq(checklistCategories.id, checklistTasks.categoryId),
-      )
+      .leftJoin(checklistTasks, eq(checklistCategories.id, checklistTasks.categoryId))
       .where(eq(checklistCategories.weddingId, weddingId))
       .groupBy(checklistCategories.id)
       .orderBy(asc(checklistCategories.sortOrder))
@@ -184,9 +175,7 @@ export const checklistService = {
       throw new Error('Cannot delete a default category')
     }
 
-    await db
-      .delete(checklistCategories)
-      .where(eq(checklistCategories.id, categoryId))
+    await db.delete(checklistCategories).where(eq(checklistCategories.id, categoryId))
 
     await activityService.log({
       weddingId,
@@ -239,10 +228,7 @@ export const checklistService = {
 
   async getTaskWithDetails(taskId: string) {
     // Get the task
-    const [task] = await db
-      .select()
-      .from(checklistTasks)
-      .where(eq(checklistTasks.id, taskId))
+    const [task] = await db.select().from(checklistTasks).where(eq(checklistTasks.id, taskId))
 
     if (!task) return null
 
@@ -327,12 +313,7 @@ export const checklistService = {
     return task!
   },
 
-  async updateTask(
-    taskId: string,
-    data: UpdateTaskInput,
-    userId: string,
-    weddingId: string,
-  ) {
+  async updateTask(taskId: string, data: UpdateTaskInput, userId: string, weddingId: string) {
     const updateData: Record<string, unknown> = {}
 
     if (data.title !== undefined) updateData.title = data.title
@@ -445,16 +426,8 @@ export const checklistService = {
     })
   },
 
-  async addNote(
-    taskId: string,
-    userId: string,
-    content: string,
-    weddingId: string,
-  ) {
-    const [note] = await db
-      .insert(taskNotes)
-      .values({ taskId, userId, content })
-      .returning()
+  async addNote(taskId: string, userId: string, content: string, weddingId: string) {
+    const [note] = await db.insert(taskNotes).values({ taskId, userId, content }).returning()
 
     if (note) {
       await activityService.log({
@@ -507,16 +480,9 @@ export const checklistService = {
         completed: sql<number>`cast(count(${checklistTasks.completedAt}) as int)`,
       })
       .from(checklistCategories)
-      .leftJoin(
-        checklistTasks,
-        eq(checklistCategories.id, checklistTasks.categoryId),
-      )
+      .leftJoin(checklistTasks, eq(checklistCategories.id, checklistTasks.categoryId))
       .where(eq(checklistCategories.weddingId, weddingId))
-      .groupBy(
-        checklistCategories.id,
-        checklistCategories.name,
-        checklistCategories.color,
-      )
+      .groupBy(checklistCategories.id, checklistCategories.name, checklistCategories.color)
 
     const tasksByCategory: TasksByCategory[] = categoryBreakdown.map((row) => ({
       categoryId: row.categoryId,

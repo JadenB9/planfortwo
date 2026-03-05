@@ -15,14 +15,14 @@ export default function BudgetSetupPage() {
   if (weddingLoading || featuresLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
 
   if (features && !features.canBudgetCategories) {
     return (
-      <div className="mx-auto max-w-4xl animate-fade-in">
+      <div className="animate-fade-in mx-auto max-w-4xl">
         <h1 className="mb-4 font-serif text-3xl font-bold text-gray-900">Budget Setup</h1>
         <UpgradePrompt message="Upgrade to set up your wedding budget" />
       </div>
@@ -32,7 +32,7 @@ export default function BudgetSetupPage() {
   if (!weddingId) return null
 
   return (
-    <div className="mx-auto max-w-4xl animate-fade-in">
+    <div className="animate-fade-in mx-auto max-w-4xl">
       <BudgetSetupWizard
         weddingId={weddingId}
         currentBudget={weddingData?.wedding.budgetTotal ?? null}

@@ -1,7 +1,12 @@
 import { z } from 'zod'
 
 export const emailTemplateTypeZodEnum = z.enum([
-  'save_the_date', 'invitation', 'update', 'reminder', 'thank_you', 'custom',
+  'save_the_date',
+  'invitation',
+  'update',
+  'reminder',
+  'thank_you',
+  'custom',
 ])
 export const campaignStatusZodEnum = z.enum(['draft', 'scheduled', 'sending', 'sent', 'failed'])
 

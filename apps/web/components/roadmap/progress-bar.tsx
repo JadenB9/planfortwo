@@ -13,7 +13,7 @@ export function ProgressBar({ progress, className = '' }: ProgressBarProps) {
   return (
     <div className={`h-2 w-full overflow-hidden rounded-full bg-gray-100 ${className}`}>
       <motion.div
-        className="h-full rounded-full bg-wedding-500"
+        className="bg-wedding-500 h-full rounded-full"
         initial={{ width: 0 }}
         animate={{ width: `${clampedProgress}%` }}
         transition={{ duration: 0.8, ease: 'easeOut' }}

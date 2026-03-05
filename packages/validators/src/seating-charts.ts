@@ -1,9 +1,21 @@
 import { z } from 'zod'
 
-export const tableTypeZodEnum = z.enum(['round', 'rectangular', 'banquet', 'head_table', 'sweetheart'])
+export const tableTypeZodEnum = z.enum([
+  'round',
+  'rectangular',
+  'banquet',
+  'head_table',
+  'sweetheart',
+])
 export const elementTypeZodEnum = z.enum([
-  'dance_floor', 'stage', 'bar', 'dj_booth', 'photo_booth',
-  'gift_table', 'dessert_table', 'entrance',
+  'dance_floor',
+  'stage',
+  'bar',
+  'dj_booth',
+  'photo_booth',
+  'gift_table',
+  'dessert_table',
+  'entrance',
 ])
 export const relationshipTypeZodEnum = z.enum(['must_together', 'prefer_together', 'keep_apart'])
 

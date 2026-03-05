@@ -53,15 +53,17 @@ export const onPaymentReminder = inngest.createFunction(
           .where(eq(weddings.id, payment.weddingId))
 
         for (const member of members) {
-          const html = await render(PaymentReminderEmail({
-            recipientName: member.firstName,
-            weddingName: wedding?.name ?? 'Your Wedding',
-            paymentTitle: payment.title,
-            vendorName: payment.vendorName,
-            amount: payment.amount,
-            dueDate: String(payment.dueDate),
-            daysUntilDue: 7,
-          }))
+          const html = await render(
+            PaymentReminderEmail({
+              recipientName: member.firstName,
+              weddingName: wedding?.name ?? 'Your Wedding',
+              paymentTitle: payment.title,
+              vendorName: payment.vendorName,
+              amount: payment.amount,
+              dueDate: String(payment.dueDate),
+              daysUntilDue: 7,
+            }),
+          )
 
           await getResend().emails.send({
             from: process.env.EMAIL_FROM ?? 'PlanForTwo <noreply@planfortwo.com>',
@@ -114,15 +116,17 @@ export const onPaymentReminder = inngest.createFunction(
           .where(eq(weddings.id, payment.weddingId))
 
         for (const member of members) {
-          const html = await render(PaymentReminderEmail({
-            recipientName: member.firstName,
-            weddingName: wedding?.name ?? 'Your Wedding',
-            paymentTitle: payment.title,
-            vendorName: payment.vendorName,
-            amount: payment.amount,
-            dueDate: String(payment.dueDate),
-            daysUntilDue: 1,
-          }))
+          const html = await render(
+            PaymentReminderEmail({
+              recipientName: member.firstName,
+              weddingName: wedding?.name ?? 'Your Wedding',
+              paymentTitle: payment.title,
+              vendorName: payment.vendorName,
+              amount: payment.amount,
+              dueDate: String(payment.dueDate),
+              daysUntilDue: 1,
+            }),
+          )
 
           await getResend().emails.send({
             from: process.env.EMAIL_FROM ?? 'PlanForTwo <noreply@planfortwo.com>',

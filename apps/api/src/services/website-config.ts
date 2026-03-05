@@ -30,7 +30,20 @@ export const websiteConfigService = {
     // Seed default sections
     const sectionValues = defaultWebsiteSections.map((s) => ({
       weddingId: data.weddingId,
-      sectionType: s.sectionType as 'hero' | 'our_story' | 'event_details' | 'wedding_party' | 'gallery' | 'travel' | 'things_to_do' | 'registry' | 'faq' | 'rsvp' | 'schedule' | 'guestbook' | 'custom',
+      sectionType: s.sectionType as
+        | 'hero'
+        | 'our_story'
+        | 'event_details'
+        | 'wedding_party'
+        | 'gallery'
+        | 'travel'
+        | 'things_to_do'
+        | 'registry'
+        | 'faq'
+        | 'rsvp'
+        | 'schedule'
+        | 'guestbook'
+        | 'custom',
       title: s.title,
       content: s.content,
       isVisible: s.isVisible,

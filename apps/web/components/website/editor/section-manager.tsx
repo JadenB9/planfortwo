@@ -15,7 +15,12 @@ interface SectionManagerProps {
   onDeleteCustom?: (id: string) => void
 }
 
-export function SectionManager({ sections, onToggleVisibility, onEdit, onDeleteCustom }: SectionManagerProps) {
+export function SectionManager({
+  sections,
+  onToggleVisibility,
+  onEdit,
+  onDeleteCustom,
+}: SectionManagerProps) {
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const sorted = [...sections].sort((a, b) => a.sortOrder - b.sortOrder)
 

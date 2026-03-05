@@ -35,10 +35,7 @@ export const userService = {
         throw new Error('Failed to create user')
       }
 
-      const [wedding] = await tx
-        .insert(weddings)
-        .values({ name: 'Our Wedding' })
-        .returning()
+      const [wedding] = await tx.insert(weddings).values({ name: 'Our Wedding' }).returning()
 
       if (!wedding) {
         throw new Error('Failed to create default wedding')
@@ -70,19 +67,13 @@ export const userService = {
   },
 
   async findByClerkId(clerkId: string) {
-    const results = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, clerkId))
+    const results = await db.select().from(users).where(eq(users.clerkId, clerkId))
 
     return results[0] ?? null
   },
 
   async findById(id: string) {
-    const results = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, id))
+    const results = await db.select().from(users).where(eq(users.id, id))
 
     return results[0] ?? null
   },

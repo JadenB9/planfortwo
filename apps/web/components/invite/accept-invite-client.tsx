@@ -42,7 +42,7 @@ export function AcceptInviteClient({ token }: AcceptInviteClientProps) {
       <button
         onClick={handleAccept}
         disabled={status === 'accepting'}
-        className="w-full rounded-xl bg-wedding-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wedding-600 disabled:cursor-not-allowed disabled:opacity-50"
+        className="bg-wedding-600 hover:bg-wedding-700 focus-visible:outline-wedding-600 w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {status === 'accepting' ? 'Joining...' : 'Accept & Join'}
       </button>

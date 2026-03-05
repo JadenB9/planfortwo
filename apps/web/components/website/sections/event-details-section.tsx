@@ -35,23 +35,35 @@ export function EventDetailsSection({ title, content }: EventDetailsSectionProps
               transition={{ delay: i * 0.1 }}
               className="rounded-2xl bg-white p-6 shadow-sm"
             >
-              <h3 className={`text-xl font-semibold ${fontPair.headingClass}`} style={{ color: colors.primary }}>
+              <h3
+                className={`text-xl font-semibold ${fontPair.headingClass}`}
+                style={{ color: colors.primary }}
+              >
                 {event.name}
               </h3>
               <div className={`mt-4 space-y-2 ${fontPair.bodyClass}`}>
                 {event.date && (
-                  <div className="flex items-center gap-2 text-sm" style={{ color: `${colors.primary}BB` }}>
+                  <div
+                    className="flex items-center gap-2 text-sm"
+                    style={{ color: `${colors.primary}BB` }}
+                  >
                     <Calendar className="h-4 w-4" style={{ color: colors.accent }} />
                     {event.date}
                   </div>
                 )}
                 {event.time && (
-                  <div className="flex items-center gap-2 text-sm" style={{ color: `${colors.primary}BB` }}>
+                  <div
+                    className="flex items-center gap-2 text-sm"
+                    style={{ color: `${colors.primary}BB` }}
+                  >
                     <Clock className="h-4 w-4" style={{ color: colors.accent }} />
                     {event.time}
                   </div>
                 )}
-                <div className="flex items-start gap-2 text-sm" style={{ color: `${colors.primary}BB` }}>
+                <div
+                  className="flex items-start gap-2 text-sm"
+                  style={{ color: `${colors.primary}BB` }}
+                >
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0" style={{ color: colors.accent }} />
                   <div>
                     <p className="font-medium">{event.venue}</p>

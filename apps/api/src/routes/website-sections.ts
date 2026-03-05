@@ -57,7 +57,10 @@ websiteSectionsRoute.put(
     const id = c.req.param('id')
     const weddingId = c.req.query('weddingId')
     if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+      return c.json(
+        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+        400,
+      )
     }
 
     const data = c.req.valid('json')
@@ -81,7 +84,10 @@ websiteSectionsRoute.post(
   async (c) => {
     const weddingId = c.req.query('weddingId')
     if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+      return c.json(
+        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+        400,
+      )
     }
 
     const { sections } = c.req.valid('json')
@@ -112,22 +118,21 @@ websiteSectionsRoute.post(
 )
 
 // DELETE /website-sections/:id?weddingId=X (custom only, gated)
-websiteSectionsRoute.delete(
-  '/:id',
-  requireFeature('canWebsiteCustomSections'),
-  async (c) => {
-    const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
-    }
+websiteSectionsRoute.delete('/:id', requireFeature('canWebsiteCustomSections'), async (c) => {
+  const id = c.req.param('id')
+  const weddingId = c.req.query('weddingId')
+  if (!weddingId) {
+    return c.json(
+      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+      400,
+    )
+  }
 
-    try {
-      await websiteSectionService.deleteCustom(id, weddingId)
-      return c.json({ data: { success: true } })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 400 }, 400)
-    }
-  },
-)
+  try {
+    await websiteSectionService.deleteCustom(id, weddingId)
+    return c.json({ data: { success: true } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Delete failed'
+    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 400 }, 400)
+  }
+})

@@ -63,7 +63,12 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
           <h2 className="font-serif text-xl font-semibold text-gray-900">Add Task</h2>
           <button onClick={onClose} className="text-gray-400 transition-colors hover:text-gray-600">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -80,7 +85,7 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Book photographer"
               required
-              className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
             />
           </div>
 
@@ -94,7 +99,7 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="Optional details..."
-              className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
             />
           </div>
 
@@ -108,7 +113,7 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
               />
             </div>
 
@@ -120,7 +125,7 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
                 id="category"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -139,7 +144,7 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
               id="priority"
               value={priority}
               onChange={(e) => setPriority(e.target.value as typeof priority)}
-              className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
             >
               <option value="must_do">Must Do</option>
               <option value="nice_to_have">Nice to Have</option>
@@ -160,7 +165,7 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
             <button
               type="submit"
               disabled={submitting || !title.trim()}
-              className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? 'Creating...' : 'Create Task'}
             </button>

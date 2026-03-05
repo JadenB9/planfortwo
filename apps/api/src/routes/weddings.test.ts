@@ -287,9 +287,7 @@ describe('Wedding Routes', () => {
     })
 
     it('should return 404 for invalid token', async () => {
-      mockedInvitationService.accept.mockRejectedValue(
-        new Error('Invitation not found'),
-      )
+      mockedInvitationService.accept.mockRejectedValue(new Error('Invitation not found'))
 
       const app = createApp()
       const res = await app.request('/weddings/accept-invite/bad-token', {
@@ -303,9 +301,7 @@ describe('Wedding Routes', () => {
     })
 
     it('should return 410 for expired invitation', async () => {
-      mockedInvitationService.accept.mockRejectedValue(
-        new Error('Invitation has expired'),
-      )
+      mockedInvitationService.accept.mockRejectedValue(new Error('Invitation has expired'))
 
       const app = createApp()
       const res = await app.request('/weddings/accept-invite/expired-token', {

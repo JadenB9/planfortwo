@@ -13,7 +13,7 @@ export const requireGuestLimit = createMiddleware<GuestLimitEnv>(async (c, next)
   const weddingId =
     c.req.query('weddingId') ??
     c.req.param('weddingId') ??
-    (await c.req.json().catch(() => ({} as Record<string, unknown>))).weddingId
+    (await c.req.json().catch(() => ({}) as Record<string, unknown>)).weddingId
 
   if (!weddingId || typeof weddingId !== 'string') {
     return c.json(

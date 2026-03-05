@@ -2,8 +2,16 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 import { weddings } from './weddings'
 
 export const ceremonyMomentEnum = pgEnum('ceremony_moment', [
-  'prelude', 'processional', 'welcome', 'reading', 'vows',
-  'ring_exchange', 'unity_ceremony', 'pronouncement', 'recessional', 'other',
+  'prelude',
+  'processional',
+  'welcome',
+  'reading',
+  'vows',
+  'ring_exchange',
+  'unity_ceremony',
+  'pronouncement',
+  'recessional',
+  'other',
 ])
 
 export const ceremonyOutlines = pgTable('ceremony_outlines', {

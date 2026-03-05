@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,8 +25,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -35,14 +44,31 @@ vi.mock('../services/activity.js', () => ({
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
-      tier: 'full', canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-      canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-      canAddAttachments: true, maxGuests: null, canEditGuests: true,
-      canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-      canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      tier: 'full',
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -100,7 +126,8 @@ describe('Activity Routes', () => {
 
       const app = createApp()
       const res = await app.request(`/activity?weddingId=${WEDDING_ID}&limit=10`, {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
 
       expect(res.status).toBe(200)
@@ -116,7 +143,8 @@ describe('Activity Routes', () => {
 
       const app = createApp()
       const res = await app.request(`/activity?weddingId=${WEDDING_ID}`, {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
 
       expect(res.status).toBe(200)
@@ -137,7 +165,8 @@ describe('Activity Routes', () => {
     it('should return 400 for invalid weddingId', async () => {
       const app = createApp()
       const res = await app.request('/activity?weddingId=not-a-uuid', {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
 
       expect(res.status).toBe(400)
@@ -146,7 +175,8 @@ describe('Activity Routes', () => {
     it('should return 400 for limit exceeding maximum', async () => {
       const app = createApp()
       const res = await app.request(`/activity?weddingId=${WEDDING_ID}&limit=200`, {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
 
       expect(res.status).toBe(400)

@@ -29,7 +29,11 @@ export function useWedding() {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load wedding data'
       console.error('useWedding error:', err)
-      if (message.includes('fetch') || message.includes('network') || message.includes('ECONNREFUSED')) {
+      if (
+        message.includes('fetch') ||
+        message.includes('network') ||
+        message.includes('ECONNREFUSED')
+      ) {
         setError('Unable to connect to the API. Please check that the server is running.')
       } else {
         setError(message)

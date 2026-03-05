@@ -58,10 +58,7 @@ export const playlistService = {
   },
 
   async deleteSong(songId: string) {
-    const [deleted] = await db
-      .delete(playlistSongs)
-      .where(eq(playlistSongs.id, songId))
-      .returning()
+    const [deleted] = await db.delete(playlistSongs).where(eq(playlistSongs.id, songId)).returning()
     return deleted ?? null
   },
 
@@ -88,10 +85,7 @@ export const playlistService = {
   },
 
   async deleteSongRequest(id: string) {
-    const [deleted] = await db
-      .delete(songRequests)
-      .where(eq(songRequests.id, id))
-      .returning()
+    const [deleted] = await db.delete(songRequests).where(eq(songRequests.id, id)).returning()
     return deleted ?? null
   },
 }

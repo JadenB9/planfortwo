@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,8 +25,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -43,14 +52,31 @@ vi.mock('../services/events.js', () => ({
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
-      tier: 'full', canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-      canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-      canAddAttachments: true, maxGuests: null, canEditGuests: true,
-      canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-      canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      tier: 'full',
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -82,34 +108,87 @@ describe('Event Routes', () => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
     vi.mocked(userService.findByClerkId).mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     })
     vi.mocked(weddingService.verifyMembership).mockResolvedValue({
-      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: WEDDING_ID,
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     })
+    mockedService.getById.mockResolvedValue({
+      id: EVENT_ID,
+      weddingId: WEDDING_ID,
+      name: 'Ceremony',
+      description: null,
+      date: null,
+      startTime: null,
+      endTime: null,
+      venue: null,
+      address: null,
+      dressCode: null,
+      sortOrder: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as never)
     mockedFeatureService.getFeatures.mockResolvedValue({
-      tier: 'full', canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-      canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-      canAddAttachments: true, maxGuests: null, canEditGuests: true,
-      canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-      canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      tier: 'full',
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     })
   })
 
   describe('GET /events', () => {
     it('should list events', async () => {
       mockedService.list.mockResolvedValue([
-        { id: EVENT_ID, weddingId: WEDDING_ID, name: 'Ceremony', description: null,
-          date: null, startTime: '2:00 PM', endTime: '3:00 PM', venue: 'Church',
-          address: null, dressCode: 'Formal', sortOrder: 0,
-          createdAt: new Date(), updatedAt: new Date() },
+        {
+          id: EVENT_ID,
+          weddingId: WEDDING_ID,
+          name: 'Ceremony',
+          description: null,
+          date: null,
+          startTime: '2:00 PM',
+          endTime: '3:00 PM',
+          venue: 'Church',
+          address: null,
+          dressCode: 'Formal',
+          sortOrder: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ] as never)
 
       const app = createApp()
-      const res = await app.request(`/events?weddingId=${WEDDING_ID}`, { method: 'GET', headers: authHeaders() })
+      const res = await app.request(`/events?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
@@ -120,16 +199,30 @@ describe('Event Routes', () => {
   describe('POST /events', () => {
     it('should create an event', async () => {
       mockedService.create.mockResolvedValue({
-        id: EVENT_ID, weddingId: WEDDING_ID, name: 'Reception',
-        description: 'Dinner and dancing', date: null, startTime: '6:00 PM',
-        endTime: '11:00 PM', venue: 'Grand Ballroom', address: null,
-        dressCode: null, sortOrder: 0, createdAt: new Date(), updatedAt: new Date(),
+        id: EVENT_ID,
+        weddingId: WEDDING_ID,
+        name: 'Reception',
+        description: 'Dinner and dancing',
+        date: null,
+        startTime: '6:00 PM',
+        endTime: '11:00 PM',
+        venue: 'Grand Ballroom',
+        address: null,
+        dressCode: null,
+        sortOrder: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request(`/events?weddingId=${WEDDING_ID}`, {
-        method: 'POST', headers: authHeaders(),
-        body: JSON.stringify({ weddingId: WEDDING_ID, name: 'Reception', description: 'Dinner and dancing' }),
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          name: 'Reception',
+          description: 'Dinner and dancing',
+        }),
       })
       expect(res.status).toBe(201)
       const body = await res.json()
@@ -140,15 +233,25 @@ describe('Event Routes', () => {
   describe('PUT /events/:id', () => {
     it('should update an event', async () => {
       mockedService.update.mockResolvedValue({
-        id: EVENT_ID, weddingId: WEDDING_ID, name: 'Updated Reception',
-        description: null, date: null, startTime: null, endTime: null,
-        venue: null, address: null, dressCode: null, sortOrder: 0,
-        createdAt: new Date(), updatedAt: new Date(),
+        id: EVENT_ID,
+        weddingId: WEDDING_ID,
+        name: 'Updated Reception',
+        description: null,
+        date: null,
+        startTime: null,
+        endTime: null,
+        venue: null,
+        address: null,
+        dressCode: null,
+        sortOrder: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request(`/events/${EVENT_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'PUT', headers: authHeaders(),
+        method: 'PUT',
+        headers: authHeaders(),
         body: JSON.stringify({ name: 'Updated Reception' }),
       })
       expect(res.status).toBe(200)
@@ -160,18 +263,28 @@ describe('Event Routes', () => {
   describe('POST /events/:id/timeline', () => {
     it('should create a timeline entry', async () => {
       mockedService.createTimelineEntry.mockResolvedValue({
-        id: 'c0000000-0000-0000-0000-000000000001', eventId: EVENT_ID,
-        weddingId: WEDDING_ID, time: '2:00 PM', title: 'Processional',
-        description: null, responsiblePerson: null, location: null,
-        notes: null, sortOrder: 0, createdAt: new Date(),
+        id: 'c0000000-0000-0000-0000-000000000001',
+        eventId: EVENT_ID,
+        weddingId: WEDDING_ID,
+        time: '2:00 PM',
+        title: 'Processional',
+        description: null,
+        responsiblePerson: null,
+        location: null,
+        notes: null,
+        sortOrder: 0,
+        createdAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request(`/events/${EVENT_ID}/timeline?weddingId=${WEDDING_ID}`, {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST',
+        headers: authHeaders(),
         body: JSON.stringify({
-          eventId: EVENT_ID, weddingId: WEDDING_ID,
-          time: '2:00 PM', title: 'Processional',
+          eventId: EVENT_ID,
+          weddingId: WEDDING_ID,
+          time: '2:00 PM',
+          title: 'Processional',
         }),
       })
       expect(res.status).toBe(201)
@@ -183,14 +296,26 @@ describe('Event Routes', () => {
   describe('GET /events/:id/timeline', () => {
     it('should list timeline entries', async () => {
       mockedService.listTimeline.mockResolvedValue([
-        { id: 'c0000000-0000-0000-0000-000000000001', eventId: EVENT_ID,
-          weddingId: WEDDING_ID, time: '2:00 PM', title: 'Processional',
-          description: null, responsiblePerson: null, location: null,
-          notes: null, sortOrder: 0, createdAt: new Date() },
+        {
+          id: 'c0000000-0000-0000-0000-000000000001',
+          eventId: EVENT_ID,
+          weddingId: WEDDING_ID,
+          time: '2:00 PM',
+          title: 'Processional',
+          description: null,
+          responsiblePerson: null,
+          location: null,
+          notes: null,
+          sortOrder: 0,
+          createdAt: new Date(),
+        },
       ] as never)
 
       const app = createApp()
-      const res = await app.request(`/events/${EVENT_ID}/timeline?weddingId=${WEDDING_ID}`, { method: 'GET', headers: authHeaders() })
+      const res = await app.request(`/events/${EVENT_ID}/timeline?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
@@ -202,7 +327,8 @@ describe('Event Routes', () => {
       mockedService.delete.mockResolvedValue(true as never)
       const app = createApp()
       const res = await app.request(`/events/${EVENT_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'DELETE', headers: authHeaders(),
+        method: 'DELETE',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(200)
     })
@@ -211,7 +337,8 @@ describe('Event Routes', () => {
       mockedService.delete.mockResolvedValue(false as never)
       const app = createApp()
       const res = await app.request(`/events/${EVENT_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'DELETE', headers: authHeaders(),
+        method: 'DELETE',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(404)
     })

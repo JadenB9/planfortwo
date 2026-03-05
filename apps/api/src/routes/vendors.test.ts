@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,8 +25,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -46,14 +55,31 @@ vi.mock('../services/vendors.js', () => ({
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
-      tier: 'full', canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-      canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-      canAddAttachments: true, maxGuests: null, canEditGuests: true,
-      canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-      canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      tier: 'full',
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -71,25 +97,59 @@ const WEDDING_ID = 'a0000000-0000-0000-0000-000000000001'
 const VENDOR_ID = 'b0000000-0000-0000-0000-000000000001'
 
 const FULL_GATES = {
-  tier: 'full' as const, canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-  canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-  canAddAttachments: true, maxGuests: null, canEditGuests: true,
-  canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-  canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-  canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-  canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-  canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+  tier: 'full' as const,
+  canAddTasks: true,
+  canEditChecklist: true,
+  canDeleteTasks: true,
+  canReorderTasks: true,
+  canCustomizeCategories: true,
+  canAddNotes: true,
+  canAddAttachments: true,
+  maxGuests: null,
+  canEditGuests: true,
+  canDeleteGuests: true,
+  canBulkImport: true,
+  canRsvp: true,
+  canSeatingChart: true,
+  canVendorManagement: true,
+  canCustomDomain: true,
+  canDataExport: true,
+  canBudgetCategories: true,
+  canBudgetExpenses: true,
+  canBudgetAnalytics: true,
+  canBudgetExport: true,
+  canPaymentSchedule: true,
+  canWebsiteBuilder: true,
+  canWebsiteAnalytics: true,
+  canWebsiteCustomSections: true,
 }
 
 const FREE_GATES = {
-  tier: 'free' as const, canAddTasks: false, canEditChecklist: false, canDeleteTasks: false,
-  canReorderTasks: false, canCustomizeCategories: false, canAddNotes: false,
-  canAddAttachments: false, maxGuests: 15, canEditGuests: false,
-  canDeleteGuests: false, canBulkImport: false, canRsvp: false,
-  canSeatingChart: false, canVendorManagement: false, canCustomDomain: false,
-  canDataExport: false, canBudgetCategories: false, canBudgetExpenses: false,
-  canBudgetAnalytics: false, canBudgetExport: false, canPaymentSchedule: false,
-  canWebsiteBuilder: false, canWebsiteAnalytics: false, canWebsiteCustomSections: false,
+  tier: 'free' as const,
+  canAddTasks: false,
+  canEditChecklist: false,
+  canDeleteTasks: false,
+  canReorderTasks: false,
+  canCustomizeCategories: false,
+  canAddNotes: false,
+  canAddAttachments: false,
+  maxGuests: 15,
+  canEditGuests: false,
+  canDeleteGuests: false,
+  canBulkImport: false,
+  canRsvp: false,
+  canSeatingChart: false,
+  canVendorManagement: false,
+  canCustomDomain: false,
+  canDataExport: false,
+  canBudgetCategories: false,
+  canBudgetExpenses: false,
+  canBudgetAnalytics: false,
+  canBudgetExport: false,
+  canPaymentSchedule: false,
+  canWebsiteBuilder: false,
+  canWebsiteAnalytics: false,
+  canWebsiteCustomSections: false,
 }
 
 function createApp() {
@@ -107,25 +167,67 @@ describe('Vendor Routes', () => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
     vi.mocked(userService.findByClerkId).mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     })
     vi.mocked(weddingService.verifyMembership).mockResolvedValue({
-      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: WEDDING_ID,
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     })
+    mockedService.getById.mockResolvedValue({
+      id: VENDOR_ID,
+      weddingId: WEDDING_ID,
+      name: 'Photo Studio',
+      category: 'Photography',
+      status: 'booked',
+      contactName: null,
+      email: null,
+      phone: null,
+      website: null,
+      address: null,
+      notes: null,
+      cost: null,
+      depositAmount: null,
+      sortOrder: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as never)
     mockedFeatureService.getFeatures.mockResolvedValue(FULL_GATES)
   })
 
   describe('GET /vendors', () => {
     it('should list vendors', async () => {
       mockedService.list.mockResolvedValue([
-        { id: VENDOR_ID, weddingId: WEDDING_ID, name: 'Photo Studio', category: 'Photography',
-          status: 'booked', contactName: 'John', email: null, phone: null, website: null,
-          address: null, notes: null, cost: 5000, depositAmount: 1000, sortOrder: 0,
-          createdAt: new Date(), updatedAt: new Date() },
+        {
+          id: VENDOR_ID,
+          weddingId: WEDDING_ID,
+          name: 'Photo Studio',
+          category: 'Photography',
+          status: 'booked',
+          contactName: 'John',
+          email: null,
+          phone: null,
+          website: null,
+          address: null,
+          notes: null,
+          cost: 5000,
+          depositAmount: 1000,
+          sortOrder: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ] as never)
 
       const app = createApp()
-      const res = await app.request(`/vendors?weddingId=${WEDDING_ID}`, { method: 'GET', headers: authHeaders() })
+      const res = await app.request(`/vendors?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
@@ -136,16 +238,28 @@ describe('Vendor Routes', () => {
   describe('POST /vendors', () => {
     it('should create a vendor', async () => {
       mockedService.create.mockResolvedValue({
-        id: VENDOR_ID, weddingId: WEDDING_ID, name: 'DJ Cool',
-        category: 'Music', status: 'researching', contactName: null,
-        email: null, phone: null, website: null, address: null, notes: null,
-        cost: null, depositAmount: null, sortOrder: 0,
-        createdAt: new Date(), updatedAt: new Date(),
+        id: VENDOR_ID,
+        weddingId: WEDDING_ID,
+        name: 'DJ Cool',
+        category: 'Music',
+        status: 'researching',
+        contactName: null,
+        email: null,
+        phone: null,
+        website: null,
+        address: null,
+        notes: null,
+        cost: null,
+        depositAmount: null,
+        sortOrder: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request(`/vendors?weddingId=${WEDDING_ID}`, {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST',
+        headers: authHeaders(),
         body: JSON.stringify({ weddingId: WEDDING_ID, name: 'DJ Cool', category: 'Music' }),
       })
       expect(res.status).toBe(201)
@@ -157,7 +271,8 @@ describe('Vendor Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
       const app = createApp()
       const res = await app.request(`/vendors?weddingId=${WEDDING_ID}`, {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST',
+        headers: authHeaders(),
         body: JSON.stringify({ weddingId: WEDDING_ID, name: 'DJ', category: 'Music' }),
       })
       expect(res.status).toBe(403)
@@ -167,16 +282,28 @@ describe('Vendor Routes', () => {
   describe('PUT /vendors/:id', () => {
     it('should update a vendor', async () => {
       mockedService.update.mockResolvedValue({
-        id: VENDOR_ID, weddingId: WEDDING_ID, name: 'DJ Awesome',
-        category: 'Music', status: 'booked', contactName: null,
-        email: null, phone: null, website: null, address: null, notes: null,
-        cost: 2000, depositAmount: null, sortOrder: 0,
-        createdAt: new Date(), updatedAt: new Date(),
+        id: VENDOR_ID,
+        weddingId: WEDDING_ID,
+        name: 'DJ Awesome',
+        category: 'Music',
+        status: 'booked',
+        contactName: null,
+        email: null,
+        phone: null,
+        website: null,
+        address: null,
+        notes: null,
+        cost: 2000,
+        depositAmount: null,
+        sortOrder: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request(`/vendors/${VENDOR_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'PUT', headers: authHeaders(),
+        method: 'PUT',
+        headers: authHeaders(),
         body: JSON.stringify({ name: 'DJ Awesome', status: 'booked' }),
       })
       expect(res.status).toBe(200)
@@ -188,7 +315,8 @@ describe('Vendor Routes', () => {
       mockedService.update.mockResolvedValue(null)
       const app = createApp()
       const res = await app.request(`/vendors/${VENDOR_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'PUT', headers: authHeaders(),
+        method: 'PUT',
+        headers: authHeaders(),
         body: JSON.stringify({ name: 'Test' }),
       })
       expect(res.status).toBe(404)
@@ -200,7 +328,8 @@ describe('Vendor Routes', () => {
       mockedService.delete.mockResolvedValue(true as never)
       const app = createApp()
       const res = await app.request(`/vendors/${VENDOR_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'DELETE', headers: authHeaders(),
+        method: 'DELETE',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(200)
     })
@@ -209,17 +338,32 @@ describe('Vendor Routes', () => {
   describe('POST /vendors/:id/communications', () => {
     it('should add a communication log', async () => {
       mockedService.addCommunication.mockResolvedValue({
-        id: 'c0000000-0000-0000-0000-000000000001', vendorId: VENDOR_ID,
-        type: 'call', subject: 'Pricing', content: 'Discussed pricing',
-        contactDate: new Date(), followUpDate: null, attachmentUrl: null,
-        attachmentName: null, createdAt: new Date(),
+        id: 'c0000000-0000-0000-0000-000000000001',
+        vendorId: VENDOR_ID,
+        type: 'call',
+        subject: 'Pricing',
+        content: 'Discussed pricing',
+        contactDate: new Date(),
+        followUpDate: null,
+        attachmentUrl: null,
+        attachmentName: null,
+        createdAt: new Date(),
       } as never)
 
       const app = createApp()
-      const res = await app.request(`/vendors/${VENDOR_ID}/communications?weddingId=${WEDDING_ID}`, {
-        method: 'POST', headers: authHeaders(),
-        body: JSON.stringify({ vendorId: VENDOR_ID, content: 'Discussed pricing', type: 'call', subject: 'Pricing' }),
-      })
+      const res = await app.request(
+        `/vendors/${VENDOR_ID}/communications?weddingId=${WEDDING_ID}`,
+        {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            vendorId: VENDOR_ID,
+            content: 'Discussed pricing',
+            type: 'call',
+            subject: 'Pricing',
+          }),
+        },
+      )
       expect(res.status).toBe(201)
       const body = await res.json()
       expect(body.data.content).toBe('Discussed pricing')
@@ -229,16 +373,25 @@ describe('Vendor Routes', () => {
   describe('POST /vendors/:id/contracts', () => {
     it('should create a contract', async () => {
       mockedService.createContract.mockResolvedValue({
-        id: 'c0000000-0000-0000-0000-000000000002', vendorId: VENDOR_ID,
-        title: 'Photography Contract', fileUrl: null, fileName: null,
-        status: 'pending', signedDate: null, depositDueDate: null,
-        balanceDueDate: null, cancellationDeadline: null, notes: null,
-        createdAt: new Date(), updatedAt: new Date(),
+        id: 'c0000000-0000-0000-0000-000000000002',
+        vendorId: VENDOR_ID,
+        title: 'Photography Contract',
+        fileUrl: null,
+        fileName: null,
+        status: 'pending',
+        signedDate: null,
+        depositDueDate: null,
+        balanceDueDate: null,
+        cancellationDeadline: null,
+        notes: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request(`/vendors/${VENDOR_ID}/contracts?weddingId=${WEDDING_ID}`, {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST',
+        headers: authHeaders(),
         body: JSON.stringify({ vendorId: VENDOR_ID, title: 'Photography Contract' }),
       })
       expect(res.status).toBe(201)

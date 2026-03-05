@@ -40,7 +40,10 @@ export function FaqSection({ title, content }: FaqSectionProps) {
               >
                 {q.question}
               </summary>
-              <p className={`mt-3 text-sm leading-relaxed ${fontPair.bodyClass}`} style={{ color: `${colors.primary}BB` }}>
+              <p
+                className={`mt-3 text-sm leading-relaxed ${fontPair.bodyClass}`}
+                style={{ color: `${colors.primary}BB` }}
+              >
                 {q.answer}
               </p>
             </motion.details>

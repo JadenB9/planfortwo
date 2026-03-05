@@ -12,12 +12,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 export default function PhotosPage() {
   const { getToken } = useAuth()
@@ -29,7 +24,9 @@ export default function PhotosPage() {
   const [showUpload, setShowUpload] = useState(false)
   const [urlInput, setUrlInput] = useState('')
   const [captionInput, setCaptionInput] = useState('')
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'favorites'>('all')
+  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'favorites'>(
+    'all',
+  )
 
   const loadPhotos = useCallback(async () => {
     if (!weddingId) return
@@ -54,7 +51,10 @@ export default function PhotosPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.photoGallery.create({ weddingId, url: urlInput.trim(), caption: captionInput || undefined }, token)
+      await api.photoGallery.create(
+        { weddingId, url: urlInput.trim(), caption: captionInput || undefined },
+        token,
+      )
       setUrlInput('')
       setCaptionInput('')
       setShowUpload(false)
@@ -113,7 +113,7 @@ export default function PhotosPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -130,7 +130,9 @@ export default function PhotosPage() {
           <h1 className="font-serif text-3xl font-bold text-gray-900">Photos</h1>
           <p className="mt-1 text-sm text-gray-600">
             Manage your wedding photo gallery.
-            {pendingCount > 0 && <span className="ml-2 font-medium text-amber-600">{pendingCount} pending review</span>}
+            {pendingCount > 0 && (
+              <span className="ml-2 font-medium text-amber-600">{pendingCount} pending review</span>
+            )}
           </p>
         </div>
         <Button onClick={() => setShowUpload(true)}>Add Photo</Button>
@@ -143,7 +145,9 @@ export default function PhotosPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
-                filter === f ? 'bg-wedding-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filter === f
+                  ? 'bg-wedding-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               {f} {f === 'pending' && pendingCount > 0 ? `(${pendingCount})` : ''}
@@ -155,14 +159,28 @@ export default function PhotosPage() {
       {filteredPhotos.length === 0 && photos.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-wedding-50">
-              <svg className="h-8 w-8 text-wedding-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+              <svg
+                className="text-wedding-600 h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
             </div>
             <h2 className="font-serif text-xl font-semibold text-gray-900">No Photos Yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">Add photos to build your wedding gallery.</p>
-            <Button className="mt-6" onClick={() => setShowUpload(true)}>Add Your First Photo</Button>
+            <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+              Add photos to build your wedding gallery.
+            </p>
+            <Button className="mt-6" onClick={() => setShowUpload(true)}>
+              Add Your First Photo
+            </Button>
           </CardContent>
         </Card>
       ) : filteredPhotos.length === 0 ? (
@@ -198,13 +216,23 @@ export default function PhotosPage() {
                     >
                       &#9733;
                     </button>
-                    <button onClick={() => handleDelete(photo.id)} className="rounded-full bg-white/90 p-1.5 text-xs text-red-600" title="Delete">
+                    <button
+                      onClick={() => handleDelete(photo.id)}
+                      className="rounded-full bg-white/90 p-1.5 text-xs text-red-600"
+                      title="Delete"
+                    >
                       &times;
                     </button>
                   </div>
                   <div className="absolute bottom-2 left-2">
                     <Badge
-                      variant={photo.moderationStatus === 'approved' ? 'default' : photo.moderationStatus === 'rejected' ? 'destructive' : 'secondary'}
+                      variant={
+                        photo.moderationStatus === 'approved'
+                          ? 'default'
+                          : photo.moderationStatus === 'rejected'
+                            ? 'destructive'
+                            : 'secondary'
+                      }
                       className="text-xs"
                     >
                       {photo.moderationStatus}
@@ -212,11 +240,23 @@ export default function PhotosPage() {
                   </div>
                 </div>
                 <CardContent className="p-3">
-                  {photo.caption && <p className="truncate text-sm text-gray-700">{photo.caption}</p>}
+                  {photo.caption && (
+                    <p className="truncate text-sm text-gray-700">{photo.caption}</p>
+                  )}
                   {photo.moderationStatus === 'pending' && (
                     <div className="mt-2 flex gap-2">
-                      <button onClick={() => handleModerate(photo.id, 'approved')} className="flex-1 rounded-lg bg-green-50 py-1 text-xs font-medium text-green-700 hover:bg-green-100">Approve</button>
-                      <button onClick={() => handleModerate(photo.id, 'rejected')} className="flex-1 rounded-lg bg-red-50 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Reject</button>
+                      <button
+                        onClick={() => handleModerate(photo.id, 'approved')}
+                        className="flex-1 rounded-lg bg-green-50 py-1 text-xs font-medium text-green-700 hover:bg-green-100"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleModerate(photo.id, 'rejected')}
+                        className="flex-1 rounded-lg bg-red-50 py-1 text-xs font-medium text-red-700 hover:bg-red-100"
+                      >
+                        Reject
+                      </button>
                     </div>
                   )}
                 </CardContent>
@@ -228,17 +268,31 @@ export default function PhotosPage() {
 
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add Photo</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Add Photo</DialogTitle>
+          </DialogHeader>
           <div className="space-y-4">
             <div>
               <Label htmlFor="photo-url">Photo URL</Label>
-              <Input id="photo-url" value={urlInput} onChange={(e) => setUrlInput(e.target.value)} placeholder="https://..." />
+              <Input
+                id="photo-url"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder="https://..."
+              />
             </div>
             <div>
               <Label htmlFor="photo-caption">Caption (optional)</Label>
-              <Input id="photo-caption" value={captionInput} onChange={(e) => setCaptionInput(e.target.value)} placeholder="Describe this photo" />
+              <Input
+                id="photo-caption"
+                value={captionInput}
+                onChange={(e) => setCaptionInput(e.target.value)}
+                placeholder="Describe this photo"
+              />
             </div>
-            <Button onClick={handleAddPhoto} className="w-full">Add Photo</Button>
+            <Button onClick={handleAddPhoto} className="w-full">
+              Add Photo
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

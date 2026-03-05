@@ -10,7 +10,17 @@ interface OnboardingData {
   country?: string
   guestCountEstimate?: number
   budgetTotal?: string
-  style?: 'classic' | 'modern' | 'rustic' | 'romantic' | 'minimalist' | 'bohemian' | 'garden' | 'beach' | 'elegant' | 'whimsical'
+  style?:
+    | 'classic'
+    | 'modern'
+    | 'rustic'
+    | 'romantic'
+    | 'minimalist'
+    | 'bohemian'
+    | 'garden'
+    | 'beach'
+    | 'elegant'
+    | 'whimsical'
   timelineTemplate?: '6-month' | '12-month' | '18-month' | 'elopement'
 }
 
@@ -42,12 +52,7 @@ export const weddingService = {
     const results = await db
       .select()
       .from(weddingMembers)
-      .where(
-        and(
-          eq(weddingMembers.weddingId, weddingId),
-          eq(weddingMembers.userId, userId),
-        ),
-      )
+      .where(and(eq(weddingMembers.weddingId, weddingId), eq(weddingMembers.userId, userId)))
 
     return results[0] ?? null
   },

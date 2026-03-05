@@ -8,10 +8,19 @@ interface CategoryListProps {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount)
 }
 
-export function CategoryList({ categories, breakdown, selectedCategoryId, onSelect }: CategoryListProps) {
+export function CategoryList({
+  categories,
+  breakdown,
+  selectedCategoryId,
+  onSelect,
+}: CategoryListProps) {
   const breakdownMap = new Map(breakdown.map((b) => [b.categoryId, b]))
 
   return (
@@ -54,7 +63,9 @@ export function CategoryList({ categories, breakdown, selectedCategoryId, onSele
               <p className="text-xs text-gray-500">
                 {formatCurrency(spent)} / {formatCurrency(allocated)}
               </p>
-              <p className={`text-xs font-medium ${percent > 100 ? 'text-red-600' : percent > 80 ? 'text-amber-600' : 'text-gray-600'}`}>
+              <p
+                className={`text-xs font-medium ${percent > 100 ? 'text-red-600' : percent > 80 ? 'text-amber-600' : 'text-gray-600'}`}
+              >
                 {percent}%
               </p>
             </div>

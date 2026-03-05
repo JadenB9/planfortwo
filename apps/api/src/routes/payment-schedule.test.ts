@@ -203,10 +203,10 @@ describe('Payment Schedule Routes', () => {
       mockedService.list.mockResolvedValue([mockPayment] as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/payment-schedule?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -218,32 +218,26 @@ describe('Payment Schedule Routes', () => {
       mockedService.list.mockResolvedValue([] as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule?weddingId=${WEDDING_ID}&filter=upcoming`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/payment-schedule?weddingId=${WEDDING_ID}&filter=upcoming`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
-      expect(mockedService.list).toHaveBeenCalledWith(
-        WEDDING_ID,
-        'upcoming',
-      )
+      expect(mockedService.list).toHaveBeenCalledWith(WEDDING_ID, 'upcoming')
     })
 
     it('should filter overdue payments', async () => {
       mockedService.list.mockResolvedValue([] as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule?weddingId=${WEDDING_ID}&filter=overdue`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/payment-schedule?weddingId=${WEDDING_ID}&filter=overdue`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
-      expect(mockedService.list).toHaveBeenCalledWith(
-        WEDDING_ID,
-        'overdue',
-      )
+      expect(mockedService.list).toHaveBeenCalledWith(WEDDING_ID, 'overdue')
     })
   })
 
@@ -272,14 +266,11 @@ describe('Payment Schedule Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify(validBody),
-        },
-      )
+      const res = await app.request(`/payment-schedule?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(validBody),
+      })
 
       expect(res.status).toBe(201)
       const body = await res.json()
@@ -291,14 +282,11 @@ describe('Payment Schedule Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify(validBody),
-        },
-      )
+      const res = await app.request(`/payment-schedule?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(validBody),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -315,14 +303,11 @@ describe('Payment Schedule Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ title: 'Updated installment' }),
-        },
-      )
+      const res = await app.request(`/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ title: 'Updated installment' }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -338,14 +323,11 @@ describe('Payment Schedule Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ isPaid: true }),
-        },
-      )
+      const res = await app.request(`/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ isPaid: true }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -357,14 +339,11 @@ describe('Payment Schedule Routes', () => {
       mockedService.update.mockResolvedValue(null)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ title: 'Updated' }),
-        },
-      )
+      const res = await app.request(`/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ title: 'Updated' }),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -377,10 +356,10 @@ describe('Payment Schedule Routes', () => {
       mockedService.delete.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -388,15 +367,13 @@ describe('Payment Schedule Routes', () => {
     })
 
     it('should return 404 for non-existent payment', async () => {
-      mockedService.delete.mockRejectedValue(
-        new Error('Payment schedule entry not found'),
-      )
+      mockedService.delete.mockRejectedValue(new Error('Payment schedule entry not found'))
 
       const app = createApp()
-      const res = await app.request(
-        `/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/payment-schedule/${PAYMENT_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()

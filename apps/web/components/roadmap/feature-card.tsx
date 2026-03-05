@@ -62,16 +62,18 @@ export function FeatureCard({ feature }: FeatureCardProps) {
     >
       <Link
         href={feature.href}
-        className="block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-colors hover:border-wedding-200"
+        className="hover:border-wedding-200 block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-colors"
       >
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-wedding-50">
-              <Icon className="h-5 w-5 text-wedding-600" />
+            <div className="bg-wedding-50 flex h-9 w-9 items-center justify-center rounded-lg">
+              <Icon className="text-wedding-600 h-5 w-5" />
             </div>
             <h3 className="text-sm font-semibold text-gray-900">{feature.label}</h3>
           </div>
-          <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}>
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}
+          >
             {statusStyle.label}
           </span>
         </div>

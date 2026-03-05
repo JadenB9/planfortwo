@@ -5,16 +5,12 @@ import HomePage from './page'
 describe('HomePage', () => {
   it('renders the main heading', () => {
     render(<HomePage />)
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      /your wedding/i
-    )
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/your wedding/i)
   })
 
   it('renders the tagline badge', () => {
     render(<HomePage />)
-    expect(
-      screen.getByText(/No subscriptions\. No ads\. Just planning\./i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/No subscriptions\. No ads\. Just planning\./i)).toBeInTheDocument()
   })
 
   it('renders Get Started Free CTA links', () => {

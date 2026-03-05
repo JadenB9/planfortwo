@@ -66,10 +66,7 @@ export async function POST(req: Request) {
             throw new Error('Failed to create user')
           }
 
-          const [wedding] = await tx
-            .insert(weddings)
-            .values({ name: 'Our Wedding' })
-            .returning()
+          const [wedding] = await tx.insert(weddings).values({ name: 'Our Wedding' }).returning()
 
           if (!wedding) {
             throw new Error('Failed to create default wedding')

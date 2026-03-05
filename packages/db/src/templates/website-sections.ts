@@ -12,7 +12,7 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
     title: 'Welcome',
     content: {
       headline: '',
-      subheadline: 'We\'re getting married!',
+      subheadline: "We're getting married!",
       backgroundImageUrl: null,
       showDate: true,
       showCountdown: true,

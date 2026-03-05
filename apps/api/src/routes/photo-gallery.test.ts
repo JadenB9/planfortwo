@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,8 +25,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -41,13 +50,30 @@ vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
       tier: 'full',
-      canAddTasks: true, canEditChecklist: true, canDeleteTasks: true, canReorderTasks: true,
-      canCustomizeCategories: true, canAddNotes: true, canAddAttachments: true,
-      maxGuests: null, canEditGuests: true, canDeleteGuests: true, canBulkImport: true,
-      canRsvp: true, canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -101,10 +127,10 @@ describe('Photo Gallery Routes', () => {
       mockedService.list.mockResolvedValue([samplePhoto] as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/photos?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -117,10 +143,10 @@ describe('Photo Gallery Routes', () => {
       mockedService.list.mockResolvedValue([] as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/photos?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -133,10 +159,10 @@ describe('Photo Gallery Routes', () => {
       mockedService.getById.mockResolvedValue(samplePhoto as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -149,10 +175,10 @@ describe('Photo Gallery Routes', () => {
       mockedService.getById.mockResolvedValue(null as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -225,14 +251,11 @@ describe('Photo Gallery Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify(updateInput),
-        },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updateInput),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -245,14 +268,11 @@ describe('Photo Gallery Routes', () => {
       mockedService.update.mockResolvedValue(null as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ caption: 'Does not exist' }),
-        },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ caption: 'Does not exist' }),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -261,14 +281,11 @@ describe('Photo Gallery Routes', () => {
 
     it('should return 400 when weddingId is missing', async () => {
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ caption: 'No wedding id' }),
-        },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ caption: 'No wedding id' }),
+      })
 
       expect(res.status).toBe(400)
       const body = await res.json()
@@ -281,10 +298,10 @@ describe('Photo Gallery Routes', () => {
       mockedService.delete.mockResolvedValue(samplePhoto as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -296,10 +313,10 @@ describe('Photo Gallery Routes', () => {
       mockedService.delete.mockResolvedValue(null as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -308,10 +325,10 @@ describe('Photo Gallery Routes', () => {
 
     it('should return 400 when weddingId is missing', async () => {
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(400)
       const body = await res.json()
@@ -327,14 +344,11 @@ describe('Photo Gallery Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}/moderate?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ status: 'approved' }),
-        },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}/moderate?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ status: 'approved' }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -349,14 +363,11 @@ describe('Photo Gallery Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}/moderate?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ status: 'rejected' }),
-        },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}/moderate?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ status: 'rejected' }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -368,14 +379,11 @@ describe('Photo Gallery Routes', () => {
       mockedService.moderate.mockResolvedValue(null as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}/moderate?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ status: 'approved' }),
-        },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}/moderate?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ status: 'approved' }),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -384,14 +392,11 @@ describe('Photo Gallery Routes', () => {
 
     it('should return 400 when weddingId is missing', async () => {
       const app = createApp()
-      const res = await app.request(
-        `/photos/${PHOTO_ID}/moderate`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ status: 'approved' }),
-        },
-      )
+      const res = await app.request(`/photos/${PHOTO_ID}/moderate`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ status: 'approved' }),
+      })
 
       expect(res.status).toBe(400)
       const body = await res.json()

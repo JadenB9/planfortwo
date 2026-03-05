@@ -1,10 +1,5 @@
 import { eq, sql, asc } from 'drizzle-orm'
-import {
-  db,
-  budgetCategories,
-  budgetItems,
-  weddings,
-} from '@planfortwo/db'
+import { db, budgetCategories, budgetItems, weddings } from '@planfortwo/db'
 import { tipDefaults } from '@planfortwo/db'
 import type {
   BudgetAnalytics,
@@ -42,10 +37,7 @@ export const budgetAnalyticsService = {
       .where(eq(budgetCategories.weddingId, weddingId))
       .orderBy(asc(budgetCategories.sortOrder))
 
-    const totalAllocated = categoryRows.reduce(
-      (acc, c) => acc + toNum(c.allocatedAmount),
-      0,
-    )
+    const totalAllocated = categoryRows.reduce((acc, c) => acc + toNum(c.allocatedAmount), 0)
 
     // Item-level aggregates
     const [itemAgg] = await db
@@ -153,9 +145,10 @@ export const budgetAnalyticsService = {
       const vendorLower = tip.vendorType.toLowerCase()
 
       // Find items whose category name contains the vendor type (fuzzy match)
-      const matching = items.filter((item) =>
-        item.categoryName.toLowerCase().includes(vendorLower) ||
-        vendorLower.includes(item.categoryName.toLowerCase()),
+      const matching = items.filter(
+        (item) =>
+          item.categoryName.toLowerCase().includes(vendorLower) ||
+          vendorLower.includes(item.categoryName.toLowerCase()),
       )
 
       const itemTotal = matching.reduce((acc, m) => acc + toNum(m.amount), 0)
@@ -287,22 +280,37 @@ export const budgetAnalyticsService = {
       // Title
       doc.fontSize(20).text(`${weddingName} - Budget Report`, { align: 'center' })
       doc.moveDown(0.5)
-      doc.fontSize(10).fillColor('#666666').text(
-        `Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
-        { align: 'center' },
-      )
+      doc
+        .fontSize(10)
+        .fillColor('#666666')
+        .text(
+          `Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+          { align: 'center' },
+        )
       doc.moveDown(1)
 
       // Summary
       doc.fontSize(14).fillColor('#000000').text('Budget Summary')
       doc.moveDown(0.3)
       doc.fontSize(10)
-      doc.text(`Total Budget: $${analytics.totalBudget.toLocaleString('en-US', { minimumFractionDigits: 2 })}`)
-      doc.text(`Total Allocated: $${analytics.totalAllocated.toLocaleString('en-US', { minimumFractionDigits: 2 })}`)
-      doc.text(`Total Spent: $${analytics.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`)
-      doc.text(`Total Paid: $${analytics.totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}`)
-      doc.text(`Total Unpaid: $${analytics.totalUnpaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}`)
-      doc.text(`Per-Guest Cost: $${analytics.perGuestCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`)
+      doc.text(
+        `Total Budget: $${analytics.totalBudget.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      )
+      doc.text(
+        `Total Allocated: $${analytics.totalAllocated.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      )
+      doc.text(
+        `Total Spent: $${analytics.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      )
+      doc.text(
+        `Total Paid: $${analytics.totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      )
+      doc.text(
+        `Total Unpaid: $${analytics.totalUnpaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      )
+      doc.text(
+        `Per-Guest Cost: $${analytics.perGuestCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      )
       doc.moveDown(1)
 
       // Category breakdown
@@ -321,11 +329,7 @@ export const budgetAnalyticsService = {
       doc.font('Helvetica')
 
       doc.moveDown(0.3)
-      doc
-        .moveTo(50, doc.y)
-        .lineTo(540, doc.y)
-        .strokeColor('#cccccc')
-        .stroke()
+      doc.moveTo(50, doc.y).lineTo(540, doc.y).strokeColor('#cccccc').stroke()
       doc.moveDown(0.2)
 
       for (const cat of analytics.categoryBreakdown) {
@@ -361,11 +365,7 @@ export const budgetAnalyticsService = {
         doc.font('Helvetica')
 
         doc.moveDown(0.3)
-        doc
-          .moveTo(50, doc.y)
-          .lineTo(540, doc.y)
-          .strokeColor('#cccccc')
-          .stroke()
+        doc.moveTo(50, doc.y).lineTo(540, doc.y).strokeColor('#cccccc').stroke()
         doc.moveDown(0.2)
 
         for (const item of items) {

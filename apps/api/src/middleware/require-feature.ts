@@ -13,8 +13,7 @@ export function requireFeature(feature: keyof FeatureGates) {
     const weddingId =
       c.req.query('weddingId') ??
       c.req.param('weddingId') ??
-      (await c.req.json().catch(() => ({} as Record<string, unknown>)))
-        .weddingId
+      (await c.req.json().catch(() => ({}) as Record<string, unknown>)).weddingId
 
     if (!weddingId || typeof weddingId !== 'string') {
       return c.json(
@@ -26,10 +25,7 @@ export function requireFeature(feature: keyof FeatureGates) {
     const gates = await featureService.getFeatures(weddingId)
 
     if (!gates[feature]) {
-      return c.json(
-        { error: 'Upgrade required', code: 'FEATURE_LOCKED', statusCode: 403 },
-        403,
-      )
+      return c.json({ error: 'Upgrade required', code: 'FEATURE_LOCKED', statusCode: 403 }, 403)
     }
 
     await next()

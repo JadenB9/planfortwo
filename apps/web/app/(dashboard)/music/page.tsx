@@ -73,7 +73,12 @@ export default function MusicPage() {
   const [requests, setRequests] = useState<SongRequest[]>([])
 
   const [showPlaylistDialog, setShowPlaylistDialog] = useState(false)
-  const [playlistForm, setPlaylistForm] = useState({ name: '', description: '', spotifyUrl: '', appleMusicUrl: '' })
+  const [playlistForm, setPlaylistForm] = useState({
+    name: '',
+    description: '',
+    spotifyUrl: '',
+    appleMusicUrl: '',
+  })
 
   const [showSongDialog, setShowSongDialog] = useState(false)
   const [songForm, setSongForm] = useState({ title: '', artist: '', category: '' })
@@ -99,99 +104,136 @@ export default function MusicPage() {
     }
   }, [getToken])
 
-  useEffect(() => { void loadData() }, [loadData])
+  useEffect(() => {
+    void loadData()
+  }, [loadData])
 
-  const loadPlaylistSongs = useCallback(async (playlistId: string) => {
-    if (!weddingId) return
-    try {
-      const token = await getToken()
-      if (!token) return
-      const { data } = await api.playlists.get(playlistId, weddingId, token)
-      setSongs(data.songs ?? [])
-      setSelectedPlaylist(playlistId)
-    } catch { /* silent */ }
-  }, [weddingId, getToken])
+  const loadPlaylistSongs = useCallback(
+    async (playlistId: string) => {
+      if (!weddingId) return
+      try {
+        const token = await getToken()
+        if (!token) return
+        const { data } = await api.playlists.get(playlistId, weddingId, token)
+        setSongs(data.songs ?? [])
+        setSelectedPlaylist(playlistId)
+      } catch {
+        /* silent */
+      }
+    },
+    [weddingId, getToken],
+  )
 
   const handleCreatePlaylist = useCallback(async () => {
     if (!weddingId) return
     try {
       const token = await getToken()
       if (!token) return
-      await api.playlists.create({
-        weddingId,
-        name: playlistForm.name,
-        description: playlistForm.description || null,
-        spotifyUrl: playlistForm.spotifyUrl || null,
-        appleMusicUrl: playlistForm.appleMusicUrl || null,
-      }, token)
+      await api.playlists.create(
+        {
+          weddingId,
+          name: playlistForm.name,
+          description: playlistForm.description || null,
+          spotifyUrl: playlistForm.spotifyUrl || null,
+          appleMusicUrl: playlistForm.appleMusicUrl || null,
+        },
+        token,
+      )
       setShowPlaylistDialog(false)
       setPlaylistForm({ name: '', description: '', spotifyUrl: '', appleMusicUrl: '' })
       void loadData()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }, [weddingId, getToken, playlistForm, loadData])
 
-  const handleDeletePlaylist = useCallback(async (id: string) => {
-    if (!weddingId) return
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.playlists.delete(id, weddingId, token)
-      if (selectedPlaylist === id) {
-        setSelectedPlaylist(null)
-        setSongs([])
+  const handleDeletePlaylist = useCallback(
+    async (id: string) => {
+      if (!weddingId) return
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.playlists.delete(id, weddingId, token)
+        if (selectedPlaylist === id) {
+          setSelectedPlaylist(null)
+          setSongs([])
+        }
+        void loadData()
+      } catch {
+        /* silent */
       }
-      void loadData()
-    } catch { /* silent */ }
-  }, [weddingId, getToken, selectedPlaylist, loadData])
+    },
+    [weddingId, getToken, selectedPlaylist, loadData],
+  )
 
   const handleAddSong = useCallback(async () => {
     if (!selectedPlaylist) return
     try {
       const token = await getToken()
       if (!token) return
-      await api.playlists.addSong({
-        playlistId: selectedPlaylist,
-        title: songForm.title,
-        artist: songForm.artist,
-        category: (songForm.category || undefined) as 'other' | undefined,
-      }, token)
+      await api.playlists.addSong(
+        {
+          playlistId: selectedPlaylist,
+          title: songForm.title,
+          artist: songForm.artist,
+          category: (songForm.category || undefined) as 'other' | undefined,
+        },
+        token,
+      )
       setShowSongDialog(false)
       setSongForm({ title: '', artist: '', category: '' })
       void loadPlaylistSongs(selectedPlaylist)
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }, [selectedPlaylist, getToken, songForm, loadPlaylistSongs])
 
-  const handleDeleteSong = useCallback(async (songId: string) => {
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.playlists.deleteSong(songId, token)
-      if (selectedPlaylist) void loadPlaylistSongs(selectedPlaylist)
-    } catch { /* silent */ }
-  }, [getToken, selectedPlaylist, loadPlaylistSongs])
+  const handleDeleteSong = useCallback(
+    async (songId: string) => {
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.playlists.deleteSong(songId, token)
+        if (selectedPlaylist) void loadPlaylistSongs(selectedPlaylist)
+      } catch {
+        /* silent */
+      }
+    },
+    [getToken, selectedPlaylist, loadPlaylistSongs],
+  )
 
-  const handleApproveRequest = useCallback(async (id: string) => {
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.playlists.approveRequest(id, token)
-      void loadData()
-    } catch { /* silent */ }
-  }, [getToken, loadData])
+  const handleApproveRequest = useCallback(
+    async (id: string) => {
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.playlists.approveRequest(id, token)
+        void loadData()
+      } catch {
+        /* silent */
+      }
+    },
+    [getToken, loadData],
+  )
 
-  const handleRejectRequest = useCallback(async (id: string) => {
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.playlists.deleteRequest(id, token)
-      void loadData()
-    } catch { /* silent */ }
-  }, [getToken, loadData])
+  const handleRejectRequest = useCallback(
+    async (id: string) => {
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.playlists.deleteRequest(id, token)
+        void loadData()
+      } catch {
+        /* silent */
+      }
+    },
+    [getToken, loadData],
+  )
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -210,7 +252,10 @@ export default function MusicPage() {
 
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex gap-6">
-          {([{ key: 'playlists' as Tab, label: 'Playlists' }, { key: 'requests' as Tab, label: `Song Requests (${requests.length})` }]).map((tab) => (
+          {[
+            { key: 'playlists' as Tab, label: 'Playlists' },
+            { key: 'requests' as Tab, label: `Song Requests (${requests.length})` },
+          ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
@@ -232,28 +277,42 @@ export default function MusicPage() {
             <div className="space-y-3 lg:col-span-1">
               <div className="flex items-center justify-between">
                 <h2 className="font-serif text-lg font-semibold text-gray-900">Playlists</h2>
-                <Button size="sm" onClick={() => setShowPlaylistDialog(true)}>New</Button>
+                <Button size="sm" onClick={() => setShowPlaylistDialog(true)}>
+                  New
+                </Button>
               </div>
               {playlists.length === 0 ? (
                 <Card>
                   <CardContent className="py-8 text-center">
-                    <p className="text-sm text-gray-500">Create your first playlist for the big day.</p>
+                    <p className="text-sm text-gray-500">
+                      Create your first playlist for the big day.
+                    </p>
                   </CardContent>
                 </Card>
               ) : (
                 playlists.map((pl) => (
                   <Card
                     key={pl.id}
-                    className={`cursor-pointer transition-shadow hover:shadow-md ${selectedPlaylist === pl.id ? 'ring-2 ring-wedding-500' : ''}`}
+                    className={`cursor-pointer transition-shadow hover:shadow-md ${selectedPlaylist === pl.id ? 'ring-wedding-500 ring-2' : ''}`}
                     onClick={() => loadPlaylistSongs(pl.id)}
                   >
                     <CardContent className="py-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium text-gray-900">{pl.name}</p>
-                          {pl.description && <p className="mt-0.5 text-xs text-gray-500">{pl.description}</p>}
+                          {pl.description && (
+                            <p className="mt-0.5 text-xs text-gray-500">{pl.description}</p>
+                          )}
                         </div>
-                        <Button variant="ghost" size="sm" className="text-red-500" onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(pl.id) }}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeletePlaylist(pl.id)
+                          }}
+                        >
                           Delete
                         </Button>
                       </div>
@@ -267,22 +326,46 @@ export default function MusicPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Songs</CardTitle>
-                    <Button size="sm" onClick={() => setShowSongDialog(true)}>Add Song</Button>
+                    <Button size="sm" onClick={() => setShowSongDialog(true)}>
+                      Add Song
+                    </Button>
                   </CardHeader>
                   <CardContent>
                     {songs.length === 0 ? (
-                      <p className="py-6 text-center text-sm text-gray-500">No songs yet. Add your first song.</p>
+                      <p className="py-6 text-center text-sm text-gray-500">
+                        No songs yet. Add your first song.
+                      </p>
                     ) : (
-                      <motion.div className="space-y-2" variants={staggerContainer} initial="hidden" animate="visible">
+                      <motion.div
+                        className="space-y-2"
+                        variants={staggerContainer}
+                        initial="hidden"
+                        animate="visible"
+                      >
                         {songs.map((song) => (
-                          <motion.div key={song.id} variants={fadeInUp} className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2">
+                          <motion.div
+                            key={song.id}
+                            variants={fadeInUp}
+                            className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2"
+                          >
                             <div>
                               <p className="text-sm font-medium text-gray-900">{song.title}</p>
                               <p className="text-xs text-gray-500">{song.artist}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                              {song.category && <Badge variant="outline" className="text-xs">{CATEGORY_LABELS[song.category] ?? song.category}</Badge>}
-                              <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDeleteSong(song.id)}>Remove</Button>
+                              {song.category && (
+                                <Badge variant="outline" className="text-xs">
+                                  {CATEGORY_LABELS[song.category] ?? song.category}
+                                </Badge>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-500"
+                                onClick={() => handleDeleteSong(song.id)}
+                              >
+                                Remove
+                              </Button>
                             </div>
                           </motion.div>
                         ))}
@@ -293,7 +376,9 @@ export default function MusicPage() {
               ) : (
                 <Card>
                   <CardContent className="py-16 text-center">
-                    <p className="text-sm text-gray-500">Select a playlist to view and manage its songs.</p>
+                    <p className="text-sm text-gray-500">
+                      Select a playlist to view and manage its songs.
+                    </p>
                   </CardContent>
                 </Card>
               )}
@@ -310,22 +395,41 @@ export default function MusicPage() {
                 </CardContent>
               </Card>
             ) : (
-              <motion.div className="space-y-3" variants={staggerContainer} initial="hidden" animate="visible">
+              <motion.div
+                className="space-y-3"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
                 {requests.map((req) => (
                   <motion.div key={req.id} variants={fadeInUp}>
                     <Card>
                       <CardContent className="flex items-center justify-between py-3">
                         <div>
-                          <p className="font-medium text-gray-900">{req.title} <span className="font-normal text-gray-500">by {req.artist}</span></p>
+                          <p className="font-medium text-gray-900">
+                            {req.title}{' '}
+                            <span className="font-normal text-gray-500">by {req.artist}</span>
+                          </p>
                           <p className="text-xs text-gray-400">Requested by {req.guestName}</p>
                           {req.notes && <p className="mt-1 text-xs text-gray-500">{req.notes}</p>}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={req.status === 'approved' ? 'default' : 'secondary'}>{req.status}</Badge>
+                          <Badge variant={req.status === 'approved' ? 'default' : 'secondary'}>
+                            {req.status}
+                          </Badge>
                           {req.status === 'pending' && (
                             <>
-                              <Button size="sm" onClick={() => handleApproveRequest(req.id)}>Approve</Button>
-                              <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleRejectRequest(req.id)}>Reject</Button>
+                              <Button size="sm" onClick={() => handleApproveRequest(req.id)}>
+                                Approve
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-500"
+                                onClick={() => handleRejectRequest(req.id)}
+                              >
+                                Reject
+                              </Button>
                             </>
                           )}
                         </div>
@@ -345,14 +449,48 @@ export default function MusicPage() {
             <DialogTitle>New Playlist</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div><Label>Name</Label><Input value={playlistForm.name} onChange={(e) => setPlaylistForm({ ...playlistForm, name: e.target.value })} placeholder="e.g. Ceremony Music" /></div>
-            <div><Label>Description</Label><Textarea value={playlistForm.description} onChange={(e) => setPlaylistForm({ ...playlistForm, description: e.target.value })} rows={2} /></div>
-            <div><Label>Spotify URL</Label><Input value={playlistForm.spotifyUrl} onChange={(e) => setPlaylistForm({ ...playlistForm, spotifyUrl: e.target.value })} placeholder="https://open.spotify.com/..." /></div>
-            <div><Label>Apple Music URL</Label><Input value={playlistForm.appleMusicUrl} onChange={(e) => setPlaylistForm({ ...playlistForm, appleMusicUrl: e.target.value })} placeholder="https://music.apple.com/..." /></div>
+            <div>
+              <Label>Name</Label>
+              <Input
+                value={playlistForm.name}
+                onChange={(e) => setPlaylistForm({ ...playlistForm, name: e.target.value })}
+                placeholder="e.g. Ceremony Music"
+              />
+            </div>
+            <div>
+              <Label>Description</Label>
+              <Textarea
+                value={playlistForm.description}
+                onChange={(e) => setPlaylistForm({ ...playlistForm, description: e.target.value })}
+                rows={2}
+              />
+            </div>
+            <div>
+              <Label>Spotify URL</Label>
+              <Input
+                value={playlistForm.spotifyUrl}
+                onChange={(e) => setPlaylistForm({ ...playlistForm, spotifyUrl: e.target.value })}
+                placeholder="https://open.spotify.com/..."
+              />
+            </div>
+            <div>
+              <Label>Apple Music URL</Label>
+              <Input
+                value={playlistForm.appleMusicUrl}
+                onChange={(e) =>
+                  setPlaylistForm({ ...playlistForm, appleMusicUrl: e.target.value })
+                }
+                placeholder="https://music.apple.com/..."
+              />
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPlaylistDialog(false)}>Cancel</Button>
-            <Button onClick={handleCreatePlaylist} disabled={!playlistForm.name}>Create</Button>
+            <Button variant="outline" onClick={() => setShowPlaylistDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreatePlaylist} disabled={!playlistForm.name}>
+              Create
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -363,21 +501,45 @@ export default function MusicPage() {
             <DialogTitle>Add Song</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div><Label>Title</Label><Input value={songForm.title} onChange={(e) => setSongForm({ ...songForm, title: e.target.value })} placeholder="Song name" /></div>
-            <div><Label>Artist</Label><Input value={songForm.artist} onChange={(e) => setSongForm({ ...songForm, artist: e.target.value })} placeholder="Artist name" /></div>
+            <div>
+              <Label>Title</Label>
+              <Input
+                value={songForm.title}
+                onChange={(e) => setSongForm({ ...songForm, title: e.target.value })}
+                placeholder="Song name"
+              />
+            </div>
+            <div>
+              <Label>Artist</Label>
+              <Input
+                value={songForm.artist}
+                onChange={(e) => setSongForm({ ...songForm, artist: e.target.value })}
+                placeholder="Artist name"
+              />
+            </div>
             <div>
               <Label>Category</Label>
-              <select value={songForm.category} onChange={(e) => setSongForm({ ...songForm, category: e.target.value })} className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm">
+              <select
+                value={songForm.category}
+                onChange={(e) => setSongForm({ ...songForm, category: e.target.value })}
+                className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
+              >
                 <option value="">None</option>
                 {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
-                  <option key={val} value={val}>{label}</option>
+                  <option key={val} value={val}>
+                    {label}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSongDialog(false)}>Cancel</Button>
-            <Button onClick={handleAddSong} disabled={!songForm.title || !songForm.artist}>Add</Button>
+            <Button variant="outline" onClick={() => setShowSongDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddSong} disabled={!songForm.title || !songForm.artist}>
+              Add
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

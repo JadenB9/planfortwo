@@ -39,7 +39,8 @@ registryRoute.get('/links', resolveWeddingMiddleware, async (c) => {
 registryRoute.post(
   '/links',
   zValidator('json', createRegistryLinkSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -71,7 +72,8 @@ registryRoute.get('/funds', resolveWeddingMiddleware, async (c) => {
 registryRoute.post(
   '/funds',
   zValidator('json', createCashFundSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -84,14 +86,16 @@ registryRoute.put(
   '/funds/:id',
   resolveWeddingMiddleware,
   zValidator('json', updateCashFundSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const fundId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await registryService.updateFund(fundId, weddingId, data)
-    if (!updated) return c.json({ error: 'Fund not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Fund not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
@@ -106,7 +110,8 @@ registryRoute.delete('/funds/:id', resolveWeddingMiddleware, async (c) => {
 registryRoute.post(
   '/funds/:id/contribute',
   zValidator('json', createCashFundContributionSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -125,7 +130,8 @@ registryRoute.get('/gifts', resolveWeddingMiddleware, async (c) => {
 registryRoute.post(
   '/gifts',
   zValidator('json', createGiftSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -138,14 +144,16 @@ registryRoute.put(
   '/gifts/:id',
   resolveWeddingMiddleware,
   zValidator('json', updateGiftSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const giftId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await registryService.updateGift(giftId, weddingId, data)
-    if (!updated) return c.json({ error: 'Gift not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Gift not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
@@ -167,7 +175,8 @@ registryRoute.get('/mood-boards', resolveWeddingMiddleware, async (c) => {
 registryRoute.post(
   '/mood-boards',
   zValidator('json', createMoodBoardSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -196,7 +205,8 @@ registryRoute.post(
   '/mood-boards/:id/items',
   resolveWeddingMiddleware,
   zValidator('json', createMoodBoardItemSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const boardId = c.req.param('id')

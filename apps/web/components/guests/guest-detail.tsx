@@ -24,7 +24,16 @@ const RSVP_COLORS: Record<string, string> = {
   maybe: 'bg-blue-50 text-blue-700 border-blue-200',
 }
 
-export function GuestDetail({ guest, households, tags, onUpdate, onDelete, onClose, canEdit, canDelete }: GuestDetailProps) {
+export function GuestDetail({
+  guest,
+  households,
+  tags,
+  onUpdate,
+  onDelete,
+  onClose,
+  canEdit,
+  canDelete,
+}: GuestDetailProps) {
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
@@ -62,7 +71,12 @@ export function GuestDetail({ guest, households, tags, onUpdate, onDelete, onClo
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -83,7 +97,9 @@ export function GuestDetail({ guest, households, tags, onUpdate, onDelete, onClo
 
             {/* Contact */}
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Contact</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Contact
+              </h3>
               <div className="mt-2 space-y-1 text-sm text-gray-700">
                 {guest.email && <p>{guest.email}</p>}
                 {guest.phone && <p>{guest.phone}</p>}
@@ -93,7 +109,9 @@ export function GuestDetail({ guest, households, tags, onUpdate, onDelete, onClo
 
             {/* Details */}
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Details</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Details
+              </h3>
               <div className="mt-2 space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Household</span>
@@ -101,7 +119,7 @@ export function GuestDetail({ guest, households, tags, onUpdate, onDelete, onClo
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Side</span>
-                  <span className="text-gray-900 capitalize">{guest.side ?? '--'}</span>
+                  <span className="capitalize text-gray-900">{guest.side ?? '--'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Meal Choice</span>
@@ -131,7 +149,9 @@ export function GuestDetail({ guest, households, tags, onUpdate, onDelete, onClo
             {/* Badges */}
             <div className="flex flex-wrap gap-2">
               {guest.isVip && (
-                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">VIP</span>
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                  VIP
+                </span>
               )}
               {guest.isChild && (
                 <span className="rounded-full bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700">
@@ -149,7 +169,9 @@ export function GuestDetail({ guest, households, tags, onUpdate, onDelete, onClo
             {/* Tags */}
             {guest.tags.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Tags</h3>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Tags
+                </h3>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {guest.tags.map((tag) => (
                     <GuestTagBadge key={tag.id} tag={tag} />
@@ -166,7 +188,7 @@ export function GuestDetail({ guest, households, tags, onUpdate, onDelete, onClo
             {canEdit && (
               <button
                 onClick={() => setEditing(true)}
-                className="flex-1 rounded-xl bg-wedding-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+                className="bg-wedding-600 hover:bg-wedding-700 flex-1 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors"
               >
                 Edit
               </button>

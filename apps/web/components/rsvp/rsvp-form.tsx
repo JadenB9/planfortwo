@@ -76,14 +76,7 @@ const RSVP_OPTIONS: { value: RsvpStatus; label: string; icon: string }[] = [
   { value: 'maybe', label: 'Not Sure Yet', icon: '?' },
 ]
 
-const MEAL_OPTIONS = [
-  'Chicken',
-  'Beef',
-  'Fish',
-  'Vegetarian',
-  'Vegan',
-  'Kids Meal',
-]
+const MEAL_OPTIONS = ['Chicken', 'Beef', 'Fish', 'Vegetarian', 'Vegan', 'Kids Meal']
 
 interface RsvpFormProps {
   lookupResult: RsvpLookupResult
@@ -94,34 +87,24 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
   const isBatch = lookupResult.householdGuests.length > 1
   const guestsToRsvp = isBatch ? lookupResult.householdGuests : [lookupResult.guest]
 
-  const [forms, setForms] = useState<GuestFormState[]>(
-    guestsToRsvp.map(createGuestFormState),
-  )
+  const [forms, setForms] = useState<GuestFormState[]>(guestsToRsvp.map(createGuestFormState))
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   function updateForm(index: number, updates: Partial<GuestFormState>) {
-    setForms((prev) =>
-      prev.map((f, i) => (i === index ? { ...f, ...updates } : f)),
-    )
+    setForms((prev) => prev.map((f, i) => (i === index ? { ...f, ...updates } : f)))
   }
 
   function updateDietary(index: number, key: keyof DietaryInfo, value: unknown) {
     setForms((prev) =>
-      prev.map((f, i) =>
-        i === index
-          ? { ...f, dietary: { ...f.dietary, [key]: value } }
-          : f,
-      ),
+      prev.map((f, i) => (i === index ? { ...f, dietary: { ...f.dietary, [key]: value } } : f)),
     )
   }
 
   function updatePlusOneDietary(index: number, key: keyof DietaryInfo, value: unknown) {
     setForms((prev) =>
       prev.map((f, i) =>
-        i === index
-          ? { ...f, plusOneDietary: { ...f.plusOneDietary, [key]: value } }
-          : f,
+        i === index ? { ...f, plusOneDietary: { ...f.plusOneDietary, [key]: value } } : f,
       ),
     )
   }
@@ -220,13 +203,11 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
               <div className="mt-6 space-y-5">
                 {/* Meal Choice */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Meal Preference
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700">Meal Preference</label>
                   <select
                     value={form.mealChoice}
                     onChange={(e) => updateForm(index, { mealChoice: e.target.value })}
-                    className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                   >
                     <option value="">Select a meal...</option>
                     {MEAL_OPTIONS.map((meal) => (
@@ -241,21 +222,21 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                 <div>
                   <p className="text-sm font-medium text-gray-700">Dietary Restrictions</p>
                   <div className="mt-2 flex flex-wrap gap-3">
-                    {(
-                      ['vegetarian', 'vegan', 'glutenFree', 'kosher', 'halal'] as const
-                    ).map((key) => (
-                      <label key={key} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={!!form.dietary[key]}
-                          onChange={(e) => updateDietary(index, key, e.target.checked)}
-                          className="h-4 w-4 rounded border-gray-300 text-wedding-600 focus:ring-wedding-600"
-                        />
-                        <span className="text-sm text-gray-700 capitalize">
-                          {key === 'glutenFree' ? 'Gluten Free' : key}
-                        </span>
-                      </label>
-                    ))}
+                    {(['vegetarian', 'vegan', 'glutenFree', 'kosher', 'halal'] as const).map(
+                      (key) => (
+                        <label key={key} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={!!form.dietary[key]}
+                            onChange={(e) => updateDietary(index, key, e.target.checked)}
+                            className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
+                          />
+                          <span className="text-sm capitalize text-gray-700">
+                            {key === 'glutenFree' ? 'Gluten Free' : key}
+                          </span>
+                        </label>
+                      ),
+                    )}
                   </div>
                   <input
                     type="text"
@@ -271,21 +252,19 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                       )
                     }
                     placeholder="Allergies (comma separated)"
-                    className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                   />
                 </div>
 
                 {/* Song Request */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Song Request
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700">Song Request</label>
                   <input
                     type="text"
                     value={form.songRequest}
                     onChange={(e) => updateForm(index, { songRequest: e.target.value })}
                     placeholder="What song will get you on the dance floor?"
-                    className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                   />
                 </div>
 
@@ -299,16 +278,14 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                     onChange={(e) => updateForm(index, { rsvpNotes: e.target.value })}
                     placeholder="Anything else the couple should know?"
                     rows={3}
-                    className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                   />
                 </div>
 
                 {/* Plus One Section */}
                 {showPlusOne && (
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <h4 className="font-serif text-lg font-semibold text-gray-900">
-                      Plus One
-                    </h4>
+                    <h4 className="font-serif text-lg font-semibold text-gray-900">Plus One</h4>
 
                     <div className="mt-3 space-y-4">
                       <label className="flex items-center gap-2">
@@ -318,11 +295,9 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                           onChange={(e) =>
                             updateForm(index, { plusOneConfirmed: e.target.checked })
                           }
-                          className="h-4 w-4 rounded border-gray-300 text-wedding-600 focus:ring-wedding-600"
+                          className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
                         />
-                        <span className="text-sm text-gray-700">
-                          I&apos;m bringing a guest
-                        </span>
+                        <span className="text-sm text-gray-700">I&apos;m bringing a guest</span>
                       </label>
 
                       {form.plusOneConfirmed && (
@@ -334,11 +309,9 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                             <input
                               type="text"
                               value={form.plusOneName}
-                              onChange={(e) =>
-                                updateForm(index, { plusOneName: e.target.value })
-                              }
+                              onChange={(e) => updateForm(index, { plusOneName: e.target.value })}
                               placeholder="Full name"
-                              className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                             />
                           </div>
 
@@ -351,7 +324,7 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                               onChange={(e) =>
                                 updateForm(index, { plusOneMealChoice: e.target.value })
                               }
-                              className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                             >
                               <option value="">Select a meal...</option>
                               {MEAL_OPTIONS.map((meal) => (
@@ -377,9 +350,9 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                                     onChange={(e) =>
                                       updatePlusOneDietary(index, key, e.target.checked)
                                     }
-                                    className="h-4 w-4 rounded border-gray-300 text-wedding-600 focus:ring-wedding-600"
+                                    className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
                                   />
-                                  <span className="text-sm text-gray-700 capitalize">
+                                  <span className="text-sm capitalize text-gray-700">
                                     {key === 'glutenFree' ? 'Gluten Free' : key}
                                   </span>
                                 </label>
@@ -397,14 +370,12 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
         )
       })}
 
-      {error && (
-        <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
-      )}
+      {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-xl bg-wedding-600 px-5 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="bg-wedding-600 hover:bg-wedding-700 w-full rounded-xl px-5 py-3.5 text-base font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       >
         {submitting ? (
           <span className="flex items-center justify-center gap-2">

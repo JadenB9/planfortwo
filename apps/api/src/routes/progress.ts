@@ -18,7 +18,10 @@ progressRoute.use('*', authMiddleware, resolveUserMiddleware)
 progressRoute.get('/', async (c) => {
   const weddingId = c.req.query('weddingId')
   if (!weddingId) {
-    return c.json({ error: 'weddingId is required', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    return c.json(
+      { error: 'weddingId is required', code: 'VALIDATION_ERROR', statusCode: 400 },
+      400,
+    )
   }
 
   const dbUserId = c.get('dbUserId')

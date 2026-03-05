@@ -21,10 +21,7 @@ export function GuestStatsBar({ stats }: GuestStatsBarProps) {
   return (
     <div className="flex flex-wrap gap-3">
       {items.map((item) => (
-        <div
-          key={item.label}
-          className={`rounded-xl px-3 py-2 text-center ${item.color}`}
-        >
+        <div key={item.label} className={`rounded-xl px-3 py-2 text-center ${item.color}`}>
           <p className="text-lg font-bold">{item.value}</p>
           <p className="text-xs font-medium">{item.label}</p>
         </div>

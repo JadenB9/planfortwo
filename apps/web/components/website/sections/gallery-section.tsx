@@ -27,7 +27,10 @@ export function GallerySection({ title, content, photos }: GallerySectionProps) 
           {title}
         </motion.h2>
         {photos.length === 0 ? (
-          <p className={`text-center ${fontPair.bodyClass}`} style={{ color: `${colors.primary}99` }}>
+          <p
+            className={`text-center ${fontPair.bodyClass}`}
+            style={{ color: `${colors.primary}99` }}
+          >
             No photos uploaded yet
           </p>
         ) : content.layout === 'masonry' ? (

@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,8 +25,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -54,20 +63,47 @@ vi.mock('../services/post-wedding.js', () => ({
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
-      tier: 'full', canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-      canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-      canAddAttachments: true, maxGuests: null, canEditGuests: true,
-      canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-      canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      tier: 'full',
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
 
-import { thankYouRoute, nameChangeRoute, vendorReviewsRoute, notificationPrefsRoute } from './post-wedding.js'
-import { thankYouService, nameChangeService, vendorReviewService, notificationPrefService } from '../services/post-wedding.js'
+import {
+  thankYouRoute,
+  nameChangeRoute,
+  vendorReviewsRoute,
+  notificationPrefsRoute,
+} from './post-wedding.js'
+import {
+  thankYouService,
+  nameChangeService,
+  vendorReviewService,
+  notificationPrefService,
+} from '../services/post-wedding.js'
 
 const mockedThankYou = vi.mocked(thankYouService)
 const mockedNameChange = vi.mocked(nameChangeService)
@@ -99,13 +135,27 @@ describe('Post-Wedding Routes', () => {
   describe('Thank You Notes', () => {
     it('should list thank you notes', async () => {
       mockedThankYou.list.mockResolvedValue([
-        { id: NOTE_ID, weddingId: WEDDING_ID, recipientName: 'Aunt Mary', status: 'not_started',
-          guestId: null, giftId: null, recipientEmail: null, recipientAddress: null,
-          message: null, sentAt: null, createdAt: new Date(), updatedAt: new Date() },
+        {
+          id: NOTE_ID,
+          weddingId: WEDDING_ID,
+          recipientName: 'Aunt Mary',
+          status: 'not_started',
+          guestId: null,
+          giftId: null,
+          recipientEmail: null,
+          recipientAddress: null,
+          message: null,
+          sentAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ] as never)
 
       const app = createApp()
-      const res = await app.request(`/thank-you?weddingId=${WEDDING_ID}`, { method: 'GET', headers: authHeaders() })
+      const res = await app.request(`/thank-you?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
@@ -114,15 +164,24 @@ describe('Post-Wedding Routes', () => {
 
     it('should create a thank you note', async () => {
       mockedThankYou.create.mockResolvedValue({
-        id: NOTE_ID, weddingId: WEDDING_ID, recipientName: 'Uncle Bob',
-        status: 'not_started', guestId: null, giftId: null, recipientEmail: null,
-        recipientAddress: null, message: null, sentAt: null,
-        createdAt: new Date(), updatedAt: new Date(),
+        id: NOTE_ID,
+        weddingId: WEDDING_ID,
+        recipientName: 'Uncle Bob',
+        status: 'not_started',
+        guestId: null,
+        giftId: null,
+        recipientEmail: null,
+        recipientAddress: null,
+        message: null,
+        sentAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request('/thank-you', {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST',
+        headers: authHeaders(),
         body: JSON.stringify({ weddingId: WEDDING_ID, recipientName: 'Uncle Bob' }),
       })
       expect(res.status).toBe(201)
@@ -132,15 +191,24 @@ describe('Post-Wedding Routes', () => {
 
     it('should update a thank you note status', async () => {
       mockedThankYou.update.mockResolvedValue({
-        id: NOTE_ID, weddingId: WEDDING_ID, recipientName: 'Aunt Mary',
-        status: 'sent', guestId: null, giftId: null, recipientEmail: null,
-        recipientAddress: null, message: 'Thank you!', sentAt: new Date(),
-        createdAt: new Date(), updatedAt: new Date(),
+        id: NOTE_ID,
+        weddingId: WEDDING_ID,
+        recipientName: 'Aunt Mary',
+        status: 'sent',
+        guestId: null,
+        giftId: null,
+        recipientEmail: null,
+        recipientAddress: null,
+        message: 'Thank you!',
+        sentAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request(`/thank-you/${NOTE_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'PUT', headers: authHeaders(),
+        method: 'PUT',
+        headers: authHeaders(),
         body: JSON.stringify({ status: 'sent', message: 'Thank you!' }),
       })
       expect(res.status).toBe(200)
@@ -152,7 +220,8 @@ describe('Post-Wedding Routes', () => {
       mockedThankYou.delete.mockResolvedValue(true as never)
       const app = createApp()
       const res = await app.request(`/thank-you/${NOTE_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'DELETE', headers: authHeaders(),
+        method: 'DELETE',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(200)
     })
@@ -161,14 +230,24 @@ describe('Post-Wedding Routes', () => {
   describe('Name Change Tasks', () => {
     it('should list name change tasks', async () => {
       mockedNameChange.list.mockResolvedValue([
-        { id: 'c0000000-0000-0000-0000-000000000001', weddingId: WEDDING_ID,
-          institution: 'Social Security', description: 'Apply for new SSN card',
-          documentsRequired: 'Marriage certificate', isCompleted: false,
-          completedAt: null, sortOrder: 0, createdAt: new Date() },
+        {
+          id: 'c0000000-0000-0000-0000-000000000001',
+          weddingId: WEDDING_ID,
+          institution: 'Social Security',
+          description: 'Apply for new SSN card',
+          documentsRequired: 'Marriage certificate',
+          isCompleted: false,
+          completedAt: null,
+          sortOrder: 0,
+          createdAt: new Date(),
+        },
       ] as never)
 
       const app = createApp()
-      const res = await app.request(`/name-change?weddingId=${WEDDING_ID}`, { method: 'GET', headers: authHeaders() })
+      const res = await app.request(`/name-change?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
@@ -177,15 +256,25 @@ describe('Post-Wedding Routes', () => {
 
     it('should toggle name change task completion', async () => {
       mockedNameChange.toggleComplete.mockResolvedValue({
-        id: 'c0000000-0000-0000-0000-000000000001', weddingId: WEDDING_ID,
-        institution: 'DMV', isCompleted: true, completedAt: new Date(),
-        description: null, documentsRequired: null, sortOrder: 0, createdAt: new Date(),
+        id: 'c0000000-0000-0000-0000-000000000001',
+        weddingId: WEDDING_ID,
+        institution: 'DMV',
+        isCompleted: true,
+        completedAt: new Date(),
+        description: null,
+        documentsRequired: null,
+        sortOrder: 0,
+        createdAt: new Date(),
       } as never)
 
       const app = createApp()
-      const res = await app.request(`/name-change/c0000000-0000-0000-0000-000000000001/toggle?weddingId=${WEDDING_ID}`, {
-        method: 'PUT', headers: authHeaders(),
-      })
+      const res = await app.request(
+        `/name-change/c0000000-0000-0000-0000-000000000001/toggle?weddingId=${WEDDING_ID}`,
+        {
+          method: 'PUT',
+          headers: authHeaders(),
+        },
+      )
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.isCompleted).toBe(true)
@@ -195,14 +284,19 @@ describe('Post-Wedding Routes', () => {
   describe('Vendor Reviews', () => {
     it('should create a vendor review', async () => {
       mockedReviews.create.mockResolvedValue({
-        id: 'd0000000-0000-0000-0000-000000000001', weddingId: WEDDING_ID,
-        vendorId: 'e0000000-0000-0000-0000-000000000001', rating: 5,
-        reviewText: 'Amazing photographer!', isPublished: false, createdAt: new Date(),
+        id: 'd0000000-0000-0000-0000-000000000001',
+        weddingId: WEDDING_ID,
+        vendorId: 'e0000000-0000-0000-0000-000000000001',
+        rating: 5,
+        reviewText: 'Amazing photographer!',
+        isPublished: false,
+        createdAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request('/vendor-reviews', {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST',
+        headers: authHeaders(),
         body: JSON.stringify({
           weddingId: WEDDING_ID,
           vendorId: 'e0000000-0000-0000-0000-000000000001',
@@ -219,14 +313,23 @@ describe('Post-Wedding Routes', () => {
   describe('Notification Preferences', () => {
     it('should get notification preferences', async () => {
       mockedNotifPrefs.get.mockResolvedValue({
-        id: 'f0000000-0000-0000-0000-000000000001', userId: 'db-user-id',
-        weddingId: WEDDING_ID, emailRsvp: true, emailPaymentReminder: true,
-        emailTaskDue: true, emailWeeklySummary: false, digestFrequency: 'daily',
-        createdAt: new Date(), updatedAt: new Date(),
+        id: 'f0000000-0000-0000-0000-000000000001',
+        userId: 'db-user-id',
+        weddingId: WEDDING_ID,
+        emailRsvp: true,
+        emailPaymentReminder: true,
+        emailTaskDue: true,
+        emailWeeklySummary: false,
+        digestFrequency: 'daily',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
-      const res = await app.request(`/notification-prefs?weddingId=${WEDDING_ID}`, { method: 'GET', headers: authHeaders() })
+      const res = await app.request(`/notification-prefs?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.emailWeeklySummary).toBe(false)
@@ -234,15 +337,22 @@ describe('Post-Wedding Routes', () => {
 
     it('should update notification preferences', async () => {
       mockedNotifPrefs.upsert.mockResolvedValue({
-        id: 'f0000000-0000-0000-0000-000000000001', userId: 'db-user-id',
-        weddingId: WEDDING_ID, emailRsvp: true, emailPaymentReminder: false,
-        emailTaskDue: true, emailWeeklySummary: true, digestFrequency: 'weekly',
-        createdAt: new Date(), updatedAt: new Date(),
+        id: 'f0000000-0000-0000-0000-000000000001',
+        userId: 'db-user-id',
+        weddingId: WEDDING_ID,
+        emailRsvp: true,
+        emailPaymentReminder: false,
+        emailTaskDue: true,
+        emailWeeklySummary: true,
+        digestFrequency: 'weekly',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
       const res = await app.request(`/notification-prefs?weddingId=${WEDDING_ID}`, {
-        method: 'PUT', headers: authHeaders(),
+        method: 'PUT',
+        headers: authHeaders(),
         body: JSON.stringify({ emailPaymentReminder: false, digestFrequency: 'weekly' }),
       })
       expect(res.status).toBe(200)

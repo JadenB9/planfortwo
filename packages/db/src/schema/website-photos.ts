@@ -7,8 +7,7 @@ export const websitePhotos = pgTable('website_photos', {
   weddingId: uuid('wedding_id')
     .notNull()
     .references(() => weddings.id, { onDelete: 'cascade' }),
-  sectionId: uuid('section_id')
-    .references(() => websiteSections.id, { onDelete: 'set null' }),
+  sectionId: uuid('section_id').references(() => websiteSections.id, { onDelete: 'set null' }),
   r2Key: text('r2_key').notNull(),
   url: text('url').notNull(),
   fileName: text('file_name').notNull(),

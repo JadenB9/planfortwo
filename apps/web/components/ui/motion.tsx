@@ -15,7 +15,13 @@ import {
 } from '@/lib/animations'
 
 // Page wrapper with fade-in-up animation
-export function PageTransition({ children, className }: { children: ReactNode; className?: string }) {
+export function PageTransition({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
   return (
     <motion.div
       variants={pageTransition}
@@ -47,12 +53,7 @@ export function StaggerList({ children, className }: { children: ReactNode; clas
 // Staggered grid container
 export function StaggerGrid({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <motion.div
-      variants={staggerGrid}
-      initial="hidden"
-      animate="visible"
-      className={className}
-    >
+    <motion.div variants={staggerGrid} initial="hidden" animate="visible" className={className}>
       {children}
     </motion.div>
   )
@@ -74,11 +75,7 @@ export function StaggerItem({ children, className }: { children: ReactNode; clas
 // List item with subtle slide
 export function ListItem({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <motion.div
-      variants={listItem}
-      transition={{ duration: 0.3 }}
-      className={className}
-    >
+    <motion.div variants={listItem} transition={{ duration: 0.3 }} className={className}>
       {children}
     </motion.div>
   )
@@ -157,13 +154,7 @@ export function ScrollReveal({
 }
 
 // Animated counter for numbers (e.g., dashboard stats)
-export function AnimatedNumber({
-  value,
-  className,
-}: {
-  value: number
-  className?: string
-}) {
+export function AnimatedNumber({ value, className }: { value: number; className?: string }) {
   return (
     <motion.span
       key={value}

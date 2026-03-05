@@ -176,20 +176,33 @@ describe('Guest Routes', () => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
     vi.mocked(userService.findByClerkId).mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     })
     vi.mocked(weddingService.verifyMembership).mockResolvedValue({
-      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: WEDDING_ID,
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     })
+    mockedGuestService.getGuest.mockResolvedValue({
+      id: GUEST_ID,
+      weddingId: WEDDING_ID,
+      firstName: 'Alice',
+      lastName: 'Smith',
+      tags: [],
+      household: null,
+    } as never)
     mockedFeatureService.getFeatures.mockResolvedValue(FULL_GATES)
   })
 
   describe('GET /guests', () => {
     it('should return paginated guest list', async () => {
       const mockResult = {
-        data: [
-          { id: GUEST_ID, firstName: 'Alice', lastName: 'Smith', weddingId: WEDDING_ID },
-        ],
+        data: [{ id: GUEST_ID, firstName: 'Alice', lastName: 'Smith', weddingId: WEDDING_ID }],
         total: 1,
         page: 1,
         pageSize: 25,
@@ -220,10 +233,10 @@ describe('Guest Routes', () => {
       mockedGuestService.listGuests.mockResolvedValue(mockResult as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/guests?weddingId=${WEDDING_ID}&rsvpStatus=accepted`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/guests?weddingId=${WEDDING_ID}&rsvpStatus=accepted`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       expect(mockedGuestService.listGuests).toHaveBeenCalledWith(
@@ -302,6 +315,7 @@ describe('Guest Routes', () => {
     it('should return a single guest', async () => {
       const mockGuest = {
         id: GUEST_ID,
+        weddingId: WEDDING_ID,
         firstName: 'Alice',
         lastName: 'Smith',
         tags: [],
@@ -409,14 +423,11 @@ describe('Guest Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify(updateBody),
-        },
-      )
+      const res = await app.request(`/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updateBody),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -427,14 +438,11 @@ describe('Guest Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify(updateBody),
-        },
-      )
+      const res = await app.request(`/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updateBody),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -447,10 +455,10 @@ describe('Guest Routes', () => {
       mockedGuestService.deleteGuest.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -461,10 +469,10 @@ describe('Guest Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()

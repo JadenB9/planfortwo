@@ -1,13 +1,18 @@
 import { z } from 'zod'
 
 export const songCategoryZodEnum = z.enum([
-  'first_dance', 'parent_dance', 'cake_cutting', 'bouquet_toss',
-  'last_dance', 'ceremony', 'cocktail_hour', 'reception', 'other',
+  'first_dance',
+  'parent_dance',
+  'cake_cutting',
+  'bouquet_toss',
+  'last_dance',
+  'ceremony',
+  'cocktail_hour',
+  'reception',
+  'other',
 ])
 
-export const songStatusZodEnum = z.enum([
-  'approved', 'pending', 'rejected',
-])
+export const songStatusZodEnum = z.enum(['approved', 'pending', 'rejected'])
 
 export const createPlaylistSchema = z.object({
   weddingId: z.string().uuid(),

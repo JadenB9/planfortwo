@@ -49,10 +49,7 @@ rsvpRoute.get(
     }
 
     if (!result) {
-      return c.json(
-        { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
     }
 
     return c.json({ data: result })
@@ -64,10 +61,7 @@ rsvpRoute.post(
   '/lookup-by-name',
   zValidator('json', rsvpNameLookupSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -84,10 +78,7 @@ rsvpRoute.post(
   '/submit',
   zValidator('json', rsvpSubmissionSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -100,10 +91,7 @@ rsvpRoute.post(
       .limit(1)
 
     if (!guest) {
-      return c.json(
-        { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
     }
 
     try {
@@ -112,15 +100,9 @@ rsvpRoute.post(
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Submit failed'
       if (message === 'RSVP deadline has passed') {
-        return c.json(
-          { error: message, code: 'RSVP_EXPIRED', statusCode: 410 },
-          410,
-        )
+        return c.json({ error: message, code: 'RSVP_EXPIRED', statusCode: 410 }, 410)
       }
-      return c.json(
-        { error: message, code: 'SUBMIT_FAILED', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: message, code: 'SUBMIT_FAILED', statusCode: 400 }, 400)
     }
   },
 )
@@ -130,10 +112,7 @@ rsvpRoute.post(
   '/submit-batch',
   zValidator('json', rsvpBatchSubmissionSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -146,10 +125,7 @@ rsvpRoute.post(
       .limit(1)
 
     if (!firstGuest) {
-      return c.json(
-        { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
     }
 
     try {
@@ -158,15 +134,9 @@ rsvpRoute.post(
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Submit failed'
       if (message === 'RSVP deadline has passed') {
-        return c.json(
-          { error: message, code: 'RSVP_EXPIRED', statusCode: 410 },
-          410,
-        )
+        return c.json({ error: message, code: 'RSVP_EXPIRED', statusCode: 410 }, 410)
       }
-      return c.json(
-        { error: message, code: 'SUBMIT_FAILED', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: message, code: 'SUBMIT_FAILED', statusCode: 400 }, 400)
     }
   },
 )
@@ -182,10 +152,7 @@ rsvpRoute.get(
   async (c) => {
     const weddingId = c.get('weddingId')
 
-    const allGuests = await db
-      .select()
-      .from(guests)
-      .where(eq(guests.weddingId, weddingId))
+    const allGuests = await db.select().from(guests).where(eq(guests.weddingId, weddingId))
 
     const totalGuests = allGuests.length
     const adults = allGuests.filter((g) => !g.isChild).length
@@ -195,9 +162,7 @@ rsvpRoute.get(
     const rsvpDeclined = allGuests.filter((g) => g.rsvpStatus === 'declined').length
     const rsvpPending = allGuests.filter((g) => g.rsvpStatus === 'pending').length
     const rsvpMaybe = allGuests.filter((g) => g.rsvpStatus === 'maybe').length
-    const confirmedPlusOnes = allGuests.filter(
-      (g) => g.hasPlusOne && g.plusOneConfirmed,
-    ).length
+    const confirmedPlusOnes = allGuests.filter((g) => g.hasPlusOne && g.plusOneConfirmed).length
 
     const dietarySummary = {
       vegetarian: 0,

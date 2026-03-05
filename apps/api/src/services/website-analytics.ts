@@ -3,7 +3,15 @@ import { db, websitePageViews } from '@planfortwo/db'
 import type { WebsiteAnalyticsSummary } from '@planfortwo/types'
 
 export const websiteAnalyticsService = {
-  async track(weddingId: string, visitorId: string, path: string, sectionViewed: string | null, referrer: string | null, country: string | null, userAgent: string | null) {
+  async track(
+    weddingId: string,
+    visitorId: string,
+    path: string,
+    sectionViewed: string | null,
+    referrer: string | null,
+    country: string | null,
+    userAgent: string | null,
+  ) {
     await db.insert(websitePageViews).values({
       weddingId,
       visitorId,

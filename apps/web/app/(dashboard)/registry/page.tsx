@@ -13,12 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 type Tab = 'links' | 'funds' | 'gifts'
 
@@ -49,7 +44,12 @@ export default function RegistryPage() {
   const [showGiftForm, setShowGiftForm] = useState(false)
   const [linkForm, setLinkForm] = useState({ storeName: '', url: '', logoUrl: '' })
   const [fundForm, setFundForm] = useState({ name: '', description: '', goalAmount: '' })
-  const [giftForm, setGiftForm] = useState({ guestName: '', description: '', estimatedValue: '', notes: '' })
+  const [giftForm, setGiftForm] = useState({
+    guestName: '',
+    description: '',
+    estimatedValue: '',
+    notes: '',
+  })
   const [editingGift, setEditingGift] = useState<Gift | null>(null)
 
   const loadAll = useCallback(async () => {
@@ -81,11 +81,21 @@ export default function RegistryPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.registry.createLink({ weddingId, storeName: linkForm.storeName.trim(), url: linkForm.url.trim(), logoUrl: linkForm.logoUrl || undefined }, token)
+      await api.registry.createLink(
+        {
+          weddingId,
+          storeName: linkForm.storeName.trim(),
+          url: linkForm.url.trim(),
+          logoUrl: linkForm.logoUrl || undefined,
+        },
+        token,
+      )
       setLinkForm({ storeName: '', url: '', logoUrl: '' })
       setShowLinkForm(false)
       void loadAll()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }
 
   const handleDeleteLink = async (id: string) => {
@@ -95,7 +105,9 @@ export default function RegistryPage() {
       if (!token) return
       await api.registry.deleteLink(id, weddingId, token)
       void loadAll()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }
 
   const handleAddFund = async () => {
@@ -103,11 +115,21 @@ export default function RegistryPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.registry.createFund({ weddingId, name: fundForm.name.trim(), description: fundForm.description || undefined, goalAmount: parseFloat(fundForm.goalAmount) }, token)
+      await api.registry.createFund(
+        {
+          weddingId,
+          name: fundForm.name.trim(),
+          description: fundForm.description || undefined,
+          goalAmount: parseFloat(fundForm.goalAmount),
+        },
+        token,
+      )
       setFundForm({ name: '', description: '', goalAmount: '' })
       setShowFundForm(false)
       void loadAll()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }
 
   const handleDeleteFund = async (id: string) => {
@@ -117,7 +139,9 @@ export default function RegistryPage() {
       if (!token) return
       await api.registry.deleteFund(id, weddingId, token)
       void loadAll()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }
 
   const handleSaveGift = async () => {
@@ -126,23 +150,35 @@ export default function RegistryPage() {
       const token = await getToken()
       if (!token) return
       if (editingGift) {
-        await api.registry.updateGift(editingGift.id, weddingId, {
-          description: giftForm.description.trim(),
-          notes: giftForm.notes || undefined,
-        }, token)
-      } else {
-        await api.registry.createGift({
+        await api.registry.updateGift(
+          editingGift.id,
           weddingId,
-          guestName: giftForm.guestName || undefined,
-          description: giftForm.description.trim(),
-          estimatedValue: giftForm.estimatedValue ? parseFloat(giftForm.estimatedValue) : undefined,
-        }, token)
+          {
+            description: giftForm.description.trim(),
+            notes: giftForm.notes || undefined,
+          },
+          token,
+        )
+      } else {
+        await api.registry.createGift(
+          {
+            weddingId,
+            guestName: giftForm.guestName || undefined,
+            description: giftForm.description.trim(),
+            estimatedValue: giftForm.estimatedValue
+              ? parseFloat(giftForm.estimatedValue)
+              : undefined,
+          },
+          token,
+        )
       }
       setGiftForm({ guestName: '', description: '', estimatedValue: '', notes: '' })
       setEditingGift(null)
       setShowGiftForm(false)
       void loadAll()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }
 
   const handleUpdateThankYou = async (gift: Gift, status: ThankYouStatus) => {
@@ -152,7 +188,9 @@ export default function RegistryPage() {
       if (!token) return
       await api.registry.updateGift(gift.id, weddingId, { thankYouStatus: status }, token)
       void loadAll()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }
 
   const handleDeleteGift = async (id: string) => {
@@ -162,7 +200,9 @@ export default function RegistryPage() {
       if (!token) return
       await api.registry.deleteGift(id, weddingId, token)
       void loadAll()
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }
 
   const isLoading = weddingLoading || loading
@@ -170,7 +210,7 @@ export default function RegistryPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -185,14 +225,26 @@ export default function RegistryPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-serif text-3xl font-bold text-gray-900">Registry</h1>
-          <p className="mt-1 text-sm text-gray-600">Manage your registries, cash funds, and gift tracking.</p>
+          <p className="mt-1 text-sm text-gray-600">
+            Manage your registries, cash funds, and gift tracking.
+          </p>
         </div>
-        <Button onClick={() => {
-          if (activeTab === 'links') setShowLinkForm(true)
-          else if (activeTab === 'funds') setShowFundForm(true)
-          else { setEditingGift(null); setGiftForm({ guestName: '', description: '', estimatedValue: '', notes: '' }); setShowGiftForm(true) }
-        }}>
-          {activeTab === 'links' ? 'Add Registry' : activeTab === 'funds' ? 'Create Fund' : 'Log Gift'}
+        <Button
+          onClick={() => {
+            if (activeTab === 'links') setShowLinkForm(true)
+            else if (activeTab === 'funds') setShowFundForm(true)
+            else {
+              setEditingGift(null)
+              setGiftForm({ guestName: '', description: '', estimatedValue: '', notes: '' })
+              setShowGiftForm(true)
+            }
+          }}
+        >
+          {activeTab === 'links'
+            ? 'Add Registry'
+            : activeTab === 'funds'
+              ? 'Create Fund'
+              : 'Log Gift'}
         </Button>
       </div>
 
@@ -203,7 +255,9 @@ export default function RegistryPage() {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`border-b-2 pb-3 text-sm font-medium transition-colors ${
-                activeTab === tab.key ? 'border-wedding-600 text-wedding-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                activeTab === tab.key
+                  ? 'border-wedding-600 text-wedding-600'
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
               }`}
             >
               {tab.label}
@@ -212,22 +266,41 @@ export default function RegistryPage() {
         </nav>
       </div>
 
-      {activeTab === 'links' && (
-        links.length === 0 ? (
+      {activeTab === 'links' &&
+        (links.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-wedding-50">
-                <svg className="h-8 w-8 text-wedding-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                <svg
+                  className="text-wedding-600 h-8 w-8"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
                 </svg>
               </div>
               <h2 className="font-serif text-xl font-semibold text-gray-900">No Registry Links</h2>
-              <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">Add links to your external registries so guests can find them easily.</p>
-              <Button className="mt-6" onClick={() => setShowLinkForm(true)}>Add Registry Link</Button>
+              <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+                Add links to your external registries so guests can find them easily.
+              </p>
+              <Button className="mt-6" onClick={() => setShowLinkForm(true)}>
+                Add Registry Link
+              </Button>
             </CardContent>
           </Card>
         ) : (
-          <motion.div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" variants={staggerContainer} initial="hidden" animate="visible">
+          <motion.div
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
             {links.map((link) => (
               <motion.div key={link.id} variants={fadeInUp}>
                 <Card>
@@ -235,76 +308,145 @@ export default function RegistryPage() {
                     <CardTitle className="text-base">{link.storeName}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm text-wedding-600 hover:underline">Visit Registry</a>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-wedding-600 text-sm hover:underline"
+                    >
+                      Visit Registry
+                    </a>
                     <p className="mt-1 text-xs text-gray-500">{link.clickCount} clicks</p>
-                    <button onClick={() => handleDeleteLink(link.id)} className="mt-3 text-xs text-red-500 hover:text-red-700">Remove</button>
+                    <button
+                      onClick={() => handleDeleteLink(link.id)}
+                      className="mt-3 text-xs text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </motion.div>
-        )
-      )}
+        ))}
 
-      {activeTab === 'funds' && (
-        funds.length === 0 ? (
+      {activeTab === 'funds' &&
+        (funds.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-wedding-50">
-                <svg className="h-8 w-8 text-wedding-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                <svg
+                  className="text-wedding-600 h-8 w-8"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
               <h2 className="font-serif text-xl font-semibold text-gray-900">No Cash Funds</h2>
-              <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">Create cash funds for your honeymoon, house, or anything else.</p>
-              <Button className="mt-6" onClick={() => setShowFundForm(true)}>Create First Fund</Button>
+              <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+                Create cash funds for your honeymoon, house, or anything else.
+              </p>
+              <Button className="mt-6" onClick={() => setShowFundForm(true)}>
+                Create First Fund
+              </Button>
             </CardContent>
           </Card>
         ) : (
-          <motion.div className="grid gap-4 sm:grid-cols-2" variants={staggerContainer} initial="hidden" animate="visible">
+          <motion.div
+            className="grid gap-4 sm:grid-cols-2"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
             {funds.map((fund) => {
-              const pct = fund.goalAmount > 0 ? Math.min(100, (fund.currentAmount / fund.goalAmount) * 100) : 0
+              const pct =
+                fund.goalAmount > 0
+                  ? Math.min(100, (fund.currentAmount / fund.goalAmount) * 100)
+                  : 0
               return (
                 <motion.div key={fund.id} variants={fadeInUp}>
                   <Card>
                     <CardHeader className="pb-2">
                       <div className="flex items-start justify-between">
                         <CardTitle className="text-base">{fund.name}</CardTitle>
-                        <Badge variant={fund.isActive ? 'default' : 'secondary'}>{fund.isActive ? 'Active' : 'Closed'}</Badge>
+                        <Badge variant={fund.isActive ? 'default' : 'secondary'}>
+                          {fund.isActive ? 'Active' : 'Closed'}
+                        </Badge>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {fund.description && <p className="mb-3 text-sm text-gray-600">{fund.description}</p>}
+                      {fund.description && (
+                        <p className="mb-3 text-sm text-gray-600">{fund.description}</p>
+                      )}
                       <div className="flex items-end justify-between text-sm">
-                        <span className="font-semibold text-gray-900">${fund.currentAmount.toLocaleString()}</span>
-                        <span className="text-gray-500">of ${fund.goalAmount.toLocaleString()}</span>
+                        <span className="font-semibold text-gray-900">
+                          ${fund.currentAmount.toLocaleString()}
+                        </span>
+                        <span className="text-gray-500">
+                          of ${fund.goalAmount.toLocaleString()}
+                        </span>
                       </div>
                       <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                        <div className="h-full rounded-full bg-wedding-500 transition-all" style={{ width: `${pct}%` }} />
+                        <div
+                          className="bg-wedding-500 h-full rounded-full transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
                       </div>
                       <p className="mt-1 text-xs text-gray-500">{Math.round(pct)}% funded</p>
-                      <button onClick={() => handleDeleteFund(fund.id)} className="mt-3 text-xs text-red-500 hover:text-red-700">Delete</button>
+                      <button
+                        onClick={() => handleDeleteFund(fund.id)}
+                        className="mt-3 text-xs text-red-500 hover:text-red-700"
+                      >
+                        Delete
+                      </button>
                     </CardContent>
                   </Card>
                 </motion.div>
               )
             })}
           </motion.div>
-        )
-      )}
+        ))}
 
-      {activeTab === 'gifts' && (
-        gifts.length === 0 ? (
+      {activeTab === 'gifts' &&
+        (gifts.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-wedding-50">
-                <svg className="h-8 w-8 text-wedding-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+              <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                <svg
+                  className="text-wedding-600 h-8 w-8"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
+                  />
                 </svg>
               </div>
               <h2 className="font-serif text-xl font-semibold text-gray-900">No Gifts Logged</h2>
-              <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">Track gifts you receive and manage thank-you notes.</p>
-              <Button className="mt-6" onClick={() => { setEditingGift(null); setGiftForm({ guestName: '', description: '', estimatedValue: '', notes: '' }); setShowGiftForm(true) }}>Log a Gift</Button>
+              <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+                Track gifts you receive and manage thank-you notes.
+              </p>
+              <Button
+                className="mt-6"
+                onClick={() => {
+                  setEditingGift(null)
+                  setGiftForm({ guestName: '', description: '', estimatedValue: '', notes: '' })
+                  setShowGiftForm(true)
+                }}
+              >
+                Log a Gift
+              </Button>
             </CardContent>
           </Card>
         ) : (
@@ -316,8 +458,12 @@ export default function RegistryPage() {
                     <p className="text-sm font-medium text-gray-900">{gift.description}</p>
                     <div className="mt-1 flex items-center gap-3 text-xs text-gray-500">
                       {gift.guestName && <span>From: {gift.guestName}</span>}
-                      {gift.estimatedValue != null && <span>${gift.estimatedValue.toLocaleString()}</span>}
-                      {gift.receivedAt && <span>Received {new Date(gift.receivedAt).toLocaleDateString()}</span>}
+                      {gift.estimatedValue != null && (
+                        <span>${gift.estimatedValue.toLocaleString()}</span>
+                      )}
+                      {gift.receivedAt && (
+                        <span>Received {new Date(gift.receivedAt).toLocaleDateString()}</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -330,48 +476,154 @@ export default function RegistryPage() {
                       <option value="drafted">Drafted</option>
                       <option value="sent">Sent</option>
                     </select>
-                    <button onClick={() => handleDeleteGift(gift.id)} className="text-xs text-red-500 hover:text-red-700">Delete</button>
+                    <button
+                      onClick={() => handleDeleteGift(gift.id)}
+                      className="text-xs text-red-500 hover:text-red-700"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-        )
-      )}
+        ))}
 
       <Dialog open={showLinkForm} onOpenChange={setShowLinkForm}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add Registry Link</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Add Registry Link</DialogTitle>
+          </DialogHeader>
           <div className="space-y-4">
-            <div><Label htmlFor="rl-name">Store Name</Label><Input id="rl-name" value={linkForm.storeName} onChange={(e) => setLinkForm({ ...linkForm, storeName: e.target.value })} placeholder="e.g., Amazon, Crate & Barrel" /></div>
-            <div><Label htmlFor="rl-url">URL</Label><Input id="rl-url" value={linkForm.url} onChange={(e) => setLinkForm({ ...linkForm, url: e.target.value })} placeholder="https://..." /></div>
-            <div><Label htmlFor="rl-logo">Logo URL (optional)</Label><Input id="rl-logo" value={linkForm.logoUrl} onChange={(e) => setLinkForm({ ...linkForm, logoUrl: e.target.value })} placeholder="https://..." /></div>
-            <Button onClick={handleAddLink} className="w-full">Add Registry</Button>
+            <div>
+              <Label htmlFor="rl-name">Store Name</Label>
+              <Input
+                id="rl-name"
+                value={linkForm.storeName}
+                onChange={(e) => setLinkForm({ ...linkForm, storeName: e.target.value })}
+                placeholder="e.g., Amazon, Crate & Barrel"
+              />
+            </div>
+            <div>
+              <Label htmlFor="rl-url">URL</Label>
+              <Input
+                id="rl-url"
+                value={linkForm.url}
+                onChange={(e) => setLinkForm({ ...linkForm, url: e.target.value })}
+                placeholder="https://..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="rl-logo">Logo URL (optional)</Label>
+              <Input
+                id="rl-logo"
+                value={linkForm.logoUrl}
+                onChange={(e) => setLinkForm({ ...linkForm, logoUrl: e.target.value })}
+                placeholder="https://..."
+              />
+            </div>
+            <Button onClick={handleAddLink} className="w-full">
+              Add Registry
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showFundForm} onOpenChange={setShowFundForm}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Create Cash Fund</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Create Cash Fund</DialogTitle>
+          </DialogHeader>
           <div className="space-y-4">
-            <div><Label htmlFor="cf-name">Fund Name</Label><Input id="cf-name" value={fundForm.name} onChange={(e) => setFundForm({ ...fundForm, name: e.target.value })} placeholder="e.g., Honeymoon Fund" /></div>
-            <div><Label htmlFor="cf-desc">Description</Label><Textarea id="cf-desc" value={fundForm.description} onChange={(e) => setFundForm({ ...fundForm, description: e.target.value })} rows={2} placeholder="Tell guests what this fund is for" /></div>
-            <div><Label htmlFor="cf-goal">Goal Amount ($)</Label><Input id="cf-goal" type="number" value={fundForm.goalAmount} onChange={(e) => setFundForm({ ...fundForm, goalAmount: e.target.value })} placeholder="5000" /></div>
-            <Button onClick={handleAddFund} className="w-full">Create Fund</Button>
+            <div>
+              <Label htmlFor="cf-name">Fund Name</Label>
+              <Input
+                id="cf-name"
+                value={fundForm.name}
+                onChange={(e) => setFundForm({ ...fundForm, name: e.target.value })}
+                placeholder="e.g., Honeymoon Fund"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cf-desc">Description</Label>
+              <Textarea
+                id="cf-desc"
+                value={fundForm.description}
+                onChange={(e) => setFundForm({ ...fundForm, description: e.target.value })}
+                rows={2}
+                placeholder="Tell guests what this fund is for"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cf-goal">Goal Amount ($)</Label>
+              <Input
+                id="cf-goal"
+                type="number"
+                value={fundForm.goalAmount}
+                onChange={(e) => setFundForm({ ...fundForm, goalAmount: e.target.value })}
+                placeholder="5000"
+              />
+            </div>
+            <Button onClick={handleAddFund} className="w-full">
+              Create Fund
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showGiftForm} onOpenChange={(open) => { if (!open) { setEditingGift(null); setShowGiftForm(false) } else setShowGiftForm(true) }}>
+      <Dialog
+        open={showGiftForm}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingGift(null)
+            setShowGiftForm(false)
+          } else setShowGiftForm(true)
+        }}
+      >
         <DialogContent>
-          <DialogHeader><DialogTitle>{editingGift ? 'Edit Gift' : 'Log a Gift'}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{editingGift ? 'Edit Gift' : 'Log a Gift'}</DialogTitle>
+          </DialogHeader>
           <div className="space-y-4">
-            <div><Label htmlFor="g-guest">From (Guest Name)</Label><Input id="g-guest" value={giftForm.guestName} onChange={(e) => setGiftForm({ ...giftForm, guestName: e.target.value })} placeholder="Guest name" /></div>
-            <div><Label htmlFor="g-desc">Description</Label><Input id="g-desc" value={giftForm.description} onChange={(e) => setGiftForm({ ...giftForm, description: e.target.value })} placeholder="What was the gift?" /></div>
-            <div><Label htmlFor="g-val">Estimated Value ($)</Label><Input id="g-val" type="number" value={giftForm.estimatedValue} onChange={(e) => setGiftForm({ ...giftForm, estimatedValue: e.target.value })} /></div>
-            <div><Label htmlFor="g-notes">Notes</Label><Textarea id="g-notes" value={giftForm.notes} onChange={(e) => setGiftForm({ ...giftForm, notes: e.target.value })} rows={2} /></div>
-            <Button onClick={handleSaveGift} className="w-full">{editingGift ? 'Save Changes' : 'Log Gift'}</Button>
+            <div>
+              <Label htmlFor="g-guest">From (Guest Name)</Label>
+              <Input
+                id="g-guest"
+                value={giftForm.guestName}
+                onChange={(e) => setGiftForm({ ...giftForm, guestName: e.target.value })}
+                placeholder="Guest name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="g-desc">Description</Label>
+              <Input
+                id="g-desc"
+                value={giftForm.description}
+                onChange={(e) => setGiftForm({ ...giftForm, description: e.target.value })}
+                placeholder="What was the gift?"
+              />
+            </div>
+            <div>
+              <Label htmlFor="g-val">Estimated Value ($)</Label>
+              <Input
+                id="g-val"
+                type="number"
+                value={giftForm.estimatedValue}
+                onChange={(e) => setGiftForm({ ...giftForm, estimatedValue: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="g-notes">Notes</Label>
+              <Textarea
+                id="g-notes"
+                value={giftForm.notes}
+                onChange={(e) => setGiftForm({ ...giftForm, notes: e.target.value })}
+                rows={2}
+              />
+            </div>
+            <Button onClick={handleSaveGift} className="w-full">
+              {editingGift ? 'Save Changes' : 'Log Gift'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

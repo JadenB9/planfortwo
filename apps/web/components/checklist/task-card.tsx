@@ -52,7 +52,7 @@ export function TaskCard({
 
   return (
     <motion.div
-      className={`group flex items-center gap-3 rounded-xl border bg-white px-4 py-3 transition-colors hover:border-wedding-200 ${
+      className={`hover:border-wedding-200 group flex items-center gap-3 rounded-xl border bg-white px-4 py-3 transition-colors ${
         isCompleted ? 'border-gray-100 opacity-70' : 'border-gray-200'
       }`}
       layout
@@ -67,7 +67,12 @@ export function TaskCard({
           {...dragHandleProps}
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 8h16M4 16h16"
+            />
           </svg>
         </button>
       )}
@@ -81,11 +86,17 @@ export function TaskCard({
         className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
           isCompleted
             ? 'border-wedding-600 bg-wedding-600 text-white'
-            : 'border-gray-300 hover:border-wedding-400'
+            : 'hover:border-wedding-400 border-gray-300'
         } ${!features.canEditChecklist ? 'cursor-not-allowed opacity-50' : ''}`}
       >
         {isCompleted && (
-          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+          <svg
+            className="h-3 w-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={3}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         )}
@@ -105,11 +116,15 @@ export function TaskCard({
 
         <div className="flex flex-shrink-0 items-center gap-2">
           {dueDateInfo && !isCompleted && (
-            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${dueDateInfo.className}`}>
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${dueDateInfo.className}`}
+            >
               {dueDateInfo.label}
             </span>
           )}
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}>
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}
+          >
             {PRIORITY_LABELS[task.priority]}
           </span>
           <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: categoryColor }} />

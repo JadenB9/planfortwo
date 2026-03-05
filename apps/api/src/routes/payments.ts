@@ -1,6 +1,10 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { createContactSubmissionSchema, createReferralSchema, redeemReferralSchema } from '@planfortwo/validators'
+import {
+  createContactSubmissionSchema,
+  createReferralSchema,
+  redeemReferralSchema,
+} from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -33,7 +37,8 @@ purchasesRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const purchaseId = c.req.param('id')
   const weddingId = c.get('weddingId')
   const purchase = await purchaseService.getById(purchaseId, weddingId)
-  if (!purchase) return c.json({ error: 'Purchase not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  if (!purchase)
+    return c.json({ error: 'Purchase not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: purchase })
 })
 
@@ -49,7 +54,8 @@ referralsRoute.get('/', async (c) => {
 referralsRoute.post(
   '/',
   zValidator('json', createReferralSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const userId = c.get('dbUserId')
@@ -62,13 +68,22 @@ referralsRoute.post(
 referralsRoute.post(
   '/redeem',
   zValidator('json', redeemReferralSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const userId = c.get('dbUserId')
     const data = c.req.valid('json')
     const redeemed = await referralService.redeem(data.referralCode, userId, data.email)
-    if (!redeemed) return c.json({ error: 'Invalid or already used referral code', code: 'INVALID_REFERRAL', statusCode: 400 }, 400)
+    if (!redeemed)
+      return c.json(
+        {
+          error: 'Invalid or already used referral code',
+          code: 'INVALID_REFERRAL',
+          statusCode: 400,
+        },
+        400,
+      )
     return c.json({ data: redeemed })
   },
 )
@@ -77,7 +92,8 @@ referralsRoute.post(
 contactRoute.post(
   '/',
   zValidator('json', createContactSubmissionSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')

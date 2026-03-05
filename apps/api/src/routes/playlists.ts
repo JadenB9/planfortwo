@@ -43,7 +43,8 @@ playlistsRoute.post(
   '/',
   resolveWeddingMiddleware,
   zValidator('json', createPlaylistSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -56,7 +57,8 @@ playlistsRoute.put(
   '/:id',
   resolveWeddingMiddleware,
   zValidator('json', updatePlaylistSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const id = c.req.param('id')
@@ -80,7 +82,8 @@ playlistsRoute.post(
   '/:id/songs',
   resolveWeddingMiddleware,
   zValidator('json', createPlaylistSongSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -107,7 +110,8 @@ playlistsRoute.post(
   '/requests',
   resolveWeddingMiddleware,
   zValidator('json', createSongRequestSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')

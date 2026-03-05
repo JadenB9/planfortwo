@@ -36,10 +36,7 @@ tasksRoute.get(
   resolveWeddingMiddleware,
   zValidator('query', taskFiltersSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -73,10 +70,7 @@ tasksRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const task = await checklistService.getTaskWithDetails(taskId)
 
   if (!task || task.weddingId !== weddingId) {
-    return c.json(
-      { error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 },
-      404,
-    )
+    return c.json({ error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 }, 404)
   }
 
   return c.json({ data: task })
@@ -88,10 +82,7 @@ tasksRoute.post(
   requireFeature('canAddTasks'),
   zValidator('json', createTaskSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -110,10 +101,7 @@ tasksRoute.put(
   requireFeature('canEditChecklist'),
   zValidator('json', updateTaskSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -125,10 +113,7 @@ tasksRoute.put(
     const updated = await checklistService.updateTask(taskId, data, dbUserId, weddingId)
 
     if (!updated) {
-      return c.json(
-        { error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 }, 404)
     }
 
     return c.json({ data: updated })
@@ -148,10 +133,7 @@ tasksRoute.patch(
     const updated = await checklistService.toggleComplete(taskId, dbUserId, weddingId)
 
     if (!updated) {
-      return c.json(
-        { error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 }, 404)
     }
 
     return c.json({ data: updated })
@@ -165,10 +147,7 @@ tasksRoute.patch(
   requireFeature('canReorderTasks'),
   zValidator('json', reorderTaskSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -178,10 +157,7 @@ tasksRoute.patch(
     const updated = await checklistService.reorderTask(taskId, sortOrder)
 
     if (!updated) {
-      return c.json(
-        { error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 }, 404)
     }
 
     return c.json({ data: updated })
@@ -189,27 +165,19 @@ tasksRoute.patch(
 )
 
 // DELETE /tasks/:id — delete task (gated)
-tasksRoute.delete(
-  '/:id',
-  resolveWeddingMiddleware,
-  requireFeature('canDeleteTasks'),
-  async (c) => {
-    const taskId = c.req.param('id')
-    const dbUserId = c.get('dbUserId')
-    const weddingId = c.get('weddingId')
+tasksRoute.delete('/:id', resolveWeddingMiddleware, requireFeature('canDeleteTasks'), async (c) => {
+  const taskId = c.req.param('id')
+  const dbUserId = c.get('dbUserId')
+  const weddingId = c.get('weddingId')
 
-    try {
-      await checklistService.deleteTask(taskId, dbUserId, weddingId)
-      return c.json({ data: { success: true } })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json(
-        { error: message, code: 'DELETE_FAILED', statusCode: 404 },
-        404,
-      )
-    }
-  },
-)
+  try {
+    await checklistService.deleteTask(taskId, dbUserId, weddingId)
+    return c.json({ data: { success: true } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Delete failed'
+    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+  }
+})
 
 // POST /tasks/bulk-reorder — bulk reorder (gated)
 tasksRoute.post(
@@ -218,10 +186,7 @@ tasksRoute.post(
   requireFeature('canReorderTasks'),
   zValidator('json', bulkReorderTasksSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -238,10 +203,7 @@ tasksRoute.post(
   requireFeature('canAddNotes'),
   zValidator('json', createTaskNoteSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {

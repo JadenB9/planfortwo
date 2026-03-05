@@ -1,7 +1,11 @@
 import { eq, and, asc, desc, ilike, or, sql, count } from 'drizzle-orm'
 import { db, budgetCategories, budgetItems } from '@planfortwo/db'
 import { storageClient } from '@planfortwo/storage'
-import type { CreateBudgetItemInput, UpdateBudgetItemInput, BudgetItemFiltersInput } from '@planfortwo/validators'
+import type {
+  CreateBudgetItemInput,
+  UpdateBudgetItemInput,
+  BudgetItemFiltersInput,
+} from '@planfortwo/validators'
 import { activityService } from './activity.js'
 
 function parseItemRow(row: typeof budgetItems.$inferSelect) {
@@ -21,9 +25,7 @@ function parseCategoryRow(row: typeof budgetCategories.$inferSelect) {
 
 export const budgetItemService = {
   async list(filters: BudgetItemFiltersInput) {
-    const conditions: ReturnType<typeof eq>[] = [
-      eq(budgetItems.weddingId, filters.weddingId),
-    ]
+    const conditions: ReturnType<typeof eq>[] = [eq(budgetItems.weddingId, filters.weddingId)]
 
     if (filters.categoryId) {
       conditions.push(eq(budgetItems.categoryId, filters.categoryId))
@@ -40,10 +42,7 @@ export const budgetItemService = {
     if (filters.search) {
       const term = `%${filters.search}%`
       conditions.push(
-        or(
-          ilike(budgetItems.description, term),
-          ilike(budgetItems.vendorName, term),
-        )!,
+        or(ilike(budgetItems.description, term), ilike(budgetItems.vendorName, term))!,
       )
     }
 
@@ -154,8 +153,10 @@ export const budgetItemService = {
     if (data.amount !== undefined) updateData.amount = data.amount.toString()
     if (data.paidAmount !== undefined) updateData.paidAmount = data.paidAmount.toString()
     if (data.payer !== undefined) updateData.payer = data.payer
-    if (data.dueDate !== undefined) updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null
-    if (data.paidDate !== undefined) updateData.paidDate = data.paidDate ? new Date(data.paidDate) : null
+    if (data.dueDate !== undefined)
+      updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null
+    if (data.paidDate !== undefined)
+      updateData.paidDate = data.paidDate ? new Date(data.paidDate) : null
     if (data.receiptUrl !== undefined) updateData.receiptUrl = data.receiptUrl
     if (data.receiptFileName !== undefined) updateData.receiptFileName = data.receiptFileName
     if (data.notes !== undefined) updateData.notes = data.notes

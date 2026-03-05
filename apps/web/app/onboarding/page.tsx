@@ -96,11 +96,42 @@ export default function OnboardingPage() {
 
   const steps = [
     <NamesStep key="names" data={data} onUpdate={updateData} onNext={handleNext} />,
-    <DateStep key="date" data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />,
-    <GuestCountStep key="guests" data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />,
-    <BudgetStep key="budget" data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />,
-    <StyleStep key="style" data={data} onUpdate={updateData} onNext={handleNext} onBack={handleBack} />,
-    <TimelineStep key="timeline" data={data} onUpdate={updateData} onSubmit={handleSubmit} onBack={handleBack} isSubmitting={isSubmitting} />,
+    <DateStep
+      key="date"
+      data={data}
+      onUpdate={updateData}
+      onNext={handleNext}
+      onBack={handleBack}
+    />,
+    <GuestCountStep
+      key="guests"
+      data={data}
+      onUpdate={updateData}
+      onNext={handleNext}
+      onBack={handleBack}
+    />,
+    <BudgetStep
+      key="budget"
+      data={data}
+      onUpdate={updateData}
+      onNext={handleNext}
+      onBack={handleBack}
+    />,
+    <StyleStep
+      key="style"
+      data={data}
+      onUpdate={updateData}
+      onNext={handleNext}
+      onBack={handleBack}
+    />,
+    <TimelineStep
+      key="timeline"
+      data={data}
+      onUpdate={updateData}
+      onSubmit={handleSubmit}
+      onBack={handleBack}
+      isSubmitting={isSubmitting}
+    />,
   ]
 
   return (

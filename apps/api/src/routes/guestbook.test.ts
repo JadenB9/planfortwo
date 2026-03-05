@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,8 +25,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -40,13 +49,30 @@ vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
       tier: 'full',
-      canAddTasks: true, canEditChecklist: true, canDeleteTasks: true, canReorderTasks: true,
-      canCustomizeCategories: true, canAddNotes: true, canAddAttachments: true,
-      maxGuests: null, canEditGuests: true, canDeleteGuests: true, canBulkImport: true,
-      canRsvp: true, canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -78,8 +104,13 @@ describe('Guestbook Routes', () => {
   describe('POST /guestbook (public)', () => {
     it('should create a guestbook entry without auth', async () => {
       mockedService.create.mockResolvedValue({
-        id: ENTRY_ID, weddingId: WEDDING_ID, authorName: 'John',
-        message: 'Congrats!', isApproved: false, isVisible: true, createdAt: new Date(),
+        id: ENTRY_ID,
+        weddingId: WEDDING_ID,
+        authorName: 'John',
+        message: 'Congrats!',
+        isApproved: false,
+        isVisible: true,
+        createdAt: new Date(),
       } as never)
 
       const app = createApp()
@@ -87,7 +118,9 @@ describe('Guestbook Routes', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          weddingId: WEDDING_ID, authorName: 'John', message: 'Congrats!',
+          weddingId: WEDDING_ID,
+          authorName: 'John',
+          message: 'Congrats!',
         }),
       })
 
@@ -100,15 +133,22 @@ describe('Guestbook Routes', () => {
   describe('GET /guestbook (admin)', () => {
     it('should list all entries with auth', async () => {
       mockedService.list.mockResolvedValue([
-        { id: ENTRY_ID, weddingId: WEDDING_ID, authorName: 'John',
-          message: 'Congrats!', isApproved: false, isVisible: true, createdAt: new Date() },
+        {
+          id: ENTRY_ID,
+          weddingId: WEDDING_ID,
+          authorName: 'John',
+          message: 'Congrats!',
+          isApproved: false,
+          isVisible: true,
+          createdAt: new Date(),
+        },
       ] as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/guestbook?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/guestbook?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -119,15 +159,21 @@ describe('Guestbook Routes', () => {
   describe('PUT /guestbook/:id/approve', () => {
     it('should approve an entry', async () => {
       mockedService.approve.mockResolvedValue({
-        id: ENTRY_ID, weddingId: WEDDING_ID, authorName: 'John',
-        message: 'Congrats!', isApproved: true, isVisible: true, createdAt: new Date(),
+        id: ENTRY_ID,
+        weddingId: WEDDING_ID,
+        authorName: 'John',
+        message: 'Congrats!',
+        isApproved: true,
+        isVisible: true,
+        createdAt: new Date(),
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/guestbook/${ENTRY_ID}/approve?weddingId=${WEDDING_ID}`,
-        { method: 'PUT', headers: authHeaders(), body: JSON.stringify({ approved: true }) },
-      )
+      const res = await app.request(`/guestbook/${ENTRY_ID}/approve?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ approved: true }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -140,10 +186,10 @@ describe('Guestbook Routes', () => {
       mockedService.delete.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/guestbook/${ENTRY_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/guestbook/${ENTRY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
     })
@@ -152,10 +198,10 @@ describe('Guestbook Routes', () => {
       mockedService.delete.mockRejectedValue(new Error('Guestbook entry not found'))
 
       const app = createApp()
-      const res = await app.request(
-        `/guestbook/${ENTRY_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/guestbook/${ENTRY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(404)
     })

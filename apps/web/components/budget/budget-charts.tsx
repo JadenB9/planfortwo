@@ -26,9 +26,12 @@ interface BudgetChartsProps {
 const PIE_COLORS = ['#8B7355', '#B5A088', '#C4A882', '#D4C4A8']
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount)
 }
-
 
 export function BudgetCharts({ categoryBreakdown, monthlySpending, splits }: BudgetChartsProps) {
   const barData = categoryBreakdown.map((c) => ({
@@ -62,7 +65,10 @@ export function BudgetCharts({ categoryBreakdown, monthlySpending, splits }: Bud
             <BarChart data={barData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-              <YAxis tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
+              <YAxis
+                tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+                tick={{ fontSize: 11 }}
+              />
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
               <Legend />
               <Bar dataKey="Allocated" fill="#D4C4A8" radius={[4, 4, 0, 0]} />
@@ -80,7 +86,10 @@ export function BudgetCharts({ categoryBreakdown, monthlySpending, splits }: Bud
             <LineChart data={lineData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-              <YAxis tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
+              <YAxis
+                tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+                tick={{ fontSize: 11 }}
+              />
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
               <Line
                 type="monotone"

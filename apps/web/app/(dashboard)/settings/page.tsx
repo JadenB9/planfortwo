@@ -36,19 +36,26 @@ export default function SettingsPage() {
       setWeddingId(w.id)
       setWeddingForm({
         name: w.name,
-        date: w.date ? new Date(w.date).toISOString().split('T')[0] ?? '' : '',
+        date: w.date ? (new Date(w.date).toISOString().split('T')[0] ?? '') : '',
         venue: w.venue ?? '',
       })
 
       try {
         const { data: prefs } = await api.notificationPrefs.get(w.id, token)
         setNotifPrefs(prefs)
-      } catch { /* first time - no prefs */ }
-    } catch { /* silent */ }
-    finally { setLoading(false) }
+      } catch {
+        /* first time - no prefs */
+      }
+    } catch {
+      /* silent */
+    } finally {
+      setLoading(false)
+    }
   }, [getToken])
 
-  useEffect(() => { void loadData() }, [loadData])
+  useEffect(() => {
+    void loadData()
+  }, [loadData])
 
   const handleSaveWedding = useCallback(async () => {
     if (!weddingId) return
@@ -56,36 +63,49 @@ export default function SettingsPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.weddings.completeOnboarding(weddingId, {
-        partnerFirstName: '',
-        partnerLastName: '',
-        weddingDate: weddingForm.date ? new Date(weddingForm.date).toISOString() : null,
-        guestCountEstimate: wedding?.guestCountEstimate ?? null,
-        budgetTotal: wedding?.budgetTotal ?? null,
-        style: wedding?.style ?? null,
-        timelineTemplate: wedding?.timelineTemplate ?? '12-month',
-      }, token)
+      await api.weddings.completeOnboarding(
+        weddingId,
+        {
+          partnerFirstName: '',
+          partnerLastName: '',
+          weddingDate: weddingForm.date ? new Date(weddingForm.date).toISOString() : null,
+          guestCountEstimate: wedding?.guestCountEstimate ?? null,
+          budgetTotal: wedding?.budgetTotal ?? null,
+          style: wedding?.style ?? null,
+          timelineTemplate: wedding?.timelineTemplate ?? '12-month',
+        },
+        token,
+      )
       void loadData()
-    } catch { /* silent */ }
-    finally { setSaving(false) }
+    } catch {
+      /* silent */
+    } finally {
+      setSaving(false)
+    }
   }, [weddingId, getToken, weddingForm, wedding, loadData])
 
-  const handleUpdateNotif = useCallback(async (key: string, value: boolean | string) => {
-    if (!weddingId) return
-    setNotifSaving(true)
-    try {
-      const token = await getToken()
-      if (!token) return
-      const { data } = await api.notificationPrefs.update(weddingId, { [key]: value }, token)
-      setNotifPrefs(data)
-    } catch { /* silent */ }
-    finally { setNotifSaving(false) }
-  }, [weddingId, getToken])
+  const handleUpdateNotif = useCallback(
+    async (key: string, value: boolean | string) => {
+      if (!weddingId) return
+      setNotifSaving(true)
+      try {
+        const token = await getToken()
+        if (!token) return
+        const { data } = await api.notificationPrefs.update(weddingId, { [key]: value }, token)
+        setNotifPrefs(data)
+      } catch {
+        /* silent */
+      } finally {
+        setNotifSaving(false)
+      }
+    },
+    [weddingId, getToken],
+  )
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -99,7 +119,9 @@ export default function SettingsPage() {
     >
       <div className="mb-8">
         <h1 className="font-serif text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-600">Manage your wedding details, notifications, and account.</p>
+        <p className="mt-1 text-sm text-gray-600">
+          Manage your wedding details, notifications, and account.
+        </p>
       </div>
 
       <Tabs defaultValue="wedding">
@@ -117,15 +139,27 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label>Wedding Name</Label>
-                <Input value={weddingForm.name} onChange={(e) => setWeddingForm({ ...weddingForm, name: e.target.value })} placeholder="The Smith-Jones Wedding" />
+                <Input
+                  value={weddingForm.name}
+                  onChange={(e) => setWeddingForm({ ...weddingForm, name: e.target.value })}
+                  placeholder="The Smith-Jones Wedding"
+                />
               </div>
               <div>
                 <Label>Wedding Date</Label>
-                <Input type="date" value={weddingForm.date} onChange={(e) => setWeddingForm({ ...weddingForm, date: e.target.value })} />
+                <Input
+                  type="date"
+                  value={weddingForm.date}
+                  onChange={(e) => setWeddingForm({ ...weddingForm, date: e.target.value })}
+                />
               </div>
               <div>
                 <Label>Venue</Label>
-                <Input value={weddingForm.venue} onChange={(e) => setWeddingForm({ ...weddingForm, venue: e.target.value })} placeholder="Venue name" />
+                <Input
+                  value={weddingForm.venue}
+                  onChange={(e) => setWeddingForm({ ...weddingForm, venue: e.target.value })}
+                  placeholder="Venue name"
+                />
               </div>
 
               <Separator />
@@ -137,15 +171,21 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Guest Estimate</Label>
-                  <p className="font-medium text-gray-900">{wedding?.guestCountEstimate ?? 'Not set'}</p>
+                  <p className="font-medium text-gray-900">
+                    {wedding?.guestCountEstimate ?? 'Not set'}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Budget</Label>
-                  <p className="font-medium text-gray-900">{wedding?.budgetTotal ? `$${wedding.budgetTotal.toLocaleString()}` : 'Not set'}</p>
+                  <p className="font-medium text-gray-900">
+                    {wedding?.budgetTotal ? `$${wedding.budgetTotal.toLocaleString()}` : 'Not set'}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Style</Label>
-                  <p className="font-medium capitalize text-gray-900">{wedding?.style ?? 'Not set'}</p>
+                  <p className="font-medium capitalize text-gray-900">
+                    {wedding?.style ?? 'Not set'}
+                  </p>
                 </div>
               </div>
 
@@ -167,7 +207,9 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-gray-900">RSVP Notifications</p>
-                  <p className="text-sm text-gray-500">Get notified when guests respond to your RSVP.</p>
+                  <p className="text-sm text-gray-500">
+                    Get notified when guests respond to your RSVP.
+                  </p>
                 </div>
                 <Switch
                   checked={notifPrefs?.emailRsvp ?? true}
@@ -179,7 +221,9 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-gray-900">Payment Reminders</p>
-                  <p className="text-sm text-gray-500">Receive reminders for upcoming vendor payments.</p>
+                  <p className="text-sm text-gray-500">
+                    Receive reminders for upcoming vendor payments.
+                  </p>
                 </div>
                 <Switch
                   checked={notifPrefs?.emailPaymentReminder ?? true}
@@ -191,7 +235,9 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-gray-900">Task Due Dates</p>
-                  <p className="text-sm text-gray-500">Get notified when checklist tasks are approaching due dates.</p>
+                  <p className="text-sm text-gray-500">
+                    Get notified when checklist tasks are approaching due dates.
+                  </p>
                 </div>
                 <Switch
                   checked={notifPrefs?.emailTaskDue ?? true}
@@ -203,7 +249,9 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-gray-900">Weekly Summary</p>
-                  <p className="text-sm text-gray-500">Receive a weekly email summarizing your planning progress.</p>
+                  <p className="text-sm text-gray-500">
+                    Receive a weekly email summarizing your planning progress.
+                  </p>
                 </div>
                 <Switch
                   checked={notifPrefs?.emailWeeklySummary ?? false}
@@ -242,7 +290,9 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Email</Label>
-                  <p className="font-medium text-gray-900">{user?.primaryEmailAddress?.emailAddress ?? 'Unknown'}</p>
+                  <p className="font-medium text-gray-900">
+                    {user?.primaryEmailAddress?.emailAddress ?? 'Unknown'}
+                  </p>
                 </div>
               </div>
 
@@ -250,22 +300,29 @@ export default function SettingsPage() {
 
               <div>
                 <h3 className="mb-2 font-medium text-gray-900">Data Export</h3>
-                <p className="mb-3 text-sm text-gray-500">Download all your wedding planning data as a CSV file.</p>
-                <Button variant="outline" onClick={async () => {
-                  if (!weddingId) return
-                  try {
-                    const token = await getToken()
-                    if (!token) return
-                    const csv = await api.budgetAnalytics.exportCsv(weddingId, token)
-                    const blob = new Blob([csv], { type: 'text/csv' })
-                    const url = URL.createObjectURL(blob)
-                    const a = document.createElement('a')
-                    a.href = url
-                    a.download = 'planfortwo-export.csv'
-                    a.click()
-                    URL.revokeObjectURL(url)
-                  } catch { /* silent */ }
-                }}>
+                <p className="mb-3 text-sm text-gray-500">
+                  Download all your wedding planning data as a CSV file.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    if (!weddingId) return
+                    try {
+                      const token = await getToken()
+                      if (!token) return
+                      const csv = await api.budgetAnalytics.exportCsv(weddingId, token)
+                      const blob = new Blob([csv], { type: 'text/csv' })
+                      const url = URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = 'planfortwo-export.csv'
+                      a.click()
+                      URL.revokeObjectURL(url)
+                    } catch {
+                      /* silent */
+                    }
+                  }}
+                >
                   Export Data (CSV)
                 </Button>
               </div>

@@ -44,14 +44,20 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
       // Load photos and analytics in parallel (may fail silently for free tier or missing config)
       const optionalPromises: Promise<void>[] = []
       optionalPromises.push(
-        api.websitePhotos.list(weddingId, token)
+        api.websitePhotos
+          .list(weddingId, token)
           .then(({ data }) => setPhotos(data))
-          .catch(() => { /* photos not available */ }),
+          .catch(() => {
+            /* photos not available */
+          }),
       )
       optionalPromises.push(
-        api.websiteAnalytics.getSummary(weddingId, token)
+        api.websiteAnalytics
+          .getSummary(weddingId, token)
           .then(({ data }) => setAnalytics(data))
-          .catch(() => { /* analytics not available on free tier */ }),
+          .catch(() => {
+            /* analytics not available on free tier */
+          }),
       )
       await Promise.all(optionalPromises)
     } catch {

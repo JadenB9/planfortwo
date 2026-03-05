@@ -1,12 +1,30 @@
-import { boolean, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { weddings } from './weddings'
 
 export const emailTemplateTypeEnum = pgEnum('email_template_type', [
-  'save_the_date', 'invitation', 'update', 'reminder', 'thank_you', 'custom',
+  'save_the_date',
+  'invitation',
+  'update',
+  'reminder',
+  'thank_you',
+  'custom',
 ])
 
 export const campaignStatusEnum = pgEnum('campaign_status', [
-  'draft', 'scheduled', 'sending', 'sent', 'failed',
+  'draft',
+  'scheduled',
+  'sending',
+  'sent',
+  'failed',
 ])
 
 export const emailCampaigns = pgTable('email_campaigns', {

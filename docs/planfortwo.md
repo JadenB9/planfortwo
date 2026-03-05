@@ -1,6 +1,6 @@
 # PlanForTwo — Master Build Prompt & Feature Specification
 
-> This document is both the **build instructions for Claude Code** and the **complete feature reference** for PlanForTwo. The first half tells Claude *how* to build. The second half tells Claude *what* to build.
+> This document is both the **build instructions for Claude Code** and the **complete feature reference** for PlanForTwo. The first half tells Claude _how_ to build. The second half tells Claude _what_ to build.
 
 ---
 
@@ -24,44 +24,44 @@
 
 Activate these skills at the right moments. This is mandatory, not optional.
 
-| When | Activate Skill |
-|------|---------------|
-| **Starting any build session** | `fullstack-vibe` — sets up the vibe coding workflow |
-| **Before any creative/design work** | `superpowers:brainstorming` — brainstorm before building |
-| **Any frontend UI work** | `ui-ux-pro-max` — design intelligence for every component |
-| **Building pages, components, layouts** | `frontend-design` — production-grade frontend interfaces |
-| **Planning a new phase/milestone** | `gsd:plan-phase` or `gsd:new-project` — structured planning |
-| **Executing a planned phase** | `gsd:execute-phase` — structured execution with atomic commits |
-| **Writing any new feature code** | `superpowers:test-driven-development` — write tests first |
-| **Writing API endpoints** | `everything-claude-code:api-design` + `everything-claude-code:backend-patterns` |
-| **Database schema changes** | `everything-claude-code:database-migrations` + `everything-claude-code:postgres-patterns` |
-| **Frontend component patterns** | `everything-claude-code:frontend-patterns` |
-| **Before any library/framework API call** | Look up docs via **Context7 MCP** — never guess APIs |
-| **Writing E2E tests** | `everything-claude-code:e2e-testing` or `everything-claude-code:e2e` |
-| **Security-sensitive code (auth, payments, input)** | `secure` + `everything-claude-code:security-review` |
-| **Ready to push code** | `push` — human-style git push |
-| **Deploying to Vercel** | `vercel:setup` / `vercel:deploy` |
-| **Completing a major feature** | `superpowers:verification-before-completion` — verify before claiming done |
-| **After writing significant code** | `superpowers:requesting-code-review` — get code reviewed |
-| **Multi-step implementation** | `superpowers:writing-plans` then `superpowers:executing-plans` |
-| **Independent parallel tasks** | `superpowers:dispatching-parallel-agents` |
-| **Debugging an issue** | `superpowers:systematic-debugging` or `gsd:debug` |
-| **Auditing completed work** | `audit-project:audit-project` |
-| **Full PR workflow** | `ship:ship` |
-| **Coding standards enforcement** | `everything-claude-code:coding-standards` |
-| **Deployment pipeline work** | `everything-claude-code:deployment-patterns` |
+| When                                                | Activate Skill                                                                            |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Starting any build session**                      | `fullstack-vibe` — sets up the vibe coding workflow                                       |
+| **Before any creative/design work**                 | `superpowers:brainstorming` — brainstorm before building                                  |
+| **Any frontend UI work**                            | `ui-ux-pro-max` — design intelligence for every component                                 |
+| **Building pages, components, layouts**             | `frontend-design` — production-grade frontend interfaces                                  |
+| **Planning a new phase/milestone**                  | `gsd:plan-phase` or `gsd:new-project` — structured planning                               |
+| **Executing a planned phase**                       | `gsd:execute-phase` — structured execution with atomic commits                            |
+| **Writing any new feature code**                    | `superpowers:test-driven-development` — write tests first                                 |
+| **Writing API endpoints**                           | `everything-claude-code:api-design` + `everything-claude-code:backend-patterns`           |
+| **Database schema changes**                         | `everything-claude-code:database-migrations` + `everything-claude-code:postgres-patterns` |
+| **Frontend component patterns**                     | `everything-claude-code:frontend-patterns`                                                |
+| **Before any library/framework API call**           | Look up docs via **Context7 MCP** — never guess APIs                                      |
+| **Writing E2E tests**                               | `everything-claude-code:e2e-testing` or `everything-claude-code:e2e`                      |
+| **Security-sensitive code (auth, payments, input)** | `secure` + `everything-claude-code:security-review`                                       |
+| **Ready to push code**                              | `push` — human-style git push                                                             |
+| **Deploying to Vercel**                             | `vercel:setup` / `vercel:deploy`                                                          |
+| **Completing a major feature**                      | `superpowers:verification-before-completion` — verify before claiming done                |
+| **After writing significant code**                  | `superpowers:requesting-code-review` — get code reviewed                                  |
+| **Multi-step implementation**                       | `superpowers:writing-plans` then `superpowers:executing-plans`                            |
+| **Independent parallel tasks**                      | `superpowers:dispatching-parallel-agents`                                                 |
+| **Debugging an issue**                              | `superpowers:systematic-debugging` or `gsd:debug`                                         |
+| **Auditing completed work**                         | `audit-project:audit-project`                                                             |
+| **Full PR workflow**                                | `ship:ship`                                                                               |
+| **Coding standards enforcement**                    | `everything-claude-code:coding-standards`                                                 |
+| **Deployment pipeline work**                        | `everything-claude-code:deployment-patterns`                                              |
 
 ### 0.3 MCP Integration Points
 
 Use these Claude-connected tools throughout the build:
 
-| MCP Tool | When to Use |
-|----------|------------|
-| **Context7** (`mcp__plugin_context7_context7`) | Before using ANY library API. Look up Next.js App Router, Hono, Drizzle, Clerk, Stripe, Inngest, Resend, dnd-kit, Tiptap, Recharts, Konva, Zod — every time. Never guess. |
-| **Cloudflare MCP** (`mcp__claude_ai_Cloudflare_Developer_Platform`) | Create R2 buckets (dev + prod), manage DNS records, search Cloudflare docs for Workers/R2/DNS configuration, query D1 if needed. |
-| **Vercel MCP** (via `vercel:setup` / `vercel:deploy` skills) | Set up project, deploy, check logs, manage environment variables. |
-| **Claude in Chrome** (`mcp__claude-in-chrome`) | Design research — browse real wedding sites, take screenshots, analyze layouts, study competitor UX flows. |
-| **claude-mem** (`mcp__plugin_claude-mem_mcp-search`) | Search for previous session context, code patterns, and decisions. Use `smart_search` and `smart_outline` for navigating the growing codebase. |
+| MCP Tool                                                            | When to Use                                                                                                                                                               |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Context7** (`mcp__plugin_context7_context7`)                      | Before using ANY library API. Look up Next.js App Router, Hono, Drizzle, Clerk, Stripe, Inngest, Resend, dnd-kit, Tiptap, Recharts, Konva, Zod — every time. Never guess. |
+| **Cloudflare MCP** (`mcp__claude_ai_Cloudflare_Developer_Platform`) | Create R2 buckets (dev + prod), manage DNS records, search Cloudflare docs for Workers/R2/DNS configuration, query D1 if needed.                                          |
+| **Vercel MCP** (via `vercel:setup` / `vercel:deploy` skills)        | Set up project, deploy, check logs, manage environment variables.                                                                                                         |
+| **Claude in Chrome** (`mcp__claude-in-chrome`)                      | Design research — browse real wedding sites, take screenshots, analyze layouts, study competitor UX flows.                                                                |
+| **claude-mem** (`mcp__plugin_claude-mem_mcp-search`)                | Search for previous session context, code patterns, and decisions. Use `smart_search` and `smart_outline` for navigating the growing codebase.                            |
 
 ### 0.4 Code Style Rules
 
@@ -83,18 +83,18 @@ Claude cannot create accounts or enter credentials for you. You must complete ev
 
 ### 1.1 Accounts to Create
 
-| # | Service | URL | What to Do | Keys You'll Get |
-|---|---------|-----|-----------|----------------|
-| 1 | **GitHub** | github.com/new | Create `JadenB9/planfortwo` repo (private), set up `main` + `dev` branches, enable branch protection on both | Repo URL |
-| 2 | **Vercel** | vercel.com/new | Connect GitHub repo, create project, set framework to Next.js | `VERCEL_TOKEN`, project ID |
-| 3 | **Supabase** | supabase.com/dashboard | Create TWO projects: `planfortwo-dev` and `planfortwo-prod`. Enable Row Level Security. Note the connection strings, anon key, service role key for each. | `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (x2 for dev/prod) |
-| 4 | **Clerk** | clerk.com | Create TWO applications: dev and prod. Enable Email+Password, Google OAuth, Apple sign-in. Set up redirect URLs. | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET` (x2) |
-| 5 | **Stripe** | stripe.com | Create account. Get test mode keys immediately. Set up a Product for the $200 one-time purchase. Create a webhook endpoint pointing to `api.planfortwo.com/webhooks/stripe`. | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` |
-| 6 | **Cloudflare** | cloudflare.com | Create account. Add `planfortwo.com` domain (buy it here or transfer nameservers). Create TWO R2 buckets: `planfortwo-dev` and `planfortwo-prod`. | `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` |
-| 7 | **Railway** | railway.app | Create account. Create a new project. Add a service for the Hono API. Connect GitHub repo. Set up auto-deploy from `dev` and `main` branches. | `RAILWAY_TOKEN`, API URL |
-| 8 | **Resend** | resend.com | Create account. Verify `planfortwo.com` domain (add DNS records in Cloudflare). Create API key. | `RESEND_API_KEY` |
-| 9 | **Inngest** | inngest.com | Create account. Create TWO environments: dev and prod. Note the event keys and signing keys. | `INNGEST_EVENT_KEY`, `INNGEST_SIGNING_KEY` |
-| 10 | **Sentry** | sentry.io | Create account. Create TWO projects: `planfortwo-web` (Next.js) and `planfortwo-api` (Node). | `SENTRY_DSN` (x2), `SENTRY_AUTH_TOKEN` |
+| #   | Service        | URL                    | What to Do                                                                                                                                                                   | Keys You'll Get                                                                                               |
+| --- | -------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 1   | **GitHub**     | github.com/new         | Create `JadenB9/planfortwo` repo (private), set up `main` + `dev` branches, enable branch protection on both                                                                 | Repo URL                                                                                                      |
+| 2   | **Vercel**     | vercel.com/new         | Connect GitHub repo, create project, set framework to Next.js                                                                                                                | `VERCEL_TOKEN`, project ID                                                                                    |
+| 3   | **Supabase**   | supabase.com/dashboard | Create TWO projects: `planfortwo-dev` and `planfortwo-prod`. Enable Row Level Security. Note the connection strings, anon key, service role key for each.                    | `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (x2 for dev/prod)            |
+| 4   | **Clerk**      | clerk.com              | Create TWO applications: dev and prod. Enable Email+Password, Google OAuth, Apple sign-in. Set up redirect URLs.                                                             | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET` (x2)                          |
+| 5   | **Stripe**     | stripe.com             | Create account. Get test mode keys immediately. Set up a Product for the $200 one-time purchase. Create a webhook endpoint pointing to `api.planfortwo.com/webhooks/stripe`. | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`                     |
+| 6   | **Cloudflare** | cloudflare.com         | Create account. Add `planfortwo.com` domain (buy it here or transfer nameservers). Create TWO R2 buckets: `planfortwo-dev` and `planfortwo-prod`.                            | `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` |
+| 7   | **Railway**    | railway.app            | Create account. Create a new project. Add a service for the Hono API. Connect GitHub repo. Set up auto-deploy from `dev` and `main` branches.                                | `RAILWAY_TOKEN`, API URL                                                                                      |
+| 8   | **Resend**     | resend.com             | Create account. Verify `planfortwo.com` domain (add DNS records in Cloudflare). Create API key.                                                                              | `RESEND_API_KEY`                                                                                              |
+| 9   | **Inngest**    | inngest.com            | Create account. Create TWO environments: dev and prod. Note the event keys and signing keys.                                                                                 | `INNGEST_EVENT_KEY`, `INNGEST_SIGNING_KEY`                                                                    |
+| 10  | **Sentry**     | sentry.io              | Create account. Create TWO projects: `planfortwo-web` (Next.js) and `planfortwo-api` (Node).                                                                                 | `SENTRY_DSN` (x2), `SENTRY_AUTH_TOKEN`                                                                        |
 
 ### 1.2 OAuth Provider Setup (Manual)
 
@@ -107,13 +107,13 @@ These require developer console access that Claude cannot perform:
 
 After Vercel and Railway are set up, add these DNS records in Cloudflare:
 
-| Type | Name | Target | Proxy |
-|------|------|--------|-------|
-| CNAME | `app` | `cname.vercel-dns.com` | Yes |
-| CNAME | `api` | Railway service URL | Yes |
-| CNAME | `*` | `cname.vercel-dns.com` (wildcard for wedding sites) | Yes |
-| TXT/CNAME | Resend verification records | (from Resend dashboard) | No |
-| TXT/CNAME | Clerk verification records | (from Clerk dashboard) | No |
+| Type      | Name                        | Target                                              | Proxy |
+| --------- | --------------------------- | --------------------------------------------------- | ----- |
+| CNAME     | `app`                       | `cname.vercel-dns.com`                              | Yes   |
+| CNAME     | `api`                       | Railway service URL                                 | Yes   |
+| CNAME     | `*`                         | `cname.vercel-dns.com` (wildcard for wedding sites) | Yes   |
+| TXT/CNAME | Resend verification records | (from Resend dashboard)                             | No    |
+| TXT/CNAME | Clerk verification records  | (from Clerk dashboard)                              | No    |
 
 ### 1.4 Stripe Webhook Setup (Manual)
 
@@ -134,22 +134,23 @@ Tell Claude: "All accounts are set up. Here are my environment variables." Then 
 
 Before designing any UI, use **Claude in Chrome** browser automation to visit and screenshot these sites. Analyze their strengths and weaknesses:
 
-| Site | URL | Study For |
-|------|-----|----------|
-| **Zola** | zola.com | Best-in-class wedding website builder, clean onboarding, registry UX |
-| **The Knot** | theknot.com | Feature breadth, checklist UX, vendor directory |
-| **Joy** | withjoy.com | Modern design, mobile experience, photo sharing |
-| **Minted** | minted.com/wedding | Premium stationery aesthetic, typography, print-to-digital |
-| **Riley & Grey** | rileyandgrey.com | Luxury wedding website templates, editorial design |
-| **Appy Couple** | appycouple.com | App-like experience, guest-facing UX |
-| **Paperless Post** | paperlesspost.com | Digital stationery design, animation, elegance |
-| **Squarespace** | squarespace.com (wedding templates) | Template builder UX, drag-and-drop editing |
-| **WithJoy** | withjoy.com | Free tier generosity, RSVP flow, clean mobile |
-| **Brides.com** | brides.com | Content/editorial style, how-to guides |
+| Site               | URL                                 | Study For                                                            |
+| ------------------ | ----------------------------------- | -------------------------------------------------------------------- |
+| **Zola**           | zola.com                            | Best-in-class wedding website builder, clean onboarding, registry UX |
+| **The Knot**       | theknot.com                         | Feature breadth, checklist UX, vendor directory                      |
+| **Joy**            | withjoy.com                         | Modern design, mobile experience, photo sharing                      |
+| **Minted**         | minted.com/wedding                  | Premium stationery aesthetic, typography, print-to-digital           |
+| **Riley & Grey**   | rileyandgrey.com                    | Luxury wedding website templates, editorial design                   |
+| **Appy Couple**    | appycouple.com                      | App-like experience, guest-facing UX                                 |
+| **Paperless Post** | paperlesspost.com                   | Digital stationery design, animation, elegance                       |
+| **Squarespace**    | squarespace.com (wedding templates) | Template builder UX, drag-and-drop editing                           |
+| **WithJoy**        | withjoy.com                         | Free tier generosity, RSVP flow, clean mobile                        |
+| **Brides.com**     | brides.com                          | Content/editorial style, how-to guides                               |
 
 ### 2.2 What to Extract From Each
 
 For every site, document:
+
 1. **Typography** — What font pairings do they use? Serif + sans-serif combos?
 2. **Color palettes** — Muted tones? Bold? What makes it feel "wedding" not "SaaS"?
 3. **Spacing & whitespace** — How generous is the breathing room?
@@ -178,6 +179,7 @@ Based on the research, every UI must follow these rules:
 ### 2.4 Template Design Approach
 
 For the 10+ wedding website templates:
+
 1. Study the best templates from Zola, Minted, Riley & Grey, and Squarespace
 2. Identify the 10 most popular "styles" (Classic, Modern, Rustic, Romantic, Minimalist, etc.)
 3. For each style, combine the best layout from one site + best typography from another + best color approach from another
@@ -219,13 +221,13 @@ Use the `superpowers:test-driven-development` skill to enforce this workflow.
 
 ### 3.3 Test Categories & When to Write Them
 
-| Test Type | Tool | Write For | Minimum Coverage |
-|-----------|------|----------|-----------------|
-| **Unit** | Vitest | All shared packages (validators, types, utils), all business logic in Hono handlers | 80%+ |
-| **API Integration** | Vitest + supertest | Every Hono endpoint — happy path + error cases + auth checks | 100% of endpoints |
-| **Component** | Vitest + React Testing Library | Complex interactive components (seating chart, budget tracker, website editor) | Key interactions |
-| **E2E** | Playwright | Every critical user flow (see list below) | All critical paths |
-| **Visual Regression** | Playwright screenshots | All 10+ wedding website templates at 3 viewport sizes | All templates |
+| Test Type             | Tool                           | Write For                                                                           | Minimum Coverage   |
+| --------------------- | ------------------------------ | ----------------------------------------------------------------------------------- | ------------------ |
+| **Unit**              | Vitest                         | All shared packages (validators, types, utils), all business logic in Hono handlers | 80%+               |
+| **API Integration**   | Vitest + supertest             | Every Hono endpoint — happy path + error cases + auth checks                        | 100% of endpoints  |
+| **Component**         | Vitest + React Testing Library | Complex interactive components (seating chart, budget tracker, website editor)      | Key interactions   |
+| **E2E**               | Playwright                     | Every critical user flow (see list below)                                           | All critical paths |
+| **Visual Regression** | Playwright screenshots         | All 10+ wedding website templates at 3 viewport sizes                               | All templates      |
 
 ### 3.4 Critical Path E2E Tests (Must Always Pass)
 
@@ -364,6 +366,7 @@ Claude must create a `CLAUDE.md` in the project root with:
 # PlanForTwo — Project Instructions
 
 ## Stack
+
 - Frontend: Next.js 15 (App Router) on Vercel
 - Backend: Hono.js on Railway
 - Database: Supabase (Postgres) + Drizzle ORM
@@ -376,6 +379,7 @@ Claude must create a `CLAUDE.md` in the project root with:
 - Monorepo: Turborepo + pnpm
 
 ## Commands
+
 - `pnpm dev` — Start both apps (web :3000, api :3001)
 - `pnpm build` — Build all apps and packages
 - `pnpm test` — Run all tests
@@ -393,6 +397,7 @@ Claude must create a `CLAUDE.md` in the project root with:
 - `pnpm email:dev` — Preview email templates
 
 ## Rules
+
 - Always run `pnpm test` before committing
 - Never skip TypeScript strict mode
 - Always validate with Zod on both client and server
@@ -409,6 +414,7 @@ Claude must create a `CLAUDE.md` in the project root with:
 Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-phase` at the start of each phase and `gsd:execute-phase` to build it.
 
 ### Phase 0: Foundation (Week 1)
+
 **Goal:** Monorepo scaffolded, all tooling works, CI green, dev environment running.
 
 - [ ] Scaffold Turborepo monorepo (structure from 4.1)
@@ -430,6 +436,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** All commands green. Both apps start. CI passes on GitHub.
 
 ### Phase 1: Auth & Onboarding (Week 2)
+
 **Goal:** Couple can sign up, invite partner, and complete onboarding.
 
 - [ ] Integrate Clerk (sign-up, login, Google OAuth, Apple)
@@ -444,6 +451,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** Two users can create accounts, link as a couple, complete onboarding, see dashboard.
 
 ### Phase 2: Dashboard & Checklist (Week 3)
+
 **Goal:** Couple sees a useful dashboard and can manage their planning checklist.
 
 - [ ] Dashboard: countdown, quick stats, upcoming tasks, activity feed
@@ -458,6 +466,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** Dashboard shows real data. Checklist is fully functional with drag-and-drop.
 
 ### Phase 3: Guest List & RSVP (Weeks 4-5)
+
 **Goal:** Full guest management and digital RSVP system.
 
 - [ ] Guest CRUD: add, edit, delete individual guests
@@ -476,6 +485,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** 200 guests can be managed. RSVPs can be sent, received, tracked, and reminded.
 
 ### Phase 4: Budget Tracker (Week 6)
+
 **Goal:** Full budget management with analytics.
 
 - [ ] Budget setup wizard (total budget, category allocation)
@@ -491,6 +501,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** Budget is fully functional with real analytics and export capabilities.
 
 ### Phase 5: Wedding Website Builder (Weeks 7-9)
+
 **Goal:** Couple can build and publish a beautiful wedding website.
 
 - [ ] **Design research first** — use Claude in Chrome to study competitor sites (section 2.1)
@@ -509,6 +520,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** A wedding website is indistinguishable from a professionally designed site. All 10 templates are beautiful.
 
 ### Phase 6: Seating Chart (Week 10)
+
 **Goal:** Visual drag-and-drop seating chart with export.
 
 - [ ] Canvas-based venue layout builder (Konva.js)
@@ -524,6 +536,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** Seating chart is intuitive, handles 200+ guests, exports print-ready.
 
 ### Phase 7: Communication & Stationery (Week 11)
+
 **Goal:** Email announcements, stationery suite.
 
 - [ ] Email composer (rich text, photo embed, recipient filtering)
@@ -538,6 +551,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** Couple can send beautiful emails and generate print-ready stationery.
 
 ### Phase 8: Vendors, Wedding Party, Events (Week 12)
+
 **Goal:** Vendor management, party coordination, multi-event support.
 
 - [ ] Vendor list with status tracking (kanban board)
@@ -553,6 +567,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** All vendor and party management features functional.
 
 ### Phase 9: Photos, Registry, Design Tools (Week 13)
+
 **Goal:** Photo sharing, registry, mood boards.
 
 - [ ] Guest photo upload (chunked upload, QR code at reception)
@@ -571,6 +586,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** Full media and registry experience working.
 
 ### Phase 10: Post-Wedding, Settings, Polish (Week 14)
+
 **Goal:** Post-wedding features, account settings, PWA, dark mode.
 
 - [ ] Thank-you note manager (auto-populated from gifts)
@@ -590,6 +606,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** Full lifecycle covered from engagement to anniversary.
 
 ### Phase 11: Landing Page, Payments, Growth (Week 15)
+
 **Goal:** Public marketing site, Stripe purchase flow, referral program.
 
 - [ ] Landing page at `planfortwo.com` (features, pricing, testimonials, demo)
@@ -606,6 +623,7 @@ Each phase is a milestone. Complete one before starting the next. Use `gsd:plan-
 **Exit criteria:** A stranger can visit planfortwo.com, sign up, try free, purchase, and use everything.
 
 ### Phase 12: Advanced Features & Hardening (Week 16+)
+
 **Goal:** Polish, advanced features, security hardening.
 
 - [ ] Ceremony planning tools (outline builder, vow workspace, processional order)
@@ -684,6 +702,7 @@ npx inngest-cli@latest dev   # Inngest dev server
 Beyond the feature spec below, ensure these small but important details are implemented:
 
 ### 7.1 UX Micro-Features
+
 - Loading skeletons on every data-fetching page (never blank white screens)
 - Optimistic UI updates (action feels instant, syncs in background)
 - Toast notifications for all user actions (saved, deleted, error)
@@ -697,6 +716,7 @@ Beyond the feature spec below, ensure these small but important details are impl
 - Infinite scroll or pagination (never load 500 guests at once)
 
 ### 7.2 Trust & Polish Signals
+
 - Favicon + web app manifest (proper PWA icons)
 - Custom 404 page with helpful navigation
 - Custom error boundary pages (something went wrong)
@@ -709,6 +729,7 @@ Beyond the feature spec below, ensure these small but important details are impl
 - Print stylesheet for pages that might be printed
 
 ### 7.3 Performance
+
 - Next.js Image component for all images (lazy loading, WebP, responsive)
 - Dynamic imports for heavy components (seating chart canvas, rich text editor)
 - React Query caching with stale-while-revalidate
@@ -717,6 +738,7 @@ Beyond the feature spec below, ensure these small but important details are impl
 - Lighthouse score target: 90+ on Performance, Accessibility, Best Practices, SEO
 
 ### 7.4 Security (Non-Negotiable)
+
 - All API endpoints authenticated (Clerk middleware on Hono)
 - Row Level Security on every Supabase table
 - CSRF protection on all forms
@@ -751,26 +773,27 @@ Beyond the feature spec below, ensure these small but important details are impl
 
 ## Stack Overview
 
-| Layer | Tool | Role |
-|-------|------|------|
-| Frontend | **Next.js** (App Router) on **Vercel** | All UI, wedding websites, couple dashboard |
-| Backend API | **Hono.js** on **Railway** | REST API, webhook handlers, business logic |
-| Database | **Supabase** (Postgres) + **Drizzle ORM** | All persistent data, RLS for multi-tenant security |
-| Auth | **Clerk** | Couple accounts, guest magic links, wedding party invites |
-| Payments | **Stripe** | One-time purchase, cash registry, vendor payments |
-| Background Jobs | **Inngest** | Email sequences, reminders, photo processing, scheduled tasks |
-| Email | **Resend** + **React Email** | Transactional emails, RSVP notifications, guest announcements |
-| File Storage | **Cloudflare R2** | Photos, documents, wedding website assets |
-| DNS / CDN | **Cloudflare** | Domain management, DDoS protection, caching, custom domains |
-| Validation | **Zod** (shared package) | Input validation shared between frontend and backend |
-| Type Safety | **TypeScript** (strict) | Shared types across all packages |
-| Monorepo | **Turborepo** + **pnpm** | Build orchestration, dependency management |
+| Layer           | Tool                                      | Role                                                          |
+| --------------- | ----------------------------------------- | ------------------------------------------------------------- |
+| Frontend        | **Next.js** (App Router) on **Vercel**    | All UI, wedding websites, couple dashboard                    |
+| Backend API     | **Hono.js** on **Railway**                | REST API, webhook handlers, business logic                    |
+| Database        | **Supabase** (Postgres) + **Drizzle ORM** | All persistent data, RLS for multi-tenant security            |
+| Auth            | **Clerk**                                 | Couple accounts, guest magic links, wedding party invites     |
+| Payments        | **Stripe**                                | One-time purchase, cash registry, vendor payments             |
+| Background Jobs | **Inngest**                               | Email sequences, reminders, photo processing, scheduled tasks |
+| Email           | **Resend** + **React Email**              | Transactional emails, RSVP notifications, guest announcements |
+| File Storage    | **Cloudflare R2**                         | Photos, documents, wedding website assets                     |
+| DNS / CDN       | **Cloudflare**                            | Domain management, DDoS protection, caching, custom domains   |
+| Validation      | **Zod** (shared package)                  | Input validation shared between frontend and backend          |
+| Type Safety     | **TypeScript** (strict)                   | Shared types across all packages                              |
+| Monorepo        | **Turborepo** + **pnpm**                  | Build orchestration, dependency management                    |
 
 ---
 
 ## Pricing Tiers
 
 ### Free Tier
+
 Just enough to get hooked. Couple creates an account, starts planning, hits walls that make $200 feel like nothing compared to their $30K wedding.
 
 - Planning checklist (view default template, can't customize)
@@ -784,6 +807,7 @@ Just enough to get hooked. Couple creates an account, starts planning, hits wall
 - No custom domain
 
 ### Full Access — $200 One-Time
+
 Everything. Forever. No subscriptions, no upsells, no ads.
 
 - All features listed in this document
@@ -804,6 +828,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 1. Authentication & Accounts
 
 ### 1.1 Couple Registration
+
 - Email + password sign-up
 - Google OAuth sign-up
 - Apple sign-up
@@ -813,6 +838,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Clerk handles all auth flows. Clerk webhook → Hono API → creates Wedding + User records in Supabase via Drizzle. Resend sends the partner invite email.
 
 ### 1.2 Guest Authentication
+
 - Magic link access (no password, no account creation)
 - Email-based verification
 - Guests access their personalized portal via unique link
@@ -821,6 +847,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Clerk magic links for guest auth. Hono API validates guest identity against Supabase guest records. Next.js renders personalized guest portal.
 
 ### 1.3 Wedding Party Access
+
 - Invite links sent to bridesmaids, groomsmen, etc.
 - Limited access: see their tasks, timeline, and group chat
 - Can't edit wedding details, budget, or vendor info
@@ -828,6 +855,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Clerk invitation flow with custom role metadata. Hono API enforces role-based permissions. Supabase RLS policies restrict data access by role.
 
 ### 1.4 Wedding Planner / Family Access
+
 - Optional: invite a professional planner or family member
 - Custom permission levels (view only, edit checklist, manage vendors, etc.)
 - Activity log shows who changed what
@@ -839,6 +867,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 2. Wedding Dashboard
 
 ### 2.1 Countdown
+
 - Days until wedding
 - Days until next milestone
 - Visual countdown widget
@@ -846,6 +875,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js client component. Wedding date stored in Supabase, rendered on frontend.
 
 ### 2.2 Quick Stats
+
 - Total guests invited / RSVPs received / pending
 - Budget spent / remaining
 - Checklist items completed / remaining
@@ -854,6 +884,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API aggregation endpoints pulling from Supabase. Next.js dashboard page with stat cards. Real-time updates via React Query polling.
 
 ### 2.3 Upcoming Tasks
+
 - Next 5 checklist items due
 - Upcoming vendor payments
 - Overdue items highlighted
@@ -861,6 +892,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API queries Supabase for tasks ordered by due date. Next.js renders task list with overdue styling.
 
 ### 2.4 Recent Activity Feed
+
 - "Sarah added 12 guests"
 - "RSVP received from John Smith"
 - "Photographer contract uploaded"
@@ -869,6 +901,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase activity_log table populated by Hono API on every action. Next.js renders chronological feed. Inngest can batch-process activity summaries.
 
 ### 2.5 Quick Actions
+
 - Add a guest
 - Update budget
 - Send an announcement
@@ -881,6 +914,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 3. Planning Checklist
 
 ### 3.1 Default Timeline Templates
+
 - 12-month planning timeline (most common)
 - 6-month accelerated timeline
 - 18-month extended timeline
@@ -890,6 +924,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase seeded with template data. On wedding creation, Hono API clones the selected template into the couple's checklist. Drizzle handles the bulk insert.
 
 ### 3.2 Task Management
+
 - Title, description, due date, category
 - Mark complete / incomplete
 - Assign to partner (bride/groom task split)
@@ -901,6 +936,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase tasks table with wedding_id foreign key. Hono CRUD endpoints. Next.js drag-and-drop UI (dnd-kit library). File attachments stored in Cloudflare R2, references in Supabase.
 
 ### 3.3 Custom Tasks
+
 - Add your own tasks to the timeline
 - Set custom due dates
 - Categorize into existing or new categories
@@ -908,6 +944,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Same Supabase tasks table, Hono API, Next.js form. Zod validates task input.
 
 ### 3.4 Task Categories
+
 - Venue & Catering
 - Photography & Video
 - Flowers & Decor
@@ -927,6 +964,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase categories table. Hono API for CRUD. Next.js filter/group UI on checklist page.
 
 ### 3.5 Progress Tracking
+
 - Overall completion percentage
 - Per-category progress bars
 - "On track" / "Behind" / "Ahead" status based on due dates vs wedding date
@@ -935,6 +973,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API calculates progress metrics from Supabase task data. Next.js progress visualization (progress bars, charts). Inngest scheduled job sends weekly summary via Resend.
 
 ### 3.6 Shared Checklist
+
 - Both partners see the same checklist in real-time
 - See who completed what
 - Comment on tasks
@@ -946,6 +985,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 4. Guest List Management
 
 ### 4.1 Guest Entry
+
 - Add individual guests (name, email, phone, address)
 - Bulk import from CSV/Excel
 - Bulk import from contacts (Google Contacts integration)
@@ -954,6 +994,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API endpoints for single + bulk guest creation. CSV parsing on the backend (papaparse). Next.js upload UI. Zod validates guest data. Supabase guests table. Inngest processes large CSV imports as background jobs.
 
 ### 4.2 Household Grouping
+
 - Group guests into households ("The Smith Family")
 - One invitation per household
 - Individual RSVP per person within household
@@ -962,6 +1003,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase households table with guests linked via household_id. Hono API manages grouping. Next.js drag-to-group UI.
 
 ### 4.3 Guest Tags & Groups
+
 - Bride's side / Groom's side
 - Family / Friends / Work / Neighbors
 - Custom tags
@@ -971,6 +1013,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase many-to-many relationship (guests_tags junction table). Hono API filter endpoints. Next.js multi-select tag UI with filtering.
 
 ### 4.4 Plus-One Management
+
 - Mark guests who get a plus-one
 - Named plus-one (you know who they're bringing)
 - Unnamed plus-one (they tell you via RSVP)
@@ -979,6 +1022,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase plus_one fields on guest record (has_plus_one, plus_one_name, plus_one_confirmed). Hono API logic. Next.js toggle UI.
 
 ### 4.5 Dietary & Accessibility Tracking
+
 - Dietary restrictions per guest (vegetarian, vegan, gluten-free, kosher, halal, allergies, other)
 - Accessibility needs (wheelchair, hearing assistance, etc.)
 - Aggregated counts for vendors ("12 vegetarian, 3 gluten-free, 2 vegan")
@@ -987,6 +1031,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase JSONB field for dietary/accessibility on guest record. Hono API aggregation endpoint. Next.js summary dashboard with export to CSV/PDF.
 
 ### 4.6 Guest Contact Info
+
 - Email, phone, mailing address per guest
 - Address book for physical invitations
 - Export mailing labels (formatted for printing)
@@ -994,6 +1039,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase guest fields. Hono API export endpoints (CSV, formatted label PDF). Next.js address management UI.
 
 ### 4.7 Kids vs Adults Tracking
+
 - Mark guests as adults or children
 - Separate counts for venue capacity and catering
 - Children's meal tracking
@@ -1002,6 +1048,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase is_child boolean + age field on guest record. Hono API aggregation. Next.js dashboard stat.
 
 ### 4.8 Travel & Accommodation Tracking
+
 - Mark guests as local or traveling
 - Hotel block assignment
 - Travel arrival/departure dates
@@ -1011,6 +1058,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase guest travel fields (is_traveling, hotel_block_id, arrival_date, departure_date). Hono API. Next.js travel dashboard tab.
 
 ### 4.9 Guest Search & Filtering
+
 - Search by name, email, tag, table, RSVP status
 - Advanced filters (traveling + no hotel, dietary + no RSVP)
 - Saved filter views
@@ -1022,6 +1070,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 5. RSVP System
 
 ### 5.1 Digital RSVP
+
 - Beautiful RSVP form matching wedding website design
 - Per-guest or per-household RSVP
 - Accept / Decline per event (ceremony, reception, rehearsal dinner)
@@ -1035,6 +1084,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js RSVP form page (public, no auth needed — accessed via unique link or code). Zod validates all input. Hono API processes submission, updates Supabase guest record. Resend sends confirmation email to guest. Inngest triggers notification to couple.
 
 ### 5.2 RSVP Tracking Dashboard
+
 - Total invited vs responded vs pending
 - Accepted vs declined breakdown
 - Per-event attendance counts
@@ -1045,6 +1095,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API aggregation endpoints from Supabase RSVP data. Next.js dashboard with charts (Recharts or Chart.js). Export via Hono CSV/PDF endpoints.
 
 ### 5.3 RSVP Reminders
+
 - Automated email reminders for non-responders
 - Customizable reminder schedule (3 weeks, 1 week, 3 days before deadline)
 - Couple can trigger manual reminder blasts
@@ -1054,6 +1105,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Inngest scheduled functions check Supabase for non-responded guests at configured intervals. Resend sends reminder emails with React Email templates. Supabase tracks reminder history (sent_at, opened_at).
 
 ### 5.4 RSVP Deadline
+
 - Set RSVP deadline date
 - Automatic cutoff (form closes after deadline, shows message)
 - Grace period option (accept late RSVPs for X days after)
@@ -1061,6 +1113,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase wedding.rsvp_deadline field. Next.js RSVP form checks deadline before rendering. Hono API rejects late submissions unless grace period active.
 
 ### 5.5 RSVP Access Methods
+
 - Unique link per guest (emailed)
 - Unique code per household (for physical invitation inserts: "RSVP at planfortwo.com/rsvp with code SMITH2026")
 - QR code on physical invitations linking to RSVP page
@@ -1073,6 +1126,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 6. Budget Tracker
 
 ### 6.1 Budget Setup
+
 - Set total wedding budget
 - Auto-suggest category allocation based on total (industry averages)
 - Manual category allocation
@@ -1081,6 +1135,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase budget table linked to wedding. Hono API with budget template data (percentage breakdowns by total). Next.js budget setup wizard.
 
 ### 6.2 Expense Categories
+
 - Venue (ceremony + reception)
 - Catering & Bar
 - Photography
@@ -1109,6 +1164,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase budget_categories table with default seed data. Hono API CRUD. Next.js category management UI.
 
 ### 6.3 Expense Tracking
+
 - Add individual expenses with: vendor, category, amount, date, paid/unpaid, notes
 - Receipt/invoice upload per expense
 - Mark as deposit, partial payment, or paid in full
@@ -1117,6 +1173,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase budget_items table. File uploads to Cloudflare R2 with reference in Supabase. Hono CRUD API. Next.js expense list with add/edit modals.
 
 ### 6.4 Payment Schedule
+
 - Calendar view of upcoming payments
 - Overdue payment alerts
 - Vendor-linked payment milestones (deposit due, balance due)
@@ -1125,6 +1182,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase payment_schedule table linked to budget_items and vendors. Hono API. Next.js calendar component. Inngest sends payment reminder emails via Resend 7 days and 1 day before due.
 
 ### 6.5 Budget Analytics
+
 - Spent vs allocated per category (bar chart)
 - Overall budget burn rate
 - Projected total based on current spending
@@ -1135,6 +1193,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API aggregation endpoints with Drizzle queries. Next.js chart components (Recharts). Real-time updates as expenses are added.
 
 ### 6.6 Tip Calculator
+
 - Suggested tip amounts by vendor type (industry standard)
 - Catering: 15-20% of food/bev total
 - DJ/Band: $50-150
@@ -1147,6 +1206,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API with tip calculation logic based on vendor type and amounts. Next.js tip calculator widget on budget page. Supabase stores couple's tip decisions.
 
 ### 6.7 Split Costs
+
 - Track who's paying for what (couple, bride's family, groom's family, other)
 - Per-expense payer assignment
 - Summary of each party's total contribution
@@ -1155,6 +1215,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase payer field on budget_items (enum: couple, bride_family, groom_family, other). Hono aggregation API. Next.js split view dashboard.
 
 ### 6.8 Budget Export
+
 - Export full budget as CSV
 - Export as formatted PDF
 - Export summary for parents/family contributing
@@ -1166,6 +1227,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 7. Wedding Website Builder
 
 ### 7.1 Template Selection
+
 - 10+ professionally designed templates
 - Styles: Classic, Modern, Rustic, Romantic, Minimalist, Bohemian, Garden, Beach, Elegant, Whimsical
 - Preview before selecting
@@ -1174,6 +1236,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js template components. Each template is a React component with the same data interface but different styling. Template selection stored in Supabase. Vercel serves the wedding websites.
 
 ### 7.2 Website Sections (Customizable)
+
 - **Hero** — Names, date, location, photo
 - **Our Story** — How we met, proposal story, timeline of relationship with photos
 - **Event Details** — Ceremony and reception info with maps (Google Maps embed)
@@ -1191,6 +1254,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js dynamic pages rendered from Supabase content. Each section is a content block stored as structured data (not raw HTML) in Supabase. Hono API serves content. Couple edits via Next.js CMS-like editor in their dashboard. Photos stored in Cloudflare R2.
 
 ### 7.3 Website Editor
+
 - Drag-and-drop section ordering
 - Rich text editing for content blocks
 - Photo upload and cropping
@@ -1202,6 +1266,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js editor page with drag-and-drop (dnd-kit), rich text (Tiptap or Plate), image upload to Cloudflare R2 via Hono API presigned URLs. All content saved to Supabase. Preview renders the actual template component with current data.
 
 ### 7.4 Custom Domain
+
 - Default: `yournames.planfortwo.com` (free)
 - Custom domain: `ourwedding.com` (paid tier)
 - SSL automatically provisioned
@@ -1210,6 +1275,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Cloudflare for DNS management and SSL. Vercel custom domain mapping. Supabase stores domain config. Hono API handles domain verification. Cloudflare API for automated DNS record creation.
 
 ### 7.5 Website Privacy
+
 - Public (anyone with link)
 - Password protected (guests enter a shared password)
 - Unlisted (only accessible via direct link, not indexed)
@@ -1217,6 +1283,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js middleware checks privacy setting from Supabase before rendering. Password stored hashed in Supabase. Robots.txt dynamically set based on privacy choice.
 
 ### 7.6 Website Analytics
+
 - Total page views
 - Unique visitors
 - Most viewed sections
@@ -1226,6 +1293,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Lightweight analytics tracking via Hono API endpoint (no third-party trackers). Events stored in Supabase. Next.js analytics dashboard for couple.
 
 ### 7.7 SEO & Social Sharing
+
 - Custom meta title and description
 - Open Graph image (auto-generated from hero section or custom upload)
 - Twitter/social media card preview
@@ -1238,6 +1306,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 8. Seating Chart
 
 ### 8.1 Venue Layout Builder
+
 - Upload venue floor plan image as background
 - OR draw floor plan from scratch
 - Place tables on the floor plan (drag and drop)
@@ -1249,6 +1318,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js canvas-based editor (Konva.js or Fabric.js). Venue layout data stored as JSON in Supabase. Floor plan images in Cloudflare R2. Hono API for save/load.
 
 ### 8.2 Guest Assignment
+
 - Drag guests from unassigned list to table seats
 - Search guests while assigning
 - Filter by group/tag
@@ -1259,6 +1329,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js drag-and-drop UI. Supabase table_assignments junction table (guest_id, table_id, seat_number). Hono API for bulk assignment operations. Conflict detection logic in Hono.
 
 ### 8.3 Relationship Mapping
+
 - Tag guest relationships: must sit together, prefer together, keep apart
 - Family group auto-seating
 - "Drama zones" — flag guests who shouldn't be near each other
@@ -1267,12 +1338,14 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase guest_relationships table (guest_a_id, guest_b_id, relationship_type). Hono API conflict-checking endpoint. Next.js visual indicators on seating chart.
 
 ### 8.4 Multiple Seating Charts
+
 - Different charts for different events (rehearsal dinner vs reception)
 - Copy and modify charts between events
 
 **Stack:** Supabase seating_charts table with event_id foreign key. Hono API clone endpoint. Next.js chart switcher UI.
 
 ### 8.5 Seating Chart Export
+
 - Print-ready PDF of the full layout
 - Alphabetical guest list with table numbers
 - Table-by-table guest list
@@ -1286,6 +1359,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 9. Vendor Management
 
 ### 9.1 Vendor Directory (Future — Phase 3)
+
 - Searchable vendor marketplace by category, location, budget
 - Vendor profiles with portfolios, pricing, availability
 - Verified reviews from real PlanForTwo weddings
@@ -1295,6 +1369,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase vendors table with full-text search + PostGIS for location queries. Hono API search endpoints. Next.js vendor browse/search pages. Stripe Connect for vendor payments (future). Cloudflare R2 for vendor portfolio images.
 
 ### 9.2 Couple's Vendor List
+
 - Add vendors you're considering or booked
 - Track status: researching, contacted, quoted, booked, paid, completed
 - Vendor contact info storage
@@ -1303,6 +1378,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase couple_vendors table linked to wedding_id. Hono CRUD API. Next.js vendor management page with kanban-style status board.
 
 ### 9.3 Vendor Communication Log
+
 - Log calls, emails, meetings with each vendor
 - Attach files (quotes, proposals, inspiration)
 - Date and notes per interaction
@@ -1311,6 +1387,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase vendor_communications table. Cloudflare R2 for file attachments. Hono API. Next.js timeline view per vendor. Inngest scheduled reminders via Resend.
 
 ### 9.4 Contract Management
+
 - Upload vendor contracts
 - Track key dates: signing date, deposit due, balance due, cancellation deadline
 - Contract status: pending, signed, active, completed
@@ -1319,6 +1396,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Cloudflare R2 for contract PDF storage. Supabase contracts table with date fields. Hono API. Next.js contract viewer with status indicators. Inngest deadline reminder emails via Resend.
 
 ### 9.5 Vendor Reviews (Post-Wedding)
+
 - Prompt couple to review vendors after the wedding
 - Star rating + text review
 - Photo uploads from the wedding
@@ -1331,6 +1409,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 10. Wedding Party Management
 
 ### 10.1 Party Members
+
 - Add members with role: Maid of Honor, Best Man, Bridesmaid, Groomsman, Flower Girl, Ring Bearer, Usher, Reader, Officiant, Musician, MC, Custom
 - Contact info, photo
 - Bride's side / Groom's side designation
@@ -1338,6 +1417,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase wedding_party table. Cloudflare R2 for photos. Hono CRUD API. Next.js party management page.
 
 ### 10.2 Party Tasks
+
 - Assign tasks to party members (pick up decorations, hold rings, give toast)
 - Tasks visible on member's portal
 - Status tracking
@@ -1345,6 +1425,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase party_tasks table linked to wedding_party member. Hono API. Next.js task list per member.
 
 ### 10.3 Outfit Coordination
+
 - Dress color, style, designer for bridesmaids
 - Suit specs for groomsmen
 - Accessory details (shoes, ties, jewelry)
@@ -1354,6 +1435,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase outfit_details JSONB field on wedding_party record. Cloudflare R2 for reference photos. Next.js outfit coordination page.
 
 ### 10.4 Party Portal
+
 - Each party member gets a personal portal (accessed via invite link)
 - Their tasks, their timeline, outfit info
 - Group chat with other party members
@@ -1362,6 +1444,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Clerk invite link with party_member role. Next.js party portal pages with restricted data. Hono API role-based filtering. Supabase RLS policies.
 
 ### 10.5 Gift Tracking
+
 - Track gifts given to party members (bridesmaids gifts, groomsmen gifts)
 - Budget per person
 - Ideas list
@@ -1374,6 +1457,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 11. Events & Timeline
 
 ### 11.1 Multi-Event Support
+
 - Create multiple events under one wedding:
   - Engagement Party
   - Bridal Shower
@@ -1392,6 +1476,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase events table linked to wedding_id. Hono CRUD API. Next.js event management page. Event details feed into wedding website.
 
 ### 11.2 Day-Of Timeline Builder
+
 - Minute-by-minute schedule for each event
 - Entries: time, description, responsible person, location/room, notes
 - Vendor arrival and setup times
@@ -1402,6 +1487,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase timeline_entries table linked to event_id. Hono API with ordering logic. Next.js drag-and-drop timeline editor.
 
 ### 11.3 Shareable Timelines
+
 - Generate role-specific timelines:
   - Vendor timeline (only entries relevant to them)
   - Wedding party timeline
@@ -1413,6 +1499,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API generates filtered timeline views based on role/tag. Resend sends timeline emails. Hono generates PDF exports. Next.js shareable timeline page (public link).
 
 ### 11.4 Live Day-Of Updates
+
 - Real-time schedule changes pushed to everyone
 - "Ceremony starting 15 minutes late"
 - Push notifications (browser) + SMS (paid tier)
@@ -1425,6 +1512,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 12. Guest Communication
 
 ### 12.1 Email Announcements
+
 - Compose and send emails to all guests or filtered groups
 - Templates: save-the-date, invitation, update, reminder, thank-you
 - Rich text editor with photo embedding
@@ -1434,6 +1522,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js email composer with rich text (Tiptap). React Email templates for rendering. Hono API queues email jobs. Inngest processes email sends in batches (rate limiting). Resend sends emails with tracking. Supabase stores email history and tracking data.
 
 ### 12.2 SMS Notifications (Paid Tier)
+
 - Text updates to guests who opt in
 - Day-of alerts (ceremony starting, location change)
 - RSVP reminders via text
@@ -1442,6 +1531,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API SMS endpoint. Inngest batch processing. Twilio or similar SMS provider (integrated via Hono). Supabase stores phone numbers and opt-in status.
 
 ### 12.3 Guest Announcements
+
 - Post updates visible on guest portal
 - "We changed venues!"
 - "Parking update"
@@ -1455,6 +1545,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 13. Design & Inspiration
 
 ### 13.1 Mood Board Builder
+
 - Save images from anywhere (upload or paste URL)
 - Organize into boards (ceremony, reception, flowers, attire, decor)
 - Add notes to each image
@@ -1463,6 +1554,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Cloudflare R2 for image storage. Supabase mood_boards and mood_board_items tables. Hono API with image upload endpoint. Next.js masonry grid layout with drag-and-drop organization.
 
 ### 13.2 Color Palette Generator
+
 - Pick 3-5 wedding colors
 - See them together in preview swatches
 - Suggested complementary palettes based on style
@@ -1472,6 +1564,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js color picker components. Supabase stores palette on wedding record. Color palette data feeds into website template rendering.
 
 ### 13.3 Style Quiz
+
 - Answer 10-15 questions about preferences
 - Get matched to a wedding style (Rustic, Modern, Classic, Bohemian, etc.)
 - Suggested website templates based on style
@@ -1480,6 +1573,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js quiz UI. Hono API scoring logic. Results stored in Supabase wedding profile. Next.js results page with recommendations.
 
 ### 13.4 Photo Shot List
+
 - Customizable checklist for photographer
 - Default shot list template (50+ must-have shots)
 - Add custom shots
@@ -1493,6 +1587,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 14. Stationery Suite (Paid Tier)
 
 ### 14.1 Digital Stationery
+
 - Save-the-Date (digital, email or shareable link)
 - Wedding Invitation (digital)
 - RSVP Card (integrated with RSVP system)
@@ -1506,6 +1601,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js stationery editor with live preview. React Email templates for digital sends. Supabase stores stationery content. Hono API for generation. Resend for email delivery of digital stationery. Cloudflare R2 for generated assets.
 
 ### 14.2 Print-Ready Export
+
 - Download high-resolution PDFs for printing
 - Standard print sizes (5x7, 4x6, A5)
 - Bleed marks and trim lines
@@ -1514,6 +1610,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API PDF generation with proper DPI and sizing (pdfkit or Puppeteer for HTML-to-PDF). Cloudflare R2 for generated files. Next.js download UI.
 
 ### 14.3 Print Partnerships (Future)
+
 - Order physical prints directly through PlanForTwo
 - Partner with print shops (Minted, Shutterfly, local printers)
 - Price comparison
@@ -1526,6 +1623,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 15. Photo & Video Sharing
 
 ### 15.1 Guest Photo Upload
+
 - Guests upload photos from the wedding day
 - Upload via wedding website or dedicated photo page
 - QR code displayed at reception (scan → upload page)
@@ -1536,6 +1634,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js upload page (chunked uploads for large files). Hono API upload endpoint with presigned URLs to Cloudflare R2. Inngest background job for image processing (resize, thumbnail, EXIF rotation). Supabase photos table tracks metadata.
 
 ### 15.2 Photo Gallery
+
 - All uploaded photos in a shared gallery
 - Couple can moderate (approve/reject before public)
 - Sort by upload time, guest name
@@ -1545,6 +1644,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase photos table with moderation_status field. Cloudflare R2 for originals + thumbnails. Hono API for gallery endpoints. Next.js gallery page with lightbox viewer. Hono generates ZIP downloads.
 
 ### 15.3 Professional Photo Integration
+
 - Photographer uploads final edited photos to a delivery gallery
 - Couple reviews and selects favorites
 - Share selected photos with guests
@@ -1553,6 +1653,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Same infrastructure as guest uploads but with a separate "professional" gallery. Cloudflare R2 storage. Access control via Clerk roles.
 
 ### 15.4 QR Code Generator
+
 - Auto-generate QR code linking to photo upload page
 - Downloadable for printing (welcome sign, table cards, etc.)
 - Custom branding on QR code frame
@@ -1561,6 +1662,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API QR code generation (qrcode library). Next.js display/download UI. Cloudflare R2 for generated QR images.
 
 ### 15.5 Video Links
+
 - Embed or link to wedding video when ready
 - Support YouTube, Vimeo, or direct upload
 - Accessible from wedding website and guest portal
@@ -1572,6 +1674,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 16. Registry Integration
 
 ### 16.1 Universal Registry Links
+
 - Link to registries from any platform (Amazon, Target, Crate & Barrel, Zola, etc.)
 - Display on wedding website registry page
 - Track which registries guests visit (click tracking)
@@ -1579,6 +1682,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase registry_links table. Hono API with click tracking. Next.js registry page on wedding website with branded buttons per retailer.
 
 ### 16.2 Cash / Experience Fund
+
 - Create custom cash funds (Honeymoon Fund, House Fund, Date Night Fund, etc.)
 - Set goals per fund with progress bar
 - Guests contribute any amount via Stripe
@@ -1588,6 +1692,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Stripe Payment Links or Stripe Checkout for contributions. Supabase cash_funds table with goal_amount and current_amount. Hono API webhook handler for Stripe payments updates Supabase totals. Next.js fund display on wedding website with progress bars. Inngest sends thank-you notification to couple when contribution received (via Resend).
 
 ### 16.3 Group Gifting
+
 - Expensive items can be split among multiple guests
 - Progress bar shows how much is funded
 - Each contributor gets credit for thank-you notes
@@ -1595,6 +1700,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase group_gifts table with contribution tracking. Stripe for payments. Hono API for contribution processing. Next.js group gift display component.
 
 ### 16.4 Gift Tracker
+
 - Automatic tracking of gifts received (from cash fund)
 - Manual entry for physical gifts
 - Link gift to guest for thank-you notes
@@ -1607,6 +1713,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 17. Post-Wedding Features
 
 ### 17.1 Thank-You Note Manager
+
 - Auto-populated list from gift tracker
 - Template thank-you note generator
 - Track status: not started, drafted, sent
@@ -1616,6 +1723,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase thank_you_notes table linked to gifts and guests. Hono API. Next.js checklist UI. Resend for digital thank-you emails with React Email templates. Inngest reminders if thank-you notes are overdue (2 weeks, 1 month after wedding).
 
 ### 17.2 Name Change Checklist
+
 - Step-by-step guide for legal name change
 - Checklist of institutions to notify:
   - Social Security Administration
@@ -1634,6 +1742,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase name_change_tasks table (seeded from template). Hono API. Next.js checklist page. Static content — no external API needed.
 
 ### 17.3 Marriage License Tracker
+
 - Reminder to apply for license (varies by state)
 - Filing deadline after ceremony
 - Required documents checklist
@@ -1642,6 +1751,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase static reference data for state requirements. Inngest scheduled reminders via Resend. Next.js info page.
 
 ### 17.4 Vendor Reviews
+
 - Prompted 2-4 weeks after wedding
 - Rate vendors you used
 - Write review
@@ -1651,6 +1761,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Inngest triggers review prompt email via Resend at configured interval after wedding date. Supabase vendor_reviews table. Hono API. Next.js review form.
 
 ### 17.5 Wedding Recap / Stats
+
 - Auto-generated summary:
   - Total guests attended
   - Total budget spent vs planned
@@ -1662,6 +1773,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API aggregation endpoint compiling stats from all Supabase tables. Next.js recap page with visualizations. Shareable public link.
 
 ### 17.6 Anniversary Reminders
+
 - Annual anniversary email
 - "1 year ago today..." with a photo from the wedding
 - Keeps couple engaged with the platform long-term
@@ -1674,6 +1786,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 18. Account & Settings
 
 ### 18.1 Couple Profile
+
 - Both partners' names, emails, photos
 - Wedding date, venue, location
 - Wedding style / theme
@@ -1682,6 +1795,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Clerk user profiles + Supabase wedding record. Hono API. Next.js settings page.
 
 ### 18.2 Notification Preferences
+
 - Email notification toggles (RSVP received, payment reminder, task due, etc.)
 - Digest frequency (instant, daily, weekly)
 - SMS opt-in/out
@@ -1690,6 +1804,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase notification_preferences table. Hono API. Next.js settings page. Inngest respects preferences before sending via Resend.
 
 ### 18.3 Privacy Controls
+
 - Wedding website visibility (public, password, unlisted)
 - Guest list privacy (who can see other guests)
 - Photo sharing permissions
@@ -1698,6 +1813,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Supabase privacy settings on wedding record. Hono API middleware enforces privacy. Next.js settings toggles.
 
 ### 18.4 Collaborator Management
+
 - Invite/remove partners, planners, family members
 - Set permission levels per collaborator
 - View activity log per user
@@ -1705,6 +1821,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Clerk organization/team features. Supabase collaborators table with role field. Hono API permission middleware. Next.js collaborator management page.
 
 ### 18.5 Data Export
+
 - Download all data as JSON or CSV
 - Photos as ZIP
 - Full wedding website as static HTML
@@ -1713,6 +1830,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Hono API export endpoints generating ZIP/JSON/CSV. Inngest background job for large exports. Cloudflare R2 for temporary export storage. Resend notifies when export is ready.
 
 ### 18.6 Account Deletion
+
 - Full data removal
 - Cancel any active subscriptions
 - Remove all files from storage
@@ -1726,6 +1844,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 19. Mobile Experience
 
 ### 19.1 Responsive Web App
+
 - Full mobile-responsive design (not a native app)
 - Touch-friendly interactions
 - Bottom navigation on mobile
@@ -1735,6 +1854,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js with Tailwind CSS responsive utilities. Mobile-first design approach. No native app needed — PWA capabilities for "add to home screen."
 
 ### 19.2 Progressive Web App (PWA)
+
 - "Add to Home Screen" prompt
 - App-like experience without app store
 - Offline support for viewing (not editing)
@@ -1743,6 +1863,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Next.js PWA configuration (next-pwa or manual service worker). Caching strategy for offline viewing. Web Push API for notifications.
 
 ### 19.3 Day-Of Mobile Mode
+
 - Simplified interface focused on:
   - Timeline view
   - Quick updates
@@ -1757,6 +1878,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 20. Admin & Internal Tools
 
 ### 20.1 Admin Dashboard (Internal)
+
 - User metrics (signups, conversions, churn)
 - Revenue tracking (Stripe dashboard integration)
 - Feature usage analytics
@@ -1766,6 +1888,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Separate Next.js admin app or protected admin routes. Hono admin API endpoints. Supabase admin queries. Stripe API for revenue data. Clerk admin SDK for user management.
 
 ### 20.2 Customer Support
+
 - In-app help center with FAQ / knowledge base
 - Contact form
 - Email support
@@ -1778,6 +1901,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 21. Development & Testing Environment
 
 ### 21.1 Local Development Setup
+
 - Single command to spin up entire stack locally (`pnpm dev`)
 - Turborepo runs both apps in parallel (web on :3000, api on :3001)
 - Docker Compose for local Postgres (no Supabase dependency for offline dev)
@@ -1789,6 +1913,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Turborepo `dev` pipeline runs Next.js and Hono concurrently. Docker Compose spins up Postgres locally. Drizzle connects to local DB or Supabase based on env. pnpm workspace handles shared packages.
 
 ### 21.2 Database Management
+
 - Drizzle schema files as source of truth
 - `drizzle-kit push` for quick dev iteration (schema → DB)
 - `drizzle-kit generate` for production migrations (generates SQL files)
@@ -1804,6 +1929,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Drizzle ORM for schema management. Seed scripts in `packages/db/seed.ts`. Supabase CLI for local development or Docker Compose Postgres.
 
 ### 21.3 Testing Strategy
+
 - **Unit Tests:** Vitest for all shared packages (validators, types, utility functions)
 - **API Tests:** Vitest + supertest for Hono API endpoints (auth mocking, DB fixtures)
 - **Component Tests:** Vitest + React Testing Library for complex UI components
@@ -1820,6 +1946,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Vitest (fast, Vite-native). Playwright for E2E (cross-browser). Stripe test mode for payment testing. Clerk test mode for auth testing. GitHub Actions runs all tests on PR.
 
 ### 21.4 Development Tools
+
 - TypeScript strict mode with no `any` allowed
 - ESLint + Prettier for consistent code style
 - Husky + lint-staged for pre-commit checks (lint, type-check, format)
@@ -1830,6 +1957,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Shared ESLint and TypeScript configs in `packages/config/`. Husky hooks run on commit. Turborepo caches lint/type-check results.
 
 ### 21.5 API Testing Tools
+
 - Bruno or Insomnia collection for all API endpoints
 - Organized by feature area (guests, budget, RSVP, etc.)
 - Pre-configured auth headers (Clerk test tokens)
@@ -1839,6 +1967,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** API collection files committed to repo. Auth tokens configured per environment.
 
 ### 21.6 Stripe Test Mode
+
 - All payment flows work in Stripe test mode
 - Test card numbers for various scenarios:
   - Successful payment: 4242 4242 4242 4242
@@ -1851,6 +1980,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Stripe CLI for local webhook forwarding. Stripe test mode keys in dev `.env`. Hono webhook handler works identically in test and production.
 
 ### 21.7 Email Testing
+
 - Resend test mode / dev API key
 - Email previews in browser during development
 - React Email dev server for template development (`pnpm email:dev`)
@@ -1863,6 +1993,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 ## 22. CI/CD & Deployment Pipeline
 
 ### 22.1 GitHub Actions CI
+
 - Triggers on every pull request to `dev` and `main`
 - Pipeline steps:
   1. Install dependencies (`pnpm install --frozen-lockfile`)
@@ -1877,6 +2008,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** GitHub Actions workflow. Turborepo remote caching (optional, via Vercel). pnpm for deterministic installs.
 
 ### 22.2 Preview / Staging Deployments
+
 - **Vercel Preview:** Every PR automatically gets a preview URL (unique per PR)
   - e.g., `planfortwo-abc123.vercel.app`
   - Connected to dev Supabase project
@@ -1894,6 +2026,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Vercel auto-deploys preview for frontend. Railway deploys dev API from `dev` branch. Separate Supabase project for dev/staging. All services have dev-mode configurations.
 
 ### 22.3 Production Deployment
+
 - **Frontend (Vercel):** Auto-deploys when `main` branch is updated
   - Production URL: `app.planfortwo.com`
   - Environment variables scoped to Production
@@ -1920,6 +2053,7 @@ Everything. Forever. No subscriptions, no upsells, no ads.
 **Stack:** Vercel production deployment. Railway production service. Supabase production project. Cloudflare DNS with proxy enabled. Stripe live mode keys. Clerk production instance. Resend verified domain.
 
 ### 22.4 Git Workflow
+
 ```
 main (production) ← only merged via PR, auto-deploys to prod
   │
@@ -1928,6 +2062,7 @@ main (production) ← only merged via PR, auto-deploys to prod
         ├── feature/jaden/guest-list
         └── feature/friend/seating-chart
 ```
+
 - Nobody pushes directly to `main` or `dev`
 - All work on feature branches
 - Feature → dev via PR (peer review)
@@ -1938,19 +2073,20 @@ main (production) ← only merged via PR, auto-deploys to prod
 
 ### 22.5 Environment Matrix
 
-| Service | Local Dev | Preview/Staging | Production |
-|---------|-----------|-----------------|------------|
-| Frontend | localhost:3000 | PR-specific.vercel.app | app.planfortwo.com |
-| Backend API | localhost:3001 | api-dev.planfortwo.com | api.planfortwo.com |
-| Database | Docker Postgres / Supabase local | Supabase dev project | Supabase prod project |
-| Auth | Clerk dev instance | Clerk dev instance | Clerk prod instance |
-| Payments | Stripe test mode | Stripe test mode | Stripe live mode |
-| Email | React Email preview / Resend dev | Resend dev (no send) | Resend production |
-| File Storage | Local filesystem / R2 dev | Cloudflare R2 dev bucket | Cloudflare R2 prod bucket |
-| Background Jobs | Inngest dev server | Inngest dev environment | Inngest production |
-| DNS | localhost | Cloudflare dev subdomains | Cloudflare production |
+| Service         | Local Dev                        | Preview/Staging           | Production                |
+| --------------- | -------------------------------- | ------------------------- | ------------------------- |
+| Frontend        | localhost:3000                   | PR-specific.vercel.app    | app.planfortwo.com        |
+| Backend API     | localhost:3001                   | api-dev.planfortwo.com    | api.planfortwo.com        |
+| Database        | Docker Postgres / Supabase local | Supabase dev project      | Supabase prod project     |
+| Auth            | Clerk dev instance               | Clerk dev instance        | Clerk prod instance       |
+| Payments        | Stripe test mode                 | Stripe test mode          | Stripe live mode          |
+| Email           | React Email preview / Resend dev | Resend dev (no send)      | Resend production         |
+| File Storage    | Local filesystem / R2 dev        | Cloudflare R2 dev bucket  | Cloudflare R2 prod bucket |
+| Background Jobs | Inngest dev server               | Inngest dev environment   | Inngest production        |
+| DNS             | localhost                        | Cloudflare dev subdomains | Cloudflare production     |
 
 ### 22.6 Monitoring & Observability (Production)
+
 - Error tracking: Sentry (frontend + backend)
 - Uptime monitoring: BetterUptime or Railway built-in
 - API response time tracking
@@ -1966,6 +2102,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 ## 23. Missing Feature Gap Analysis — Additional Features
 
 ### 23.1 Onboarding Flow
+
 - Step-by-step wizard after sign-up:
   1. Partner names
   2. Wedding date (known or estimated)
@@ -1979,6 +2116,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js multi-step form wizard. Supabase stores onboarding data on wedding record. Hono API processes setup. Clerk creates the couple relationship.
 
 ### 23.2 Landing Page / Marketing Site
+
 - Public-facing homepage at `planfortwo.com`
 - Features overview, pricing, testimonials
 - Demo wedding website (interactive preview)
@@ -1989,6 +2127,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js static pages (ISR for blog). Vercel hosts everything. Cloudflare caches static content. Separate from the app routes (`/` vs `/dashboard`).
 
 ### 23.3 Referral Program
+
 - Every couple gets a referral link
 - Refer a friend who purchases → both get a bonus (e.g., extra templates, stationery credit)
 - Track referrals in dashboard
@@ -1997,6 +2136,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Supabase referrals table (referrer_id, referred_id, status, reward_given). Hono API tracks referral code usage at purchase. Stripe metadata tags referral source. Next.js referral page in dashboard.
 
 ### 23.4 Accessibility (a11y)
+
 - WCAG 2.1 AA compliance across all pages
 - Keyboard navigation for all features
 - Screen reader support
@@ -2009,6 +2149,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js accessibility practices. Tailwind CSS focus-visible utilities. ESLint jsx-a11y plugin. Playwright accessibility testing.
 
 ### 23.5 Internationalization (Future)
+
 - Multi-language support for the app interface
 - Multi-language wedding websites (for multicultural weddings)
 - Currency support for budget (USD, EUR, GBP, CAD, AUD, etc.)
@@ -2018,6 +2159,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js i18n routing. Translation files in `packages/i18n/`. Supabase stores locale preferences. Hono API respects timezone headers.
 
 ### 23.6 Dark Mode
+
 - System preference detection
 - Manual toggle
 - Applies to dashboard and wedding website preview
@@ -2026,6 +2168,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js + Tailwind CSS dark mode (class strategy). `next-themes` library. Preference stored in localStorage and Supabase user settings.
 
 ### 23.7 Offline Support
+
 - View checklist, guest list, budget offline (PWA cache)
 - Queue changes made offline, sync when back online
 - Critical for destination weddings with spotty WiFi
@@ -2034,6 +2177,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js service worker (PWA). Cache API for offline data. Background sync for queued mutations. IndexedDB for offline storage.
 
 ### 23.8 Music & Playlist Management
+
 - Couple creates must-play and do-not-play lists
 - Guests suggest songs via RSVP or dedicated page
 - Share playlist with DJ/band
@@ -2043,6 +2187,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Supabase songs table (title, artist, requested_by, category, status). Hono API. Next.js playlist management page. Song request field in RSVP form.
 
 ### 23.9 Weather Integration
+
 - Weather forecast for wedding day (updates as date approaches)
 - Historical weather data for venue location (outdoor wedding planning)
 - Severe weather alerts
@@ -2051,6 +2196,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Hono API fetches weather data from free weather API (Open-Meteo). Supabase caches forecasts. Inngest daily weather check job as wedding date approaches. Resend sends weather alert emails.
 
 ### 23.10 Honeymoon Planning Section
+
 - Destination research notes
 - Travel booking links
 - Packing checklist
@@ -2061,6 +2207,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Supabase honeymoon tables (itinerary, documents, packing_list). Hono CRUD API. Next.js honeymoon planning pages. Cloudflare R2 for document uploads.
 
 ### 23.11 Wedding Hashtag Tools
+
 - Hashtag generator based on couple names
 - Uniqueness checker (is #SmithWedding2026 already used?)
 - Display hashtag on wedding website
@@ -2069,6 +2216,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Hono API hashtag generation logic. Next.js hashtag tools page. Social media API integration (future, complex).
 
 ### 23.12 Ceremony Planning
+
 - Ceremony outline builder (processional, readings, vows, ring exchange, etc.)
 - Reading selection library
 - Vow writing workspace (private per partner, optional reveal feature)
@@ -2079,6 +2227,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Supabase ceremony tables (outline, readings, vows, processional). Hono API. Next.js ceremony planning pages. Privacy controls on vows (partner can't see until chosen moment).
 
 ### 23.13 Legal & Paperwork
+
 - Marriage license requirements by state/country
 - Required documents checklist
 - Blood test requirements (some states)
@@ -2091,6 +2240,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Supabase static reference data seeded by state/country. Next.js info pages. Hono API serves location-specific requirements.
 
 ### 23.14 Emergency & Day-Of Toolkit
+
 - Emergency kit checklist (sewing kit, stain remover, pain relievers, etc.)
 - Important phone numbers list (all vendors, venue coordinator, emergency contacts)
 - Timeline with real-time updates
@@ -2101,6 +2251,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js dedicated `/emergency` route optimized for mobile. Supabase stores emergency contacts and contingency plans. Service worker caches this page for offline access.
 
 ### 23.15 Gift Registry Aggregator
+
 - Import gift lists from external registries via URL
 - Unified view of all gifts across all registries
 - Track which items have been purchased (if registry provides API)
@@ -2109,6 +2260,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Hono API scrapes or uses APIs from major registries (where available). Supabase stores aggregated gift data. Next.js unified registry view. Inngest periodic sync job.
 
 ### 23.16 Wedding Party Proposal Tools
+
 - Digital "Will you be my bridesmaid/groomsman?" cards
 - Custom message and photo
 - Shareable link or email delivery
@@ -2118,6 +2270,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js animated proposal page. Supabase proposal records. Resend delivers proposal emails. Cloudflare R2 for custom photos.
 
 ### 23.17 Rehearsal Dinner Planning
+
 - Separate event with its own:
   - Guest list (subset of wedding guests)
   - Venue and catering
@@ -2128,6 +2281,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Uses existing multi-event system (Section 11). Supabase event record with type="rehearsal_dinner". All sub-features (guests, budget, timeline) scoped to event.
 
 ### 23.18 Print-at-Home Templates
+
 - Welcome signs
 - Table numbers
 - Menu cards
@@ -2140,6 +2294,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Next.js template editor with live preview. Hono API PDF generation (Puppeteer HTML-to-PDF for complex layouts). Cloudflare R2 for generated files. Styled using couple's color palette from Supabase.
 
 ### 23.19 Couple's Private Journal
+
 - Private space for thoughts, feelings, memories during planning
 - Milestone entries (venue visit, dress shopping, cake tasting)
 - Photo diary
@@ -2149,6 +2304,7 @@ main (production) ← only merged via PR, auto-deploys to prod
 **Stack:** Supabase journal_entries table with strict RLS (couple only). Cloudflare R2 for journal photos. Hono API. Next.js journal page with rich text editor.
 
 ### 23.20 Social Sharing
+
 - Share wedding website on social media (beautiful preview cards)
 - Share countdown on Instagram stories (generated image)
 - Share RSVP stats ("80% of guests confirmed!")
@@ -2160,47 +2316,47 @@ main (production) ← only merged via PR, auto-deploys to prod
 
 ## Feature Count Summary (Updated)
 
-| # | Category | Features |
-|---|----------|----------|
-| 1 | Auth & Accounts | 4 |
-| 2 | Dashboard | 5 |
-| 3 | Planning Checklist | 6 |
-| 4 | Guest List | 9 |
-| 5 | RSVP System | 5 |
-| 6 | Budget Tracker | 8 |
-| 7 | Wedding Website | 7 |
-| 8 | Seating Chart | 5 |
-| 9 | Vendor Management | 5 |
-| 10 | Wedding Party | 5 |
-| 11 | Events & Timeline | 4 |
-| 12 | Guest Communication | 3 |
-| 13 | Design & Inspiration | 4 |
-| 14 | Stationery Suite | 3 |
-| 15 | Photo & Video | 5 |
-| 16 | Registry | 4 |
-| 17 | Post-Wedding | 6 |
-| 18 | Account & Settings | 6 |
-| 19 | Mobile Experience | 3 |
-| 20 | Admin & Internal | 2 |
-| 21 | Dev & Testing Environment | 7 |
-| 22 | CI/CD & Deployment | 6 |
-| 23 | Additional Features (Gap Analysis) | 20 |
-| | **TOTAL** | **~130 feature areas** |
+| #   | Category                           | Features               |
+| --- | ---------------------------------- | ---------------------- |
+| 1   | Auth & Accounts                    | 4                      |
+| 2   | Dashboard                          | 5                      |
+| 3   | Planning Checklist                 | 6                      |
+| 4   | Guest List                         | 9                      |
+| 5   | RSVP System                        | 5                      |
+| 6   | Budget Tracker                     | 8                      |
+| 7   | Wedding Website                    | 7                      |
+| 8   | Seating Chart                      | 5                      |
+| 9   | Vendor Management                  | 5                      |
+| 10  | Wedding Party                      | 5                      |
+| 11  | Events & Timeline                  | 4                      |
+| 12  | Guest Communication                | 3                      |
+| 13  | Design & Inspiration               | 4                      |
+| 14  | Stationery Suite                   | 3                      |
+| 15  | Photo & Video                      | 5                      |
+| 16  | Registry                           | 4                      |
+| 17  | Post-Wedding                       | 6                      |
+| 18  | Account & Settings                 | 6                      |
+| 19  | Mobile Experience                  | 3                      |
+| 20  | Admin & Internal                   | 2                      |
+| 21  | Dev & Testing Environment          | 7                      |
+| 22  | CI/CD & Deployment                 | 6                      |
+| 23  | Additional Features (Gap Analysis) | 20                     |
+|     | **TOTAL**                          | **~130 feature areas** |
 
 ---
 
 ## Stack Usage Summary
 
-| Tool | Where It's Used |
-|------|----------------|
-| **Next.js / Vercel** | All UI: dashboard, checklist, guest list, budget, website builder, seating chart, RSVP forms, admin. Wedding websites are also Next.js pages served from Vercel. |
-| **Hono / Railway** | All API endpoints: CRUD operations, aggregations, file upload handling, webhook processing, PDF/CSV generation, QR code generation, email queueing. |
-| **Supabase / Drizzle** | All persistent data: weddings, guests, budgets, tasks, events, vendors, photos metadata, settings, analytics, audit logs. RLS for multi-tenant security. Realtime for live updates. |
-| **Clerk** | All auth: couple registration (email/Google/Apple), partner invites, guest magic links, wedding party access, role-based permissions, admin access. |
-| **Stripe** | Payments: $200 one-time purchase via Checkout, cash registry fund contributions, future vendor marketplace commissions. Webhooks for payment confirmation. |
-| **Inngest** | All background jobs: RSVP reminder sequences, payment due reminders, email batch sends, photo processing (resize/thumbnail), weekly progress emails, post-wedding review prompts, anniversary emails, data export generation, account deletion after grace period, scheduled cron jobs. |
-| **Resend + React Email** | All email: RSVP confirmations, reminders, guest announcements, partner invites, payment receipts, weekly summaries, thank-you note sends, anniversary emails, support emails. Beautiful templates via React Email. |
-| **Cloudflare R2** | All file storage: guest photos, engagement photos, mood board images, vendor contracts, receipts, QR codes, stationery PDFs, wedding website assets, data exports. |
-| **Cloudflare DNS/CDN** | Domain management: planfortwo.com routing, custom wedding website domains (CNAME), SSL, caching, DDoS protection. |
-| **Zod** | All validation: shared schemas between frontend forms and backend API endpoints. Guest data, budget entries, RSVP submissions, wedding settings. |
-| **Turborepo + pnpm** | Build system: orchestrates builds across web app, API, and shared packages (db, types, validators, ui). Cached builds for fast iteration. |
+| Tool                     | Where It's Used                                                                                                                                                                                                                                                                         |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Next.js / Vercel**     | All UI: dashboard, checklist, guest list, budget, website builder, seating chart, RSVP forms, admin. Wedding websites are also Next.js pages served from Vercel.                                                                                                                        |
+| **Hono / Railway**       | All API endpoints: CRUD operations, aggregations, file upload handling, webhook processing, PDF/CSV generation, QR code generation, email queueing.                                                                                                                                     |
+| **Supabase / Drizzle**   | All persistent data: weddings, guests, budgets, tasks, events, vendors, photos metadata, settings, analytics, audit logs. RLS for multi-tenant security. Realtime for live updates.                                                                                                     |
+| **Clerk**                | All auth: couple registration (email/Google/Apple), partner invites, guest magic links, wedding party access, role-based permissions, admin access.                                                                                                                                     |
+| **Stripe**               | Payments: $200 one-time purchase via Checkout, cash registry fund contributions, future vendor marketplace commissions. Webhooks for payment confirmation.                                                                                                                              |
+| **Inngest**              | All background jobs: RSVP reminder sequences, payment due reminders, email batch sends, photo processing (resize/thumbnail), weekly progress emails, post-wedding review prompts, anniversary emails, data export generation, account deletion after grace period, scheduled cron jobs. |
+| **Resend + React Email** | All email: RSVP confirmations, reminders, guest announcements, partner invites, payment receipts, weekly summaries, thank-you note sends, anniversary emails, support emails. Beautiful templates via React Email.                                                                      |
+| **Cloudflare R2**        | All file storage: guest photos, engagement photos, mood board images, vendor contracts, receipts, QR codes, stationery PDFs, wedding website assets, data exports.                                                                                                                      |
+| **Cloudflare DNS/CDN**   | Domain management: planfortwo.com routing, custom wedding website domains (CNAME), SSL, caching, DDoS protection.                                                                                                                                                                       |
+| **Zod**                  | All validation: shared schemas between frontend forms and backend API endpoints. Guest data, budget entries, RSVP submissions, wedding settings.                                                                                                                                        |
+| **Turborepo + pnpm**     | Build system: orchestrates builds across web app, API, and shared packages (db, types, validators, ui). Cached builds for fast iteration.                                                                                                                                               |

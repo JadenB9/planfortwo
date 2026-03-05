@@ -133,7 +133,9 @@ budgetItemsRoute.post(
     z.object({
       weddingId: z.string().uuid(),
       fileName: z.string().min(1).max(255),
-      contentType: z.string().regex(/^(image\/(jpeg|png|gif|webp)|application\/pdf)$/, 'Must be an image or PDF'),
+      contentType: z
+        .string()
+        .regex(/^(image\/(jpeg|png|gif|webp)|application\/pdf)$/, 'Must be an image or PDF'),
     }),
     (result, c) => {
       if (!result.success) {

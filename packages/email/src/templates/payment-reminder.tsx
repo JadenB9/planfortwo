@@ -46,13 +46,15 @@ export function PaymentReminderEmail({
   return (
     <Html>
       <Head />
-      <Preview>Payment reminder: {paymentTitle} due {urgency}</Preview>
+      <Preview>
+        Payment reminder: {paymentTitle} due {urgency}
+      </Preview>
       <Body style={main}>
         <Container style={container}>
           <Heading style={heading}>Payment Reminder</Heading>
           <Text style={text}>
-            Hi {recipientName}, this is a friendly reminder about an upcoming payment
-            for {weddingName}.
+            Hi {recipientName}, this is a friendly reminder about an upcoming payment for{' '}
+            {weddingName}.
           </Text>
           <Section style={detailsBox}>
             <Text style={detailLabel}>Payment</Text>
@@ -72,9 +74,7 @@ export function PaymentReminderEmail({
             This payment is due {urgency}. Please make sure it is taken care of on time!
           </Text>
           <Hr style={hr} />
-          <Text style={footer}>
-            With love, The PlanForTwo Team
-          </Text>
+          <Text style={footer}>With love, The PlanForTwo Team</Text>
         </Container>
       </Body>
     </Html>

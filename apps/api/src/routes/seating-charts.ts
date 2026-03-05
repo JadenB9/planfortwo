@@ -48,7 +48,8 @@ seatingChartsRoute.post(
   '/',
   requireFeature('canSeatingChart'),
   zValidator('json', createSeatingChartSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -63,32 +64,41 @@ seatingChartsRoute.put(
   resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   zValidator('json', updateSeatingChartSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const chartId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await seatingChartService.updateChart(chartId, weddingId, data)
-    if (!updated) return c.json({ error: 'Chart not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Chart not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
 
-seatingChartsRoute.delete('/:id', resolveWeddingMiddleware, requireFeature('canSeatingChart'), async (c) => {
-  const chartId = c.req.param('id')
-  const weddingId = c.get('weddingId')
-  const deleted = await seatingChartService.deleteChart(chartId, weddingId)
-  if (!deleted) return c.json({ error: 'Chart not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-  return c.json({ data: { success: true } })
-})
+seatingChartsRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canSeatingChart'),
+  async (c) => {
+    const chartId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const deleted = await seatingChartService.deleteChart(chartId, weddingId)
+    if (!deleted)
+      return c.json({ error: 'Chart not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    return c.json({ data: { success: true } })
+  },
+)
 
 seatingChartsRoute.post(
   '/:id/tables',
   resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   zValidator('json', createSeatingTableSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const chartId = c.req.param('id')
@@ -106,29 +116,37 @@ seatingChartsRoute.put(
   resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   zValidator('json', updateSeatingTableSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const tableId = c.req.param('tableId')
     const data = c.req.valid('json')
     const updated = await seatingChartService.updateTable(tableId, data)
-    if (!updated) return c.json({ error: 'Table not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Table not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
 
-seatingChartsRoute.delete('/tables/:tableId', resolveWeddingMiddleware, requireFeature('canSeatingChart'), async (c) => {
-  const tableId = c.req.param('tableId')
-  await seatingChartService.deleteTable(tableId)
-  return c.json({ data: { success: true } })
-})
+seatingChartsRoute.delete(
+  '/tables/:tableId',
+  resolveWeddingMiddleware,
+  requireFeature('canSeatingChart'),
+  async (c) => {
+    const tableId = c.req.param('tableId')
+    await seatingChartService.deleteTable(tableId)
+    return c.json({ data: { success: true } })
+  },
+)
 
 seatingChartsRoute.post(
   '/:id/elements',
   resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   zValidator('json', createVenueElementSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const chartId = c.req.param('id')
@@ -141,18 +159,24 @@ seatingChartsRoute.post(
   },
 )
 
-seatingChartsRoute.delete('/elements/:elementId', resolveWeddingMiddleware, requireFeature('canSeatingChart'), async (c) => {
-  const elementId = c.req.param('elementId')
-  await seatingChartService.deleteElement(elementId)
-  return c.json({ data: { success: true } })
-})
+seatingChartsRoute.delete(
+  '/elements/:elementId',
+  resolveWeddingMiddleware,
+  requireFeature('canSeatingChart'),
+  async (c) => {
+    const elementId = c.req.param('elementId')
+    await seatingChartService.deleteElement(elementId)
+    return c.json({ data: { success: true } })
+  },
+)
 
 seatingChartsRoute.post(
   '/assignments',
   resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   zValidator('json', assignGuestSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -161,11 +185,16 @@ seatingChartsRoute.post(
   },
 )
 
-seatingChartsRoute.delete('/assignments/:guestId', resolveWeddingMiddleware, requireFeature('canSeatingChart'), async (c) => {
-  const guestId = c.req.param('guestId')
-  await seatingChartService.unassignGuest(guestId)
-  return c.json({ data: { success: true } })
-})
+seatingChartsRoute.delete(
+  '/assignments/:guestId',
+  resolveWeddingMiddleware,
+  requireFeature('canSeatingChart'),
+  async (c) => {
+    const guestId = c.req.param('guestId')
+    await seatingChartService.unassignGuest(guestId)
+    return c.json({ data: { success: true } })
+  },
+)
 
 seatingChartsRoute.get('/:id/conflicts', resolveWeddingMiddleware, async (c) => {
   const chartId = c.req.param('id')
@@ -179,14 +208,16 @@ seatingChartsRoute.post(
   resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   zValidator('json', cloneChartSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const chartId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const { name } = c.req.valid('json')
     const cloned = await seatingChartService.cloneChart(chartId, weddingId, name)
-    if (!cloned) return c.json({ error: 'Chart not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!cloned)
+      return c.json({ error: 'Chart not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: cloned }, 201)
   },
 )
@@ -202,7 +233,8 @@ seatingChartsRoute.post(
   resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   zValidator('json', createGuestRelationshipSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -211,8 +243,13 @@ seatingChartsRoute.post(
   },
 )
 
-seatingChartsRoute.delete('/relationships/:id', resolveWeddingMiddleware, requireFeature('canSeatingChart'), async (c) => {
-  const id = c.req.param('id')
-  await seatingChartService.deleteRelationship(id)
-  return c.json({ data: { success: true } })
-})
+seatingChartsRoute.delete(
+  '/relationships/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canSeatingChart'),
+  async (c) => {
+    const id = c.req.param('id')
+    await seatingChartService.deleteRelationship(id)
+    return c.json({ data: { success: true } })
+  },
+)

@@ -104,10 +104,16 @@ describe('Website Public Routes', () => {
     })
 
     it('should return 404 for unpublished website', async () => {
-      setQueryResults([{
-        id: 'config-1', weddingId: 'w-1', templateId: 'classic',
-        publishedAt: null, privacyMode: 'public', passwordHash: null,
-      }])
+      setQueryResults([
+        {
+          id: 'config-1',
+          weddingId: 'w-1',
+          templateId: 'classic',
+          publishedAt: null,
+          privacyMode: 'public',
+          passwordHash: null,
+        },
+      ])
 
       const app = createApp()
       const res = await app.request('/website-public/my-wedding')
@@ -116,10 +122,16 @@ describe('Website Public Routes', () => {
     })
 
     it('should return limited info for password-protected website', async () => {
-      setQueryResults([{
-        id: 'config-1', weddingId: 'w-1', templateId: 'classic',
-        publishedAt: new Date(), privacyMode: 'password', passwordHash: 'hashed',
-      }])
+      setQueryResults([
+        {
+          id: 'config-1',
+          weddingId: 'w-1',
+          templateId: 'classic',
+          publishedAt: new Date(),
+          privacyMode: 'password',
+          passwordHash: 'hashed',
+        },
+      ])
 
       const app = createApp()
       const res = await app.request('/website-public/secret-wedding')
@@ -133,13 +145,25 @@ describe('Website Public Routes', () => {
 
     it('should return full website data for public site', async () => {
       setQueryResults(
-        [{
-          id: 'config-1', weddingId: 'w-1', templateId: 'garden-party',
-          publishedAt: new Date(), privacyMode: 'public', passwordHash: null,
-          customColors: null, fontPair: 'playfair-lato', subdomain: 'jj-wedding',
-          customDomain: null, domainVerified: false, metaTitle: 'Our Wedding',
-          metaDescription: null, ogImageUrl: null, hashtag: '#JJWedding',
-        }],
+        [
+          {
+            id: 'config-1',
+            weddingId: 'w-1',
+            templateId: 'garden-party',
+            publishedAt: new Date(),
+            privacyMode: 'public',
+            passwordHash: null,
+            customColors: null,
+            fontPair: 'playfair-lato',
+            subdomain: 'jj-wedding',
+            customDomain: null,
+            domainVerified: false,
+            metaTitle: 'Our Wedding',
+            metaDescription: null,
+            ogImageUrl: null,
+            hashtag: '#JJWedding',
+          },
+        ],
         [{ name: 'Jane & John', date: '2026-09-15' }],
         [{ id: 's-1', sectionType: 'hero', title: 'Welcome', isVisible: true }],
         [{ id: 'p-1', url: 'https://cdn.example.com/photo.jpg' }],
@@ -166,7 +190,11 @@ describe('Website Public Routes', () => {
       const res = await app.request('/website-public/jj-wedding/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: '/', sectionViewed: 'hero', referrer: 'https://instagram.com' }),
+        body: JSON.stringify({
+          path: '/',
+          sectionViewed: 'hero',
+          referrer: 'https://instagram.com',
+        }),
       })
 
       expect(res.status).toBe(200)

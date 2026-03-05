@@ -59,7 +59,12 @@ export const websiteSectionService = {
     }
   },
 
-  async createCustom(weddingId: string, title: string, content: Record<string, unknown> | undefined, userId: string) {
+  async createCustom(
+    weddingId: string,
+    title: string,
+    content: Record<string, unknown> | undefined,
+    userId: string,
+  ) {
     const sections = await this.list(weddingId)
     const maxOrder = sections.reduce((max, s) => Math.max(max, s.sortOrder), -1)
 

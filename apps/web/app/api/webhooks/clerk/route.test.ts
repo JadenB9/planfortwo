@@ -131,7 +131,8 @@ describe('Clerk Webhook Route', () => {
       const mockTx = {
         insert: vi.fn().mockReturnValue({
           values: vi.fn().mockReturnValue({
-            returning: vi.fn()
+            returning: vi
+              .fn()
               .mockResolvedValueOnce([{ id: 'user-1', clerkId: 'user_clerk_abc' }])
               .mockResolvedValueOnce([{ id: 'wedding-1' }]),
           }),
@@ -144,11 +145,13 @@ describe('Clerk Webhook Route', () => {
           insertCount++
           if (insertCount <= 2) {
             return {
-              returning: vi.fn().mockResolvedValue(
-                insertCount === 1
-                  ? [{ id: 'user-1', clerkId: 'user_clerk_abc' }]
-                  : [{ id: 'wedding-1' }],
-              ),
+              returning: vi
+                .fn()
+                .mockResolvedValue(
+                  insertCount === 1
+                    ? [{ id: 'user-1', clerkId: 'user_clerk_abc' }]
+                    : [{ id: 'wedding-1' }],
+                ),
             }
           }
           return { returning: vi.fn().mockResolvedValue([]) }

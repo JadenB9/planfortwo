@@ -11,7 +11,12 @@ interface ReceiptUploadProps {
   onUploaded: () => void
 }
 
-export function ReceiptUpload({ budgetItemId, weddingId, currentReceiptUrl, onUploaded }: ReceiptUploadProps) {
+export function ReceiptUpload({
+  budgetItemId,
+  weddingId,
+  currentReceiptUrl,
+  onUploaded,
+}: ReceiptUploadProps) {
   const { getToken } = useAuth()
   const fileRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
@@ -81,10 +86,15 @@ export function ReceiptUpload({ budgetItemId, weddingId, currentReceiptUrl, onUp
           href={currentReceiptUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs text-wedding-600 hover:text-wedding-700"
+          className="text-wedding-600 hover:text-wedding-700 inline-flex items-center gap-1 text-xs"
         >
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+            />
           </svg>
           View current receipt
         </a>
@@ -97,10 +107,10 @@ export function ReceiptUpload({ budgetItemId, weddingId, currentReceiptUrl, onUp
           accept="image/*,.pdf"
           onChange={handleFileChange}
           disabled={uploading}
-          className="block w-full text-sm text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:bg-wedding-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-wedding-700 hover:file:bg-wedding-100"
+          className="file:bg-wedding-50 file:text-wedding-700 hover:file:bg-wedding-100 block w-full text-sm text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:px-3 file:py-1.5 file:text-sm file:font-medium"
         />
         {uploading && (
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-wedding-200 border-t-wedding-600" />
+          <div className="border-wedding-200 border-t-wedding-600 h-5 w-5 animate-spin rounded-full border-2" />
         )}
       </div>
 

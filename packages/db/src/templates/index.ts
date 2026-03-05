@@ -22,10 +22,14 @@ export interface TemplateCategory {
 
 export function getTemplateTasks(template: TimelineTemplate): TemplateTask[] {
   switch (template) {
-    case '6-month': return tasks6Month
-    case '12-month': return tasks12Month
-    case '18-month': return tasks18Month
-    case 'elopement': return tasksElopement
+    case '6-month':
+      return tasks6Month
+    case '12-month':
+      return tasks12Month
+    case '18-month':
+      return tasks18Month
+    case 'elopement':
+      return tasksElopement
     default: {
       const _exhaustive: never = template
       throw new Error(`Unknown template: ${_exhaustive}`)

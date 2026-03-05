@@ -110,12 +110,15 @@ export const reorderTaskSchema = z.object({
 export type ReorderTaskInput = z.infer<typeof reorderTaskSchema>
 
 export const bulkReorderTasksSchema = z.object({
-  tasks: z.array(
-    z.object({
-      id: z.string().uuid(),
-      sortOrder: z.number().int().min(0),
-    }),
-  ).min(1).max(500),
+  tasks: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        sortOrder: z.number().int().min(0),
+      }),
+    )
+    .min(1)
+    .max(500),
 })
 
 export type BulkReorderTasksInput = z.infer<typeof bulkReorderTasksSchema>
@@ -139,7 +142,10 @@ export type CreateCategoryInput = z.infer<typeof createCategorySchema>
 
 export const updateCategorySchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color').optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color')
+    .optional(),
   icon: z.string().min(1).max(50).optional(),
 })
 
@@ -158,15 +164,18 @@ export const taskFiltersSchema = z.object({
 export type TaskFiltersInput = z.infer<typeof taskFiltersSchema>
 
 // ── Guest: Dietary Info ──
-export const dietaryInfoSchema = z.object({
-  vegetarian: z.boolean().optional(),
-  vegan: z.boolean().optional(),
-  glutenFree: z.boolean().optional(),
-  kosher: z.boolean().optional(),
-  halal: z.boolean().optional(),
-  allergies: z.array(z.string().max(100)).max(20).optional(),
-  notes: z.string().max(500).optional(),
-}).nullable().optional()
+export const dietaryInfoSchema = z
+  .object({
+    vegetarian: z.boolean().optional(),
+    vegan: z.boolean().optional(),
+    glutenFree: z.boolean().optional(),
+    kosher: z.boolean().optional(),
+    halal: z.boolean().optional(),
+    allergies: z.array(z.string().max(100)).max(20).optional(),
+    notes: z.string().max(500).optional(),
+  })
+  .nullable()
+  .optional()
 
 export type DietaryInfoInput = z.infer<typeof dietaryInfoSchema>
 
@@ -269,10 +278,12 @@ export const createGuestTagSchema = z.object({
 export type CreateGuestTagInput = z.infer<typeof createGuestTagSchema>
 
 // ── RSVP: Lookup ──
-export const rsvpLookupSchema = z.object({
-  token: z.string().min(1).optional(),
-  code: z.string().min(1).optional(),
-}).refine((d) => d.token || d.code, { message: 'Token or code is required' })
+export const rsvpLookupSchema = z
+  .object({
+    token: z.string().min(1).optional(),
+    code: z.string().min(1).optional(),
+  })
+  .refine((d) => d.token || d.code, { message: 'Token or code is required' })
 
 export type RsvpLookupInput = z.infer<typeof rsvpLookupSchema>
 
@@ -331,7 +342,10 @@ export type CreateBudgetCategoryInput = z.infer<typeof createBudgetCategorySchem
 export const updateBudgetCategorySchema = z.object({
   name: z.string().min(1).max(100).optional(),
   icon: z.string().min(1).max(50).optional(),
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color').optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color')
+    .optional(),
   allocatedAmount: z.number().min(0).max(10_000_000).optional(),
 })
 
@@ -410,12 +424,16 @@ export type UpdatePaymentScheduleInput = z.infer<typeof updatePaymentScheduleSch
 export const budgetSetupSchema = z.object({
   weddingId: z.string().uuid(),
   totalBudget: z.number().min(0).max(10_000_000),
-  categoryAllocations: z.array(z.object({
-    name: z.string().min(1).max(100),
-    icon: z.string().min(1).max(50),
-    color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
-    allocatedAmount: z.number().min(0),
-  })).optional(),
+  categoryAllocations: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(100),
+        icon: z.string().min(1).max(50),
+        color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+        allocatedAmount: z.number().min(0),
+      }),
+    )
+    .optional(),
 })
 
 export type BudgetSetupInput = z.infer<typeof budgetSetupSchema>
@@ -423,17 +441,39 @@ export type BudgetSetupInput = z.infer<typeof budgetSetupSchema>
 // ── Website: Enums ──
 export const privacyModeZodEnum = z.enum(['public', 'password', 'unlisted'])
 export const websiteSectionTypeZodEnum = z.enum([
-  'hero', 'our_story', 'event_details', 'wedding_party', 'gallery',
-  'travel', 'things_to_do', 'registry', 'faq', 'rsvp', 'schedule',
-  'guestbook', 'custom',
+  'hero',
+  'our_story',
+  'event_details',
+  'wedding_party',
+  'gallery',
+  'travel',
+  'things_to_do',
+  'registry',
+  'faq',
+  'rsvp',
+  'schedule',
+  'guestbook',
+  'custom',
 ])
 export const fontPairZodEnum = z.enum([
-  'playfair-lato', 'cormorant-fira', 'great-vibes-montserrat',
-  'josefin-open-sans', 'libre-baskerville-source-sans', 'dancing-script-nunito',
+  'playfair-lato',
+  'cormorant-fira',
+  'great-vibes-montserrat',
+  'josefin-open-sans',
+  'libre-baskerville-source-sans',
+  'dancing-script-nunito',
 ])
 export const templateIdZodEnum = z.enum([
-  'classic', 'modern', 'rustic', 'romantic', 'minimalist',
-  'bohemian', 'garden', 'beach', 'elegant', 'whimsical',
+  'classic',
+  'modern',
+  'rustic',
+  'romantic',
+  'minimalist',
+  'bohemian',
+  'garden',
+  'beach',
+  'elegant',
+  'whimsical',
 ])
 
 // ── Website: Custom Colors ──
@@ -452,7 +492,10 @@ export const subdomainSchema = z
   .string()
   .min(3)
   .max(50)
-  .regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/, 'Lowercase alphanumeric and hyphens only, cannot start or end with a hyphen')
+  .regex(
+    /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/,
+    'Lowercase alphanumeric and hyphens only, cannot start or end with a hyphen',
+  )
 
 // ── Website: Config ──
 export const createWebsiteConfigSchema = z.object({
@@ -488,12 +531,15 @@ export const updateWebsiteSectionSchema = z.object({
 export type UpdateWebsiteSectionInput = z.infer<typeof updateWebsiteSectionSchema>
 
 export const reorderWebsiteSectionsSchema = z.object({
-  sections: z.array(
-    z.object({
-      id: z.string().uuid(),
-      sortOrder: z.number().int().min(0),
-    }),
-  ).min(1).max(20),
+  sections: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        sortOrder: z.number().int().min(0),
+      }),
+    )
+    .min(1)
+    .max(20),
 })
 
 export type ReorderWebsiteSectionsInput = z.infer<typeof reorderWebsiteSectionsSchema>
@@ -533,12 +579,15 @@ export const registerPhotoSchema = z.object({
 export type RegisterPhotoInput = z.infer<typeof registerPhotoSchema>
 
 export const reorderPhotosSchema = z.object({
-  photos: z.array(
-    z.object({
-      id: z.string().uuid(),
-      sortOrder: z.number().int().min(0),
-    }),
-  ).min(1).max(200),
+  photos: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        sortOrder: z.number().int().min(0),
+      }),
+    )
+    .min(1)
+    .max(200),
 })
 
 export type ReorderPhotosInput = z.infer<typeof reorderPhotosSchema>

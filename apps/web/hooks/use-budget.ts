@@ -74,19 +74,28 @@ export function useBudget({ weddingId, initialFilters }: UseBudgetOptions) {
       // Load analytics in parallel (feature-gated, may fail for free tier)
       const analyticsPromises: Promise<void>[] = []
       analyticsPromises.push(
-        api.budgetAnalytics.getAnalytics(weddingId, token)
+        api.budgetAnalytics
+          .getAnalytics(weddingId, token)
           .then(({ data }) => setAnalytics(data))
-          .catch(() => { /* analytics not available on free tier */ }),
+          .catch(() => {
+            /* analytics not available on free tier */
+          }),
       )
       analyticsPromises.push(
-        api.budgetAnalytics.getTips(weddingId, token)
+        api.budgetAnalytics
+          .getTips(weddingId, token)
           .then(({ data }) => setTips(data))
-          .catch(() => { /* tips not available on free tier */ }),
+          .catch(() => {
+            /* tips not available on free tier */
+          }),
       )
       analyticsPromises.push(
-        api.budgetAnalytics.getSplits(weddingId, token)
+        api.budgetAnalytics
+          .getSplits(weddingId, token)
           .then(({ data }) => setSplits(data))
-          .catch(() => { /* splits not available on free tier */ }),
+          .catch(() => {
+            /* splits not available on free tier */
+          }),
       )
       await Promise.all(analyticsPromises)
     } catch {

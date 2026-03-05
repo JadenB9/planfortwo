@@ -1,21 +1,6 @@
 import { randomUUID } from 'crypto'
-import {
-  eq,
-  and,
-  or,
-  ilike,
-  count,
-  desc,
-  asc,
-  inArray,
-} from 'drizzle-orm'
-import {
-  db,
-  guests,
-  guestTags,
-  guestTagAssignments,
-  households,
-} from '@planfortwo/db'
+import { eq, and, or, ilike, count, desc, asc, inArray } from 'drizzle-orm'
+import { db, guests, guestTags, guestTagAssignments, households } from '@planfortwo/db'
 import type {
   GuestWithTags,
   GuestStats,
@@ -40,7 +25,7 @@ async function getTagsForGuest(guestId: string) {
 }
 
 async function getTagsForGuests(guestIds: string[]) {
-  if (guestIds.length === 0) return new Map<string, typeof guestTags.$inferSelect[]>()
+  if (guestIds.length === 0) return new Map<string, (typeof guestTags.$inferSelect)[]>()
 
   const assignments = await db
     .select({
@@ -51,7 +36,7 @@ async function getTagsForGuests(guestIds: string[]) {
     .innerJoin(guestTags, eq(guestTagAssignments.tagId, guestTags.id))
     .where(inArray(guestTagAssignments.guestId, guestIds))
 
-  const map = new Map<string, typeof guestTags.$inferSelect[]>()
+  const map = new Map<string, (typeof guestTags.$inferSelect)[]>()
   for (const a of assignments) {
     const existing = map.get(a.guestId) ?? []
     existing.push(a.tag)
@@ -62,9 +47,7 @@ async function getTagsForGuests(guestIds: string[]) {
 
 export const guestService = {
   async listGuests(filters: GuestFiltersInput) {
-    const conditions: ReturnType<typeof eq>[] = [
-      eq(guests.weddingId, filters.weddingId),
-    ]
+    const conditions: ReturnType<typeof eq>[] = [eq(guests.weddingId, filters.weddingId)]
 
     if (filters.rsvpStatus) {
       conditions.push(eq(guests.rsvpStatus, filters.rsvpStatus))
@@ -92,12 +75,7 @@ export const guestService = {
 
     if (filters.search) {
       const term = `%${filters.search}%`
-      conditions.push(
-        or(
-          ilike(guests.firstName, term),
-          ilike(guests.lastName, term),
-        )!,
-      )
+      conditions.push(or(ilike(guests.firstName, term), ilike(guests.lastName, term))!)
     }
 
     // For tag filtering, we need a subquery
@@ -110,7 +88,13 @@ export const guestService = {
 
       guestIdsWithTag = tagAssignments.map((a) => a.guestId)
       if (guestIdsWithTag.length === 0) {
-        return { data: [], total: 0, page: filters.page, pageSize: filters.pageSize, hasMore: false }
+        return {
+          data: [],
+          total: 0,
+          page: filters.page,
+          pageSize: filters.pageSize,
+          hasMore: false,
+        }
       }
       conditions.push(inArray(guests.id, guestIdsWithTag))
     }
@@ -146,7 +130,9 @@ export const guestService = {
     const guestIds = guestRows.map((g) => g.id)
     const tagsMap = await getTagsForGuests(guestIds)
 
-    const householdIds = [...new Set(guestRows.map((g) => g.householdId).filter(Boolean))] as string[]
+    const householdIds = [
+      ...new Set(guestRows.map((g) => g.householdId).filter(Boolean)),
+    ] as string[]
     let householdsMap = new Map<string, typeof households.$inferSelect>()
     if (householdIds.length > 0) {
       const householdRows = await db
@@ -177,10 +163,7 @@ export const guestService = {
   },
 
   async getGuest(id: string) {
-    const [guest] = await db
-      .select()
-      .from(guests)
-      .where(eq(guests.id, id))
+    const [guest] = await db.select().from(guests).where(eq(guests.id, id))
 
     if (!guest) return null
 
@@ -188,10 +171,7 @@ export const guestService = {
 
     let household = null
     if (guest.householdId) {
-      const [h] = await db
-        .select()
-        .from(households)
-        .where(eq(households.id, guest.householdId))
+      const [h] = await db.select().from(households).where(eq(households.id, guest.householdId))
       household = h ?? null
     }
 
@@ -266,11 +246,7 @@ export const guestService = {
     if (input.songRequest !== undefined) updateData.songRequest = input.songRequest
     if (input.rsvpNotes !== undefined) updateData.rsvpNotes = input.rsvpNotes
 
-    const [updated] = await db
-      .update(guests)
-      .set(updateData)
-      .where(eq(guests.id, id))
-      .returning()
+    const [updated] = await db.update(guests).set(updateData).where(eq(guests.id, id)).returning()
 
     if (updated && input.tagIds !== undefined) {
       await this.setTagsForGuest(id, input.tagIds)
@@ -322,10 +298,7 @@ export const guestService = {
   },
 
   async getStats(weddingId: string): Promise<GuestStats> {
-    const allGuests = await db
-      .select()
-      .from(guests)
-      .where(eq(guests.weddingId, weddingId))
+    const allGuests = await db.select().from(guests).where(eq(guests.weddingId, weddingId))
 
     const totalGuests = allGuests.length
     const adults = allGuests.filter((g) => !g.isChild).length
@@ -384,15 +357,11 @@ export const guestService = {
 
   async setTagsForGuest(guestId: string, tagIds: string[]) {
     // Delete existing assignments
-    await db
-      .delete(guestTagAssignments)
-      .where(eq(guestTagAssignments.guestId, guestId))
+    await db.delete(guestTagAssignments).where(eq(guestTagAssignments.guestId, guestId))
 
     // Insert new ones
     if (tagIds.length > 0) {
-      await db.insert(guestTagAssignments).values(
-        tagIds.map((tagId) => ({ guestId, tagId })),
-      )
+      await db.insert(guestTagAssignments).values(tagIds.map((tagId) => ({ guestId, tagId })))
     }
   },
 
@@ -459,9 +428,9 @@ export const guestService = {
           lastName,
           email: (row.email ?? '').trim() || null,
           phone: (row.phone ?? '').trim() || null,
-          side: (['bride', 'groom', 'both'].includes(row.side ?? '')
+          side: ['bride', 'groom', 'both'].includes(row.side ?? '')
             ? (row.side as 'bride' | 'groom' | 'both')
-            : null),
+            : null,
           isChild: (row.ischild ?? row.is_child ?? '').toLowerCase() === 'yes',
           isVip: (row.isvip ?? row.is_vip ?? '').toLowerCase() === 'yes',
           hasPlusOne: (row.hasplusone ?? row.has_plus_one ?? '').toLowerCase() === 'yes',

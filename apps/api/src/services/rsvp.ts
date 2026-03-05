@@ -50,7 +50,11 @@ export const rsvpService = {
     }
   },
 
-  async lookupByName(weddingId: string, firstName: string, lastName: string): Promise<Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[]> {
+  async lookupByName(
+    weddingId: string,
+    firstName: string,
+    lastName: string,
+  ): Promise<Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[]> {
     const results = await db
       .select()
       .from(guests)
@@ -62,7 +66,10 @@ export const rsvpService = {
         ),
       )
 
-    return results.map(({ email: _e, phone: _p, rsvpToken: _t, ...rest }) => rest) as Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[]
+    return results.map(({ email: _e, phone: _p, rsvpToken: _t, ...rest }) => rest) as Omit<
+      Guest,
+      'email' | 'phone' | 'rsvpToken'
+    >[]
   },
 
   async submitRsvp(submission: RsvpSubmissionInput, weddingId: string): Promise<Guest> {

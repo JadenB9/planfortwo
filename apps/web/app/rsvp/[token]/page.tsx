@@ -50,12 +50,12 @@ export default function RsvpTokenPage() {
   }, [loadRsvp])
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-cream-50 to-white px-4 py-12">
-      <div className="w-full max-w-lg animate-fade-in">
+    <main className="from-cream-50 flex min-h-screen items-center justify-center bg-gradient-to-b to-white px-4 py-12">
+      <div className="animate-fade-in w-full max-w-lg">
         {/* Loading */}
         {state === 'loading' && (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+            <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
             <p className="mt-4 text-sm text-gray-500">Finding your invitation...</p>
           </div>
         )}
@@ -78,15 +78,14 @@ export default function RsvpTokenPage() {
                 />
               </svg>
             </div>
-            <h2 className="font-serif text-2xl font-bold text-gray-900">
-              Invitation Not Found
-            </h2>
+            <h2 className="font-serif text-2xl font-bold text-gray-900">Invitation Not Found</h2>
             <p className="mt-3 text-gray-600">
-              {errorMessage ?? 'We could not find your invitation. Please check your link and try again.'}
+              {errorMessage ??
+                'We could not find your invitation. Please check your link and try again.'}
             </p>
             <Link
               href="/rsvp"
-              className="mt-6 inline-block rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+              className="bg-wedding-600 hover:bg-wedding-700 mt-6 inline-block rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
             >
               Try Again
             </Link>
@@ -131,22 +130,15 @@ export default function RsvpTokenPage() {
               )}
             </div>
 
-            <RsvpForm
-              lookupResult={lookupResult}
-              onSuccess={() => setState('success')}
-            />
+            <RsvpForm lookupResult={lookupResult} onSuccess={() => setState('success')} />
           </div>
         )}
 
         {/* Success */}
-        {state === 'success' && lookupResult && (
-          <RsvpConfirmation lookupResult={lookupResult} />
-        )}
+        {state === 'success' && lookupResult && <RsvpConfirmation lookupResult={lookupResult} />}
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs text-gray-400">
-          Powered by PlanForTwo
-        </p>
+        <p className="mt-8 text-center text-xs text-gray-400">Powered by PlanForTwo</p>
       </div>
     </main>
   )

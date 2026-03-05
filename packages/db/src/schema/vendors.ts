@@ -2,11 +2,19 @@ import { integer, numeric, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 import { weddings } from './weddings'
 
 export const vendorStatusEnum = pgEnum('vendor_status', [
-  'researching', 'contacted', 'quoted', 'booked', 'paid', 'completed',
+  'researching',
+  'contacted',
+  'quoted',
+  'booked',
+  'paid',
+  'completed',
 ])
 
 export const contractStatusEnum = pgEnum('contract_status', [
-  'pending', 'signed', 'active', 'completed',
+  'pending',
+  'signed',
+  'active',
+  'completed',
 ])
 
 export const vendors = pgTable('vendors', {

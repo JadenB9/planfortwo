@@ -61,7 +61,7 @@ export function PublicWebsiteClient({
 
   useEffect(() => {
     fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`)
-      .then((res) => res.ok ? res.json() : { data: [] })
+      .then((res) => (res.ok ? res.json() : { data: [] }))
       .then((json) => setGuestbookEntries(json.data ?? []))
       .catch(() => {})
   }, [slug])
@@ -73,7 +73,9 @@ export function PublicWebsiteClient({
       body: JSON.stringify({ weddingId: '', authorName, message }),
     })
     if (res.ok) {
-      const refreshRes = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`)
+      const refreshRes = await fetch(
+        `${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`,
+      )
       if (refreshRes.ok) {
         const json = await refreshRes.json()
         setGuestbookEntries(json.data ?? [])

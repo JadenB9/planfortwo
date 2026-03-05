@@ -19,13 +19,13 @@ export function StatCard({ label, value, icon, trend }: StatCardProps) {
     >
       <div className="flex items-center justify-between">
         <motion.div
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-wedding-50 text-wedding-600"
+          className="bg-wedding-50 text-wedding-600 flex h-10 w-10 items-center justify-center rounded-xl"
           whileHover={{ rotate: 8, scale: 1.1 }}
           transition={{ duration: 0.3 }}
         >
           {icon}
         </motion.div>
-        {trend && <span className="text-xs font-medium text-sage-600">{trend}</span>}
+        {trend && <span className="text-sage-600 text-xs font-medium">{trend}</span>}
       </div>
       <motion.p
         className="mt-4 text-2xl font-bold text-gray-900"

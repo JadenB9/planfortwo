@@ -208,14 +208,11 @@ describe('Category Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify(updateBody),
-        },
-      )
+      const res = await app.request(`/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updateBody),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -226,14 +223,11 @@ describe('Category Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify(updateBody),
-        },
-      )
+      const res = await app.request(`/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updateBody),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -246,10 +240,10 @@ describe('Category Routes', () => {
       mockedChecklistService.deleteCategory.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -260,10 +254,10 @@ describe('Category Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()

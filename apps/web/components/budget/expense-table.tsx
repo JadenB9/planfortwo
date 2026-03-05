@@ -14,8 +14,8 @@ type SortDir = 'asc' | 'desc'
 
 const PAYER_LABELS: Record<Payer, string> = {
   couple: 'Couple',
-  bride_family: 'Bride\'s Family',
-  groom_family: 'Groom\'s Family',
+  bride_family: "Bride's Family",
+  groom_family: "Groom's Family",
   other: 'Other',
 }
 
@@ -34,12 +34,20 @@ const STATUS_COLORS: Record<PaymentStatus, string> = {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount)
 }
 
 function formatDate(date: Date | null): string {
   if (!date) return '-'
-  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 
 export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
@@ -86,7 +94,9 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
   if (items.length === 0) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-        <p className="text-sm text-gray-500">No expenses yet. Add your first expense to get started.</p>
+        <p className="text-sm text-gray-500">
+          No expenses yet. Add your first expense to get started.
+        </p>
       </div>
     )
   }
@@ -141,9 +151,7 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
             <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
               <td className="px-4 py-3">
                 <p className="font-medium text-gray-900">{item.vendorName ?? item.description}</p>
-                {item.vendorName && (
-                  <p className="text-xs text-gray-500">{item.description}</p>
-                )}
+                {item.vendorName && <p className="text-xs text-gray-500">{item.description}</p>}
               </td>
               <td className="px-4 py-3">
                 <span className="inline-flex items-center gap-1 text-xs">
@@ -158,7 +166,9 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
                 {formatCurrency(item.paidAmount)}
               </td>
               <td className="px-4 py-3">
-                <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[item.paymentStatus]}`}>
+                <span
+                  className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[item.paymentStatus]}`}
+                >
                   {STATUS_LABELS[item.paymentStatus]}
                 </span>
               </td>
@@ -168,7 +178,7 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onEdit(item)}
-                    className="text-xs font-medium text-wedding-600 hover:text-wedding-700"
+                    className="text-wedding-600 hover:text-wedding-700 text-xs font-medium"
                   >
                     Edit
                   </button>

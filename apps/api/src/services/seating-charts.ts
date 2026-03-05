@@ -35,15 +35,9 @@ export const seatingChartService = {
 
     if (!chart) return null
 
-    const tables = await db
-      .select()
-      .from(seatingTables)
-      .where(eq(seatingTables.chartId, chartId))
+    const tables = await db.select().from(seatingTables).where(eq(seatingTables.chartId, chartId))
 
-    const elements = await db
-      .select()
-      .from(venueElements)
-      .where(eq(venueElements.chartId, chartId))
+    const elements = await db.select().from(venueElements).where(eq(venueElements.chartId, chartId))
 
     const allAssignments: (typeof tableAssignments.$inferSelect)[] = []
     for (const table of tables) {
@@ -190,10 +184,7 @@ export const seatingChartService = {
   },
 
   async getAssignments(chartId: string) {
-    const tables = await db
-      .select()
-      .from(seatingTables)
-      .where(eq(seatingTables.chartId, chartId))
+    const tables = await db.select().from(seatingTables).where(eq(seatingTables.chartId, chartId))
 
     const result: { tableId: string; guestId: string; seatNumber: number | null }[] = []
     for (const table of tables) {
@@ -213,10 +204,7 @@ export const seatingChartService = {
   },
 
   async listRelationships(weddingId: string) {
-    return db
-      .select()
-      .from(guestRelationships)
-      .where(eq(guestRelationships.weddingId, weddingId))
+    return db.select().from(guestRelationships).where(eq(guestRelationships.weddingId, weddingId))
   },
 
   async createRelationship(data: CreateGuestRelationshipInput) {
@@ -243,10 +231,7 @@ export const seatingChartService = {
       .from(guestRelationships)
       .where(eq(guestRelationships.weddingId, weddingId))
 
-    const tables = await db
-      .select()
-      .from(seatingTables)
-      .where(eq(seatingTables.chartId, chartId))
+    const tables = await db.select().from(seatingTables).where(eq(seatingTables.chartId, chartId))
 
     const guestTableMap = new Map<string, string>()
     for (const table of tables) {
@@ -289,7 +274,12 @@ export const seatingChartService = {
       }
     }
 
-    const capacityWarnings: { tableId: string; label: string; capacity: number; assigned: number }[] = []
+    const capacityWarnings: {
+      tableId: string
+      label: string
+      capacity: number
+      assigned: number
+    }[] = []
     for (const table of tables) {
       const assigns = await db
         .select()

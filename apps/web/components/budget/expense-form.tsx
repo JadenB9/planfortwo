@@ -2,7 +2,12 @@
 
 import { useState } from 'react'
 import { useAuth } from '@clerk/nextjs'
-import type { BudgetCategory, BudgetItemWithCategory, PaymentStatus, Payer } from '@planfortwo/types'
+import type {
+  BudgetCategory,
+  BudgetItemWithCategory,
+  PaymentStatus,
+  Payer,
+} from '@planfortwo/types'
 import { createBudgetItemSchema, updateBudgetItemSchema } from '@planfortwo/validators'
 import { api } from '@/lib/api'
 
@@ -28,16 +33,24 @@ const STATUS_OPTIONS = [
   { value: 'paid', label: 'Paid' },
 ]
 
-export function ExpenseForm({ weddingId, categories, editingItem, onClose, onSaved }: ExpenseFormProps) {
+export function ExpenseForm({
+  weddingId,
+  categories,
+  editingItem,
+  onClose,
+  onSaved,
+}: ExpenseFormProps) {
   const { getToken } = useAuth()
   const isEditing = !!editingItem
 
-  const [categoryId, setCategoryId] = useState(editingItem?.categoryId ?? (categories[0]?.id ?? ''))
+  const [categoryId, setCategoryId] = useState(editingItem?.categoryId ?? categories[0]?.id ?? '')
   const [vendorName, setVendorName] = useState(editingItem?.vendorName ?? '')
   const [description, setDescription] = useState(editingItem?.description ?? '')
   const [amount, setAmount] = useState(editingItem?.amount?.toString() ?? '')
   const [paidAmount, setPaidAmount] = useState(editingItem?.paidAmount?.toString() ?? '0')
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(editingItem?.paymentStatus ?? 'unpaid')
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
+    editingItem?.paymentStatus ?? 'unpaid',
+  )
   const [payer, setPayer] = useState<Payer>(editingItem?.payer ?? 'couple')
   const [dueDate, setDueDate] = useState(
     editingItem?.dueDate ? new Date(editingItem.dueDate).toISOString().split('T')[0] : '',
@@ -104,7 +117,12 @@ export function ExpenseForm({ weddingId, categories, editingItem, onClose, onSav
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -240,7 +258,7 @@ export function ExpenseForm({ weddingId, categories, editingItem, onClose, onSav
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-wedding-700 disabled:opacity-50"
+              className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm disabled:opacity-50"
             >
               {saving ? 'Saving...' : isEditing ? 'Update Expense' : 'Add Expense'}
             </button>

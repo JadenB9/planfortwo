@@ -77,7 +77,11 @@ export const registryService = {
         goalAmount: data.goalAmount?.toString() ?? '0',
       })
       .returning()
-    return { ...fund!, goalAmount: parseFloat(fund!.goalAmount), currentAmount: parseFloat(fund!.currentAmount) }
+    return {
+      ...fund!,
+      goalAmount: parseFloat(fund!.goalAmount),
+      currentAmount: parseFloat(fund!.currentAmount),
+    }
   },
 
   async updateFund(fundId: string, weddingId: string, data: UpdateCashFundInput) {
@@ -92,11 +96,17 @@ export const registryService = {
       .where(and(eq(cashFunds.id, fundId), eq(cashFunds.weddingId, weddingId)))
       .returning()
     if (!updated) return null
-    return { ...updated, goalAmount: parseFloat(updated.goalAmount), currentAmount: parseFloat(updated.currentAmount) }
+    return {
+      ...updated,
+      goalAmount: parseFloat(updated.goalAmount),
+      currentAmount: parseFloat(updated.currentAmount),
+    }
   },
 
   async deleteFund(fundId: string, weddingId: string) {
-    await db.delete(cashFunds).where(and(eq(cashFunds.id, fundId), eq(cashFunds.weddingId, weddingId)))
+    await db
+      .delete(cashFunds)
+      .where(and(eq(cashFunds.id, fundId), eq(cashFunds.weddingId, weddingId)))
   },
 
   async addContribution(data: CreateCashFundContributionInput) {
@@ -195,7 +205,9 @@ export const registryService = {
   },
 
   async deleteMoodBoard(boardId: string, weddingId: string) {
-    await db.delete(moodBoards).where(and(eq(moodBoards.id, boardId), eq(moodBoards.weddingId, weddingId)))
+    await db
+      .delete(moodBoards)
+      .where(and(eq(moodBoards.id, boardId), eq(moodBoards.weddingId, weddingId)))
   },
 
   async listBoardItems(boardId: string) {

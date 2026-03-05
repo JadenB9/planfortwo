@@ -202,10 +202,10 @@ describe('Budget Analytics Routes', () => {
       mockedService.getAnalytics.mockResolvedValue(mockAnalytics as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/analytics?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/analytics?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -231,10 +231,10 @@ describe('Budget Analytics Routes', () => {
       mockedService.getAnalytics.mockResolvedValue(emptyAnalytics as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/analytics?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/analytics?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -247,10 +247,10 @@ describe('Budget Analytics Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/analytics?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/analytics?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -279,10 +279,10 @@ describe('Budget Analytics Routes', () => {
       mockedService.getTipSuggestions.mockResolvedValue(mockTips as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/tips?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/tips?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -303,10 +303,10 @@ describe('Budget Analytics Routes', () => {
       mockedService.getSplitSummary.mockResolvedValue(mockSplits as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/splits?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/splits?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -325,10 +325,10 @@ describe('Budget Analytics Routes', () => {
       mockedService.getSplitSummary.mockResolvedValue(mockSplits as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/splits?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/splits?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -345,16 +345,14 @@ describe('Budget Analytics Routes', () => {
       mockedService.exportCsv.mockResolvedValue(csvContent)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/export/csv?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/export/csv?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       expect(res.headers.get('Content-Type')).toBe('text/csv')
-      expect(res.headers.get('Content-Disposition')).toContain(
-        'budget-export.csv',
-      )
+      expect(res.headers.get('Content-Disposition')).toContain('budget-export.csv')
       const text = await res.text()
       expect(text).toContain('Category')
       expect(text).toContain('Grand Ballroom')
@@ -364,10 +362,10 @@ describe('Budget Analytics Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/export/csv?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/export/csv?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -381,26 +379,24 @@ describe('Budget Analytics Routes', () => {
       mockedService.exportPdf.mockResolvedValue(pdfBuffer)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/export/pdf?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/export/pdf?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       expect(res.headers.get('Content-Type')).toBe('application/pdf')
-      expect(res.headers.get('Content-Disposition')).toContain(
-        'budget-report.pdf',
-      )
+      expect(res.headers.get('Content-Disposition')).toContain('budget-report.pdf')
     })
 
     it('should return 403 on free tier (canBudgetExport gated)', async () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget/export/pdf?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget/export/pdf?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()

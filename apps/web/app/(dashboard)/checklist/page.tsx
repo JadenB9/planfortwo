@@ -76,7 +76,9 @@ export default function ChecklistPage() {
     if (!weddingId || !features?.canReorderTasks) return
     setTasks((prev) => {
       const map = new Map(updates.map((u) => [u.id, u.sortOrder]))
-      return [...prev].sort((a, b) => (map.get(a.id) ?? a.sortOrder) - (map.get(b.id) ?? b.sortOrder))
+      return [...prev].sort(
+        (a, b) => (map.get(a.id) ?? a.sortOrder) - (map.get(b.id) ?? b.sortOrder),
+      )
     })
     try {
       const token = await getToken()
@@ -95,7 +97,9 @@ export default function ChecklistPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="rounded-2xl border border-red-200 bg-red-50 px-8 py-6">
-          <h2 className="font-serif text-xl font-semibold text-red-800">Unable to load checklist</h2>
+          <h2 className="font-serif text-xl font-semibold text-red-800">
+            Unable to load checklist
+          </h2>
           <p className="mt-2 text-sm text-red-600">{apiError}</p>
           <button
             onClick={() => window.location.reload()}
@@ -111,7 +115,7 @@ export default function ChecklistPage() {
   if (isLoading && tasks.length === 0) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -134,7 +138,7 @@ export default function ChecklistPage() {
         {features?.canAddTasks ? (
           <button
             onClick={() => setShowAddForm(true)}
-            className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+            className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
           >
             Add Task
           </button>
@@ -149,7 +153,9 @@ export default function ChecklistPage() {
         {/* Sidebar filters */}
         <div className="hidden w-56 flex-shrink-0 lg:block">
           <div className="rounded-2xl border border-gray-200 bg-white p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Categories</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Categories
+            </h3>
             <CategoryFilter
               categories={categories}
               selectedId={selectedCategoryId}

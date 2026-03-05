@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,8 +25,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -36,13 +45,30 @@ vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
       tier: 'full',
-      canAddTasks: true, canEditChecklist: true, canDeleteTasks: true, canReorderTasks: true,
-      canCustomizeCategories: true, canAddNotes: true, canAddAttachments: true,
-      maxGuests: null, canEditGuests: true, canDeleteGuests: true, canBulkImport: true,
-      canRsvp: true, canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -89,17 +115,15 @@ describe('Website Analytics Routes', () => {
           { country: 'US', count: 60 },
           { country: 'GB', count: 15 },
         ],
-        topReferrers: [
-          { referrer: 'https://instagram.com', count: 30 },
-        ],
+        topReferrers: [{ referrer: 'https://instagram.com', count: 30 }],
       }
       mockedService.getSummary.mockResolvedValue(summary)
 
       const app = createApp()
-      const res = await app.request(
-        `/website-analytics?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/website-analytics?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -113,20 +137,37 @@ describe('Website Analytics Routes', () => {
     it('should return 403 on free tier (canWebsiteAnalytics gated)', async () => {
       mockedFeatureService.getFeatures.mockResolvedValue({
         tier: 'free',
-        canAddTasks: false, canEditChecklist: false, canDeleteTasks: false, canReorderTasks: false,
-        canCustomizeCategories: false, canAddNotes: false, canAddAttachments: false,
-        maxGuests: 15, canEditGuests: false, canDeleteGuests: false, canBulkImport: false,
-        canRsvp: false, canSeatingChart: false, canVendorManagement: false, canCustomDomain: false,
-        canDataExport: false, canBudgetCategories: false, canBudgetExpenses: false,
-        canBudgetAnalytics: false, canBudgetExport: false, canPaymentSchedule: false,
-        canWebsiteBuilder: true, canWebsiteAnalytics: false, canWebsiteCustomSections: false,
+        canAddTasks: false,
+        canEditChecklist: false,
+        canDeleteTasks: false,
+        canReorderTasks: false,
+        canCustomizeCategories: false,
+        canAddNotes: false,
+        canAddAttachments: false,
+        maxGuests: 15,
+        canEditGuests: false,
+        canDeleteGuests: false,
+        canBulkImport: false,
+        canRsvp: false,
+        canSeatingChart: false,
+        canVendorManagement: false,
+        canCustomDomain: false,
+        canDataExport: false,
+        canBudgetCategories: false,
+        canBudgetExpenses: false,
+        canBudgetAnalytics: false,
+        canBudgetExport: false,
+        canPaymentSchedule: false,
+        canWebsiteBuilder: true,
+        canWebsiteAnalytics: false,
+        canWebsiteCustomSections: false,
       })
 
       const app = createApp()
-      const res = await app.request(
-        `/website-analytics?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/website-analytics?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -135,10 +176,7 @@ describe('Website Analytics Routes', () => {
 
     it('should return 400 when weddingId is missing', async () => {
       const app = createApp()
-      const res = await app.request(
-        `/website-analytics`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/website-analytics`, { method: 'GET', headers: authHeaders() })
 
       expect(res.status).toBe(400)
       const body = await res.json()

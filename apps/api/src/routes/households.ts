@@ -1,9 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import {
-  createHouseholdSchema,
-  updateHouseholdSchema,
-} from '@planfortwo/validators'
+import { createHouseholdSchema, updateHouseholdSchema } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -24,15 +21,11 @@ export const householdsRoute = new Hono<Env>()
 householdsRoute.use('*', authMiddleware, resolveUserMiddleware)
 
 // GET /households?weddingId=X — list households with guests
-householdsRoute.get(
-  '/',
-  resolveWeddingMiddleware,
-  async (c) => {
-    const weddingId = c.get('weddingId')
-    const result = await householdService.listHouseholds(weddingId)
-    return c.json({ data: result })
-  },
-)
+householdsRoute.get('/', resolveWeddingMiddleware, async (c) => {
+  const weddingId = c.get('weddingId')
+  const result = await householdService.listHouseholds(weddingId)
+  return c.json({ data: result })
+})
 
 // GET /households/:id — single household with guests
 householdsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
@@ -55,10 +48,7 @@ householdsRoute.post(
   '/',
   zValidator('json', createHouseholdSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -76,10 +66,7 @@ householdsRoute.put(
   resolveWeddingMiddleware,
   zValidator('json', updateHouseholdSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -119,9 +106,6 @@ householdsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
     return c.json({ data: { success: true } })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Delete failed'
-    return c.json(
-      { error: message, code: 'DELETE_FAILED', statusCode: 404 },
-      404,
-    )
+    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
   }
 })

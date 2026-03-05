@@ -12,12 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 const VENDOR_CATEGORIES: { value: VendorCategory; label: string }[] = [
   { value: 'venue', label: 'Venue' },
@@ -87,7 +82,17 @@ export default function VendorsPage() {
   }, [loadVendors])
 
   const resetForm = () => {
-    setForm({ name: '', category: 'venue', status: 'researching', contactName: '', email: '', phone: '', website: '', cost: '', notes: '' })
+    setForm({
+      name: '',
+      category: 'venue',
+      status: 'researching',
+      contactName: '',
+      email: '',
+      phone: '',
+      website: '',
+      cost: '',
+      notes: '',
+    })
     setEditingVendor(null)
   }
 
@@ -160,7 +165,7 @@ export default function VendorsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -178,13 +183,20 @@ export default function VendorsPage() {
           <p className="mt-1 text-sm text-gray-600">
             Manage your wedding vendors and track costs.
             {vendors.length > 0 && (
-              <span className="ml-2 font-medium text-wedding-600">
+              <span className="text-wedding-600 ml-2 font-medium">
                 Total: ${totalCost.toLocaleString()}
               </span>
             )}
           </p>
         </div>
-        <Button onClick={() => { resetForm(); setShowForm(true) }}>Add Vendor</Button>
+        <Button
+          onClick={() => {
+            resetForm()
+            setShowForm(true)
+          }}
+        >
+          Add Vendor
+        </Button>
       </div>
 
       {vendors.length > 0 && (
@@ -192,38 +204,63 @@ export default function VendorsPage() {
           <button
             onClick={() => setFilterCategory('')}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-              !filterCategory ? 'bg-wedding-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              !filterCategory
+                ? 'bg-wedding-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             All ({vendors.length})
           </button>
-          {VENDOR_CATEGORIES.filter((c) => vendors.some((v) => v.category === c.value)).map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setFilterCategory(cat.value)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                filterCategory === cat.value ? 'bg-wedding-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {cat.label} ({vendors.filter((v) => v.category === cat.value).length})
-            </button>
-          ))}
+          {VENDOR_CATEGORIES.filter((c) => vendors.some((v) => v.category === c.value)).map(
+            (cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setFilterCategory(cat.value)}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  filterCategory === cat.value
+                    ? 'bg-wedding-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {cat.label} ({vendors.filter((v) => v.category === cat.value).length})
+              </button>
+            ),
+          )}
         </div>
       )}
 
       {filteredVendors.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-wedding-50">
-              <svg className="h-8 w-8 text-wedding-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+              <svg
+                className="text-wedding-600 h-8 w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
               </svg>
             </div>
             <h2 className="font-serif text-xl font-semibold text-gray-900">No Vendors Yet</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
-              Start adding your wedding vendors to keep track of contacts, costs, and booking status.
+              Start adding your wedding vendors to keep track of contacts, costs, and booking
+              status.
             </p>
-            <Button className="mt-6" onClick={() => { resetForm(); setShowForm(true) }}>Add Your First Vendor</Button>
+            <Button
+              className="mt-6"
+              onClick={() => {
+                resetForm()
+                setShowForm(true)
+              }}
+            >
+              Add Your First Vendor
+            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -235,26 +272,36 @@ export default function VendorsPage() {
         >
           {filteredVendors.map((vendor) => (
             <motion.div key={vendor.id} variants={fadeInUp}>
-              <Card className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => openEdit(vendor)}>
+              <Card
+                className="cursor-pointer transition-shadow hover:shadow-md"
+                onClick={() => openEdit(vendor)}
+              >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-base">{vendor.name}</CardTitle>
                       <p className="mt-0.5 text-xs capitalize text-gray-500">
-                        {VENDOR_CATEGORIES.find((c) => c.value === vendor.category)?.label ?? vendor.category}
+                        {VENDOR_CATEGORIES.find((c) => c.value === vendor.category)?.label ??
+                          vendor.category}
                       </p>
                     </div>
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[vendor.status]}`}>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[vendor.status]}`}
+                    >
                       {vendor.status}
                     </span>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {vendor.contactName && <p className="text-sm text-gray-600">{vendor.contactName}</p>}
+                  {vendor.contactName && (
+                    <p className="text-sm text-gray-600">{vendor.contactName}</p>
+                  )}
                   {vendor.email && <p className="text-xs text-gray-500">{vendor.email}</p>}
                   {vendor.phone && <p className="text-xs text-gray-500">{vendor.phone}</p>}
                   {vendor.cost != null && vendor.cost > 0 && (
-                    <p className="mt-2 text-sm font-semibold text-gray-900">${vendor.cost.toLocaleString()}</p>
+                    <p className="mt-2 text-sm font-semibold text-gray-900">
+                      ${vendor.cost.toLocaleString()}
+                    </p>
                   )}
                   <button
                     onClick={(e) => {
@@ -272,7 +319,15 @@ export default function VendorsPage() {
         </motion.div>
       )}
 
-      <Dialog open={showForm} onOpenChange={(open) => { if (!open) { resetForm(); setShowForm(false) } else setShowForm(true) }}>
+      <Dialog
+        open={showForm}
+        onOpenChange={(open) => {
+          if (!open) {
+            resetForm()
+            setShowForm(false)
+          } else setShowForm(true)
+        }}
+      >
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingVendor ? 'Edit Vendor' : 'Add Vendor'}</DialogTitle>
@@ -280,18 +335,37 @@ export default function VendorsPage() {
           <div className="space-y-4">
             <div>
               <Label htmlFor="v-name">Vendor Name</Label>
-              <Input id="v-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g., Elegant Events" />
+              <Input
+                id="v-name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g., Elegant Events"
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="v-category">Category</Label>
-                <select id="v-category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value as VendorCategory })} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm">
-                  {VENDOR_CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                <select
+                  id="v-category"
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value as VendorCategory })}
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
+                >
+                  {VENDOR_CATEGORIES.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
                 <Label htmlFor="v-status">Status</Label>
-                <select id="v-status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as VendorStatus })} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm">
+                <select
+                  id="v-status"
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value as VendorStatus })}
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
+                >
                   <option value="researching">Researching</option>
                   <option value="contacted">Contacted</option>
                   <option value="booked">Booked</option>
@@ -302,31 +376,66 @@ export default function VendorsPage() {
             </div>
             <div>
               <Label htmlFor="v-contact">Contact Name</Label>
-              <Input id="v-contact" value={form.contactName} onChange={(e) => setForm({ ...form, contactName: e.target.value })} placeholder="Contact person" />
+              <Input
+                id="v-contact"
+                value={form.contactName}
+                onChange={(e) => setForm({ ...form, contactName: e.target.value })}
+                placeholder="Contact person"
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="v-email">Email</Label>
-                <Input id="v-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" />
+                <Input
+                  id="v-email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="email@example.com"
+                />
               </div>
               <div>
                 <Label htmlFor="v-phone">Phone</Label>
-                <Input id="v-phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(555) 123-4567" />
+                <Input
+                  id="v-phone"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="(555) 123-4567"
+                />
               </div>
             </div>
             <div>
               <Label htmlFor="v-website">Website</Label>
-              <Input id="v-website" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} placeholder="https://..." />
+              <Input
+                id="v-website"
+                value={form.website}
+                onChange={(e) => setForm({ ...form, website: e.target.value })}
+                placeholder="https://..."
+              />
             </div>
             <div>
               <Label htmlFor="v-cost">Cost ($)</Label>
-              <Input id="v-cost" type="number" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} placeholder="0.00" />
+              <Input
+                id="v-cost"
+                type="number"
+                value={form.cost}
+                onChange={(e) => setForm({ ...form, cost: e.target.value })}
+                placeholder="0.00"
+              />
             </div>
             <div>
               <Label htmlFor="v-notes">Notes</Label>
-              <Textarea id="v-notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Additional notes..." rows={3} />
+              <Textarea
+                id="v-notes"
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                placeholder="Additional notes..."
+                rows={3}
+              />
             </div>
-            <Button onClick={handleSave} className="w-full">{editingVendor ? 'Save Changes' : 'Add Vendor'}</Button>
+            <Button onClick={handleSave} className="w-full">
+              {editingVendor ? 'Save Changes' : 'Add Vendor'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

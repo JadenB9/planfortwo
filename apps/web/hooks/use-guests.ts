@@ -2,7 +2,14 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@clerk/nextjs'
-import type { GuestWithTags, GuestStats, Household, GuestTag, RsvpStatus, GuestSide } from '@planfortwo/types'
+import type {
+  GuestWithTags,
+  GuestStats,
+  Household,
+  GuestTag,
+  RsvpStatus,
+  GuestSide,
+} from '@planfortwo/types'
 import { api } from '@/lib/api'
 
 export interface GuestFilterState {

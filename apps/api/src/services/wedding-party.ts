@@ -127,10 +127,7 @@ export const weddingPartyService = {
   },
 
   async listGifts(memberId: string) {
-    return db
-      .select()
-      .from(partyGifts)
-      .where(eq(partyGifts.memberId, memberId))
+    return db.select().from(partyGifts).where(eq(partyGifts.memberId, memberId))
   },
 
   async createGift(data: CreatePartyGiftInput) {

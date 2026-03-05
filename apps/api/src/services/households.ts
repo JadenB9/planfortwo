@@ -53,9 +53,7 @@ export const householdService = {
 
       if (!existing) break
 
-      const rand = randomInt(1000)
-        .toString()
-        .padStart(3, '0')
+      const rand = randomInt(1000).toString().padStart(3, '0')
       rsvpCode = `${generateRsvpCode(input.name)}${rand}`
       attempts++
     }

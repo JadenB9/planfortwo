@@ -29,34 +29,52 @@ export default function WebsitePage() {
     if (!weddingId) return
     const token = await getToken()
     if (!token) return
-    const slug = wedding?.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') ?? 'our-wedding'
+    const slug =
+      wedding?.name
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') ?? 'our-wedding'
     await api.websiteConfig.create({ weddingId, templateId: 'classic', subdomain: slug }, token)
     await refetch()
   }, [weddingId, getToken, refetch, wedding?.name])
 
-  const handleTemplateChange = useCallback(async (templateId: string) => {
-    if (!weddingId || !config) return
-    const token = await getToken()
-    if (!token) return
-    await api.websiteConfig.update(config.id, weddingId, { templateId: templateId as 'classic' }, token)
-    await refetch()
-  }, [weddingId, config, getToken, refetch])
+  const handleTemplateChange = useCallback(
+    async (templateId: string) => {
+      if (!weddingId || !config) return
+      const token = await getToken()
+      if (!token) return
+      await api.websiteConfig.update(
+        config.id,
+        weddingId,
+        { templateId: templateId as 'classic' },
+        token,
+      )
+      await refetch()
+    },
+    [weddingId, config, getToken, refetch],
+  )
 
-  const handleConfigUpdate = useCallback(async (updates: Record<string, unknown>) => {
-    if (!weddingId || !config) return
-    const token = await getToken()
-    if (!token) return
-    await api.websiteConfig.update(config.id, weddingId, updates, token)
-    await refetch()
-  }, [weddingId, config, getToken, refetch])
+  const handleConfigUpdate = useCallback(
+    async (updates: Record<string, unknown>) => {
+      if (!weddingId || !config) return
+      const token = await getToken()
+      if (!token) return
+      await api.websiteConfig.update(config.id, weddingId, updates, token)
+      await refetch()
+    },
+    [weddingId, config, getToken, refetch],
+  )
 
-  const handleToggleVisibility = useCallback(async (sectionId: string, isVisible: boolean) => {
-    if (!weddingId) return
-    const token = await getToken()
-    if (!token) return
-    await api.websiteSections.update(sectionId, weddingId, { isVisible }, token)
-    await refetch()
-  }, [weddingId, getToken, refetch])
+  const handleToggleVisibility = useCallback(
+    async (sectionId: string, isVisible: boolean) => {
+      if (!weddingId) return
+      const token = await getToken()
+      if (!token) return
+      await api.websiteSections.update(sectionId, weddingId, { isVisible }, token)
+      await refetch()
+    },
+    [weddingId, getToken, refetch],
+  )
 
   const handlePublish = useCallback(async () => {
     if (!weddingId || !config) return
@@ -74,28 +92,34 @@ export default function WebsitePage() {
     await refetch()
   }, [weddingId, config, getToken, refetch])
 
-  const handleCheckSubdomain = useCallback(async (subdomain: string): Promise<boolean> => {
-    const token = await getToken()
-    if (!token) return false
-    try {
-      const res = await api.websiteConfig.checkSubdomain(subdomain, token)
-      return (res as { data: { available: boolean } }).data.available
-    } catch {
-      return false
-    }
-  }, [getToken])
+  const handleCheckSubdomain = useCallback(
+    async (subdomain: string): Promise<boolean> => {
+      const token = await getToken()
+      if (!token) return false
+      try {
+        const res = await api.websiteConfig.checkSubdomain(subdomain, token)
+        return (res as { data: { available: boolean } }).data.available
+      } catch {
+        return false
+      }
+    },
+    [getToken],
+  )
 
   const handleSectionEdit = useCallback((section: WebsiteSection) => {
     setEditingSection(section)
   }, [])
 
-  const handleSectionReorder = useCallback(async (reordered: { id: string; sortOrder: number }[]) => {
-    if (!weddingId) return
-    const token = await getToken()
-    if (!token) return
-    await api.websiteSections.reorder(weddingId, { sections: reordered }, token)
-    await refetch()
-  }, [weddingId, getToken, refetch])
+  const handleSectionReorder = useCallback(
+    async (reordered: { id: string; sortOrder: number }[]) => {
+      if (!weddingId) return
+      const token = await getToken()
+      if (!token) return
+      await api.websiteSections.reorder(weddingId, { sections: reordered }, token)
+      await refetch()
+    },
+    [weddingId, getToken, refetch],
+  )
 
   if (loading) {
     return (
@@ -163,8 +187,15 @@ export default function WebsitePage() {
           />
           {editingSection && (
             <div className="mt-4 rounded-xl border bg-white p-4">
-              <p className="text-sm text-gray-500">Section editor for &ldquo;{editingSection.title}&rdquo; — coming in next iteration</p>
-              <Button variant="outline" size="sm" className="mt-2" onClick={() => setEditingSection(null)}>
+              <p className="text-sm text-gray-500">
+                Section editor for &ldquo;{editingSection.title}&rdquo; — coming in next iteration
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setEditingSection(null)}
+              >
                 Close
               </Button>
             </div>

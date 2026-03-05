@@ -1,11 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import {
-  createGuestSchema,
-  updateGuestSchema,
-  guestFiltersSchema,
-} from '@planfortwo/validators'
+import { createGuestSchema, updateGuestSchema, guestFiltersSchema } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -33,10 +29,7 @@ guestsRoute.get(
   resolveWeddingMiddleware,
   zValidator('query', guestFiltersSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -47,33 +40,24 @@ guestsRoute.get(
 )
 
 // GET /guests/stats?weddingId=X — guest statistics
-guestsRoute.get(
-  '/stats',
-  resolveWeddingMiddleware,
-  async (c) => {
-    const weddingId = c.get('weddingId')
-    const stats = await guestService.getStats(weddingId)
-    return c.json({ data: stats })
-  },
-)
+guestsRoute.get('/stats', resolveWeddingMiddleware, async (c) => {
+  const weddingId = c.get('weddingId')
+  const stats = await guestService.getStats(weddingId)
+  return c.json({ data: stats })
+})
 
 // GET /guests/export?weddingId=X — CSV export (gated)
-guestsRoute.get(
-  '/export',
-  requireFeature('canDataExport'),
-  resolveWeddingMiddleware,
-  async (c) => {
-    const weddingId = c.get('weddingId')
-    const csv = await guestService.exportCsv(weddingId)
-    return new Response(csv, {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/csv',
-        'Content-Disposition': 'attachment; filename="guests.csv"',
-      },
-    })
-  },
-)
+guestsRoute.get('/export', requireFeature('canDataExport'), resolveWeddingMiddleware, async (c) => {
+  const weddingId = c.get('weddingId')
+  const csv = await guestService.exportCsv(weddingId)
+  return new Response(csv, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/csv',
+      'Content-Disposition': 'attachment; filename="guests.csv"',
+    },
+  })
+})
 
 // GET /guests/:id — single guest
 guestsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
@@ -82,10 +66,7 @@ guestsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const guest = await guestService.getGuest(guestId)
 
   if (!guest || guest.weddingId !== weddingId) {
-    return c.json(
-      { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
-      404,
-    )
+    return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
   }
 
   return c.json({ data: guest })
@@ -97,10 +78,7 @@ guestsRoute.post(
   requireGuestLimit,
   zValidator('json', createGuestSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -119,10 +97,7 @@ guestsRoute.put(
   requireFeature('canEditGuests'),
   zValidator('json', updateGuestSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -134,10 +109,7 @@ guestsRoute.put(
     const updated = await guestService.updateGuest(guestId, data, dbUserId, weddingId)
 
     if (!updated) {
-      return c.json(
-        { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
     }
 
     return c.json({ data: updated })
@@ -159,10 +131,7 @@ guestsRoute.delete(
       return c.json({ data: { success: true } })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json(
-        { error: message, code: 'DELETE_FAILED', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
     }
   },
 )
@@ -172,17 +141,21 @@ guestsRoute.post(
   '/bulk-import',
   requireFeature('canBulkImport'),
   requireGuestLimit,
-  zValidator('json', z.object({
-    weddingId: z.string().uuid(),
-    csvContent: z.string().min(1),
-  }), (result, c) => {
-    if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
-    }
-  }),
+  zValidator(
+    'json',
+    z.object({
+      weddingId: z.string().uuid(),
+      csvContent: z.string().min(1),
+    }),
+    (result, c) => {
+      if (!result.success) {
+        return c.json(
+          { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
+          400,
+        )
+      }
+    },
+  ),
   async (c) => {
     const { weddingId, csvContent } = c.req.valid('json')
     const dbUserId = c.get('dbUserId')
@@ -196,16 +169,20 @@ guestsRoute.post(
 guestsRoute.post(
   '/:id/tags',
   resolveWeddingMiddleware,
-  zValidator('json', z.object({
-    tagIds: z.array(z.string().uuid()).min(1).max(20),
-  }), (result, c) => {
-    if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
-    }
-  }),
+  zValidator(
+    'json',
+    z.object({
+      tagIds: z.array(z.string().uuid()).min(1).max(20),
+    }),
+    (result, c) => {
+      if (!result.success) {
+        return c.json(
+          { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
+          400,
+        )
+      }
+    },
+  ),
   async (c) => {
     const guestId = c.req.param('id')
     const weddingId = c.get('weddingId')
@@ -213,10 +190,7 @@ guestsRoute.post(
 
     const guest = await guestService.getGuest(guestId)
     if (!guest || guest.weddingId !== weddingId) {
-      return c.json(
-        { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
     }
 
     await guestService.setTagsForGuest(guestId, tagIds)
@@ -232,10 +206,7 @@ guestsRoute.delete('/:id/tags/:tagId', resolveWeddingMiddleware, async (c) => {
 
   const guest = await guestService.getGuest(guestId)
   if (!guest || guest.weddingId !== weddingId) {
-    return c.json(
-      { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
-      404,
-    )
+    return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
   }
 
   const { guestTagService } = await import('../services/guest-tags.js')

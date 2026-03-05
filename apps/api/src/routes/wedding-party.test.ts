@@ -86,6 +86,8 @@ vi.mock('../services/features.js', () => ({
 
 import { weddingPartyRoute } from './wedding-party.js'
 import { weddingPartyService } from '../services/wedding-party.js'
+import { userService } from '../services/users.js'
+import { weddingService } from '../services/weddings.js'
 
 const WEDDING_ID = 'a0000000-0000-0000-0000-000000000001'
 const MEMBER_ID = 'b0000000-0000-0000-0000-000000000001'
@@ -142,16 +144,28 @@ describe('Wedding Party Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
+    vi.mocked(userService.findByClerkId).mockResolvedValue({
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
+    })
+    vi.mocked(weddingService.verifyMembership).mockResolvedValue({
+      id: 'member-1',
+      weddingId: WEDDING_ID,
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
+    })
     vi.mocked(weddingPartyService.getById).mockResolvedValue(mockMember)
   })
 
   describe('GET /wedding-party', () => {
     it('should list all members', async () => {
       vi.mocked(weddingPartyService.list).mockResolvedValue([mockMember])
-      const res = await app.request(
-        `/wedding-party?weddingId=${WEDDING_ID}`,
-        { headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party?weddingId=${WEDDING_ID}`, {
+        headers: authHeaders,
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
@@ -162,10 +176,9 @@ describe('Wedding Party Routes', () => {
   describe('GET /wedding-party/:id', () => {
     it('should get a member by id', async () => {
       vi.mocked(weddingPartyService.getById).mockResolvedValue(mockMember)
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`,
-        { headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`, {
+        headers: authHeaders,
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.id).toBe(MEMBER_ID)
@@ -173,10 +186,9 @@ describe('Wedding Party Routes', () => {
 
     it('should return 404 when member not found', async () => {
       vi.mocked(weddingPartyService.getById).mockResolvedValue(null)
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`,
-        { headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`, {
+        headers: authHeaders,
+      })
       expect(res.status).toBe(404)
       const body = await res.json()
       expect(body.error).toBe('Member not found')
@@ -206,14 +218,11 @@ describe('Wedding Party Routes', () => {
     it('should update a member', async () => {
       const updated = { ...mockMember, name: 'Alice Johnson' }
       vi.mocked(weddingPartyService.update).mockResolvedValue(updated)
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: jsonHeaders,
-          body: JSON.stringify({ name: 'Alice Johnson' }),
-        },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: jsonHeaders,
+        body: JSON.stringify({ name: 'Alice Johnson' }),
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.name).toBe('Alice Johnson')
@@ -221,14 +230,11 @@ describe('Wedding Party Routes', () => {
 
     it('should return 404 when updating non-existent member', async () => {
       vi.mocked(weddingPartyService.update).mockResolvedValue(null)
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: jsonHeaders,
-          body: JSON.stringify({ name: 'Nobody' }),
-        },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: jsonHeaders,
+        body: JSON.stringify({ name: 'Nobody' }),
+      })
       expect(res.status).toBe(404)
     })
 
@@ -247,10 +253,10 @@ describe('Wedding Party Routes', () => {
   describe('DELETE /wedding-party/:id', () => {
     it('should delete a member', async () => {
       vi.mocked(weddingPartyService.delete).mockResolvedValue(true)
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders,
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.success).toBe(true)
@@ -258,10 +264,10 @@ describe('Wedding Party Routes', () => {
 
     it('should return 404 when deleting non-existent member', async () => {
       vi.mocked(weddingPartyService.delete).mockResolvedValue(false)
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders,
+      })
       expect(res.status).toBe(404)
     })
 
@@ -279,10 +285,9 @@ describe('Wedding Party Routes', () => {
   describe('GET /wedding-party/:id/tasks', () => {
     it('should list tasks for a member', async () => {
       vi.mocked(weddingPartyService.listTasks).mockResolvedValue([mockTask])
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}/tasks?weddingId=${WEDDING_ID}`,
-        { headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}/tasks?weddingId=${WEDDING_ID}`, {
+        headers: authHeaders,
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
@@ -293,18 +298,15 @@ describe('Wedding Party Routes', () => {
   describe('POST /wedding-party/:id/tasks', () => {
     it('should create a task', async () => {
       vi.mocked(weddingPartyService.createTask).mockResolvedValue(mockTask)
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}/tasks?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: jsonHeaders,
-          body: JSON.stringify({
-            memberId: MEMBER_ID,
-            weddingId: WEDDING_ID,
-            title: 'Pick up flowers',
-          }),
-        },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}/tasks?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify({
+          memberId: MEMBER_ID,
+          weddingId: WEDDING_ID,
+          title: 'Pick up flowers',
+        }),
+      })
       expect(res.status).toBe(201)
       const body = await res.json()
       expect(body.data.title).toBe('Pick up flowers')
@@ -315,14 +317,11 @@ describe('Wedding Party Routes', () => {
     it('should update a task', async () => {
       const updated = { ...mockTask, title: 'Pick up bouquets' }
       vi.mocked(weddingPartyService.updateTask).mockResolvedValue(updated)
-      const res = await app.request(
-        `/wedding-party/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: jsonHeaders,
-          body: JSON.stringify({ title: 'Pick up bouquets' }),
-        },
-      )
+      const res = await app.request(`/wedding-party/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: jsonHeaders,
+        body: JSON.stringify({ title: 'Pick up bouquets' }),
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.title).toBe('Pick up bouquets')
@@ -330,14 +329,11 @@ describe('Wedding Party Routes', () => {
 
     it('should return 404 when updating non-existent task', async () => {
       vi.mocked(weddingPartyService.updateTask).mockResolvedValue(null)
-      const res = await app.request(
-        `/wedding-party/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: jsonHeaders,
-          body: JSON.stringify({ title: 'No task' }),
-        },
-      )
+      const res = await app.request(`/wedding-party/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: jsonHeaders,
+        body: JSON.stringify({ title: 'No task' }),
+      })
       expect(res.status).toBe(404)
     })
   })
@@ -345,10 +341,10 @@ describe('Wedding Party Routes', () => {
   describe('DELETE /wedding-party/tasks/:taskId', () => {
     it('should delete a task', async () => {
       vi.mocked(weddingPartyService.deleteTask).mockResolvedValue(undefined)
-      const res = await app.request(
-        `/wedding-party/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders,
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.success).toBe(true)
@@ -358,10 +354,9 @@ describe('Wedding Party Routes', () => {
   describe('GET /wedding-party/:id/gifts', () => {
     it('should list gifts for a member', async () => {
       vi.mocked(weddingPartyService.listGifts).mockResolvedValue([mockGift])
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}/gifts?weddingId=${WEDDING_ID}`,
-        { headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}/gifts?weddingId=${WEDDING_ID}`, {
+        headers: authHeaders,
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
@@ -372,20 +367,17 @@ describe('Wedding Party Routes', () => {
   describe('POST /wedding-party/:id/gifts', () => {
     it('should create a gift', async () => {
       vi.mocked(weddingPartyService.createGift).mockResolvedValue(mockGift)
-      const res = await app.request(
-        `/wedding-party/${MEMBER_ID}/gifts?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: jsonHeaders,
-          body: JSON.stringify({
-            memberId: MEMBER_ID,
-            weddingId: WEDDING_ID,
-            title: 'Custom earrings',
-            description: 'Rose gold set',
-            budget: 5000,
-          }),
-        },
-      )
+      const res = await app.request(`/wedding-party/${MEMBER_ID}/gifts?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify({
+          memberId: MEMBER_ID,
+          weddingId: WEDDING_ID,
+          title: 'Custom earrings',
+          description: 'Rose gold set',
+          budget: 5000,
+        }),
+      })
       expect(res.status).toBe(201)
       const body = await res.json()
       expect(body.data.title).toBe('Custom earrings')
@@ -395,10 +387,10 @@ describe('Wedding Party Routes', () => {
   describe('DELETE /wedding-party/gifts/:giftId', () => {
     it('should delete a gift', async () => {
       vi.mocked(weddingPartyService.deleteGift).mockResolvedValue(undefined)
-      const res = await app.request(
-        `/wedding-party/gifts/${GIFT_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders },
-      )
+      const res = await app.request(`/wedding-party/gifts/${GIFT_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders,
+      })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.success).toBe(true)

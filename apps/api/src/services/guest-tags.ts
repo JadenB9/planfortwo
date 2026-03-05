@@ -28,10 +28,7 @@ export const guestTagService = {
   },
 
   async getTag(id: string) {
-    const [tag] = await db
-      .select()
-      .from(guestTags)
-      .where(eq(guestTags.id, id))
+    const [tag] = await db.select().from(guestTags).where(eq(guestTags.id, id))
     return tag ?? null
   },
 
@@ -58,20 +55,12 @@ export const guestTagService = {
   },
 
   async assignTag(guestId: string, tagId: string) {
-    await db
-      .insert(guestTagAssignments)
-      .values({ guestId, tagId })
-      .onConflictDoNothing()
+    await db.insert(guestTagAssignments).values({ guestId, tagId }).onConflictDoNothing()
   },
 
   async removeTag(guestId: string, tagId: string) {
     await db
       .delete(guestTagAssignments)
-      .where(
-        and(
-          eq(guestTagAssignments.guestId, guestId),
-          eq(guestTagAssignments.tagId, tagId),
-        ),
-      )
+      .where(and(eq(guestTagAssignments.guestId, guestId), eq(guestTagAssignments.tagId, tagId)))
   },
 }

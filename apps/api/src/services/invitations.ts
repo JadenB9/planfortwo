@@ -7,11 +7,7 @@ import { emailService } from './email.js'
 const INVITATION_EXPIRY_DAYS = 7
 
 export const invitationService = {
-  async createAndSend(
-    weddingId: string,
-    invitedByUserId: string,
-    email: string,
-  ) {
+  async createAndSend(weddingId: string, invitedByUserId: string, email: string) {
     const token = crypto.randomUUID()
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + INVITATION_EXPIRY_DAYS)
@@ -33,9 +29,7 @@ export const invitationService = {
     }
 
     const inviter = await userService.findById(invitedByUserId)
-    const inviterName = inviter
-      ? `${inviter.firstName} ${inviter.lastName}`
-      : 'Your partner'
+    const inviterName = inviter ? `${inviter.firstName} ${inviter.lastName}` : 'Your partner'
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
     const inviteUrl = `${appUrl}/invite/${token}`

@@ -27,10 +27,7 @@ weddingsRoute.get('/mine', async (c) => {
   const wedding = await weddingService.findByUserId(dbUserId)
 
   if (!wedding) {
-    return c.json(
-      { error: 'No wedding found', code: 'WEDDING_NOT_FOUND', statusCode: 404 },
-      404,
-    )
+    return c.json({ error: 'No wedding found', code: 'WEDDING_NOT_FOUND', statusCode: 404 }, 404)
   }
 
   const members = await weddingService.getMembers(wedding.id)
@@ -57,10 +54,7 @@ weddingsRoute.post(
   '/:id/onboarding',
   zValidator('json', onboardingSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -116,10 +110,7 @@ weddingsRoute.post(
   '/:id/invite-partner',
   zValidator('json', invitePartnerSchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -153,10 +144,7 @@ weddingsRoute.post(
         : 'EMAIL_SEND_FAILED'
 
       console.error('Partner invite failed:', message)
-      return c.json(
-        { error: message, code, statusCode: 500 },
-        500,
-      )
+      return c.json({ error: message, code, statusCode: 500 }, 500)
     }
   },
 )
@@ -175,27 +163,15 @@ weddingsRoute.post('/accept-invite/:token', async (c) => {
     const message = err instanceof Error ? err.message : 'Failed to accept invitation'
 
     if (message.includes('not found')) {
-      return c.json(
-        { error: message, code: 'INVITATION_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: message, code: 'INVITATION_NOT_FOUND', statusCode: 404 }, 404)
     }
     if (message.includes('expired')) {
-      return c.json(
-        { error: message, code: 'INVITATION_EXPIRED', statusCode: 410 },
-        410,
-      )
+      return c.json({ error: message, code: 'INVITATION_EXPIRED', statusCode: 410 }, 410)
     }
     if (message.includes('already been')) {
-      return c.json(
-        { error: message, code: 'INVITATION_USED', statusCode: 409 },
-        409,
-      )
+      return c.json({ error: message, code: 'INVITATION_USED', statusCode: 409 }, 409)
     }
 
-    return c.json(
-      { error: message, code: 'INVITATION_FAILED', statusCode: 400 },
-      400,
-    )
+    return c.json({ error: message, code: 'INVITATION_FAILED', statusCode: 400 }, 400)
   }
 })

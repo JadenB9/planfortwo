@@ -37,7 +37,8 @@ ceremonyRoute.post(
   '/outlines',
   resolveWeddingMiddleware,
   zValidator('json', createCeremonyOutlineSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -50,7 +51,8 @@ ceremonyRoute.put(
   '/outlines/:id',
   resolveWeddingMiddleware,
   zValidator('json', updateCeremonyOutlineSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const id = c.req.param('id')
@@ -82,7 +84,8 @@ ceremonyRoute.put(
   '/vows',
   resolveWeddingMiddleware,
   zValidator('json', updateVowSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const weddingId = c.get('weddingId')
@@ -104,7 +107,8 @@ ceremonyRoute.post(
   '/processional',
   resolveWeddingMiddleware,
   zValidator('json', createProcessionalEntrySchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -117,7 +121,8 @@ ceremonyRoute.put(
   '/processional/:id',
   resolveWeddingMiddleware,
   zValidator('json', updateProcessionalEntrySchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const id = c.req.param('id')

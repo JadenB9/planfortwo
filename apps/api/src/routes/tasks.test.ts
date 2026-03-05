@@ -126,10 +126,17 @@ describe('Task Routes', () => {
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
 
     vi.mocked(userService.findByClerkId).mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     })
     vi.mocked(weddingService.verifyMembership).mockResolvedValue({
-      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: WEDDING_ID,
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     })
 
     // Reset to full-tier by default
@@ -155,9 +162,7 @@ describe('Task Routes', () => {
 
   describe('GET /tasks', () => {
     it('should return task list', async () => {
-      const mockTasks = [
-        { id: TASK_ID, title: 'Book venue', weddingId: WEDDING_ID },
-      ]
+      const mockTasks = [{ id: TASK_ID, title: 'Book venue', weddingId: WEDDING_ID }]
       mockedChecklistService.listTasks.mockResolvedValue(mockTasks as never)
 
       const app = createApp()
@@ -191,6 +196,7 @@ describe('Task Routes', () => {
     it('should return task with details', async () => {
       const mockTask = {
         id: TASK_ID,
+        weddingId: WEDDING_ID,
         title: 'Book venue',
         category: { id: CATEGORY_ID, name: 'Venue' },
         notes: [],
@@ -313,10 +319,10 @@ describe('Task Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/${TASK_ID}/complete?weddingId=${WEDDING_ID}`,
-        { method: 'PATCH', headers: authHeaders() },
-      )
+      const res = await app.request(`/tasks/${TASK_ID}/complete?weddingId=${WEDDING_ID}`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -327,10 +333,10 @@ describe('Task Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/${TASK_ID}/complete?weddingId=${WEDDING_ID}`,
-        { method: 'PATCH', headers: authHeaders() },
-      )
+      const res = await app.request(`/tasks/${TASK_ID}/complete?weddingId=${WEDDING_ID}`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -346,14 +352,11 @@ describe('Task Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/${TASK_ID}/reorder?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PATCH',
-          headers: authHeaders(),
-          body: JSON.stringify({ sortOrder: 5 }),
-        },
-      )
+      const res = await app.request(`/tasks/${TASK_ID}/reorder?weddingId=${WEDDING_ID}`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ sortOrder: 5 }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -364,14 +367,11 @@ describe('Task Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/${TASK_ID}/reorder?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PATCH',
-          headers: authHeaders(),
-          body: JSON.stringify({ sortOrder: 5 }),
-        },
-      )
+      const res = await app.request(`/tasks/${TASK_ID}/reorder?weddingId=${WEDDING_ID}`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ sortOrder: 5 }),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -384,10 +384,10 @@ describe('Task Routes', () => {
       mockedChecklistService.deleteTask.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -398,10 +398,10 @@ describe('Task Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -421,14 +421,11 @@ describe('Task Routes', () => {
       }
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/bulk-reorder?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify(reorderBody),
-        },
-      )
+      const res = await app.request(`/tasks/bulk-reorder?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(reorderBody),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -446,14 +443,11 @@ describe('Task Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/${TASK_ID}/notes?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ content: 'Check availability' }),
-        },
-      )
+      const res = await app.request(`/tasks/${TASK_ID}/notes?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ content: 'Check availability' }),
+      })
 
       expect(res.status).toBe(201)
       const body = await res.json()
@@ -464,14 +458,11 @@ describe('Task Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/tasks/${TASK_ID}/notes?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ content: 'Check availability' }),
-        },
-      )
+      const res = await app.request(`/tasks/${TASK_ID}/notes?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ content: 'Check availability' }),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()

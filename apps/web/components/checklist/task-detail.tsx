@@ -20,7 +20,14 @@ const PRIORITY_OPTIONS = [
   { value: 'optional', label: 'Optional' },
 ] as const
 
-export function TaskDetail({ taskId, weddingId, features, categories, onClose, onUpdated }: TaskDetailProps) {
+export function TaskDetail({
+  taskId,
+  weddingId,
+  features,
+  categories,
+  onClose,
+  onUpdated,
+}: TaskDetailProps) {
   const { getToken } = useAuth()
   const [task, setTask] = useState<TaskWithDetails | null>(null)
   const [loading, setLoading] = useState(true)
@@ -44,7 +51,7 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
       setTask(data)
       setEditTitle(data.title)
       setEditDescription(data.description ?? '')
-      setEditDueDate(data.dueDate ? new Date(data.dueDate).toISOString().split('T')[0] ?? '' : '')
+      setEditDueDate(data.dueDate ? (new Date(data.dueDate).toISOString().split('T')[0] ?? '') : '')
       setEditCategoryId(data.categoryId)
       setEditPriority(data.priority)
     } catch {
@@ -124,20 +131,28 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
           <h2 className="font-serif text-lg font-semibold text-gray-900">Task Details</h2>
           <button onClick={onClose} className="text-gray-400 transition-colors hover:text-gray-600">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-wedding-200 border-t-wedding-600" />
+            <div className="border-wedding-200 border-t-wedding-600 h-6 w-6 animate-spin rounded-full border-2" />
           </div>
         ) : task ? (
           <div className="space-y-6 p-6">
             <div className="space-y-4">
               <div>
-                <label htmlFor="detail-title" className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="detail-title"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Title
                 </label>
                 <input
@@ -146,12 +161,15 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   disabled={!features.canEditChecklist}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-500"
                 />
               </div>
 
               <div>
-                <label htmlFor="detail-desc" className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="detail-desc"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Description
                 </label>
                 <textarea
@@ -160,13 +178,16 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
                   onChange={(e) => setEditDescription(e.target.value)}
                   disabled={!features.canEditChecklist}
                   rows={3}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="detail-due" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="detail-due"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Due Date
                   </label>
                   <input
@@ -175,12 +196,15 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
                     value={editDueDate}
                     onChange={(e) => setEditDueDate(e.target.value)}
                     disabled={!features.canEditChecklist}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20 disabled:bg-gray-50 disabled:text-gray-500"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-500"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="detail-cat" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="detail-cat"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Category
                   </label>
                   <select
@@ -188,7 +212,7 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
                     value={editCategoryId}
                     onChange={(e) => setEditCategoryId(e.target.value)}
                     disabled={!features.canEditChecklist}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20 disabled:bg-gray-50 disabled:text-gray-500"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-500"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -200,7 +224,10 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
               </div>
 
               <div>
-                <label htmlFor="detail-priority" className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="detail-priority"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Priority
                 </label>
                 <select
@@ -208,7 +235,7 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
                   value={editPriority}
                   onChange={(e) => setEditPriority(e.target.value)}
                   disabled={!features.canEditChecklist}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-500"
                 >
                   {PRIORITY_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -222,7 +249,7 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
                 <button
                   onClick={handleSave}
                   disabled={saving || !editTitle.trim()}
-                  className="w-full rounded-xl bg-wedding-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="bg-wedding-600 hover:bg-wedding-700 w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -263,7 +290,7 @@ export function TaskDetail({ taskId, weddingId, features, categories, onClose, o
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') void handleAddNote()
                     }}
-                    className="flex-1 rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 flex-1 rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                   />
                   <button
                     onClick={handleAddNote}

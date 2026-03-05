@@ -1,10 +1,28 @@
-import { boolean, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { weddings } from './weddings'
 
 export const partyRoleEnum = pgEnum('party_role', [
-  'maid_of_honor', 'best_man', 'bridesmaid', 'groomsman',
-  'flower_girl', 'ring_bearer', 'usher', 'reader',
-  'officiant', 'musician', 'mc', 'custom',
+  'maid_of_honor',
+  'best_man',
+  'bridesmaid',
+  'groomsman',
+  'flower_girl',
+  'ring_bearer',
+  'usher',
+  'reader',
+  'officiant',
+  'musician',
+  'mc',
+  'custom',
 ])
 
 export const partySideEnum = pgEnum('party_side', ['bride', 'groom'])

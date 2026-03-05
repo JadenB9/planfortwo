@@ -102,11 +102,25 @@ describe('Household Routes', () => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
     vi.mocked(userService.findByClerkId).mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     })
     vi.mocked(weddingService.verifyMembership).mockResolvedValue({
-      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: WEDDING_ID,
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     })
+    mockedHouseholdService.getHousehold.mockResolvedValue({
+      id: HOUSEHOLD_ID,
+      weddingId: WEDDING_ID,
+      name: 'The Smiths',
+      rsvpCode: 'SMITHS2026',
+      guests: [],
+    } as never)
   })
 
   describe('GET /households', () => {
@@ -139,6 +153,7 @@ describe('Household Routes', () => {
     it('should return a household with guests', async () => {
       const mockHousehold = {
         id: HOUSEHOLD_ID,
+        weddingId: WEDDING_ID,
         name: 'The Smiths',
         rsvpCode: 'SMITHS2026',
         guests: [],
@@ -250,10 +265,10 @@ describe('Household Routes', () => {
       mockedHouseholdService.deleteHousehold.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/households/${HOUSEHOLD_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/households/${HOUSEHOLD_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()

@@ -10,7 +10,12 @@ interface PublishToggleProps {
   onUnpublish: () => void
 }
 
-export function PublishToggle({ isPublished, subdomain, onPublish, onUnpublish }: PublishToggleProps) {
+export function PublishToggle({
+  isPublished,
+  subdomain,
+  onPublish,
+  onUnpublish,
+}: PublishToggleProps) {
   const siteUrl = subdomain ? `/w/${subdomain}` : null
 
   return (
@@ -27,7 +32,12 @@ export function PublishToggle({ isPublished, subdomain, onPublish, onUnpublish }
               {isPublished ? 'Published' : 'Unpublished'}
             </p>
             {isPublished && siteUrl && (
-              <a href={siteUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-wedding-600 hover:underline">
+              <a
+                href={siteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-wedding-600 text-xs hover:underline"
+              >
                 {siteUrl}
               </a>
             )}

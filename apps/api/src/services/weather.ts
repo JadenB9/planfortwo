@@ -32,7 +32,11 @@ const WEATHER_CODES: Record<number, string> = {
 }
 
 export const weatherService = {
-  async getForecast(latitude: number, longitude: number, days: number = 7): Promise<WeatherForecast[]> {
+  async getForecast(
+    latitude: number,
+    longitude: number,
+    days: number = 7,
+  ): Promise<WeatherForecast[]> {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&timezone=auto&forecast_days=${Math.min(days, 16)}`
 
     const response = await fetch(url)
@@ -40,7 +44,7 @@ export const weatherService = {
       throw new Error(`Weather API error: ${response.status}`)
     }
 
-    const data = await response.json() as {
+    const data = (await response.json()) as {
       daily: {
         time: string[]
         temperature_2m_max: number[]

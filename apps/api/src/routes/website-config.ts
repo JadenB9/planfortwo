@@ -81,7 +81,10 @@ websiteConfigRoute.put(
     const id = c.req.param('id')
     const weddingId = c.req.query('weddingId')
     if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+      return c.json(
+        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+        400,
+      )
     }
 
     const data = c.req.valid('json')
@@ -105,7 +108,10 @@ websiteConfigRoute.post(
     const id = c.req.param('id')
     const weddingId = c.req.query('weddingId')
     if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+      return c.json(
+        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+        400,
+      )
     }
 
     const updated = await websiteConfigService.publish(id, weddingId, c.get('dbUserId'))
@@ -126,7 +132,10 @@ websiteConfigRoute.post(
     const id = c.req.param('id')
     const weddingId = c.req.query('weddingId')
     if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+      return c.json(
+        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+        400,
+      )
     }
 
     const updated = await websiteConfigService.unpublish(id, weddingId, c.get('dbUserId'))
@@ -152,7 +161,10 @@ websiteConfigRoute.post(
     const id = c.req.param('id')
     const weddingId = c.req.query('weddingId')
     if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+      return c.json(
+        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+        400,
+      )
     }
 
     const { password } = c.req.valid('json')
@@ -167,14 +179,21 @@ websiteConfigRoute.post(
 // POST /website-config/verify-password (public)
 websiteConfigRoute.post(
   '/verify-password',
-  zValidator('json', z.object({
-    subdomain: z.string().min(1),
-    password: z.string().min(1),
-  }), (result, c) => {
-    if (!result.success) {
-      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
-    }
-  }),
+  zValidator(
+    'json',
+    z.object({
+      subdomain: z.string().min(1),
+      password: z.string().min(1),
+    }),
+    (result, c) => {
+      if (!result.success) {
+        return c.json(
+          { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
+          400,
+        )
+      }
+    },
+  ),
   async (c) => {
     const { subdomain, password } = c.req.valid('json')
     const valid = await websiteConfigService.verifyPassword(subdomain, password)
@@ -183,22 +202,17 @@ websiteConfigRoute.post(
 )
 
 // GET /website-config/check-subdomain?subdomain=X
-websiteConfigRoute.get(
-  '/check-subdomain',
-  authMiddleware,
-  resolveUserMiddleware,
-  async (c) => {
-    const subdomain = c.req.query('subdomain')
-    if (!subdomain) {
-      return c.json({ error: 'Subdomain required', code: 'MISSING_SUBDOMAIN', statusCode: 400 }, 400)
-    }
+websiteConfigRoute.get('/check-subdomain', authMiddleware, resolveUserMiddleware, async (c) => {
+  const subdomain = c.req.query('subdomain')
+  if (!subdomain) {
+    return c.json({ error: 'Subdomain required', code: 'MISSING_SUBDOMAIN', statusCode: 400 }, 400)
+  }
 
-    const parsed = subdomainSchema.safeParse(subdomain)
-    if (!parsed.success) {
-      return c.json({ data: { available: false, reason: 'Invalid format' } })
-    }
+  const parsed = subdomainSchema.safeParse(subdomain)
+  if (!parsed.success) {
+    return c.json({ data: { available: false, reason: 'Invalid format' } })
+  }
 
-    const available = await websiteConfigService.checkSubdomain(subdomain)
-    return c.json({ data: { available } })
-  },
-)
+  const available = await websiteConfigService.checkSubdomain(subdomain)
+  return c.json({ data: { available } })
+})

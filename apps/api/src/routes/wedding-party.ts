@@ -43,7 +43,8 @@ weddingPartyRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 weddingPartyRoute.post(
   '/',
   zValidator('json', createPartyMemberSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -57,14 +58,16 @@ weddingPartyRoute.put(
   '/:id',
   resolveWeddingMiddleware,
   zValidator('json', updatePartyMemberSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const memberId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await weddingPartyService.update(memberId, weddingId, data)
-    if (!updated) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
@@ -73,7 +76,8 @@ weddingPartyRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const memberId = c.req.param('id')
   const weddingId = c.get('weddingId')
   const deleted = await weddingPartyService.delete(memberId, weddingId)
-  if (!deleted) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  if (!deleted)
+    return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
 
@@ -90,13 +94,15 @@ weddingPartyRoute.post(
   '/:id/tasks',
   resolveWeddingMiddleware,
   zValidator('json', createPartyTaskSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const memberId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const member = await weddingPartyService.getById(memberId, weddingId)
-    if (!member) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!member)
+      return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
     const task = await weddingPartyService.createTask(data)
     return c.json({ data: task }, 201)
@@ -107,13 +113,15 @@ weddingPartyRoute.put(
   '/tasks/:taskId',
   resolveWeddingMiddleware,
   zValidator('json', updatePartyTaskSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const taskId = c.req.param('taskId')
     const data = c.req.valid('json')
     const updated = await weddingPartyService.updateTask(taskId, data)
-    if (!updated) return c.json({ error: 'Task not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Task not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
@@ -137,13 +145,15 @@ weddingPartyRoute.post(
   '/:id/gifts',
   resolveWeddingMiddleware,
   zValidator('json', createPartyGiftSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const memberId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const member = await weddingPartyService.getById(memberId, weddingId)
-    if (!member) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!member)
+      return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
     const gift = await weddingPartyService.createGift(data)
     return c.json({ data: gift }, 201)

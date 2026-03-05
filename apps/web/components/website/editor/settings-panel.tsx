@@ -5,7 +5,13 @@ import type { WebsiteConfig } from '@planfortwo/types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 
 interface SettingsPanelProps {
@@ -36,7 +42,10 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
         <div className="flex gap-2">
           <Input
             value={subdomain}
-            onChange={(e) => { setSubdomain(e.target.value); setSubdomainAvailable(null) }}
+            onChange={(e) => {
+              setSubdomain(e.target.value)
+              setSubdomainAvailable(null)
+            }}
             placeholder="your-wedding"
           />
           <Button variant="outline" onClick={handleCheckSubdomain} disabled={checking}>
@@ -61,7 +70,9 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
           value={config.privacyMode}
           onValueChange={(value) => onUpdate({ privacyMode: value })}
         >
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="public">Public</SelectItem>
             <SelectItem value="password">Password Protected</SelectItem>

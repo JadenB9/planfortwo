@@ -58,7 +58,8 @@ export const budgetCategoryService = {
     if (data.name !== undefined) updateData.name = data.name
     if (data.icon !== undefined) updateData.icon = data.icon
     if (data.color !== undefined) updateData.color = data.color
-    if (data.allocatedAmount !== undefined) updateData.allocatedAmount = data.allocatedAmount.toString()
+    if (data.allocatedAmount !== undefined)
+      updateData.allocatedAmount = data.allocatedAmount.toString()
 
     const [updated] = await db
       .update(budgetCategories)

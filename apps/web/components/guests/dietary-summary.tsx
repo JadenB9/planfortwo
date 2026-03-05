@@ -34,7 +34,7 @@ export function DietarySummaryCard({ summary }: DietarySummaryCardProps) {
         {items.map((item) => (
           <div key={item.label} className="flex items-center justify-between text-sm">
             <span className="text-gray-600">{item.label}</span>
-            <span className="rounded-full bg-wedding-50 px-2 py-0.5 text-xs font-semibold text-wedding-700">
+            <span className="bg-wedding-50 text-wedding-700 rounded-full px-2 py-0.5 text-xs font-semibold">
               {item.count}
             </span>
           </div>

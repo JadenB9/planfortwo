@@ -196,9 +196,7 @@ describe('RSVP Routes', () => {
 
   describe('POST /rsvp/lookup-by-name (public)', () => {
     it('should lookup by name', async () => {
-      const mockGuests = [
-        { id: GUEST_ID, firstName: 'Alice', lastName: 'Smith' },
-      ]
+      const mockGuests = [{ id: GUEST_ID, firstName: 'Alice', lastName: 'Smith' }]
       mockedRsvpService.lookupByName.mockResolvedValue(mockGuests as never)
 
       const app = createApp()
@@ -262,9 +260,7 @@ describe('RSVP Routes', () => {
         }),
       })
 
-      mockedRsvpService.submitRsvp.mockRejectedValue(
-        new Error('RSVP deadline has passed'),
-      )
+      mockedRsvpService.submitRsvp.mockRejectedValue(new Error('RSVP deadline has passed'))
 
       const app = createApp()
       const res = await app.request('/rsvp/submit', {
@@ -348,18 +344,14 @@ describe('RSVP Routes', () => {
         }),
       })
 
-      mockedRsvpService.submitBatchRsvp.mockRejectedValue(
-        new Error('RSVP deadline has passed'),
-      )
+      mockedRsvpService.submitBatchRsvp.mockRejectedValue(new Error('RSVP deadline has passed'))
 
       const app = createApp()
       const res = await app.request('/rsvp/submit-batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          submissions: [
-            { guestId: GUEST_ID, rsvpStatus: 'accepted' },
-          ],
+          submissions: [{ guestId: GUEST_ID, rsvpStatus: 'accepted' }],
         }),
       })
 

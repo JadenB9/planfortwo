@@ -17,18 +17,21 @@ export default function GuestImportPage() {
   const weddingId = weddingData?.wedding.id ?? null
   const { features, loading: featuresLoading } = useFeatures(weddingId)
 
-  const handleImport = useCallback(async (file: File): Promise<CsvImportResult> => {
-    if (!weddingId) throw new Error('No wedding found')
-    const token = await getToken()
-    if (!token) throw new Error('Not authenticated')
-    const { data } = await api.guests.bulkImport(weddingId, file, token)
-    return data
-  }, [weddingId, getToken])
+  const handleImport = useCallback(
+    async (file: File): Promise<CsvImportResult> => {
+      if (!weddingId) throw new Error('No wedding found')
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+      const { data } = await api.guests.bulkImport(weddingId, file, token)
+      return data
+    },
+    [weddingId, getToken],
+  )
 
   if (weddingLoading || featuresLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -51,12 +54,9 @@ export default function GuestImportPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl animate-fade-in">
+    <div className="animate-fade-in mx-auto max-w-2xl">
       <div className="mb-6">
-        <Link
-          href="/guests"
-          className="text-sm text-wedding-600 hover:text-wedding-700"
-        >
+        <Link href="/guests" className="text-wedding-600 hover:text-wedding-700 text-sm">
           &larr; Back to Guest List
         </Link>
         <h1 className="mt-2 font-serif text-3xl font-bold text-gray-900">Import Guests</h1>
@@ -65,10 +65,7 @@ export default function GuestImportPage() {
         </p>
       </div>
 
-      <ImportWizard
-        onImport={handleImport}
-        onClose={() => router.push('/guests')}
-      />
+      <ImportWizard onImport={handleImport} onClose={() => router.push('/guests')} />
     </div>
   )
 }

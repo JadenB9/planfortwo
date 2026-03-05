@@ -81,6 +81,8 @@ vi.mock('../services/features.js', () => ({
 import { budgetItemsRoute } from './budget-items.js'
 import { budgetItemService } from '../services/budget-items.js'
 import { featureService } from '../services/features.js'
+import { userService } from '../services/users.js'
+import { weddingService } from '../services/weddings.js'
 
 const mockedService = vi.mocked(budgetItemService)
 const mockedFeatureService = vi.mocked(featureService)
@@ -194,6 +196,19 @@ describe('Budget Item Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
+    vi.mocked(userService.findByClerkId).mockResolvedValue({
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
+    })
+    vi.mocked(weddingService.verifyMembership).mockResolvedValue({
+      id: 'member-1',
+      weddingId: WEDDING_ID,
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
+    })
     mockedFeatureService.getFeatures.mockResolvedValue(FULL_GATES)
   })
 
@@ -209,10 +224,10 @@ describe('Budget Item Routes', () => {
       mockedService.list.mockResolvedValue(mockResult as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-items?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -254,10 +269,10 @@ describe('Budget Item Routes', () => {
       mockedService.list.mockResolvedValue(mockResult as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items?weddingId=${WEDDING_ID}&paymentStatus=paid`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-items?weddingId=${WEDDING_ID}&paymentStatus=paid`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       expect(mockedService.list).toHaveBeenCalledWith(
@@ -276,10 +291,10 @@ describe('Budget Item Routes', () => {
       mockedService.list.mockResolvedValue(mockResult as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items?weddingId=${WEDDING_ID}&payer=bride_family`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-items?weddingId=${WEDDING_ID}&payer=bride_family`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       expect(mockedService.list).toHaveBeenCalledWith(
@@ -298,10 +313,10 @@ describe('Budget Item Routes', () => {
       mockedService.list.mockResolvedValue(mockResult as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items?weddingId=${WEDDING_ID}&page=2&pageSize=10`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-items?weddingId=${WEDDING_ID}&page=2&pageSize=10`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -316,10 +331,10 @@ describe('Budget Item Routes', () => {
       mockedService.get.mockResolvedValue(mockItem as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -331,10 +346,10 @@ describe('Budget Item Routes', () => {
       mockedService.get.mockResolvedValue(null)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -369,14 +384,11 @@ describe('Budget Item Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify(validBody),
-        },
-      )
+      const res = await app.request(`/budget-items?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(validBody),
+      })
 
       expect(res.status).toBe(201)
       const body = await res.json()
@@ -388,14 +400,11 @@ describe('Budget Item Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify(validBody),
-        },
-      )
+      const res = await app.request(`/budget-items?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(validBody),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -411,14 +420,11 @@ describe('Budget Item Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ description: 'Updated deposit' }),
-        },
-      )
+      const res = await app.request(`/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ description: 'Updated deposit' }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -433,14 +439,11 @@ describe('Budget Item Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ paymentStatus: 'paid' }),
-        },
-      )
+      const res = await app.request(`/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ paymentStatus: 'paid' }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -452,14 +455,11 @@ describe('Budget Item Routes', () => {
       mockedService.update.mockResolvedValue(null)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ description: 'Updated' }),
-        },
-      )
+      const res = await app.request(`/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ description: 'Updated' }),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -472,10 +472,10 @@ describe('Budget Item Routes', () => {
       mockedService.delete.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -486,10 +486,10 @@ describe('Budget Item Routes', () => {
       mockedService.delete.mockRejectedValue(new Error('Budget item not found'))
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-items/${ITEM_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -505,18 +505,15 @@ describe('Budget Item Routes', () => {
       })
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-items/${ITEM_ID}/upload-url?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            weddingId: WEDDING_ID,
-            fileName: 'receipt.pdf',
-            contentType: 'application/pdf',
-          }),
-        },
-      )
+      const res = await app.request(`/budget-items/${ITEM_ID}/upload-url?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          fileName: 'receipt.pdf',
+          contentType: 'application/pdf',
+        }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()

@@ -57,7 +57,8 @@ export const emailCampaignService = {
     if (data.subject !== undefined) updateData.subject = data.subject
     if (data.body !== undefined) updateData.body = data.body
     if (data.templateType !== undefined) updateData.templateType = data.templateType
-    if (data.scheduledAt !== undefined) updateData.scheduledAt = data.scheduledAt ? new Date(data.scheduledAt) : null
+    if (data.scheduledAt !== undefined)
+      updateData.scheduledAt = data.scheduledAt ? new Date(data.scheduledAt) : null
     if (data.recipientFilter !== undefined) updateData.recipientFilter = data.recipientFilter
 
     const [updated] = await db
@@ -77,10 +78,7 @@ export const emailCampaignService = {
   },
 
   async getRecipients(campaignId: string) {
-    return db
-      .select()
-      .from(emailRecipients)
-      .where(eq(emailRecipients.campaignId, campaignId))
+    return db.select().from(emailRecipients).where(eq(emailRecipients.campaignId, campaignId))
   },
 
   async addRecipient(campaignId: string, email: string, name: string, guestId?: string) {

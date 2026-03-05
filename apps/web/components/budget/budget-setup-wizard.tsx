@@ -33,10 +33,19 @@ const DEFAULT_ALLOCATIONS: Omit<CategoryAllocation, 'amount'>[] = [
 ]
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount)
 }
 
-export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClose }: BudgetSetupWizardProps) {
+export function BudgetSetupWizard({
+  weddingId,
+  currentBudget,
+  onComplete,
+  onClose,
+}: BudgetSetupWizardProps) {
   const { getToken } = useAuth()
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [totalBudget, setTotalBudget] = useState(currentBudget?.toString() ?? '')
@@ -61,7 +70,7 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
 
   function handleAllocationChange(index: number, newAmount: string) {
     setAllocations((prev) =>
-      prev.map((item, i) => i === index ? { ...item, amount: Number(newAmount) || 0 } : item),
+      prev.map((item, i) => (i === index ? { ...item, amount: Number(newAmount) || 0 } : item)),
     )
   }
 
@@ -93,7 +102,12 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
           <h2 className="font-serif text-xl font-semibold text-gray-900">Set Up Your Budget</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -112,7 +126,8 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
         {step === 1 && (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              What is your total wedding budget? We will suggest category allocations based on common wedding spending patterns.
+              What is your total wedding budget? We will suggest category allocations based on
+              common wedding spending patterns.
             </p>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Total Budget</label>
@@ -132,7 +147,7 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
               <button
                 onClick={handleSetBudget}
                 disabled={!totalBudget || Number(totalBudget) <= 0}
-                className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-wedding-700 disabled:opacity-50"
+                className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
               >
                 Next
               </button>
@@ -145,7 +160,9 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-600">Adjust allocations to fit your priorities.</p>
-              <p className={`text-sm font-medium ${getAllocatedTotal() > Number(totalBudget) ? 'text-red-600' : 'text-gray-600'}`}>
+              <p
+                className={`text-sm font-medium ${getAllocatedTotal() > Number(totalBudget) ? 'text-red-600' : 'text-gray-600'}`}
+              >
                 {formatCurrency(getAllocatedTotal())} / {formatCurrency(Number(totalBudget))}
               </p>
             </div>
@@ -156,7 +173,9 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
                   <span className="w-6 text-center">{alloc.icon}</span>
                   <span className="w-36 text-sm text-gray-700">{alloc.name}</span>
                   <div className="relative flex-1">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">$</span>
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                      $
+                    </span>
                     <input
                       type="number"
                       value={alloc.amount}
@@ -166,7 +185,10 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
                     />
                   </div>
                   <span className="w-10 text-right text-xs text-gray-500">
-                    {Number(totalBudget) > 0 ? Math.round((alloc.amount / Number(totalBudget)) * 100) : 0}%
+                    {Number(totalBudget) > 0
+                      ? Math.round((alloc.amount / Number(totalBudget)) * 100)
+                      : 0}
+                    %
                   </span>
                 </div>
               ))}
@@ -181,7 +203,7 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
               </button>
               <button
                 onClick={() => setStep(3)}
-                className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-wedding-700"
+                className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
               >
                 Review
               </button>
@@ -197,7 +219,9 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">Total Budget</span>
-                <span className="text-lg font-bold text-gray-900">{formatCurrency(Number(totalBudget))}</span>
+                <span className="text-lg font-bold text-gray-900">
+                  {formatCurrency(Number(totalBudget))}
+                </span>
               </div>
               <div className="space-y-1.5">
                 {allocations.map((alloc) => (
@@ -205,7 +229,9 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
                     <span className="text-gray-600">
                       {alloc.icon} {alloc.name}
                     </span>
-                    <span className="font-medium text-gray-900">{formatCurrency(alloc.amount)}</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(alloc.amount)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -223,7 +249,7 @@ export function BudgetSetupWizard({ weddingId, currentBudget, onComplete, onClos
               <button
                 onClick={handleConfirm}
                 disabled={saving}
-                className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-wedding-700 disabled:opacity-50"
+                className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
               >
                 {saving ? 'Setting up...' : 'Confirm & Create'}
               </button>

@@ -5,7 +5,11 @@ interface SplitCostsProps {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount)
 }
 
 const PAYER_GROUPS = [
@@ -16,7 +20,8 @@ const PAYER_GROUPS = [
 ]
 
 export function SplitCosts({ splits }: SplitCostsProps) {
-  const grandTotal = splits.couple.total + splits.brideFamily.total + splits.groomFamily.total + splits.other.total
+  const grandTotal =
+    splits.couple.total + splits.brideFamily.total + splits.groomFamily.total + splits.other.total
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6">
@@ -65,7 +70,9 @@ export function SplitCosts({ splits }: SplitCostsProps) {
           <div className="border-t border-gray-200 pt-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-900">Total</span>
-              <span className="text-sm font-semibold text-gray-900">{formatCurrency(grandTotal)}</span>
+              <span className="text-sm font-semibold text-gray-900">
+                {formatCurrency(grandTotal)}
+              </span>
             </div>
           </div>
         </div>

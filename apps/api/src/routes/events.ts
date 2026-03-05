@@ -42,7 +42,8 @@ eventsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 eventsRoute.post(
   '/',
   zValidator('json', createEventSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -56,14 +57,16 @@ eventsRoute.put(
   '/:id',
   resolveWeddingMiddleware,
   zValidator('json', updateEventSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const eventId = c.req.param('id')
     const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await eventService.update(eventId, weddingId, data)
-    if (!updated) return c.json({ error: 'Event not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Event not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )
@@ -89,7 +92,8 @@ eventsRoute.post(
   '/:id/timeline',
   resolveWeddingMiddleware,
   zValidator('json', createTimelineEntrySchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const eventId = c.req.param('id')
@@ -106,13 +110,15 @@ eventsRoute.put(
   '/timeline/:entryId',
   resolveWeddingMiddleware,
   zValidator('json', updateTimelineEntrySchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const entryId = c.req.param('entryId')
     const data = c.req.valid('json')
     const updated = await eventService.updateTimelineEntry(entryId, data)
-    if (!updated) return c.json({ error: 'Entry not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    if (!updated)
+      return c.json({ error: 'Entry not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
 )

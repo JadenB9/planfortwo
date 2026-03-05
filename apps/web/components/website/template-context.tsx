@@ -21,7 +21,12 @@ interface TemplateProviderProps {
   children: ReactNode
 }
 
-export function TemplateProvider({ templateId, customColors, fontPairId, children }: TemplateProviderProps) {
+export function TemplateProvider({
+  templateId,
+  customColors,
+  fontPairId,
+  children,
+}: TemplateProviderProps) {
   const styles = useMemo(() => {
     const template = getTemplate(templateId)
     const colors = customColors ?? template.defaultColors
@@ -39,9 +44,7 @@ export function TemplateProvider({ templateId, customColors, fontPairId, childre
 
   return (
     <TemplateContext.Provider value={styles}>
-      <div style={styles.cssVariables as React.CSSProperties}>
-        {children}
-      </div>
+      <div style={styles.cssVariables as React.CSSProperties}>{children}</div>
     </TemplateContext.Provider>
   )
 }

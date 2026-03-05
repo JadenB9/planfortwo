@@ -52,13 +52,30 @@ vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
       tier: 'full',
-      canAddTasks: true, canEditChecklist: true, canDeleteTasks: true, canReorderTasks: true,
-      canCustomizeCategories: true, canAddNotes: true, canAddAttachments: true,
-      maxGuests: null, canEditGuests: true, canDeleteGuests: true, canBulkImport: true,
-      canRsvp: true, canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -90,19 +107,30 @@ describe('Website Config Routes', () => {
   describe('GET /website-config', () => {
     it('should return config for a wedding', async () => {
       mockedService.get.mockResolvedValue({
-        id: CONFIG_ID, weddingId: WEDDING_ID, templateId: 'classic',
-        customColors: null, fontPair: 'playfair-lato', privacyMode: 'public',
-        passwordHash: null, subdomain: 'jane-john', customDomain: null,
-        domainVerified: false, metaTitle: null, metaDescription: null,
-        ogImageUrl: null, hashtag: null, publishedAt: null,
-        createdAt: new Date(), updatedAt: new Date(),
+        id: CONFIG_ID,
+        weddingId: WEDDING_ID,
+        templateId: 'classic',
+        customColors: null,
+        fontPair: 'playfair-lato',
+        privacyMode: 'public',
+        passwordHash: null,
+        subdomain: 'jane-john',
+        customDomain: null,
+        domainVerified: false,
+        metaTitle: null,
+        metaDescription: null,
+        ogImageUrl: null,
+        hashtag: null,
+        publishedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/website-config?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/website-config?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -113,27 +141,35 @@ describe('Website Config Routes', () => {
   describe('POST /website-config', () => {
     it('should create a website config', async () => {
       mockedService.create.mockResolvedValue({
-        id: CONFIG_ID, weddingId: WEDDING_ID, templateId: 'modern',
-        customColors: null, fontPair: 'playfair-lato', privacyMode: 'public',
-        passwordHash: null, subdomain: 'jane-john', customDomain: null,
-        domainVerified: false, metaTitle: null, metaDescription: null,
-        ogImageUrl: null, hashtag: null, publishedAt: null,
-        createdAt: new Date(), updatedAt: new Date(),
+        id: CONFIG_ID,
+        weddingId: WEDDING_ID,
+        templateId: 'modern',
+        customColors: null,
+        fontPair: 'playfair-lato',
+        privacyMode: 'public',
+        passwordHash: null,
+        subdomain: 'jane-john',
+        customDomain: null,
+        domainVerified: false,
+        metaTitle: null,
+        metaDescription: null,
+        ogImageUrl: null,
+        hashtag: null,
+        publishedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/website-config?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            weddingId: WEDDING_ID,
-            templateId: 'modern',
-            subdomain: 'jane-john',
-          }),
-        },
-      )
+      const res = await app.request(`/website-config?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          templateId: 'modern',
+          subdomain: 'jane-john',
+        }),
+      })
 
       expect(res.status).toBe(201)
       const body = await res.json()
@@ -141,21 +177,20 @@ describe('Website Config Routes', () => {
     })
 
     it('should return 409 if config already exists', async () => {
-      mockedService.create.mockRejectedValue(new Error('Website config already exists for this wedding'))
+      mockedService.create.mockRejectedValue(
+        new Error('Website config already exists for this wedding'),
+      )
 
       const app = createApp()
-      const res = await app.request(
-        `/website-config?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            weddingId: WEDDING_ID,
-            templateId: 'classic',
-            subdomain: 'jane-john',
-          }),
-        },
-      )
+      const res = await app.request(`/website-config?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          templateId: 'classic',
+          subdomain: 'jane-john',
+        }),
+      })
 
       expect(res.status).toBe(409)
     })
@@ -164,7 +199,9 @@ describe('Website Config Routes', () => {
   describe('POST /website-config/:id/publish', () => {
     it('should publish the website', async () => {
       mockedService.publish.mockResolvedValue({
-        id: CONFIG_ID, weddingId: WEDDING_ID, publishedAt: new Date(),
+        id: CONFIG_ID,
+        weddingId: WEDDING_ID,
+        publishedAt: new Date(),
       } as never)
 
       const app = createApp()
@@ -182,10 +219,10 @@ describe('Website Config Routes', () => {
       mockedService.checkSubdomain.mockResolvedValue(true)
 
       const app = createApp()
-      const res = await app.request(
-        `/website-config/check-subdomain?subdomain=new-couple`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/website-config/check-subdomain?subdomain=new-couple`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -198,14 +235,11 @@ describe('Website Config Routes', () => {
       mockedService.verifyPassword.mockResolvedValue(true)
 
       const app = createApp()
-      const res = await app.request(
-        `/website-config/verify-password`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subdomain: 'jane-john', password: 'secret123' }),
-        },
-      )
+      const res = await app.request(`/website-config/verify-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subdomain: 'jane-john', password: 'secret123' }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()

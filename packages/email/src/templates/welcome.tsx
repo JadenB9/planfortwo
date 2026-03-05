@@ -36,9 +36,7 @@ export function WelcomeEmail({ firstName }: WelcomeEmailProps) {
             <Text style={listItem}>4. Explore your planning checklist</Text>
           </Section>
           <Hr style={hr} />
-          <Text style={footer}>
-            With love, The PlanForTwo Team
-          </Text>
+          <Text style={footer}>With love, The PlanForTwo Team</Text>
         </Container>
       </Body>
     </Html>

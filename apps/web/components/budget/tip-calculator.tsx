@@ -5,7 +5,11 @@ interface TipCalculatorProps {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount)
 }
 
 export function TipCalculator({ tips }: TipCalculatorProps) {
@@ -35,7 +39,9 @@ export function TipCalculator({ tips }: TipCalculatorProps) {
             {tips.map((tip) => (
               <tr key={tip.vendorType} className="border-b border-gray-100">
                 <td className="py-2.5 font-medium text-gray-900">{tip.vendorType}</td>
-                <td className="py-2.5 text-right text-gray-700">{formatCurrency(tip.suggestedAmount)}</td>
+                <td className="py-2.5 text-right text-gray-700">
+                  {formatCurrency(tip.suggestedAmount)}
+                </td>
                 <td className="py-2.5 text-right text-gray-500">{tip.suggestedPercent}%</td>
                 <td className="py-2.5 text-right text-gray-500">
                   {formatCurrency(tip.min)} - {formatCurrency(tip.max)}

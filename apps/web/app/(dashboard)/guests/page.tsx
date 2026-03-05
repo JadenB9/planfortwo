@@ -23,31 +23,62 @@ export default function GuestsPage() {
   const { data: weddingData, loading: weddingLoading, error: weddingError } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
   const { features, loading: featuresLoading, error: featuresError } = useFeatures(weddingId)
-  const { guests, stats, households, tags, loading, filters, updateFilters, setSearchDebounced, refetch } = useGuests({ weddingId })
+  const {
+    guests,
+    stats,
+    households,
+    tags,
+    loading,
+    filters,
+    updateFilters,
+    setSearchDebounced,
+    refetch,
+  } = useGuests({ weddingId })
 
   const [selectedGuest, setSelectedGuest] = useState<GuestWithTags | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
 
-  const handleCreateGuest = useCallback(async (data: GuestFormData) => {
-    if (!weddingId) return
-    const token = await getToken()
-    if (!token) return
-    await api.guests.create(
-      { weddingId, firstName: data.firstName, lastName: data.lastName, email: data.email, phone: data.phone, householdId: data.householdId, side: data.side, isChild: data.isChild ?? false, isVip: data.isVip ?? false, hasPlusOne: data.hasPlusOne ?? false, plusOneName: data.plusOneName, mealChoice: data.mealChoice, dietary: data.dietary, tagIds: data.tagIds },
-      token,
-    )
-    setShowAddForm(false)
-    await refetch()
-  }, [weddingId, getToken, refetch])
+  const handleCreateGuest = useCallback(
+    async (data: GuestFormData) => {
+      if (!weddingId) return
+      const token = await getToken()
+      if (!token) return
+      await api.guests.create(
+        {
+          weddingId,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          householdId: data.householdId,
+          side: data.side,
+          isChild: data.isChild ?? false,
+          isVip: data.isVip ?? false,
+          hasPlusOne: data.hasPlusOne ?? false,
+          plusOneName: data.plusOneName,
+          mealChoice: data.mealChoice,
+          dietary: data.dietary,
+          tagIds: data.tagIds,
+        },
+        token,
+      )
+      setShowAddForm(false)
+      await refetch()
+    },
+    [weddingId, getToken, refetch],
+  )
 
-  const handleUpdateGuest = useCallback(async (data: GuestFormData) => {
-    if (!weddingId || !selectedGuest) return
-    const token = await getToken()
-    if (!token) return
-    await api.guests.update(selectedGuest.id, data, weddingId, token)
-    setSelectedGuest(null)
-    await refetch()
-  }, [weddingId, selectedGuest, getToken, refetch])
+  const handleUpdateGuest = useCallback(
+    async (data: GuestFormData) => {
+      if (!weddingId || !selectedGuest) return
+      const token = await getToken()
+      if (!token) return
+      await api.guests.update(selectedGuest.id, data, weddingId, token)
+      setSelectedGuest(null)
+      await refetch()
+    },
+    [weddingId, selectedGuest, getToken, refetch],
+  )
 
   const handleDeleteGuest = useCallback(async () => {
     if (!weddingId || !selectedGuest) return
@@ -64,7 +95,9 @@ export default function GuestsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="rounded-2xl border border-red-200 bg-red-50 px-8 py-6">
-          <h2 className="font-serif text-xl font-semibold text-red-800">Unable to load guest list</h2>
+          <h2 className="font-serif text-xl font-semibold text-red-800">
+            Unable to load guest list
+          </h2>
           <p className="mt-2 text-sm text-red-600">{apiError}</p>
           <button
             onClick={() => window.location.reload()}
@@ -80,12 +113,16 @@ export default function GuestsPage() {
   if (weddingLoading || featuresLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
 
-  const atGuestCap = features?.maxGuests !== null && features?.maxGuests !== undefined && stats !== null && stats.totalGuests >= features.maxGuests
+  const atGuestCap =
+    features?.maxGuests !== null &&
+    features?.maxGuests !== undefined &&
+    stats !== null &&
+    stats.totalGuests >= features.maxGuests
 
   return (
     <motion.div
@@ -98,9 +135,7 @@ export default function GuestsPage() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-serif text-3xl font-bold text-gray-900">Guest List</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Manage your guests, households, and RSVPs.
-          </p>
+          <p className="mt-1 text-sm text-gray-600">Manage your guests, households, and RSVPs.</p>
         </div>
         <div className="flex gap-3">
           {features?.canBulkImport && (
@@ -114,7 +149,7 @@ export default function GuestsPage() {
           <button
             onClick={() => setShowAddForm(true)}
             disabled={atGuestCap}
-            className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             Add Guest
           </button>
@@ -148,16 +183,14 @@ export default function GuestsPage() {
         {/* Table */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+            <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
           </div>
         ) : (
           <GuestTable guests={guests} onSelectGuest={setSelectedGuest} />
         )}
 
         {/* Dietary Summary */}
-        {stats && stats.totalGuests > 0 && (
-          <DietarySummaryCard summary={stats.dietarySummary} />
-        )}
+        {stats && stats.totalGuests > 0 && <DietarySummaryCard summary={stats.dietarySummary} />}
       </div>
 
       {/* Guest Detail Slide-over */}

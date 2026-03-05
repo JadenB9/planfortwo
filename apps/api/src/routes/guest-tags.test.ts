@@ -45,6 +45,7 @@ vi.mock('../services/guest-tags.js', () => ({
     listTags: vi.fn(),
     createTag: vi.fn(),
     deleteTag: vi.fn(),
+    getTag: vi.fn(),
     seedDefaultTags: vi.fn(),
     assignTag: vi.fn(),
     removeTag: vi.fn(),
@@ -103,11 +104,25 @@ describe('Guest Tag Routes', () => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
     vi.mocked(userService.findByClerkId).mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     })
     vi.mocked(weddingService.verifyMembership).mockResolvedValue({
-      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: WEDDING_ID,
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     })
+    mockedGuestTagService.getTag.mockResolvedValue({
+      id: TAG_ID,
+      weddingId: WEDDING_ID,
+      name: 'Family',
+      color: '#FF0000',
+      isDefault: true,
+    } as never)
   })
 
   describe('GET /guest-tags', () => {

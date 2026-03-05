@@ -80,7 +80,9 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
           <h2 className="font-serif text-lg font-semibold text-gray-900">
             {guest ? 'Edit Guest' : 'Add Guest'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">&times;</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            &times;
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="max-h-[70vh] overflow-y-auto p-6">
@@ -93,7 +95,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                   value={formData.firstName}
                   onChange={(e) => update('firstName', e.target.value)}
                   required
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
                 />
               </div>
               <div>
@@ -103,7 +105,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                   value={formData.lastName}
                   onChange={(e) => update('lastName', e.target.value)}
                   required
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
                 />
               </div>
             </div>
@@ -115,7 +117,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                   type="email"
                   value={formData.email ?? ''}
                   onChange={(e) => update('email', e.target.value || null)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
                 />
               </div>
               <div>
@@ -124,7 +126,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                   type="tel"
                   value={formData.phone ?? ''}
                   onChange={(e) => update('phone', e.target.value || null)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
                 />
               </div>
             </div>
@@ -135,11 +137,13 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                 <select
                   value={formData.householdId ?? ''}
                   onChange={(e) => update('householdId', e.target.value || null)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
                 >
                   <option value="">None</option>
                   {households.map((h) => (
-                    <option key={h.id} value={h.id}>{h.name}</option>
+                    <option key={h.id} value={h.id}>
+                      {h.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -148,7 +152,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                 <select
                   value={formData.side ?? ''}
                   onChange={(e) => update('side', (e.target.value as GuestSide) || null)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
                 >
                   <option value="">Not specified</option>
                   <option value="bride">Bride</option>
@@ -164,7 +168,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                   type="checkbox"
                   checked={formData.isChild ?? false}
                   onChange={(e) => update('isChild', e.target.checked)}
-                  className="rounded border-gray-300 text-wedding-600 focus:ring-wedding-600"
+                  className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
                 />
                 Child
               </label>
@@ -173,7 +177,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                   type="checkbox"
                   checked={formData.isVip ?? false}
                   onChange={(e) => update('isVip', e.target.checked)}
-                  className="rounded border-gray-300 text-wedding-600 focus:ring-wedding-600"
+                  className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
                 />
                 VIP
               </label>
@@ -182,7 +186,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                   type="checkbox"
                   checked={formData.hasPlusOne ?? false}
                   onChange={(e) => update('hasPlusOne', e.target.checked)}
-                  className="rounded border-gray-300 text-wedding-600 focus:ring-wedding-600"
+                  className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
                 />
                 Has Plus-One
               </label>
@@ -190,12 +194,14 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
 
             {formData.hasPlusOne && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Plus-One Name</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Plus-One Name
+                </label>
                 <input
                   type="text"
                   value={formData.plusOneName ?? ''}
                   onChange={(e) => update('plusOneName', e.target.value || null)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
                 />
               </div>
             )}
@@ -207,7 +213,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                 value={formData.mealChoice ?? ''}
                 onChange={(e) => update('mealChoice', e.target.value || null)}
                 placeholder="e.g. Chicken, Fish, Vegetarian"
-                className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
               />
             </div>
 
@@ -216,9 +222,11 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
               <input
                 type="text"
                 value={formData.dietary?.notes ?? ''}
-                onChange={(e) => update('dietary', e.target.value ? { notes: e.target.value } : null)}
+                onChange={(e) =>
+                  update('dietary', e.target.value ? { notes: e.target.value } : null)
+                }
                 placeholder="Allergies, restrictions, etc."
-                className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
               />
             </div>
 
@@ -234,9 +242,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                         type="button"
                         onClick={() => toggleTag(tag.id)}
                         className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                          selected
-                            ? 'ring-2 ring-offset-1'
-                            : 'opacity-60 hover:opacity-100'
+                          selected ? 'ring-2 ring-offset-1' : 'opacity-60 hover:opacity-100'
                         }`}
                         style={{
                           backgroundColor: `${tag.color}20`,
@@ -266,7 +272,7 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
             <button
               type="submit"
               disabled={submitting || !formData.firstName.trim() || !formData.lastName.trim()}
-              className="rounded-xl bg-wedding-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? 'Saving...' : guest ? 'Update Guest' : 'Add Guest'}
             </button>

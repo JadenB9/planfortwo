@@ -57,13 +57,22 @@ export function OurStorySection({ title, content }: OurStorySectionProps) {
                   style={{ backgroundColor: colors.accent, left: i % 2 === 0 ? '100%' : '0%' }}
                 />
                 <div className="max-w-xs">
-                  <p className={`text-sm font-medium ${fontPair.bodyClass}`} style={{ color: colors.accent }}>
+                  <p
+                    className={`text-sm font-medium ${fontPair.bodyClass}`}
+                    style={{ color: colors.accent }}
+                  >
                     {event.date}
                   </p>
-                  <h3 className={`mt-1 text-lg font-semibold ${fontPair.headingClass}`} style={{ color: colors.primary }}>
+                  <h3
+                    className={`mt-1 text-lg font-semibold ${fontPair.headingClass}`}
+                    style={{ color: colors.primary }}
+                  >
                     {event.title}
                   </h3>
-                  <p className={`mt-1 text-sm ${fontPair.bodyClass}`} style={{ color: `${colors.primary}CC` }}>
+                  <p
+                    className={`mt-1 text-sm ${fontPair.bodyClass}`}
+                    style={{ color: `${colors.primary}CC` }}
+                  >
                     {event.description}
                   </p>
                 </div>

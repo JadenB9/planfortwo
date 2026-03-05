@@ -45,11 +45,11 @@ export function PricingCard({
       <Card
         className={cn(
           'flex w-full flex-col',
-          highlighted && 'relative border-2 border-wedding-600 shadow-lg'
+          highlighted && 'border-wedding-600 relative border-2 shadow-lg',
         )}
       >
         {highlighted && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-wedding-600 px-4 py-1 text-xs font-semibold text-white">
+          <div className="bg-wedding-600 absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-xs font-semibold text-white">
             Most Popular
           </div>
         )}
@@ -59,9 +59,7 @@ export function PricingCard({
             <span className="font-serif text-4xl font-bold tracking-tight text-gray-900">
               {price}
             </span>
-            {price !== 'Free' && (
-              <span className="ml-1 text-sm text-gray-500">one-time</span>
-            )}
+            {price !== 'Free' && <span className="ml-1 text-sm text-gray-500">one-time</span>}
           </div>
           <p className="mt-2 text-sm text-gray-500">{description}</p>
         </CardHeader>
@@ -70,15 +68,12 @@ export function PricingCard({
             {features.map((feature) => (
               <li key={feature.label} className="flex items-start gap-3">
                 {feature.included ? (
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-sage-600" />
+                  <Check className="text-sage-600 mt-0.5 h-4 w-4 shrink-0" />
                 ) : (
                   <X className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
                 )}
                 <span
-                  className={cn(
-                    'text-sm',
-                    feature.included ? 'text-gray-700' : 'text-gray-400'
-                  )}
+                  className={cn('text-sm', feature.included ? 'text-gray-700' : 'text-gray-400')}
                 >
                   {feature.label}
                 </span>
@@ -91,8 +86,8 @@ export function PricingCard({
               className={cn(
                 'w-full rounded-xl',
                 highlighted
-                  ? 'bg-wedding-600 text-white hover:bg-wedding-700'
-                  : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  ? 'bg-wedding-600 hover:bg-wedding-700 text-white'
+                  : 'bg-gray-100 text-gray-900 hover:bg-gray-200',
               )}
               size="lg"
             >
@@ -106,7 +101,5 @@ export function PricingCard({
 }
 
 export function PricingCards({ children }: { children: ReactNode }) {
-  return (
-    <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">{children}</div>
-  )
+  return <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">{children}</div>
 }

@@ -59,12 +59,23 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
     <div className="space-y-6">
       {step === 'upload' && (
         <div className="rounded-2xl border-2 border-dashed border-gray-300 p-8 text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+            />
           </svg>
           <p className="mt-3 text-sm text-gray-600">Upload a CSV file with guest information.</p>
           <p className="mt-1 text-xs text-gray-500">
-            Expected columns: firstName, lastName, email, phone, side, isVip, isChild, hasPlusOne, plusOneName
+            Expected columns: firstName, lastName, email, phone, side, isVip, isChild, hasPlusOne,
+            plusOneName
           </p>
           <input
             ref={fileRef}
@@ -75,7 +86,7 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
           />
           <button
             onClick={() => fileRef.current?.click()}
-            className="mt-4 rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+            className="bg-wedding-600 hover:bg-wedding-700 mt-4 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
           >
             Select CSV File
           </button>
@@ -93,7 +104,9 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
                   {previewRows[0]?.map((header, i) => (
-                    <th key={i} className="px-3 py-2 font-semibold text-gray-700">{header}</th>
+                    <th key={i} className="px-3 py-2 font-semibold text-gray-700">
+                      {header}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -101,7 +114,9 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
                 {previewRows.slice(1).map((row, ri) => (
                   <tr key={ri}>
                     {row.map((cell, ci) => (
-                      <td key={ci} className="px-3 py-2 text-gray-600">{cell}</td>
+                      <td key={ci} className="px-3 py-2 text-gray-600">
+                        {cell}
+                      </td>
                     ))}
                   </tr>
                 ))}
@@ -110,7 +125,11 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
           </div>
           <div className="mt-4 flex justify-end gap-3">
             <button
-              onClick={() => { setStep('upload'); setFile(null); setPreviewRows([]) }}
+              onClick={() => {
+                setStep('upload')
+                setFile(null)
+                setPreviewRows([])
+              }}
               className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               Back
@@ -118,7 +137,7 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
             <button
               onClick={handleImport}
               disabled={importing}
-              className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 disabled:opacity-50"
+              className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:opacity-50"
             >
               {importing ? 'Importing...' : 'Import Guests'}
             </button>
@@ -154,7 +173,7 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
           )}
           <button
             onClick={onClose}
-            className="mt-4 w-full rounded-xl bg-wedding-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+            className="bg-wedding-600 hover:bg-wedding-700 mt-4 w-full rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors"
           >
             Done
           </button>

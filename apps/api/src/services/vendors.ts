@@ -171,7 +171,9 @@ export const vendorService = {
         status: data.status,
         depositDueDate: data.depositDueDate ? new Date(data.depositDueDate) : undefined,
         balanceDueDate: data.balanceDueDate ? new Date(data.balanceDueDate) : undefined,
-        cancellationDeadline: data.cancellationDeadline ? new Date(data.cancellationDeadline) : undefined,
+        cancellationDeadline: data.cancellationDeadline
+          ? new Date(data.cancellationDeadline)
+          : undefined,
         notes: data.notes,
       })
       .returning()

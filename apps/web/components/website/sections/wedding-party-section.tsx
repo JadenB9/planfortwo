@@ -37,7 +37,11 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
               {member.imageUrl ? (
                 <div className="mx-auto h-40 w-40 overflow-hidden rounded-full">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={member.imageUrl} alt={member.name} className="h-full w-full object-cover" />
+                  <img
+                    src={member.imageUrl}
+                    alt={member.name}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               ) : (
                 <div
@@ -47,14 +51,20 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
                   {member.name.charAt(0)}
                 </div>
               )}
-              <h3 className={`mt-4 text-lg font-semibold ${fontPair.headingClass}`} style={{ color: colors.primary }}>
+              <h3
+                className={`mt-4 text-lg font-semibold ${fontPair.headingClass}`}
+                style={{ color: colors.primary }}
+              >
                 {member.name}
               </h3>
               <p className={`text-sm ${fontPair.bodyClass}`} style={{ color: colors.accent }}>
                 {member.role}
               </p>
               {member.description && (
-                <p className={`mt-2 text-sm ${fontPair.bodyClass}`} style={{ color: `${colors.primary}99` }}>
+                <p
+                  className={`mt-2 text-sm ${fontPair.bodyClass}`}
+                  style={{ color: `${colors.primary}99` }}
+                >
                   {member.description}
                 </p>
               )}

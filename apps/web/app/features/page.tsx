@@ -99,8 +99,7 @@ const featureCategories: FeatureCategory[] = [
   {
     icon: Building2,
     title: 'Vendor Management',
-    description:
-      'Keep all your vendor contacts, contracts, and payments organized in one place.',
+    description: 'Keep all your vendor contacts, contracts, and payments organized in one place.',
     items: [
       'Vendor directory and search',
       'Contract and document storage',
@@ -138,8 +137,7 @@ const featureCategories: FeatureCategory[] = [
   {
     icon: Gift,
     title: 'Registry & Gifts',
-    description:
-      'Manage your gift registry, track received gifts, and send thank-you notes.',
+    description: 'Manage your gift registry, track received gifts, and send thank-you notes.',
     items: [
       'Registry links and wishlists',
       'Cash fund setup',
@@ -151,8 +149,7 @@ const featureCategories: FeatureCategory[] = [
   {
     icon: Heart,
     title: 'Ceremony Planning',
-    description:
-      'Plan every detail of your ceremony from vows to the processional order.',
+    description: 'Plan every detail of your ceremony from vows to the processional order.',
     items: [
       'Ceremony outline builder',
       'Vow workspace and drafts',
@@ -164,8 +161,7 @@ const featureCategories: FeatureCategory[] = [
   {
     icon: Music,
     title: 'Music & Playlists',
-    description:
-      'Build the perfect soundtrack for your wedding with collaborative playlist tools.',
+    description: 'Build the perfect soundtrack for your wedding with collaborative playlist tools.',
     items: [
       'Playlist builder for each event',
       'Guest song requests',
@@ -203,8 +199,7 @@ const featureCategories: FeatureCategory[] = [
   {
     icon: Settings,
     title: 'Settings & Account',
-    description:
-      'Manage your wedding details, notification preferences, and account settings.',
+    description: 'Manage your wedding details, notification preferences, and account settings.',
     items: [
       'Wedding details and date management',
       'Notification preferences',
@@ -263,7 +258,7 @@ export default function FeaturesPage() {
   return (
     <main className="min-h-screen">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-sage-100 bg-white/80 backdrop-blur-md">
+      <nav className="border-sage-100 sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <Link href="/" className="font-serif text-xl font-bold text-gray-900">
             PlanForTwo
@@ -278,7 +273,7 @@ export default function FeaturesPage() {
             <Button
               asChild
               size="sm"
-              className="rounded-lg bg-wedding-600 text-white hover:bg-wedding-700"
+              className="bg-wedding-600 hover:bg-wedding-700 rounded-lg text-white"
             >
               <Link href="/dashboard">Get Started</Link>
             </Button>
@@ -287,16 +282,15 @@ export default function FeaturesPage() {
       </nav>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-sage-50 to-white px-4 pb-20 pt-24 sm:px-6 lg:px-8">
+      <section className="from-sage-50 bg-gradient-to-b to-white px-4 pb-20 pt-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <AnimatedSection>
             <h1 className="font-serif text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
               Everything you need to plan your perfect wedding
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-              From guest lists to budgets, checklists to websites — plan your
-              wedding stress-free with tools designed for couples, not
-              corporations.
+              From guest lists to budgets, checklists to websites — plan your wedding stress-free
+              with tools designed for couples, not corporations.
             </p>
           </AnimatedSection>
         </div>
@@ -310,8 +304,8 @@ export default function FeaturesPage() {
               Built for real couples
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-              Every feature is designed with couples in mind — no bloat, no
-              complexity, just the tools you actually need.
+              Every feature is designed with couples in mind — no bloat, no complexity, just the
+              tools you actually need.
             </p>
           </AnimatedSection>
 
@@ -319,32 +313,22 @@ export default function FeaturesPage() {
             {featureCategories.map((category, index) => {
               const Icon = category.icon
               return (
-                <AnimatedSection
-                  key={category.title}
-                  delay={index * 0.1}
-                >
+                <AnimatedSection key={category.title} delay={index * 0.1}>
                   <Card className="h-full transition-shadow hover:shadow-md">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sage-100">
-                          <Icon className="h-5 w-5 text-sage-700" />
+                        <div className="bg-sage-100 flex h-10 w-10 items-center justify-center rounded-lg">
+                          <Icon className="text-sage-700 h-5 w-5" />
                         </div>
-                        <CardTitle className="text-lg">
-                          {category.title}
-                        </CardTitle>
+                        <CardTitle className="text-lg">{category.title}</CardTitle>
                       </div>
-                      <p className="mt-2 text-sm text-gray-500">
-                        {category.description}
-                      </p>
+                      <p className="mt-2 text-sm text-gray-500">{category.description}</p>
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
                         {category.items.map((item) => (
-                          <li
-                            key={item}
-                            className="flex items-start gap-2 text-sm text-gray-600"
-                          >
-                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-sage-400" />
+                          <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
+                            <span className="bg-sage-400 mt-1 h-1.5 w-1.5 shrink-0 rounded-full" />
                             {item}
                           </li>
                         ))}
@@ -368,8 +352,8 @@ export default function FeaturesPage() {
               Simple, honest pricing
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-              No subscriptions. No hidden fees. Pay once and plan your wedding
-              with everything you need.
+              No subscriptions. No hidden fees. Pay once and plan your wedding with everything you
+              need.
             </p>
           </AnimatedSection>
 
@@ -420,29 +404,23 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-b from-white to-sage-50 px-4 py-20 sm:px-6 lg:px-8">
+      <section className="to-sage-50 bg-gradient-to-b from-white px-4 py-20 sm:px-6 lg:px-8">
         <AnimatedSection className="mx-auto max-w-2xl text-center">
           <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Ready to start planning?
           </h2>
           <p className="mt-4 text-gray-600">
-            Join thousands of couples who chose a simpler way to plan their
-            wedding.
+            Join thousands of couples who chose a simpler way to plan their wedding.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
               asChild
               size="lg"
-              className="rounded-xl bg-wedding-600 px-8 text-white hover:bg-wedding-700"
+              className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-8 text-white"
             >
               <Link href="/dashboard">Start Free</Link>
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="rounded-xl px-8"
-            >
+            <Button asChild variant="outline" size="lg" className="rounded-xl px-8">
               <Link href="/dashboard">Get Full Access</Link>
             </Button>
           </div>

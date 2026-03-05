@@ -28,7 +28,9 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
         <h3 className="font-serif text-lg font-semibold text-gray-900">Upcoming Tasks</h3>
-        <p className="mt-2 text-sm text-gray-500">No upcoming tasks. Your checklist will appear here.</p>
+        <p className="mt-2 text-sm text-gray-500">
+          No upcoming tasks. Your checklist will appear here.
+        </p>
       </div>
     )
   }
@@ -39,7 +41,7 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
         <h3 className="font-serif text-lg font-semibold text-gray-900">Upcoming Tasks</h3>
         <Link
           href="/checklist"
-          className="text-sm font-medium text-wedding-600 transition-colors hover:text-wedding-700"
+          className="text-wedding-600 hover:text-wedding-700 text-sm font-medium transition-colors"
         >
           View all
         </Link>
@@ -63,11 +65,17 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
               <p className="truncate text-sm font-medium text-gray-900">{task.title}</p>
               {task.dueDate && (
                 <p className="mt-0.5 text-xs text-gray-500">
-                  Due {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  Due{' '}
+                  {new Date(task.dueDate).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </p>
               )}
             </div>
-            <span className={`ml-3 flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}>
+            <span
+              className={`ml-3 flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}
+            >
               {PRIORITY_LABELS[task.priority]}
             </span>
           </motion.div>

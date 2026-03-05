@@ -138,16 +138,14 @@ export function RsvpEntry() {
             <label htmlFor="rsvp-code" className="block text-sm font-medium text-gray-700">
               RSVP Code
             </label>
-            <p className="mt-1 text-xs text-gray-500">
-              Enter the code from your invitation
-            </p>
+            <p className="mt-1 text-xs text-gray-500">Enter the code from your invitation</p>
             <input
               id="rsvp-code"
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="e.g. SMITH2025"
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-center text-lg tracking-wider text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-center text-lg tracking-wider text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
               autoComplete="off"
             />
           </div>
@@ -159,7 +157,7 @@ export function RsvpEntry() {
           <button
             type="submit"
             disabled={!code.trim() || codeLoading}
-            className="w-full rounded-xl bg-wedding-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-wedding-600 hover:bg-wedding-700 w-full rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             {codeLoading ? (
               <span className="flex items-center justify-center gap-2">
@@ -189,7 +187,7 @@ export function RsvpEntry() {
               value={weddingId}
               onChange={(e) => setWeddingId(e.target.value)}
               placeholder="Wedding ID"
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
             />
           </div>
 
@@ -204,7 +202,7 @@ export function RsvpEntry() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Jane"
-                className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
               />
             </div>
             <div>
@@ -217,7 +215,7 @@ export function RsvpEntry() {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Doe"
-                className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
               />
             </div>
           </div>
@@ -229,7 +227,7 @@ export function RsvpEntry() {
           <button
             type="submit"
             disabled={!firstName.trim() || !lastName.trim() || !weddingId.trim() || nameLoading}
-            className="w-full rounded-xl bg-wedding-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-wedding-600 hover:bg-wedding-700 w-full rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             {nameLoading ? (
               <span className="flex items-center justify-center gap-2">
@@ -253,7 +251,7 @@ export function RsvpEntry() {
                     key={guest.id}
                     onClick={() => handleGuestSelect(guest)}
                     disabled={!guest.rsvpToken}
-                    className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-left transition-colors hover:border-wedding-300 hover:bg-wedding-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="hover:border-wedding-300 hover:bg-wedding-50 flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <span className="text-sm font-medium text-gray-900">
                       {guest.firstName} {guest.lastName}

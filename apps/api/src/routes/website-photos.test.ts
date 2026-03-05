@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,8 +25,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -39,13 +48,30 @@ vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
       tier: 'full',
-      canAddTasks: true, canEditChecklist: true, canDeleteTasks: true, canReorderTasks: true,
-      canCustomizeCategories: true, canAddNotes: true, canAddAttachments: true,
-      maxGuests: null, canEditGuests: true, canDeleteGuests: true, canBulkImport: true,
-      canRsvp: true, canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -72,13 +98,30 @@ function authHeaders(): Record<string, string> {
 
 const FULL_GATES = {
   tier: 'full' as const,
-  canAddTasks: true, canEditChecklist: true, canDeleteTasks: true, canReorderTasks: true,
-  canCustomizeCategories: true, canAddNotes: true, canAddAttachments: true,
-  maxGuests: null, canEditGuests: true, canDeleteGuests: true, canBulkImport: true,
-  canRsvp: true, canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-  canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-  canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-  canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+  canAddTasks: true,
+  canEditChecklist: true,
+  canDeleteTasks: true,
+  canReorderTasks: true,
+  canCustomizeCategories: true,
+  canAddNotes: true,
+  canAddAttachments: true,
+  maxGuests: null,
+  canEditGuests: true,
+  canDeleteGuests: true,
+  canBulkImport: true,
+  canRsvp: true,
+  canSeatingChart: true,
+  canVendorManagement: true,
+  canCustomDomain: true,
+  canDataExport: true,
+  canBudgetCategories: true,
+  canBudgetExpenses: true,
+  canBudgetAnalytics: true,
+  canBudgetExport: true,
+  canPaymentSchedule: true,
+  canWebsiteBuilder: true,
+  canWebsiteAnalytics: true,
+  canWebsiteCustomSections: true,
 }
 
 describe('Website Photo Routes', () => {
@@ -98,42 +141,40 @@ describe('Website Photo Routes', () => {
       })
 
       const app = createApp()
-      const res = await app.request(
-        `/website-photos/upload-url?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            weddingId: WEDDING_ID,
-            fileName: 'ceremony.jpg',
-            mimeType: 'image/jpeg',
-            fileSize: 2_000_000,
-          }),
-        },
-      )
+      const res = await app.request(`/website-photos/upload-url?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          fileName: 'ceremony.jpg',
+          mimeType: 'image/jpeg',
+          fileSize: 2_000_000,
+        }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.uploadUrl).toContain('https://')
       expect(body.data.r2Key).toBeDefined()
-      expect(mockedService.getUploadUrl).toHaveBeenCalledWith(WEDDING_ID, 'ceremony.jpg', 'image/jpeg')
+      expect(mockedService.getUploadUrl).toHaveBeenCalledWith(
+        WEDDING_ID,
+        'ceremony.jpg',
+        'image/jpeg',
+      )
     })
 
     it('should return 400 for invalid mime type', async () => {
       const app = createApp()
-      const res = await app.request(
-        `/website-photos/upload-url?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            weddingId: WEDDING_ID,
-            fileName: 'doc.pdf',
-            mimeType: 'application/pdf',
-            fileSize: 500_000,
-          }),
-        },
-      )
+      const res = await app.request(`/website-photos/upload-url?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          fileName: 'doc.pdf',
+          mimeType: 'application/pdf',
+          fileSize: 500_000,
+        }),
+      })
 
       expect(res.status).toBe(400)
       const body = await res.json()
@@ -143,29 +184,43 @@ describe('Website Photo Routes', () => {
     it('should return 403 on free tier', async () => {
       mockedFeatureService.getFeatures.mockResolvedValue({
         tier: 'free',
-        canAddTasks: false, canEditChecklist: false, canDeleteTasks: false, canReorderTasks: false,
-        canCustomizeCategories: false, canAddNotes: false, canAddAttachments: false,
-        maxGuests: 15, canEditGuests: false, canDeleteGuests: false, canBulkImport: false,
-        canRsvp: false, canSeatingChart: false, canVendorManagement: false, canCustomDomain: false,
-        canDataExport: false, canBudgetCategories: false, canBudgetExpenses: false,
-        canBudgetAnalytics: false, canBudgetExport: false, canPaymentSchedule: false,
-        canWebsiteBuilder: false, canWebsiteAnalytics: false, canWebsiteCustomSections: false,
+        canAddTasks: false,
+        canEditChecklist: false,
+        canDeleteTasks: false,
+        canReorderTasks: false,
+        canCustomizeCategories: false,
+        canAddNotes: false,
+        canAddAttachments: false,
+        maxGuests: 15,
+        canEditGuests: false,
+        canDeleteGuests: false,
+        canBulkImport: false,
+        canRsvp: false,
+        canSeatingChart: false,
+        canVendorManagement: false,
+        canCustomDomain: false,
+        canDataExport: false,
+        canBudgetCategories: false,
+        canBudgetExpenses: false,
+        canBudgetAnalytics: false,
+        canBudgetExport: false,
+        canPaymentSchedule: false,
+        canWebsiteBuilder: false,
+        canWebsiteAnalytics: false,
+        canWebsiteCustomSections: false,
       })
 
       const app = createApp()
-      const res = await app.request(
-        `/website-photos/upload-url?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            weddingId: WEDDING_ID,
-            fileName: 'photo.jpg',
-            mimeType: 'image/jpeg',
-            fileSize: 1_000_000,
-          }),
-        },
-      )
+      const res = await app.request(`/website-photos/upload-url?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          fileName: 'photo.jpg',
+          mimeType: 'image/jpeg',
+          fileSize: 1_000_000,
+        }),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -197,14 +252,11 @@ describe('Website Photo Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/website-photos?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify(photoData),
-        },
-      )
+      const res = await app.request(`/website-photos?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(photoData),
+      })
 
       expect(res.status).toBe(201)
       const body = await res.json()
@@ -218,10 +270,10 @@ describe('Website Photo Routes', () => {
       mockedService.delete.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/website-photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/website-photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -233,10 +285,10 @@ describe('Website Photo Routes', () => {
       mockedService.delete.mockRejectedValue(new Error('Photo not found'))
 
       const app = createApp()
-      const res = await app.request(
-        `/website-photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/website-photos/${PHOTO_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -245,10 +297,10 @@ describe('Website Photo Routes', () => {
 
     it('should return 400 when weddingId is missing', async () => {
       const app = createApp()
-      const res = await app.request(
-        `/website-photos/${PHOTO_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/website-photos/${PHOTO_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(400)
       const body = await res.json()
@@ -261,19 +313,16 @@ describe('Website Photo Routes', () => {
       mockedService.reorder.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/website-photos/reorder?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            photos: [
-              { id: PHOTO_ID, sortOrder: 2 },
-              { id: 'd0000000-0000-0000-0000-000000000002', sortOrder: 0 },
-            ],
-          }),
-        },
-      )
+      const res = await app.request(`/website-photos/reorder?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          photos: [
+            { id: PHOTO_ID, sortOrder: 2 },
+            { id: 'd0000000-0000-0000-0000-000000000002', sortOrder: 0 },
+          ],
+        }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -282,16 +331,13 @@ describe('Website Photo Routes', () => {
 
     it('should return 400 when weddingId is missing', async () => {
       const app = createApp()
-      const res = await app.request(
-        `/website-photos/reorder`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            photos: [{ id: PHOTO_ID, sortOrder: 0 }],
-          }),
-        },
-      )
+      const res = await app.request(`/website-photos/reorder`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          photos: [{ id: PHOTO_ID, sortOrder: 0 }],
+        }),
+      })
 
       expect(res.status).toBe(400)
       const body = await res.json()

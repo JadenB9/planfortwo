@@ -50,7 +50,10 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
           {title}
         </motion.h2>
         {content.message && (
-          <p className={`mb-8 text-center ${fontPair.bodyClass}`} style={{ color: `${colors.primary}BB` }}>
+          <p
+            className={`mb-8 text-center ${fontPair.bodyClass}`}
+            style={{ color: `${colors.primary}BB` }}
+          >
             {content.message}
           </p>
         )}
@@ -95,7 +98,9 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
           </button>
           {submitted && (
             <p className={`mt-2 text-sm ${fontPair.bodyClass}`} style={{ color: colors.accent }}>
-              {content.requireApproval ? 'Thank you! Your message will appear after approval.' : 'Thank you for your message!'}
+              {content.requireApproval
+                ? 'Thank you! Your message will appear after approval.'
+                : 'Thank you for your message!'}
             </p>
           )}
         </motion.form>
@@ -113,7 +118,10 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
                 <p className={`text-sm ${fontPair.bodyClass}`} style={{ color: colors.primary }}>
                   {entry.message}
                 </p>
-                <p className={`mt-2 text-xs font-medium ${fontPair.bodyClass}`} style={{ color: colors.accent }}>
+                <p
+                  className={`mt-2 text-xs font-medium ${fontPair.bodyClass}`}
+                  style={{ color: colors.accent }}
+                >
                   — {entry.authorName}
                 </p>
               </motion.div>

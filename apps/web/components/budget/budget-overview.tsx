@@ -6,7 +6,11 @@ interface BudgetOverviewProps {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount)
 }
 
 export function BudgetOverview({ analytics, budgetTotal }: BudgetOverviewProps) {
@@ -27,9 +31,7 @@ export function BudgetOverview({ analytics, budgetTotal }: BudgetOverviewProps) 
         <p className="text-sm text-gray-600">Spent</p>
         <p className="mt-2 text-2xl font-bold text-gray-900">{formatCurrency(spent)}</p>
         {analytics && (
-          <p className="mt-1 text-xs text-gray-500">
-            {formatCurrency(analytics.totalPaid)} paid
-          </p>
+          <p className="mt-1 text-xs text-gray-500">{formatCurrency(analytics.totalPaid)} paid</p>
         )}
       </div>
 
@@ -42,7 +44,9 @@ export function BudgetOverview({ analytics, budgetTotal }: BudgetOverviewProps) 
 
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
         <p className="text-sm text-gray-600">Budget Used</p>
-        <p className={`mt-2 text-2xl font-bold ${percentUsed > 100 ? 'text-red-600' : percentUsed > 80 ? 'text-amber-600' : 'text-sage-700'}`}>
+        <p
+          className={`mt-2 text-2xl font-bold ${percentUsed > 100 ? 'text-red-600' : percentUsed > 80 ? 'text-amber-600' : 'text-sage-700'}`}
+        >
           {percentUsed}%
         </p>
         <div className="mt-2 h-2 w-full rounded-full bg-gray-200">

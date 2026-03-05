@@ -15,11 +15,13 @@ export const guestbookService = {
     return db
       .select()
       .from(guestbookEntries)
-      .where(and(
-        eq(guestbookEntries.weddingId, weddingId),
-        eq(guestbookEntries.isApproved, true),
-        eq(guestbookEntries.isVisible, true),
-      ))
+      .where(
+        and(
+          eq(guestbookEntries.weddingId, weddingId),
+          eq(guestbookEntries.isApproved, true),
+          eq(guestbookEntries.isVisible, true),
+        ),
+      )
       .orderBy(desc(guestbookEntries.createdAt))
   },
 

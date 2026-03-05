@@ -38,11 +38,7 @@ export const emailService = {
     }
   },
 
-  async sendPartnerInvite(
-    email: string,
-    inviterName: string,
-    inviteUrl: string,
-  ) {
+  async sendPartnerInvite(email: string, inviterName: string, inviteUrl: string) {
     const resend = getResendClient()
     if (!resend) {
       console.warn('[email] RESEND_API_KEY not configured — skipping partner invite email', {

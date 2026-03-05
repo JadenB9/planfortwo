@@ -106,9 +106,7 @@ describe('RSVP Service', () => {
 
   describe('lookupByName', () => {
     it('should return matching guests (case-insensitive)', async () => {
-      const mockGuests = [
-        { id: 'g1', firstName: 'Alice', lastName: 'Smith', weddingId: 'w1' },
-      ]
+      const mockGuests = [{ id: 'g1', firstName: 'Alice', lastName: 'Smith', weddingId: 'w1' }]
 
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
@@ -132,21 +130,25 @@ describe('RSVP Service', () => {
           }),
         }),
       })
-
       ;(mockedDb.transaction as ReturnType<typeof vi.fn>).mockImplementation(async (cb) => {
         const tx = {
           update: vi.fn().mockReturnValue({
             set: vi.fn().mockReturnValue({
               where: vi.fn().mockReturnValue({
-                returning: vi.fn()
-                  .mockResolvedValueOnce([{
-                    id: 'g1',
-                    rsvpStatus: 'accepted',
-                  }])
-                  .mockResolvedValueOnce([{
-                    id: 'g2',
-                    rsvpStatus: 'declined',
-                  }]),
+                returning: vi
+                  .fn()
+                  .mockResolvedValueOnce([
+                    {
+                      id: 'g1',
+                      rsvpStatus: 'accepted',
+                    },
+                  ])
+                  .mockResolvedValueOnce([
+                    {
+                      id: 'g2',
+                      rsvpStatus: 'declined',
+                    },
+                  ]),
               }),
             }),
           }),

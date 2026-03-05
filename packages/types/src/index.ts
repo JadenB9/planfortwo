@@ -721,7 +721,19 @@ export type ActivityAction =
   | 'website_template_changed'
   | 'guestbook_entry_created'
 
-export type EntityType = 'task' | 'category' | 'note' | 'attachment' | 'guest' | 'household' | 'budget_category' | 'budget_item' | 'payment' | 'website' | 'website_section' | 'guestbook_entry'
+export type EntityType =
+  | 'task'
+  | 'category'
+  | 'note'
+  | 'attachment'
+  | 'guest'
+  | 'household'
+  | 'budget_category'
+  | 'budget_item'
+  | 'payment'
+  | 'website'
+  | 'website_section'
+  | 'guestbook_entry'
 
 export interface ActivityLogEntry {
   id: string
@@ -916,7 +928,16 @@ export interface VendorCommunication {
 }
 
 // ── Events ──
-export type EventType = 'ceremony' | 'reception' | 'rehearsal_dinner' | 'bridal_shower' | 'bachelor_party' | 'bachelorette_party' | 'engagement_party' | 'brunch' | 'other'
+export type EventType =
+  | 'ceremony'
+  | 'reception'
+  | 'rehearsal_dinner'
+  | 'bridal_shower'
+  | 'bachelor_party'
+  | 'bachelorette_party'
+  | 'engagement_party'
+  | 'brunch'
+  | 'other'
 
 export interface WeddingEvent {
   id: string

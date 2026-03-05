@@ -2,16 +2,28 @@ import { integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 import { weddings } from './weddings'
 
 export const tableTypeEnum = pgEnum('table_type', [
-  'round', 'rectangular', 'banquet', 'head_table', 'sweetheart',
+  'round',
+  'rectangular',
+  'banquet',
+  'head_table',
+  'sweetheart',
 ])
 
 export const elementTypeEnum = pgEnum('element_type', [
-  'dance_floor', 'stage', 'bar', 'dj_booth', 'photo_booth',
-  'gift_table', 'dessert_table', 'entrance',
+  'dance_floor',
+  'stage',
+  'bar',
+  'dj_booth',
+  'photo_booth',
+  'gift_table',
+  'dessert_table',
+  'entrance',
 ])
 
 export const relationshipTypeEnum = pgEnum('relationship_type', [
-  'must_together', 'prefer_together', 'keep_apart',
+  'must_together',
+  'prefer_together',
+  'keep_apart',
 ])
 
 export const seatingCharts = pgTable('seating_charts', {

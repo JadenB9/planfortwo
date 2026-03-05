@@ -2,13 +2,18 @@ import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzl
 import { weddings } from './weddings'
 
 export const songCategoryEnum = pgEnum('song_category', [
-  'first_dance', 'parent_dance', 'cake_cutting', 'bouquet_toss',
-  'last_dance', 'ceremony', 'cocktail_hour', 'reception', 'other',
+  'first_dance',
+  'parent_dance',
+  'cake_cutting',
+  'bouquet_toss',
+  'last_dance',
+  'ceremony',
+  'cocktail_hour',
+  'reception',
+  'other',
 ])
 
-export const songStatusEnum = pgEnum('song_status', [
-  'approved', 'pending', 'rejected',
-])
+export const songStatusEnum = pgEnum('song_status', ['approved', 'pending', 'rejected'])
 
 export const playlists = pgTable('playlists', {
   id: uuid('id').primaryKey().defaultRandom(),

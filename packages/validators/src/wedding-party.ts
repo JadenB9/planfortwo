@@ -1,9 +1,18 @@
 import { z } from 'zod'
 
 export const partyRoleZodEnum = z.enum([
-  'maid_of_honor', 'best_man', 'bridesmaid', 'groomsman',
-  'flower_girl', 'ring_bearer', 'usher', 'reader',
-  'officiant', 'musician', 'mc', 'custom',
+  'maid_of_honor',
+  'best_man',
+  'bridesmaid',
+  'groomsman',
+  'flower_girl',
+  'ring_bearer',
+  'usher',
+  'reader',
+  'officiant',
+  'musician',
+  'mc',
+  'custom',
 ])
 export const partySideZodEnum = z.enum(['bride', 'groom'])
 

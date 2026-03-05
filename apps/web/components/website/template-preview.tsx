@@ -27,7 +27,7 @@ export function TemplatePreview({ templateId, selected = false, onClick }: Templ
         <p className="mt-0.5 text-xs text-gray-500">{template.description}</p>
       </div>
       {selected && (
-        <div className="absolute right-2 top-2 rounded-full bg-wedding-600 px-2 py-0.5 text-xs font-medium text-white">
+        <div className="bg-wedding-600 absolute right-2 top-2 rounded-full px-2 py-0.5 text-xs font-medium text-white">
           Active
         </div>
       )}
@@ -53,11 +53,7 @@ function TemplatePreviewContent({ template }: { template: TemplateMetadata }) {
       />
       <div className="flex gap-1">
         {[defaultColors.primary, defaultColors.secondary, defaultColors.accent].map((color, i) => (
-          <div
-            key={i}
-            className="h-3 w-3 rounded-full"
-            style={{ backgroundColor: color }}
-          />
+          <div key={i} className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
         ))}
       </div>
     </div>

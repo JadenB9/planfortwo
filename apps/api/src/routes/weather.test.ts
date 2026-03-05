@@ -8,10 +8,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -19,14 +25,31 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
-      tier: 'full', canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-      canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-      canAddAttachments: true, maxGuests: null, canEditGuests: true,
-      canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-      canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-      canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-      canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-      canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+      tier: 'full',
+      canAddTasks: true,
+      canEditChecklist: true,
+      canDeleteTasks: true,
+      canReorderTasks: true,
+      canCustomizeCategories: true,
+      canAddNotes: true,
+      canAddAttachments: true,
+      maxGuests: null,
+      canEditGuests: true,
+      canDeleteGuests: true,
+      canBulkImport: true,
+      canRsvp: true,
+      canSeatingChart: true,
+      canVendorManagement: true,
+      canCustomDomain: true,
+      canDataExport: true,
+      canBudgetCategories: true,
+      canBudgetExpenses: true,
+      canBudgetAnalytics: true,
+      canBudgetExport: true,
+      canPaymentSchedule: true,
+      canWebsiteBuilder: true,
+      canWebsiteAnalytics: true,
+      canWebsiteCustomSections: true,
     }),
   },
 }))
@@ -51,9 +74,30 @@ function authHeaders(): Record<string, string> {
 }
 
 const mockForecast = [
-  { date: '2026-06-15', temperatureMax: 28, temperatureMin: 18, precipitation: 0, weatherCode: 0, description: 'Clear sky' },
-  { date: '2026-06-16', temperatureMax: 25, temperatureMin: 16, precipitation: 2.5, weatherCode: 61, description: 'Slight rain' },
-  { date: '2026-06-17', temperatureMax: 22, temperatureMin: 14, precipitation: 0, weatherCode: 2, description: 'Partly cloudy' },
+  {
+    date: '2026-06-15',
+    temperatureMax: 28,
+    temperatureMin: 18,
+    precipitation: 0,
+    weatherCode: 0,
+    description: 'Clear sky',
+  },
+  {
+    date: '2026-06-16',
+    temperatureMax: 25,
+    temperatureMin: 16,
+    precipitation: 2.5,
+    weatherCode: 61,
+    description: 'Slight rain',
+  },
+  {
+    date: '2026-06-17',
+    temperatureMax: 22,
+    temperatureMin: 14,
+    precipitation: 0,
+    weatherCode: 2,
+    description: 'Partly cloudy',
+  },
 ]
 
 describe('Weather Routes', () => {
@@ -68,7 +112,8 @@ describe('Weather Routes', () => {
 
       const app = createApp()
       const res = await app.request('/weather?latitude=40.7128&longitude=-74.006&days=3', {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -82,7 +127,8 @@ describe('Weather Routes', () => {
 
       const app = createApp()
       const res = await app.request('/weather?latitude=51.5074&longitude=-0.1278', {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(200)
       expect(mockedService.getForecast).toHaveBeenCalledWith(51.5074, -0.1278, 7)
@@ -99,7 +145,8 @@ describe('Weather Routes', () => {
     it('should return 400 for invalid latitude', async () => {
       const app = createApp()
       const res = await app.request('/weather?latitude=100&longitude=-74.0&days=7', {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(400)
     })
@@ -107,7 +154,8 @@ describe('Weather Routes', () => {
     it('should return 400 for invalid longitude', async () => {
       const app = createApp()
       const res = await app.request('/weather?latitude=40.7&longitude=200&days=7', {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(400)
     })
@@ -115,7 +163,8 @@ describe('Weather Routes', () => {
     it('should return 400 for missing coordinates', async () => {
       const app = createApp()
       const res = await app.request('/weather?days=7', {
-        method: 'GET', headers: authHeaders(),
+        method: 'GET',
+        headers: authHeaders(),
       })
       expect(res.status).toBe(400)
     })

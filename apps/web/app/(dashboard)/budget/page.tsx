@@ -54,32 +54,43 @@ export default function BudgetPage() {
   const [editingItem, setEditingItem] = useState<BudgetItemWithCategory | undefined>(undefined)
   const [showSetupWizard, setShowSetupWizard] = useState(false)
 
-  const handleDeleteExpense = useCallback(async (id: string) => {
-    if (!weddingId) return
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.budgetItems.delete(id, weddingId, token)
-      void refetch()
-    } catch {
-      /* silent */
-    }
-  }, [weddingId, getToken, refetch])
+  const handleDeleteExpense = useCallback(
+    async (id: string) => {
+      if (!weddingId) return
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.budgetItems.delete(id, weddingId, token)
+        void refetch()
+      } catch {
+        /* silent */
+      }
+    },
+    [weddingId, getToken, refetch],
+  )
 
-  const handleMarkPaid = useCallback(async (paymentId: string) => {
-    if (!weddingId) return
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.paymentSchedule.update(paymentId, weddingId, {
-        isPaid: true,
-        paidDate: new Date().toISOString(),
-      }, token)
-      void refetch()
-    } catch {
-      /* silent */
-    }
-  }, [weddingId, getToken, refetch])
+  const handleMarkPaid = useCallback(
+    async (paymentId: string) => {
+      if (!weddingId) return
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.paymentSchedule.update(
+          paymentId,
+          weddingId,
+          {
+            isPaid: true,
+            paidDate: new Date().toISOString(),
+          },
+          token,
+        )
+        void refetch()
+      } catch {
+        /* silent */
+      }
+    },
+    [weddingId, getToken, refetch],
+  )
 
   const handleExportCsv = useCallback(async () => {
     if (!weddingId) return
@@ -104,7 +115,7 @@ export default function BudgetPage() {
   if (isLoading && categories.length === 0) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -112,7 +123,12 @@ export default function BudgetPage() {
   // Free tier: show basic budget total with upgrade prompt
   if (features && features.tier === 'free') {
     return (
-      <motion.div className="mx-auto max-w-4xl" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ...springSmooth }}>
+      <motion.div
+        className="mx-auto max-w-4xl"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ...springSmooth }}
+      >
         <div className="mb-8">
           <h1 className="font-serif text-3xl font-bold text-gray-900">Budget</h1>
           <p className="mt-1 text-sm text-gray-600">Track every dollar for your wedding.</p>
@@ -158,7 +174,7 @@ export default function BudgetPage() {
                 setEditingItem(undefined)
                 setShowExpenseForm(true)
               }}
-              className="rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-wedding-700"
+              className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm"
             >
               Add Expense
             </button>
@@ -168,18 +184,29 @@ export default function BudgetPage() {
 
       {needsSetup ? (
         <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-wedding-50">
-            <svg className="h-8 w-8 text-wedding-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <svg
+              className="text-wedding-600 h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <h2 className="font-serif text-xl font-semibold text-gray-900">Set Up Your Budget</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
-            Get started by entering your total budget. We will suggest category allocations based on common wedding spending patterns.
+            Get started by entering your total budget. We will suggest category allocations based on
+            common wedding spending patterns.
           </p>
           <button
             onClick={() => setShowSetupWizard(true)}
-            className="mt-6 rounded-xl bg-wedding-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-wedding-700"
+            className="bg-wedding-600 hover:bg-wedding-700 mt-6 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-sm"
           >
             Get Started
           </button>
@@ -187,7 +214,10 @@ export default function BudgetPage() {
       ) : (
         <>
           {/* Budget overview stats */}
-          <BudgetOverview analytics={analytics} budgetTotal={weddingData?.wedding.budgetTotal ?? null} />
+          <BudgetOverview
+            analytics={analytics}
+            budgetTotal={weddingData?.wedding.budgetTotal ?? null}
+          />
 
           {/* Tab navigation */}
           <div className="mt-6 border-b border-gray-200">

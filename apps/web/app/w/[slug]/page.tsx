@@ -22,7 +22,20 @@ interface PublicWebsiteData {
   sections: Array<{
     id: string
     weddingId: string
-    sectionType: 'hero' | 'our_story' | 'event_details' | 'wedding_party' | 'gallery' | 'travel' | 'things_to_do' | 'registry' | 'faq' | 'rsvp' | 'schedule' | 'guestbook' | 'custom'
+    sectionType:
+      | 'hero'
+      | 'our_story'
+      | 'event_details'
+      | 'wedding_party'
+      | 'gallery'
+      | 'travel'
+      | 'things_to_do'
+      | 'registry'
+      | 'faq'
+      | 'rsvp'
+      | 'schedule'
+      | 'guestbook'
+      | 'custom'
     title: string
     content: Record<string, unknown>
     isVisible: boolean
@@ -55,7 +68,7 @@ async function getWebsiteData(slug: string): Promise<PublicWebsiteData | null> {
       next: { revalidate: 60 },
     })
     if (!res.ok) return null
-    const json = await res.json() as { data: PublicWebsiteData }
+    const json = (await res.json()) as { data: PublicWebsiteData }
     return json.data
   } catch {
     return null
@@ -69,10 +82,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: data.config.metaTitle ?? `${data.weddingName} — Wedding`,
-    description: data.config.metaDescription ?? `Join us to celebrate the wedding of ${data.weddingName}`,
+    description:
+      data.config.metaDescription ?? `Join us to celebrate the wedding of ${data.weddingName}`,
     openGraph: {
       title: data.config.metaTitle ?? `${data.weddingName} — Wedding`,
-      description: data.config.metaDescription ?? `Join us to celebrate the wedding of ${data.weddingName}`,
+      description:
+        data.config.metaDescription ?? `Join us to celebrate the wedding of ${data.weddingName}`,
       images: data.config.ogImageUrl ? [data.config.ogImageUrl] : [],
     },
   }

@@ -6,7 +6,7 @@ interface UpgradePromptProps {
 export function UpgradePrompt({ message, className = '' }: UpgradePromptProps) {
   return (
     <div
-      className={`flex items-center gap-2 rounded-xl border border-wedding-200 bg-wedding-100 px-4 py-3 text-sm text-wedding-700 ${className}`}
+      className={`border-wedding-200 bg-wedding-100 text-wedding-700 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${className}`}
     >
       <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path

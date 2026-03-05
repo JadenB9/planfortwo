@@ -1,8 +1,16 @@
 import { z } from 'zod'
 
 export const ceremonyMomentZodEnum = z.enum([
-  'prelude', 'processional', 'welcome', 'reading', 'vows',
-  'ring_exchange', 'unity_ceremony', 'pronouncement', 'recessional', 'other',
+  'prelude',
+  'processional',
+  'welcome',
+  'reading',
+  'vows',
+  'ring_exchange',
+  'unity_ceremony',
+  'pronouncement',
+  'recessional',
+  'other',
 ])
 
 export const createCeremonyOutlineSchema = z.object({

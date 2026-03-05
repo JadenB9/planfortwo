@@ -1,13 +1,9 @@
 import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { weddings } from './weddings'
 
-export const photoModerationEnum = pgEnum('photo_moderation', [
-  'pending', 'approved', 'rejected',
-])
+export const photoModerationEnum = pgEnum('photo_moderation', ['pending', 'approved', 'rejected'])
 
-export const photoSourceEnum = pgEnum('photo_source', [
-  'guest', 'professional', 'couple',
-])
+export const photoSourceEnum = pgEnum('photo_source', ['guest', 'professional', 'couple'])
 
 export const photos = pgTable('photos', {
   id: uuid('id').primaryKey().defaultRandom(),

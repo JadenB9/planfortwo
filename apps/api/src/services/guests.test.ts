@@ -114,7 +114,14 @@ describe('Guest Service', () => {
           hasPlusOne: true,
           plusOneConfirmed: true,
           rsvpStatus: 'accepted',
-          dietary: { vegetarian: true, vegan: false, glutenFree: false, kosher: false, halal: false, allergies: ['nuts'] },
+          dietary: {
+            vegetarian: true,
+            vegan: false,
+            glutenFree: false,
+            kosher: false,
+            halal: false,
+            allergies: ['nuts'],
+          },
           mealChoice: 'chicken',
         },
         {
@@ -132,7 +139,14 @@ describe('Guest Service', () => {
           hasPlusOne: false,
           plusOneConfirmed: false,
           rsvpStatus: 'declined',
-          dietary: { vegetarian: false, vegan: true, glutenFree: false, kosher: false, halal: false, allergies: [] },
+          dietary: {
+            vegetarian: false,
+            vegan: true,
+            glutenFree: false,
+            kosher: false,
+            halal: false,
+            allergies: [],
+          },
           mealChoice: 'chicken',
         },
       ]
@@ -234,7 +248,6 @@ describe('Guest Service', () => {
         errors: [],
         meta: {},
       } as never)
-
       ;(mockedDb.insert as ReturnType<typeof vi.fn>).mockReturnValue({
         values: vi.fn().mockResolvedValue(undefined),
       })
@@ -256,7 +269,6 @@ describe('Guest Service', () => {
         errors: [],
         meta: {},
       } as never)
-
       ;(mockedDb.insert as ReturnType<typeof vi.fn>).mockReturnValue({
         values: vi.fn().mockResolvedValue(undefined),
       })

@@ -63,25 +63,72 @@ export function SectionRenderer({
         />
       )
     case 'our_story':
-      return <OurStorySection title={section.title} content={section.content as unknown as OurStoryContent} />
+      return (
+        <OurStorySection
+          title={section.title}
+          content={section.content as unknown as OurStoryContent}
+        />
+      )
     case 'event_details':
-      return <EventDetailsSection title={section.title} content={section.content as unknown as EventDetailsContent} />
+      return (
+        <EventDetailsSection
+          title={section.title}
+          content={section.content as unknown as EventDetailsContent}
+        />
+      )
     case 'wedding_party':
-      return <WeddingPartySection title={section.title} content={section.content as unknown as WeddingPartyContent} />
+      return (
+        <WeddingPartySection
+          title={section.title}
+          content={section.content as unknown as WeddingPartyContent}
+        />
+      )
     case 'gallery':
-      return <GallerySection title={section.title} content={section.content as unknown as GalleryContent} photos={sectionPhotos.length > 0 ? sectionPhotos : photos} />
+      return (
+        <GallerySection
+          title={section.title}
+          content={section.content as unknown as GalleryContent}
+          photos={sectionPhotos.length > 0 ? sectionPhotos : photos}
+        />
+      )
     case 'travel':
-      return <TravelSection title={section.title} content={section.content as unknown as TravelContent} />
+      return (
+        <TravelSection
+          title={section.title}
+          content={section.content as unknown as TravelContent}
+        />
+      )
     case 'things_to_do':
-      return <ThingsToDoSection title={section.title} content={section.content as unknown as ThingsToDoContent} />
+      return (
+        <ThingsToDoSection
+          title={section.title}
+          content={section.content as unknown as ThingsToDoContent}
+        />
+      )
     case 'registry':
-      return <RegistrySection title={section.title} content={section.content as unknown as RegistryContent} />
+      return (
+        <RegistrySection
+          title={section.title}
+          content={section.content as unknown as RegistryContent}
+        />
+      )
     case 'faq':
       return <FaqSection title={section.title} content={section.content as unknown as FaqContent} />
     case 'rsvp':
-      return <RsvpSection title={section.title} content={section.content as unknown as RsvpSectionContent} rsvpSlug={slug} />
+      return (
+        <RsvpSection
+          title={section.title}
+          content={section.content as unknown as RsvpSectionContent}
+          rsvpSlug={slug}
+        />
+      )
     case 'schedule':
-      return <ScheduleSection title={section.title} content={section.content as unknown as ScheduleContent} />
+      return (
+        <ScheduleSection
+          title={section.title}
+          content={section.content as unknown as ScheduleContent}
+        />
+      )
     case 'guestbook':
       return (
         <GuestbookSection
@@ -93,7 +140,12 @@ export function SectionRenderer({
         />
       )
     case 'custom':
-      return <CustomSection title={section.title} content={section.content as unknown as CustomSectionContent} />
+      return (
+        <CustomSection
+          title={section.title}
+          content={section.content as unknown as CustomSectionContent}
+        />
+      )
     default:
       return null
   }

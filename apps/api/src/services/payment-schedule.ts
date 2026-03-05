@@ -20,9 +20,7 @@ function parseItemRow(row: typeof budgetItems.$inferSelect) {
 
 export const paymentScheduleService = {
   async list(weddingId: string, filter: 'upcoming' | 'overdue' | 'all' = 'all') {
-    const conditions: ReturnType<typeof eq>[] = [
-      eq(paymentSchedule.weddingId, weddingId),
-    ]
+    const conditions: ReturnType<typeof eq>[] = [eq(paymentSchedule.weddingId, weddingId)]
 
     const now = new Date()
 

@@ -52,7 +52,7 @@ export default function RoadmapPage() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-wedding-200 border-t-wedding-600" />
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -67,7 +67,7 @@ export default function RoadmapPage() {
           </p>
           <a
             href="/dashboard"
-            className="mt-4 inline-flex items-center rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+            className="bg-wedding-600 hover:bg-wedding-700 mt-4 inline-flex items-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
           >
             Go to Dashboard
           </a>

@@ -19,7 +19,7 @@ export function ProgressBar({ completed, total, className = '' }: ProgressBarPro
           {completed} of {total} tasks complete
         </span>
         <motion.span
-          className="font-semibold text-wedding-600"
+          className="text-wedding-600 font-semibold"
           key={percentage}
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
@@ -30,7 +30,7 @@ export function ProgressBar({ completed, total, className = '' }: ProgressBarPro
       </div>
       <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
         <motion.div
-          className="h-full rounded-full bg-wedding-600"
+          className="bg-wedding-600 h-full rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.8, ease: 'easeOut', ...springSmooth }}

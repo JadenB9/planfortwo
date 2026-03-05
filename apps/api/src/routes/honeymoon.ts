@@ -43,7 +43,8 @@ honeymoonRoute.post(
   '/',
   resolveWeddingMiddleware,
   zValidator('json', createHoneymoonPlanSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -56,7 +57,8 @@ honeymoonRoute.put(
   '/:id',
   resolveWeddingMiddleware,
   zValidator('json', updateHoneymoonPlanSchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const id = c.req.param('id')
@@ -80,7 +82,8 @@ honeymoonRoute.post(
   '/:id/activities',
   resolveWeddingMiddleware,
   zValidator('json', createHoneymoonActivitySchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const data = c.req.valid('json')
@@ -93,7 +96,8 @@ honeymoonRoute.put(
   '/activities/:activityId',
   resolveWeddingMiddleware,
   zValidator('json', updateHoneymoonActivitySchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const activityId = c.req.param('activityId')

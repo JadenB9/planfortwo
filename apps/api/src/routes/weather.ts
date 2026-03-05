@@ -26,7 +26,8 @@ weatherRoute.use('*', authMiddleware, resolveUserMiddleware)
 weatherRoute.get(
   '/',
   zValidator('query', weatherQuerySchema, (result, c) => {
-    if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const { latitude, longitude, days } = c.req.valid('query')

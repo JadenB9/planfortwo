@@ -33,9 +33,7 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-gray-900">
-          What&apos;s your budget?
-        </h2>
+        <h2 className="font-serif text-3xl font-bold text-gray-900">What&apos;s your budget?</h2>
         <p className="mt-2 text-gray-600">
           This helps us set up your budget tracker with realistic categories.
         </p>
@@ -52,7 +50,7 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
             className={`rounded-2xl border-2 px-4 py-5 text-center transition-all ${
               data.budgetTotal === option.value && !showCustom
                 ? 'border-wedding-600 bg-wedding-50 shadow-md'
-                : 'border-gray-200 hover:border-wedding-300 hover:bg-wedding-50/50'
+                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-gray-200'
             }`}
           >
             <span className="block text-lg font-semibold text-gray-900">{option.label}</span>
@@ -66,7 +64,7 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
             setShowCustom(true)
             if (isPreset) onUpdate({ budgetTotal: null })
           }}
-          className="text-sm font-medium text-wedding-600 transition-colors hover:text-wedding-700"
+          className="text-wedding-600 hover:text-wedding-700 text-sm font-medium transition-colors"
         >
           Enter a custom amount
         </button>
@@ -86,7 +84,7 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
               step={1000}
               value={data.budgetTotal && !isPreset ? data.budgetTotal : ''}
               onChange={(e) => handleCustomChange(e.target.value)}
-              className="w-full rounded-xl border border-gray-300 py-3 pl-8 pr-4 text-gray-900 shadow-sm transition-colors focus:border-wedding-600 focus:outline-none focus:ring-2 focus:ring-wedding-600/20"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 py-3 pl-8 pr-4 text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
               placeholder="30000"
             />
           </div>
@@ -102,7 +100,7 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
         </button>
         <button
           onClick={onNext}
-          className="flex-1 rounded-xl bg-wedding-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wedding-600"
+          className="bg-wedding-600 hover:bg-wedding-700 focus-visible:outline-wedding-600 flex-1 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           {data.budgetTotal ? 'Continue' : 'Skip for Now'}
         </button>

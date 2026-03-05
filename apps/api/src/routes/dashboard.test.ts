@@ -72,9 +72,7 @@ describe('Dashboard Routes', () => {
       const mockStats = {
         tasksCompleted: 8,
         tasksTotal: 25,
-        upcomingTasks: [
-          { id: 'task-1', title: 'Book venue', dueDate: '2026-06-01' },
-        ],
+        upcomingTasks: [{ id: 'task-1', title: 'Book venue', dueDate: '2026-06-01' }],
         recentActivity: [],
         tasksByCategory: [
           {

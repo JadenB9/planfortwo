@@ -1,10 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import {
-  createBudgetCategorySchema,
-  updateBudgetCategorySchema,
-} from '@planfortwo/validators'
+import { createBudgetCategorySchema, updateBudgetCategorySchema } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -38,10 +35,7 @@ budgetCategoriesRoute.post(
   requireFeature('canBudgetCategories'),
   zValidator('json', createBudgetCategorySchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -57,17 +51,21 @@ budgetCategoriesRoute.post(
 budgetCategoriesRoute.post(
   '/seed-defaults',
   requireFeature('canBudgetCategories'),
-  zValidator('json', z.object({
-    weddingId: z.string().uuid(),
-    totalBudget: z.number().min(0).max(10_000_000).optional(),
-  }), (result, c) => {
-    if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
-    }
-  }),
+  zValidator(
+    'json',
+    z.object({
+      weddingId: z.string().uuid(),
+      totalBudget: z.number().min(0).max(10_000_000).optional(),
+    }),
+    (result, c) => {
+      if (!result.success) {
+        return c.json(
+          { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
+          400,
+        )
+      }
+    },
+  ),
   async (c) => {
     const { weddingId, totalBudget } = c.req.valid('json')
     const dbUserId = c.get('dbUserId')
@@ -83,10 +81,7 @@ budgetCategoriesRoute.put(
   requireFeature('canBudgetCategories'),
   zValidator('json', updateBudgetCategorySchema, (result, c) => {
     if (!result.success) {
-      return c.json(
-        { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
     }
   }),
   async (c) => {
@@ -115,30 +110,23 @@ budgetCategoriesRoute.put(
 )
 
 // DELETE /budget-categories/:id — delete category (gated)
-budgetCategoriesRoute.delete(
-  '/:id',
-  requireFeature('canBudgetCategories'),
-  async (c) => {
-    const categoryId = c.req.param('id')
-    const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
+budgetCategoriesRoute.delete('/:id', requireFeature('canBudgetCategories'), async (c) => {
+  const categoryId = c.req.param('id')
+  const dbUserId = c.get('dbUserId')
+  const weddingId = c.req.query('weddingId')
 
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+  if (!weddingId) {
+    return c.json(
+      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+      400,
+    )
+  }
 
-    try {
-      await budgetCategoryService.delete(categoryId, weddingId, dbUserId)
-      return c.json({ data: { success: true } })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json(
-        { error: message, code: 'DELETE_FAILED', statusCode: 404 },
-        404,
-      )
-    }
-  },
-)
+  try {
+    await budgetCategoryService.delete(categoryId, weddingId, dbUserId)
+    return c.json({ data: { success: true } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Delete failed'
+    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+  }
+})

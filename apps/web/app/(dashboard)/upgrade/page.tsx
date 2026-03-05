@@ -45,9 +45,7 @@ export default function UpgradePage() {
       </Link>
 
       <div className="mb-10 text-center">
-        <h1 className="font-serif text-3xl font-bold text-gray-900">
-          Choose Your Plan
-        </h1>
+        <h1 className="font-serif text-3xl font-bold text-gray-900">Choose Your Plan</h1>
         <p className="mt-2 text-gray-600">
           Unlock every feature and plan your perfect day without limits.
         </p>
@@ -90,9 +88,9 @@ export default function UpgradePage() {
         <motion.div
           variants={fadeInUp}
           transition={{ duration: 0.4, ...springSmooth }}
-          className="relative rounded-2xl border-2 border-wedding-600 bg-white p-8 shadow-md"
+          className="border-wedding-600 relative rounded-2xl border-2 bg-white p-8 shadow-md"
         >
-          <div className="absolute -top-3 left-6 rounded-full bg-wedding-600 px-3 py-0.5 text-xs font-semibold text-white">
+          <div className="bg-wedding-600 absolute -top-3 left-6 rounded-full px-3 py-0.5 text-xs font-semibold text-white">
             Recommended
           </div>
 
@@ -103,9 +101,7 @@ export default function UpgradePage() {
             <span className="ml-1 text-sm text-gray-500">one-time</span>
           </p>
 
-          <button
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-wedding-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
-          >
+          <button className="bg-wedding-600 hover:bg-wedding-700 mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors">
             <Sparkles className="h-4 w-4" />
             Purchase Full Plan
           </button>
@@ -113,7 +109,7 @@ export default function UpgradePage() {
           <ul className="mt-8 space-y-3">
             {FULL_FEATURES.map((feature) => (
               <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-700">
-                <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-wedding-600" />
+                <Check className="text-wedding-600 mt-0.5 h-4 w-4 flex-shrink-0" />
                 {feature}
               </li>
             ))}

@@ -37,15 +37,24 @@ export function ThingsToDoSection({ title, content }: ThingsToDoSectionProps) {
               style={{ backgroundColor: `${colors.secondary}44` }}
             >
               {activity.category && (
-                <span className={`text-xs font-medium uppercase tracking-wider ${fontPair.bodyClass}`} style={{ color: colors.accent }}>
+                <span
+                  className={`text-xs font-medium uppercase tracking-wider ${fontPair.bodyClass}`}
+                  style={{ color: colors.accent }}
+                >
                   {activity.category}
                 </span>
               )}
-              <h3 className={`mt-1 text-lg font-semibold ${fontPair.headingClass}`} style={{ color: colors.primary }}>
+              <h3
+                className={`mt-1 text-lg font-semibold ${fontPair.headingClass}`}
+                style={{ color: colors.primary }}
+              >
                 {activity.name}
               </h3>
               {activity.description && (
-                <p className={`mt-2 text-sm ${fontPair.bodyClass}`} style={{ color: `${colors.primary}BB` }}>
+                <p
+                  className={`mt-2 text-sm ${fontPair.bodyClass}`}
+                  style={{ color: `${colors.primary}BB` }}
+                >
                   {activity.description}
                 </p>
               )}

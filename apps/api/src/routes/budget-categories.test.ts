@@ -182,10 +182,10 @@ describe('Budget Category Routes', () => {
       mockedService.list.mockResolvedValue(mockCategories as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories?weddingId=${WEDDING_ID}`,
-        { method: 'GET', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-categories?weddingId=${WEDDING_ID}`, {
+        method: 'GET',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -219,14 +219,11 @@ describe('Budget Category Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify(validBody),
-        },
-      )
+      const res = await app.request(`/budget-categories?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(validBody),
+      })
 
       expect(res.status).toBe(201)
       const body = await res.json()
@@ -237,14 +234,11 @@ describe('Budget Category Routes', () => {
       mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify(validBody),
-        },
-      )
+      const res = await app.request(`/budget-categories?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(validBody),
+      })
 
       expect(res.status).toBe(403)
       const body = await res.json()
@@ -257,26 +251,19 @@ describe('Budget Category Routes', () => {
       mockedService.seedDefaults.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories/seed-defaults?weddingId=${WEDDING_ID}`,
-        {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({
-            weddingId: WEDDING_ID,
-            totalBudget: 30000,
-          }),
-        },
-      )
+      const res = await app.request(`/budget-categories/seed-defaults?weddingId=${WEDDING_ID}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          totalBudget: 30000,
+        }),
+      })
 
       expect(res.status).toBe(201)
       const body = await res.json()
       expect(body.data.success).toBe(true)
-      expect(mockedService.seedDefaults).toHaveBeenCalledWith(
-        WEDDING_ID,
-        30000,
-        'db-user-id',
-      )
+      expect(mockedService.seedDefaults).toHaveBeenCalledWith(WEDDING_ID, 30000, 'db-user-id')
     })
   })
 
@@ -298,14 +285,11 @@ describe('Budget Category Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify(updateBody),
-        },
-      )
+      const res = await app.request(`/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updateBody),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -327,14 +311,11 @@ describe('Budget Category Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify({ allocatedAmount: 8000 }),
-        },
-      )
+      const res = await app.request(`/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ allocatedAmount: 8000 }),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -345,14 +326,11 @@ describe('Budget Category Routes', () => {
       mockedService.update.mockResolvedValue(null)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        {
-          method: 'PUT',
-          headers: authHeaders(),
-          body: JSON.stringify(updateBody),
-        },
-      )
+      const res = await app.request(`/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(updateBody),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()
@@ -365,10 +343,10 @@ describe('Budget Category Routes', () => {
       mockedService.delete.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -379,10 +357,10 @@ describe('Budget Category Routes', () => {
       mockedService.delete.mockRejectedValue(new Error('Category not found'))
 
       const app = createApp()
-      const res = await app.request(
-        `/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`,
-        { method: 'DELETE', headers: authHeaders() },
-      )
+      const res = await app.request(`/budget-categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
 
       expect(res.status).toBe(404)
       const body = await res.json()

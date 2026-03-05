@@ -18,9 +18,7 @@ test.describe('Auth Pages', () => {
     })
   })
 
-  test('unauthenticated user accessing /dashboard gets redirected to sign-in', async ({
-    page,
-  }) => {
+  test('unauthenticated user accessing /dashboard gets redirected to sign-in', async ({ page }) => {
     await page.goto('/dashboard')
     // Clerk middleware should redirect to sign-in
     await page.waitForURL(/\/sign-in/, { timeout: 10_000 })

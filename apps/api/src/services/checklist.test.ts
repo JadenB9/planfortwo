@@ -43,7 +43,13 @@ vi.mock('@planfortwo/db', () => {
       { name: 'Venue & Catering', color: '#E57373', icon: 'utensils', sortOrder: 0 },
     ],
     getTemplateTasks: vi.fn().mockReturnValue([
-      { title: 'Book venue', description: 'Find and book', categoryIndex: 0, monthsBefore: 12, priority: 'must_do' },
+      {
+        title: 'Book venue',
+        description: 'Find and book',
+        categoryIndex: 0,
+        monthsBefore: 12,
+        priority: 'must_do',
+      },
     ]),
   }
 })

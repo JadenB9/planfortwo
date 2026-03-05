@@ -62,7 +62,9 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
         <h3 className="font-serif text-lg font-semibold text-gray-900">Recent Activity</h3>
-        <p className="mt-2 text-sm text-gray-500">No activity yet. Actions will appear here as you plan.</p>
+        <p className="mt-2 text-sm text-gray-500">
+          No activity yet. Actions will appear here as you plan.
+        </p>
       </div>
     )
   }
@@ -78,7 +80,9 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
         animate="visible"
       >
         {activities.slice(0, 10).map((entry) => {
-          const taskName = (entry.metadata as Record<string, unknown> | null)?.taskTitle as string | undefined
+          const taskName = (entry.metadata as Record<string, unknown> | null)?.taskTitle as
+            | string
+            | undefined
 
           return (
             <motion.div
@@ -88,7 +92,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
               transition={{ duration: 0.3, ...springSmooth }}
             >
               <motion.div
-                className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-wedding-400"
+                className="bg-wedding-400 mt-1.5 h-2 w-2 flex-shrink-0 rounded-full"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
@@ -96,9 +100,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-gray-700">
                   <span className="font-medium">{ACTION_LABELS[entry.action]}</span>
-                  {taskName && (
-                    <span className="text-gray-500">{` - ${taskName}`}</span>
-                  )}
+                  {taskName && <span className="text-gray-500">{` - ${taskName}`}</span>}
                 </p>
                 <p className="mt-0.5 text-xs text-gray-400">{formatTimestamp(entry.createdAt)}</p>
               </div>

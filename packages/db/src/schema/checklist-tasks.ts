@@ -3,11 +3,7 @@ import { weddings } from './weddings'
 import { checklistCategories } from './checklist-categories'
 import { users } from './users'
 
-export const taskPriorityEnum = pgEnum('task_priority', [
-  'must_do',
-  'nice_to_have',
-  'optional',
-])
+export const taskPriorityEnum = pgEnum('task_priority', ['must_do', 'nice_to_have', 'optional'])
 
 export const checklistTasks = pgTable('checklist_tasks', {
   id: uuid('id').primaryKey().defaultRandom(),

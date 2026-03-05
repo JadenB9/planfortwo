@@ -47,18 +47,30 @@ export function TravelSection({ title, content }: TravelSectionProps) {
                 transition={{ delay: i * 0.1 }}
                 className="rounded-2xl bg-white p-6 shadow-sm"
               >
-                <h3 className={`text-lg font-semibold ${fontPair.headingClass}`} style={{ color: colors.primary }}>
+                <h3
+                  className={`text-lg font-semibold ${fontPair.headingClass}`}
+                  style={{ color: colors.primary }}
+                >
                   {hotel.name}
                 </h3>
                 <div className={`mt-3 space-y-2 text-sm ${fontPair.bodyClass}`}>
                   {hotel.address && (
-                    <div className="flex items-start gap-2" style={{ color: `${colors.primary}BB` }}>
-                      <MapPin className="mt-0.5 h-4 w-4 shrink-0" style={{ color: colors.accent }} />
+                    <div
+                      className="flex items-start gap-2"
+                      style={{ color: `${colors.primary}BB` }}
+                    >
+                      <MapPin
+                        className="mt-0.5 h-4 w-4 shrink-0"
+                        style={{ color: colors.accent }}
+                      />
                       {hotel.address}
                     </div>
                   )}
                   {hotel.phone && (
-                    <div className="flex items-center gap-2" style={{ color: `${colors.primary}BB` }}>
+                    <div
+                      className="flex items-center gap-2"
+                      style={{ color: `${colors.primary}BB` }}
+                    >
                       <Phone className="h-4 w-4" style={{ color: colors.accent }} />
                       {hotel.phone}
                     </div>
@@ -91,7 +103,12 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             className="mt-10 overflow-hidden rounded-2xl"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.mapEmbed, { ADD_TAGS: ['iframe'], ADD_ATTR: ['allowfullscreen', 'frameborder', 'loading'] }) }}
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(content.mapEmbed, {
+                ADD_TAGS: ['iframe'],
+                ADD_ATTR: ['allowfullscreen', 'frameborder', 'loading'],
+              }),
+            }}
           />
         )}
       </div>

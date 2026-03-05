@@ -42,7 +42,8 @@ export const honeymoonService = {
 
   async updatePlan(id: string, weddingId: string, data: UpdateHoneymoonPlanInput) {
     const setData: Record<string, unknown> = { ...data }
-    if (data.startDate !== undefined) setData.startDate = data.startDate ? new Date(data.startDate) : null
+    if (data.startDate !== undefined)
+      setData.startDate = data.startDate ? new Date(data.startDate) : null
     if (data.endDate !== undefined) setData.endDate = data.endDate ? new Date(data.endDate) : null
     const [updated] = await db
       .update(honeymoonPlans)

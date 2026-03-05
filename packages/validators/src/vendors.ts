@@ -1,7 +1,12 @@
 import { z } from 'zod'
 
 export const vendorStatusZodEnum = z.enum([
-  'researching', 'contacted', 'quoted', 'booked', 'paid', 'completed',
+  'researching',
+  'contacted',
+  'quoted',
+  'booked',
+  'paid',
+  'completed',
 ])
 export const contractStatusZodEnum = z.enum(['pending', 'signed', 'active', 'completed'])
 

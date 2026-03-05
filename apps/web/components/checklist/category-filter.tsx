@@ -31,7 +31,9 @@ export function CategoryFilter({ categories, selectedId, onSelect }: CategoryFil
           key={category.id}
           onClick={() => onSelect(category.id)}
           className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-            selectedId === category.id ? 'bg-wedding-50 text-wedding-700' : 'text-gray-700 hover:bg-gray-100'
+            selectedId === category.id
+              ? 'bg-wedding-50 text-wedding-700'
+              : 'text-gray-700 hover:bg-gray-100'
           }`}
         >
           <span

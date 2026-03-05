@@ -57,25 +57,24 @@ websitePhotosRoute.post(
 )
 
 // DELETE /website-photos/:id?weddingId=X
-websitePhotosRoute.delete(
-  '/:id',
-  requireFeature('canWebsiteBuilder'),
-  async (c) => {
-    const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
-    }
+websitePhotosRoute.delete('/:id', requireFeature('canWebsiteBuilder'), async (c) => {
+  const id = c.req.param('id')
+  const weddingId = c.req.query('weddingId')
+  if (!weddingId) {
+    return c.json(
+      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+      400,
+    )
+  }
 
-    try {
-      await websitePhotoService.delete(id, weddingId)
-      return c.json({ data: { success: true } })
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
-    }
-  },
-)
+  try {
+    await websitePhotoService.delete(id, weddingId)
+    return c.json({ data: { success: true } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Delete failed'
+    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+  }
+})
 
 // POST /website-photos/reorder
 websitePhotosRoute.post(
@@ -90,7 +89,10 @@ websitePhotosRoute.post(
     const { photos } = c.req.valid('json')
     const weddingId = c.req.query('weddingId')
     if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+      return c.json(
+        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
+        400,
+      )
     }
 
     await websitePhotoService.reorder(weddingId, photos)

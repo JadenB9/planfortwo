@@ -14,10 +14,7 @@ export const websitePublicRoute = new Hono()
 websitePublicRoute.get('/:slug', async (c) => {
   const slug = c.req.param('slug')
 
-  const [config] = await db
-    .select()
-    .from(websiteConfigs)
-    .where(eq(websiteConfigs.subdomain, slug))
+  const [config] = await db.select().from(websiteConfigs).where(eq(websiteConfigs.subdomain, slug))
 
   if (!config || !config.publishedAt) {
     return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -44,10 +41,9 @@ websitePublicRoute.get('/:slug', async (c) => {
   const sections = await db
     .select()
     .from(websiteSections)
-    .where(and(
-      eq(websiteSections.weddingId, config.weddingId),
-      eq(websiteSections.isVisible, true),
-    ))
+    .where(
+      and(eq(websiteSections.weddingId, config.weddingId), eq(websiteSections.isVisible, true)),
+    )
     .orderBy(asc(websiteSections.sortOrder))
 
   const photos = await db
@@ -61,16 +57,20 @@ websitePublicRoute.get('/:slug', async (c) => {
     headers['X-Robots-Tag'] = 'noindex'
   }
 
-  return c.json({
-    data: {
-      ...config,
-      passwordHash: undefined,
-      sections,
-      photos,
-      weddingName: wedding?.name ?? '',
-      weddingDate: wedding?.date ?? null,
+  return c.json(
+    {
+      data: {
+        ...config,
+        passwordHash: undefined,
+        sections,
+        photos,
+        weddingName: wedding?.name ?? '',
+        weddingDate: wedding?.date ?? null,
+      },
     },
-  }, 200, headers)
+    200,
+    headers,
+  )
 })
 
 // POST /website-public/:slug/track — record analytics event (NO auth)
