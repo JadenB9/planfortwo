@@ -154,7 +154,7 @@ export const progressService = {
       {
         key: 'checklist',
         label: 'Checklist',
-        href: '/dashboard/checklist',
+        href: '/checklist',
         status: deriveStatus(totalTasks, checklistProgress),
         progress: checklistProgress,
         itemCount: totalTasks,
@@ -166,7 +166,7 @@ export const progressService = {
       {
         key: 'guests',
         label: 'Guest List',
-        href: '/dashboard/guests',
+        href: '/guests',
         status: deriveStatus(guestCount, guestProgress),
         progress: guestProgress,
         itemCount: guestCount,
@@ -176,7 +176,7 @@ export const progressService = {
       {
         key: 'budget',
         label: 'Budget',
-        href: '/dashboard/budget',
+        href: '/budget',
         status: deriveStatus(budgetCatCount + budgetItemCount, budgetProgress),
         progress: budgetProgress,
         itemCount: budgetItemCount,
@@ -186,7 +186,7 @@ export const progressService = {
       {
         key: 'website',
         label: 'Website',
-        href: '/dashboard/website',
+        href: '/website',
         status: websiteConfig
           ? websiteConfig.publishedAt
             ? 'completed'
@@ -203,7 +203,7 @@ export const progressService = {
       {
         key: 'seating',
         label: 'Seating Chart',
-        href: '/dashboard/seating',
+        href: '/seating',
         status: deriveStatus(seatingCount, seatingProgress),
         progress: seatingProgress,
         itemCount: seatingCount,
@@ -213,7 +213,7 @@ export const progressService = {
       {
         key: 'vendors',
         label: 'Vendors',
-        href: '/dashboard/vendors',
+        href: '/vendors',
         status: deriveStatus(vendorCount, vendorProgress),
         progress: vendorProgress,
         itemCount: vendorCount,
@@ -225,7 +225,7 @@ export const progressService = {
       {
         key: 'events',
         label: 'Events',
-        href: '/dashboard/events',
+        href: '/events',
         status: deriveStatus(eventCount, eventProgress),
         progress: eventProgress,
         itemCount: eventCount,
@@ -234,7 +234,7 @@ export const progressService = {
       {
         key: 'photos',
         label: 'Photos',
-        href: '/dashboard/photos',
+        href: '/photos',
         status: deriveStatus(photoCount, photoProgress),
         progress: photoProgress,
         itemCount: photoCount,
@@ -243,7 +243,7 @@ export const progressService = {
       {
         key: 'registry',
         label: 'Registry',
-        href: '/dashboard/registry',
+        href: '/registry',
         status: deriveStatus(registryTotal, registryProgress),
         progress: registryProgress,
         itemCount: registryTotal,
@@ -255,7 +255,7 @@ export const progressService = {
       {
         key: 'ceremony',
         label: 'Ceremony',
-        href: '/dashboard/ceremony',
+        href: '/ceremony',
         status: deriveStatus(ceremonyCount, ceremonyProgress),
         progress: ceremonyProgress,
         itemCount: ceremonyCount,
@@ -265,7 +265,7 @@ export const progressService = {
       {
         key: 'music',
         label: 'Music',
-        href: '/dashboard/music',
+        href: '/music',
         status: deriveStatus(playlistCount, playlistProgress),
         progress: playlistProgress,
         itemCount: playlistCount,
@@ -275,7 +275,7 @@ export const progressService = {
       {
         key: 'honeymoon',
         label: 'Honeymoon',
-        href: '/dashboard/honeymoon',
+        href: '/honeymoon',
         status: deriveStatus(honeymoonCount, honeymoonProgress),
         progress: honeymoonProgress,
         itemCount: honeymoonCount,
@@ -285,7 +285,7 @@ export const progressService = {
       {
         key: 'communication',
         label: 'Communication',
-        href: '/dashboard/communication',
+        href: '/communication',
         status: deriveStatus(emailCount, emailProgress),
         progress: emailProgress,
         itemCount: emailCount,
