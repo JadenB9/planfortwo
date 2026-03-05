@@ -624,27 +624,27 @@ export const trackPageViewSchema = z.object({
 export type TrackPageViewInput = z.infer<typeof trackPageViewSchema>
 
 // Phase 6: Seating Charts
-export * from './seating-charts'
+export * from './seating-charts.js'
 
 // Phase 7: Email Campaigns
-export * from './email-campaigns'
+export * from './email-campaigns.js'
 
 // Phase 8: Vendors, Wedding Party, Events
-export * from './vendors'
-export * from './wedding-party'
-export * from './events'
+export * from './vendors.js'
+export * from './wedding-party.js'
+export * from './events.js'
 
 // Phase 9: Photos, Registry, Design
-export * from './photos'
-export * from './registry'
+export * from './photos.js'
+export * from './registry.js'
 
 // Phase 10: Post-Wedding
-export * from './post-wedding'
+export * from './post-wedding.js'
 
 // Phase 11: Payments & Growth
-export * from './payments'
+export * from './payments.js'
 
 // Phase 12: Ceremony, Music, Honeymoon
-export * from './ceremony'
-export * from './playlists'
-export * from './honeymoon'
+export * from './ceremony.js'
+export * from './playlists.js'
+export * from './honeymoon.js'
