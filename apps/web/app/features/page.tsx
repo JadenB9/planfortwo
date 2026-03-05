@@ -7,9 +7,15 @@ import {
   LayoutGrid,
   Building2,
   Mail,
+  Calendar,
+  Camera,
+  Gift,
+  Heart,
+  Music,
+  Plane,
+  Settings,
   type LucideIcon,
 } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -22,7 +28,6 @@ interface FeatureCategory {
   title: string
   description: string
   items: string[]
-  comingSoon?: boolean
 }
 
 const featureCategories: FeatureCategory[] = [
@@ -90,7 +95,6 @@ const featureCategories: FeatureCategory[] = [
       'Dietary restriction flags',
       'Print-ready export',
     ],
-    comingSoon: true,
   },
   {
     icon: Building2,
@@ -104,7 +108,84 @@ const featureCategories: FeatureCategory[] = [
       'Review and rating system',
       'Communication log',
     ],
-    comingSoon: true,
+  },
+  {
+    icon: Calendar,
+    title: 'Events & Timeline',
+    description:
+      'Plan every event leading up to and including your big day with a visual timeline.',
+    items: [
+      'Event planning and scheduling',
+      'Timeline builder',
+      'Day-of schedule',
+      'Rehearsal dinner coordination',
+      'Vendor arrival times',
+    ],
+  },
+  {
+    icon: Camera,
+    title: 'Photos & Gallery',
+    description:
+      'Collect and organize all your wedding photos in one beautiful, shareable gallery.',
+    items: [
+      'Photo uploads and organization',
+      'Guest photo submissions',
+      'Photo moderation tools',
+      'Shareable gallery links',
+      'Download and print options',
+    ],
+  },
+  {
+    icon: Gift,
+    title: 'Registry & Gifts',
+    description:
+      'Manage your gift registry, track received gifts, and send thank-you notes.',
+    items: [
+      'Registry links and wishlists',
+      'Cash fund setup',
+      'Gift tracking and status',
+      'Thank-you note manager',
+      'Gift receipt confirmations',
+    ],
+  },
+  {
+    icon: Heart,
+    title: 'Ceremony Planning',
+    description:
+      'Plan every detail of your ceremony from vows to the processional order.',
+    items: [
+      'Ceremony outline builder',
+      'Vow workspace and drafts',
+      'Processional order planner',
+      'Reading and music selections',
+      'Officiant coordination',
+    ],
+  },
+  {
+    icon: Music,
+    title: 'Music & Playlists',
+    description:
+      'Build the perfect soundtrack for your wedding with collaborative playlist tools.',
+    items: [
+      'Playlist builder for each event',
+      'Guest song requests',
+      'DJ and band coordination',
+      'Do-not-play list',
+      'First dance and special song picks',
+    ],
+  },
+  {
+    icon: Plane,
+    title: 'Honeymoon Planning',
+    description:
+      'Plan your dream honeymoon with destination research, itineraries, and packing lists.',
+    items: [
+      'Destination planning and research',
+      'Itinerary builder',
+      'Packing list generator',
+      'Travel document checklist',
+      'Budget tracking for trips',
+    ],
   },
   {
     icon: Mail,
@@ -118,7 +199,19 @@ const featureCategories: FeatureCategory[] = [
       'Email campaign tracking',
       'Guest communication history',
     ],
-    comingSoon: true,
+  },
+  {
+    icon: Settings,
+    title: 'Settings & Account',
+    description:
+      'Manage your wedding details, notification preferences, and account settings.',
+    items: [
+      'Wedding details and date management',
+      'Notification preferences',
+      'Partner account management',
+      'Data export and backup',
+      'Privacy and sharing controls',
+    ],
   },
 ]
 
@@ -134,6 +227,13 @@ const freePlanFeatures = [
   { label: 'Custom domain', included: false },
   { label: 'Budget analytics & export', included: false },
   { label: 'CSV and PDF data export', included: false },
+  { label: 'Seating chart builder', included: false },
+  { label: 'Vendor management', included: false },
+  { label: 'Event timeline & scheduling', included: false },
+  { label: 'Photo gallery & submissions', included: false },
+  { label: 'Registry & gift tracking', included: false },
+  { label: 'Ceremony & music planning', included: false },
+  { label: 'Honeymoon planning', included: false },
   { label: 'Priority support', included: false },
 ]
 
@@ -149,12 +249,43 @@ const fullPlanFeatures = [
   { label: 'Custom domain', included: true },
   { label: 'Budget analytics & export', included: true },
   { label: 'CSV and PDF data export', included: true },
+  { label: 'Seating chart builder', included: true },
+  { label: 'Vendor management', included: true },
+  { label: 'Event timeline & scheduling', included: true },
+  { label: 'Photo gallery & submissions', included: true },
+  { label: 'Registry & gift tracking', included: true },
+  { label: 'Ceremony & music planning', included: true },
+  { label: 'Honeymoon planning', included: true },
   { label: 'Priority support', included: true },
 ]
 
 export default function FeaturesPage() {
   return (
     <main className="min-h-screen">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 border-b border-sage-100 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          <Link href="/" className="font-serif text-xl font-bold text-gray-900">
+            PlanForTwo
+          </Link>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/"
+              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+            >
+              Home
+            </Link>
+            <Button
+              asChild
+              size="sm"
+              className="rounded-lg bg-wedding-600 text-white hover:bg-wedding-700"
+            >
+              <Link href="/dashboard">Get Started</Link>
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero */}
       <section className="bg-gradient-to-b from-sage-50 to-white px-4 pb-20 pt-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
@@ -198,16 +329,9 @@ export default function FeaturesPage() {
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sage-100">
                           <Icon className="h-5 w-5 text-sage-700" />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg">
-                            {category.title}
-                          </CardTitle>
-                          {category.comingSoon && (
-                            <Badge className="bg-sage-100 text-sage-700 hover:bg-sage-100">
-                              Coming Soon
-                            </Badge>
-                          )}
-                        </div>
+                        <CardTitle className="text-lg">
+                          {category.title}
+                        </CardTitle>
                       </div>
                       <p className="mt-2 text-sm text-gray-500">
                         {category.description}
@@ -257,7 +381,7 @@ export default function FeaturesPage() {
                 description="Get a taste of PlanForTwo with essential planning tools."
                 features={freePlanFeatures}
                 cta="Start Free"
-                href="/sign-up"
+                href="/dashboard"
                 delay={0.1}
               />
               <PricingCard
@@ -266,7 +390,7 @@ export default function FeaturesPage() {
                 description="Everything unlimited. Every feature. One payment."
                 features={fullPlanFeatures}
                 cta="Get Full Access"
-                href="/sign-up"
+                href="/dashboard"
                 highlighted
                 delay={0.2}
               />
@@ -311,7 +435,7 @@ export default function FeaturesPage() {
               size="lg"
               className="rounded-xl bg-wedding-600 px-8 text-white hover:bg-wedding-700"
             >
-              <Link href="/sign-up">Start Free</Link>
+              <Link href="/dashboard">Start Free</Link>
             </Button>
             <Button
               asChild
@@ -319,7 +443,7 @@ export default function FeaturesPage() {
               size="lg"
               className="rounded-xl px-8"
             >
-              <Link href="/sign-up">Get Full Access</Link>
+              <Link href="/dashboard">Get Full Access</Link>
             </Button>
           </div>
         </AnimatedSection>

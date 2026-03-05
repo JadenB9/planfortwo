@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [guestStats, setGuestStats] = useState<GuestStats | null>(null)
+  const [websiteStatus, setWebsiteStatus] = useState<string>('Not Set Up')
   const [loading, setLoading] = useState(true)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteStatus, setInviteStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
@@ -38,6 +39,19 @@ export default function DashboardPage() {
           api.guests.stats(data.wedding.id, token)
             .then(({ data: gs }) => setGuestStats(gs))
             .catch(() => { /* guest stats may not exist yet */ })
+        )
+        promises.push(
+          api.websiteConfig.get(data.wedding.id, token)
+            .then(({ data: configData }) => {
+              if (!configData) {
+                setWebsiteStatus('Not Set Up')
+              } else if (configData.publishedAt) {
+                setWebsiteStatus('Published')
+              } else {
+                setWebsiteStatus('Draft')
+              }
+            })
+            .catch(() => { setWebsiteStatus('Not Set Up') })
         )
         await Promise.all(promises)
       }
@@ -64,7 +78,8 @@ export default function DashboardPage() {
       setInviteStatus('sent')
       setInviteEmail('')
     } catch (err) {
-      setInviteError(err instanceof Error ? err.message : 'Failed to send invite')
+      console.error('Invite partner error:', err)
+      setInviteError(err instanceof Error ? err.message : 'Failed to send invite. Please check that the API server is running.')
       setInviteStatus('error')
     }
   }
@@ -198,12 +213,13 @@ export default function DashboardPage() {
           <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Website"
-              value="Coming Soon"
+              value={websiteStatus}
               icon={
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                 </svg>
               }
+              trend={websiteStatus === 'Published' ? 'Live' : undefined}
             />
           </motion.div>
         </motion.div>

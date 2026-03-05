@@ -17,9 +17,9 @@ import { UpgradePrompt } from '@/components/checklist/upgrade-prompt'
 
 export default function ChecklistPage() {
   const { getToken } = useAuth()
-  const { data: weddingData, loading: weddingLoading } = useWedding()
+  const { data: weddingData, loading: weddingLoading, error: weddingError } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
-  const { features, loading: featuresLoading } = useFeatures(weddingId)
+  const { features, loading: featuresLoading, error: featuresError } = useFeatures(weddingId)
 
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
   const [tasks, setTasks] = useState<ChecklistTask[]>([])
@@ -88,6 +88,25 @@ export default function ChecklistPage() {
   }
 
   const isLoading = weddingLoading || featuresLoading || loadingTasks
+
+  const apiError = weddingError || featuresError
+
+  if (apiError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-8 py-6">
+          <h2 className="font-serif text-xl font-semibold text-red-800">Unable to load checklist</h2>
+          <p className="mt-2 text-sm text-red-600">{apiError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 rounded-xl bg-red-600 px-5 py-2 text-sm font-semibold text-white hover:bg-red-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (isLoading && tasks.length === 0) {
     return (
