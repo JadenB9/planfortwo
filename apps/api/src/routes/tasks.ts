@@ -67,11 +67,12 @@ tasksRoute.get(
 )
 
 // GET /tasks/:id — task detail
-tasksRoute.get('/:id', async (c) => {
+tasksRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const taskId = c.req.param('id')
+  const weddingId = c.get('weddingId')
   const task = await checklistService.getTaskWithDetails(taskId)
 
-  if (!task) {
+  if (!task || task.weddingId !== weddingId) {
     return c.json(
       { error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 },
       404,
@@ -105,6 +106,7 @@ tasksRoute.post(
 // PUT /tasks/:id — update task (gated)
 tasksRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canEditChecklist'),
   zValidator('json', updateTaskSchema, (result, c) => {
     if (!result.success) {
@@ -118,14 +120,7 @@ tasksRoute.put(
     const taskId = c.req.param('id')
     const data = c.req.valid('json')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const updated = await checklistService.updateTask(taskId, data, dbUserId, weddingId)
 
@@ -143,18 +138,12 @@ tasksRoute.put(
 // PATCH /tasks/:id/complete — toggle completion (gated)
 tasksRoute.patch(
   '/:id/complete',
+  resolveWeddingMiddleware,
   requireFeature('canEditChecklist'),
   async (c) => {
     const taskId = c.req.param('id')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const updated = await checklistService.toggleComplete(taskId, dbUserId, weddingId)
 
@@ -172,6 +161,7 @@ tasksRoute.patch(
 // PATCH /tasks/:id/reorder — single reorder (gated)
 tasksRoute.patch(
   '/:id/reorder',
+  resolveWeddingMiddleware,
   requireFeature('canReorderTasks'),
   zValidator('json', reorderTaskSchema, (result, c) => {
     if (!result.success) {
@@ -201,18 +191,12 @@ tasksRoute.patch(
 // DELETE /tasks/:id — delete task (gated)
 tasksRoute.delete(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canDeleteTasks'),
   async (c) => {
     const taskId = c.req.param('id')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     try {
       await checklistService.deleteTask(taskId, dbUserId, weddingId)
@@ -230,6 +214,7 @@ tasksRoute.delete(
 // POST /tasks/bulk-reorder — bulk reorder (gated)
 tasksRoute.post(
   '/bulk-reorder',
+  resolveWeddingMiddleware,
   requireFeature('canReorderTasks'),
   zValidator('json', bulkReorderTasksSchema, (result, c) => {
     if (!result.success) {
@@ -249,6 +234,7 @@ tasksRoute.post(
 // POST /tasks/:id/notes — add note (gated)
 tasksRoute.post(
   '/:id/notes',
+  resolveWeddingMiddleware,
   requireFeature('canAddNotes'),
   zValidator('json', createTaskNoteSchema, (result, c) => {
     if (!result.success) {
@@ -261,15 +247,8 @@ tasksRoute.post(
   async (c) => {
     const taskId = c.req.param('id')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
+    const weddingId = c.get('weddingId')
     const { content } = c.req.valid('json')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
 
     const note = await checklistService.addNote(taskId, dbUserId, content, weddingId)
     return c.json({ data: note }, 201)

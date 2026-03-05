@@ -46,16 +46,9 @@ budgetItemsRoute.get(
 )
 
 // GET /budget-items/:id — single item
-budgetItemsRoute.get('/:id', async (c) => {
+budgetItemsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const itemId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-
-  if (!weddingId) {
-    return c.json(
-      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-      400,
-    )
-  }
+  const weddingId = c.get('weddingId')
 
   const item = await budgetItemService.get(itemId, weddingId)
 
@@ -93,6 +86,7 @@ budgetItemsRoute.post(
 // PUT /budget-items/:id — update item (gated)
 budgetItemsRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canBudgetExpenses'),
   zValidator('json', updateBudgetItemSchema, (result, c) => {
     if (!result.success) {
@@ -106,14 +100,7 @@ budgetItemsRoute.put(
     const itemId = c.req.param('id')
     const data = c.req.valid('json')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const updated = await budgetItemService.update(itemId, weddingId, data, dbUserId)
 
@@ -131,18 +118,12 @@ budgetItemsRoute.put(
 // DELETE /budget-items/:id — delete item (gated)
 budgetItemsRoute.delete(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canBudgetExpenses'),
   async (c) => {
     const itemId = c.req.param('id')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     try {
       await budgetItemService.delete(itemId, weddingId, dbUserId)
@@ -160,6 +141,7 @@ budgetItemsRoute.delete(
 // POST /budget-items/:id/upload-url — get presigned upload URL (gated)
 budgetItemsRoute.post(
   '/:id/upload-url',
+  resolveWeddingMiddleware,
   requireFeature('canBudgetExpenses'),
   zValidator('json', z.object({
     weddingId: z.string().uuid(),
@@ -175,7 +157,8 @@ budgetItemsRoute.post(
   }),
   async (c) => {
     const itemId = c.req.param('id')
-    const { weddingId, fileName, contentType } = c.req.valid('json')
+    const weddingId = c.get('weddingId')
+    const { fileName, contentType } = c.req.valid('json')
 
     const result = await budgetItemService.getUploadUrl(weddingId, itemId, fileName, contentType)
     return c.json({ data: result })

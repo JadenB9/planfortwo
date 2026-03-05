@@ -35,11 +35,12 @@ householdsRoute.get(
 )
 
 // GET /households/:id — single household with guests
-householdsRoute.get('/:id', async (c) => {
+householdsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const id = c.req.param('id')
+  const weddingId = c.get('weddingId')
   const household = await householdService.getHousehold(id)
 
-  if (!household) {
+  if (!household || household.weddingId !== weddingId) {
     return c.json(
       { error: 'Household not found', code: 'HOUSEHOLD_NOT_FOUND', statusCode: 404 },
       404,
@@ -72,6 +73,7 @@ householdsRoute.post(
 // PUT /households/:id — update household
 householdsRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   zValidator('json', updateHouseholdSchema, (result, c) => {
     if (!result.success) {
       return c.json(
@@ -82,7 +84,16 @@ householdsRoute.put(
   }),
   async (c) => {
     const id = c.req.param('id')
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
+
+    const household = await householdService.getHousehold(id)
+    if (!household || household.weddingId !== weddingId) {
+      return c.json(
+        { error: 'Household not found', code: 'HOUSEHOLD_NOT_FOUND', statusCode: 404 },
+        404,
+      )
+    }
 
     const updated = await householdService.updateHousehold(id, data)
 
@@ -98,17 +109,10 @@ householdsRoute.put(
 )
 
 // DELETE /households/:id?weddingId=X — delete household
-householdsRoute.delete('/:id', async (c) => {
+householdsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const id = c.req.param('id')
   const dbUserId = c.get('dbUserId')
-  const weddingId = c.req.query('weddingId')
-
-  if (!weddingId) {
-    return c.json(
-      { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-      400,
-    )
-  }
+  const weddingId = c.get('weddingId')
 
   try {
     await householdService.deleteHousehold(id, dbUserId, weddingId)

@@ -77,6 +77,8 @@ vi.mock('../services/features.js', () => ({
 
 import { guestTagsRoute } from './guest-tags.js'
 import { guestTagService } from '../services/guest-tags.js'
+import { userService } from '../services/users.js'
+import { weddingService } from '../services/weddings.js'
 
 const mockedGuestTagService = vi.mocked(guestTagService)
 
@@ -100,6 +102,12 @@ describe('Guest Tag Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
+    vi.mocked(userService.findByClerkId).mockResolvedValue({
+      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+    })
+    vi.mocked(weddingService.verifyMembership).mockResolvedValue({
+      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+    })
   })
 
   describe('GET /guest-tags', () => {
@@ -170,7 +178,7 @@ describe('Guest Tag Routes', () => {
       mockedGuestTagService.deleteTag.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(`/guest-tags/${TAG_ID}`, {
+      const res = await app.request(`/guest-tags/${TAG_ID}?weddingId=${WEDDING_ID}`, {
         method: 'DELETE',
         headers: authHeaders(),
       })
@@ -184,7 +192,7 @@ describe('Guest Tag Routes', () => {
       mockedGuestTagService.deleteTag.mockRejectedValue(new Error('Tag not found'))
 
       const app = createApp()
-      const res = await app.request(`/guest-tags/${TAG_ID}`, {
+      const res = await app.request(`/guest-tags/${TAG_ID}?weddingId=${WEDDING_ID}`, {
         method: 'DELETE',
         headers: authHeaders(),
       })

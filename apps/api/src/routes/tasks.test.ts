@@ -80,6 +80,8 @@ vi.mock('../services/features.js', () => ({
 import { tasksRoute } from './tasks.js'
 import { checklistService } from '../services/checklist.js'
 import { featureService } from '../services/features.js'
+import { userService } from '../services/users.js'
+import { weddingService } from '../services/weddings.js'
 
 const mockedChecklistService = vi.mocked(checklistService)
 const mockedFeatureService = vi.mocked(featureService)
@@ -122,6 +124,13 @@ describe('Task Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
+
+    vi.mocked(userService.findByClerkId).mockResolvedValue({
+      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+    })
+    vi.mocked(weddingService.verifyMembership).mockResolvedValue({
+      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+    })
 
     // Reset to full-tier by default
     mockedFeatureService.getFeatures.mockResolvedValue({
@@ -191,7 +200,7 @@ describe('Task Routes', () => {
       mockedChecklistService.getTaskWithDetails.mockResolvedValue(mockTask as never)
 
       const app = createApp()
-      const res = await app.request(`/tasks/${TASK_ID}`, {
+      const res = await app.request(`/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
         method: 'GET',
         headers: authHeaders(),
       })
@@ -206,7 +215,7 @@ describe('Task Routes', () => {
       mockedChecklistService.getTaskWithDetails.mockResolvedValue(null)
 
       const app = createApp()
-      const res = await app.request(`/tasks/${TASK_ID}`, {
+      const res = await app.request(`/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
         method: 'GET',
         headers: authHeaders(),
       })

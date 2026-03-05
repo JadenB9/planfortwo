@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Sparkles, ExternalLink } from 'lucide-react'
 import { staggerContainer, navItem, springSmooth } from '@/lib/animations'
 import { NAV_GROUPS } from '@/lib/navigation'
 
@@ -20,7 +20,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden w-64 border-r border-gray-200 bg-white lg:block">
+    <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white lg:flex">
       <div className="flex h-16 items-center border-b border-gray-200 px-6">
         <Link href="/dashboard" className="font-serif text-xl font-bold text-gray-900">
           Plan<span className="text-wedding-600">For</span>Two
@@ -91,6 +91,24 @@ export function Sidebar() {
           )
         })}
       </motion.nav>
+
+      {/* Bottom section */}
+      <div className="mt-auto border-t border-gray-200 p-3 space-y-2">
+        <Link
+          href="/upgrade"
+          className="flex items-center justify-center gap-2 rounded-xl bg-wedding-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+        >
+          <Sparkles className="h-4 w-4" />
+          Upgrade Plan
+        </Link>
+        <Link
+          href="/"
+          className="flex items-center gap-2 px-3 py-2 text-xs text-gray-400 transition-colors hover:text-gray-600"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          Visit Home Page
+        </Link>
+      </div>
     </aside>
   )
 }

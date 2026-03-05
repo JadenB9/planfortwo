@@ -76,6 +76,8 @@ vi.mock('../services/features.js', () => ({
 
 import { householdsRoute } from './households.js'
 import { householdService } from '../services/households.js'
+import { userService } from '../services/users.js'
+import { weddingService } from '../services/weddings.js'
 
 const mockedHouseholdService = vi.mocked(householdService)
 
@@ -99,6 +101,12 @@ describe('Household Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
+    vi.mocked(userService.findByClerkId).mockResolvedValue({
+      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+    })
+    vi.mocked(weddingService.verifyMembership).mockResolvedValue({
+      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+    })
   })
 
   describe('GET /households', () => {
@@ -138,7 +146,7 @@ describe('Household Routes', () => {
       mockedHouseholdService.getHousehold.mockResolvedValue(mockHousehold as never)
 
       const app = createApp()
-      const res = await app.request(`/households/${HOUSEHOLD_ID}`, {
+      const res = await app.request(`/households/${HOUSEHOLD_ID}?weddingId=${WEDDING_ID}`, {
         method: 'GET',
         headers: authHeaders(),
       })
@@ -152,7 +160,7 @@ describe('Household Routes', () => {
       mockedHouseholdService.getHousehold.mockResolvedValue(null)
 
       const app = createApp()
-      const res = await app.request(`/households/${HOUSEHOLD_ID}`, {
+      const res = await app.request(`/households/${HOUSEHOLD_ID}?weddingId=${WEDDING_ID}`, {
         method: 'GET',
         headers: authHeaders(),
       })
@@ -210,7 +218,7 @@ describe('Household Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(`/households/${HOUSEHOLD_ID}`, {
+      const res = await app.request(`/households/${HOUSEHOLD_ID}?weddingId=${WEDDING_ID}`, {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({ name: 'The Jones Family' }),
@@ -225,7 +233,7 @@ describe('Household Routes', () => {
       mockedHouseholdService.updateHousehold.mockResolvedValue(null)
 
       const app = createApp()
-      const res = await app.request(`/households/${HOUSEHOLD_ID}`, {
+      const res = await app.request(`/households/${HOUSEHOLD_ID}?weddingId=${WEDDING_ID}`, {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({ name: 'Non-existent' }),

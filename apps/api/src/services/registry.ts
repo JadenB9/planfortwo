@@ -186,6 +186,14 @@ export const registryService = {
     return board!
   },
 
+  async getMoodBoard(boardId: string, weddingId: string) {
+    const [board] = await db
+      .select()
+      .from(moodBoards)
+      .where(and(eq(moodBoards.id, boardId), eq(moodBoards.weddingId, weddingId)))
+    return board ?? null
+  },
+
   async deleteMoodBoard(boardId: string, weddingId: string) {
     await db.delete(moodBoards).where(and(eq(moodBoards.id, boardId), eq(moodBoards.weddingId, weddingId)))
   },

@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import type { DashboardData, DashboardStats, GuestStats } from '@planfortwo/types'
 import { api } from '@/lib/api'
 import { staggerGrid, fadeInUp, springSmooth } from '@/lib/animations'
+import Link from 'next/link'
+import { Map, ArrowRight } from 'lucide-react'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { UpcomingTasks } from '@/components/dashboard/upcoming-tasks'
 import { ActivityFeed } from '@/components/dashboard/activity-feed'
@@ -127,6 +129,30 @@ export default function DashboardPage() {
             days until the big day
           </p>
         )}
+      </motion.div>
+
+      {/* Roadmap Quick Link */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        className="mb-6"
+      >
+        <Link
+          href="/roadmap"
+          className="group flex items-center justify-between rounded-2xl border border-sage-200 bg-gradient-to-r from-sage-50 to-cream-50 p-5 shadow-sm transition-all hover:shadow-md"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sage-100">
+              <Map className="h-5 w-5 text-sage-700" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Planning Roadmap</p>
+              <p className="text-xs text-gray-500">Track your overall wedding planning progress</p>
+            </div>
+          </div>
+          <ArrowRight className="h-5 w-5 text-gray-400 transition-transform group-hover:translate-x-1" />
+        </Link>
       </motion.div>
 
       <div className="space-y-6">

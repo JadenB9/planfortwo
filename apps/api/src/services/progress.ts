@@ -27,27 +27,7 @@ function deriveStatus(itemCount: number, progress: number): FeatureStatus {
 
 export const progressService = {
   async getProgress(weddingId: string): Promise<PlanningProgress> {
-    const [
-      checklistResult,
-      checklistCompletedResult,
-      guestResult,
-      guestRsvpResult,
-      budgetCatResult,
-      budgetItemResult,
-      budgetPaidResult,
-      websiteResult,
-      seatingResult,
-      vendorResult,
-      vendorBookedResult,
-      eventResult,
-      photoResult,
-      registryLinkResult,
-      cashFundResult,
-      ceremonyResult,
-      playlistResult,
-      honeymoonResult,
-      emailResult,
-    ] = await Promise.all([
+    const results = await Promise.allSettled([
       db.select({ value: count() }).from(checklistTasks).where(eq(checklistTasks.weddingId, weddingId)),
       db.select({ value: count() }).from(checklistTasks).where(and(eq(checklistTasks.weddingId, weddingId), isNotNull(checklistTasks.completedAt))),
       db.select({ value: count() }).from(guests).where(eq(guests.weddingId, weddingId)),
@@ -69,61 +49,71 @@ export const progressService = {
       db.select({ value: count() }).from(emailCampaigns).where(eq(emailCampaigns.weddingId, weddingId)),
     ])
 
-    const totalTasks = checklistResult[0]?.value ?? 0
-    const completedTasks = checklistCompletedResult[0]?.value ?? 0
+    // Safe extraction: if a query failed (e.g. table doesn't exist), return 0
+    const cnt = (i: number): number => {
+      const r = results[i]
+      if (!r || r.status !== 'fulfilled') return 0
+      return (r.value as { value: number }[])[0]?.value ?? 0
+    }
+
+    const totalTasks = cnt(0)
+    const completedTasks = cnt(1)
     const checklistProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
 
-    const guestCount = guestResult[0]?.value ?? 0
-    const rsvpCount = guestRsvpResult[0]?.value ?? 0
+    const guestCount = cnt(2)
+    const rsvpCount = cnt(3)
     let guestProgress = 0
     if (guestCount > 0) guestProgress += 50
     if (rsvpCount > 0) guestProgress += 50
 
-    const budgetCatCount = budgetCatResult[0]?.value ?? 0
-    const budgetItemCount = budgetItemResult[0]?.value ?? 0
-    const budgetPaidCount = budgetPaidResult[0]?.value ?? 0
+    const budgetCatCount = cnt(4)
+    const budgetItemCount = cnt(5)
+    const budgetPaidCount = cnt(6)
     let budgetProgress = 0
     if (budgetCatCount > 0) budgetProgress += 25
     if (budgetItemCount > 0) budgetProgress += 25
     if (budgetPaidCount > 0) budgetProgress += 50
 
-    const websiteConfig = websiteResult[0] ?? null
+    const websiteSettled = results[7]
+    const websiteConfig = websiteSettled.status === 'fulfilled'
+      ? (websiteSettled.value as Array<Record<string, unknown>>)[0] ?? null
+      : null
     let websiteProgress = 0
     if (websiteConfig && websiteConfig.publishedAt) websiteProgress = 100
     else if (websiteConfig) websiteProgress = 50
 
-    const seatingCount = seatingResult[0]?.value ?? 0
+    const seatingCount = cnt(8)
     const seatingProgress = seatingCount > 0 ? 50 : 0
 
-    const vendorCount = vendorResult[0]?.value ?? 0
-    const vendorBookedCount = vendorBookedResult[0]?.value ?? 0
+    const vendorCount = cnt(9)
+    const vendorBookedCount = cnt(10)
     let vendorProgress = 0
     if (vendorCount > 0) vendorProgress += 50
     if (vendorBookedCount > 0) vendorProgress += 50
 
-    const eventCount = eventResult[0]?.value ?? 0
+    const eventCount = cnt(11)
     const eventProgress = eventCount > 0 ? 50 : 0
 
-    const photoCount = photoResult[0]?.value ?? 0
+    const photoCount = cnt(12)
     const photoProgress = photoCount > 0 ? 50 : 0
 
-    const registryLinkCount = registryLinkResult[0]?.value ?? 0
-    const cashFundCount = cashFundResult[0]?.value ?? 0
+    const registryLinkCount = cnt(13)
+    const cashFundCount = cnt(14)
     const registryTotal = registryLinkCount + cashFundCount
     let registryProgress = 0
     if (registryLinkCount > 0) registryProgress += 50
     if (cashFundCount > 0) registryProgress += 50
 
-    const ceremonyCount = ceremonyResult[0]?.value ?? 0
+    const ceremonyCount = cnt(15)
     const ceremonyProgress = ceremonyCount > 0 ? 50 : 0
 
-    const playlistCount = playlistResult[0]?.value ?? 0
+    const playlistCount = cnt(16)
     const playlistProgress = playlistCount > 0 ? 50 : 0
 
-    const honeymoonCount = honeymoonResult[0]?.value ?? 0
+    const honeymoonCount = cnt(17)
     const honeymoonProgress = honeymoonCount > 0 ? 50 : 0
 
-    const emailCount = emailResult[0]?.value ?? 0
+    const emailCount = cnt(18)
     const emailProgress = emailCount > 0 ? 50 : 0
 
     const features: FeatureProgress[] = [

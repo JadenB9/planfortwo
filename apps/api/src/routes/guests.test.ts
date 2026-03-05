@@ -108,6 +108,8 @@ vi.mock('@planfortwo/db', () => ({
 import { guestsRoute } from './guests.js'
 import { guestService } from '../services/guests.js'
 import { featureService } from '../services/features.js'
+import { userService } from '../services/users.js'
+import { weddingService } from '../services/weddings.js'
 
 const mockedGuestService = vi.mocked(guestService)
 const mockedFeatureService = vi.mocked(featureService)
@@ -173,6 +175,12 @@ describe('Guest Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
+    vi.mocked(userService.findByClerkId).mockResolvedValue({
+      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+    })
+    vi.mocked(weddingService.verifyMembership).mockResolvedValue({
+      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+    })
     mockedFeatureService.getFeatures.mockResolvedValue(FULL_GATES)
   })
 
@@ -302,7 +310,7 @@ describe('Guest Routes', () => {
       mockedGuestService.getGuest.mockResolvedValue(mockGuest as never)
 
       const app = createApp()
-      const res = await app.request(`/guests/${GUEST_ID}`, {
+      const res = await app.request(`/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`, {
         method: 'GET',
         headers: authHeaders(),
       })
@@ -317,7 +325,7 @@ describe('Guest Routes', () => {
       mockedGuestService.getGuest.mockResolvedValue(null)
 
       const app = createApp()
-      const res = await app.request(`/guests/${GUEST_ID}`, {
+      const res = await app.request(`/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`, {
         method: 'GET',
         headers: authHeaders(),
       })
@@ -511,7 +519,7 @@ describe('Guest Routes', () => {
       mockedGuestService.setTagsForGuest.mockResolvedValue(undefined)
 
       const app = createApp()
-      const res = await app.request(`/guests/${GUEST_ID}/tags`, {
+      const res = await app.request(`/guests/${GUEST_ID}/tags?weddingId=${WEDDING_ID}`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({ tagIds: [TAG_ID] }),
@@ -526,7 +534,7 @@ describe('Guest Routes', () => {
   describe('DELETE /guests/:id/tags/:tagId', () => {
     it('should remove a tag from a guest', async () => {
       const app = createApp()
-      const res = await app.request(`/guests/${GUEST_ID}/tags/${TAG_ID}`, {
+      const res = await app.request(`/guests/${GUEST_ID}/tags/${TAG_ID}?weddingId=${WEDDING_ID}`, {
         method: 'DELETE',
         headers: authHeaders(),
       })

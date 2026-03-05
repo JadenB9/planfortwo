@@ -54,13 +54,13 @@ emailCampaignsRoute.post(
 
 emailCampaignsRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   zValidator('json', updateEmailCampaignSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const campaignId = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await emailCampaignService.update(campaignId, weddingId, data)
     if (!updated) return c.json({ error: 'Campaign not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -68,17 +68,19 @@ emailCampaignsRoute.put(
   },
 )
 
-emailCampaignsRoute.delete('/:id', async (c) => {
+emailCampaignsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const campaignId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   const deleted = await emailCampaignService.delete(campaignId, weddingId)
   if (!deleted) return c.json({ error: 'Campaign not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
 
-emailCampaignsRoute.get('/:id/recipients', async (c) => {
+emailCampaignsRoute.get('/:id/recipients', resolveWeddingMiddleware, async (c) => {
   const campaignId = c.req.param('id')
+  const weddingId = c.get('weddingId')
+  const campaign = await emailCampaignService.getById(campaignId, weddingId)
+  if (!campaign) return c.json({ error: 'Campaign not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   const recipients = await emailCampaignService.getRecipients(campaignId)
   return c.json({ data: recipients })
 })
@@ -108,13 +110,13 @@ announcementsRoute.post(
 
 announcementsRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   zValidator('json', updateAnnouncementSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const announcementId = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await announcementService.update(announcementId, weddingId, data)
     if (!updated) return c.json({ error: 'Announcement not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -122,10 +124,9 @@ announcementsRoute.put(
   },
 )
 
-announcementsRoute.delete('/:id', async (c) => {
+announcementsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const announcementId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   const deleted = await announcementService.delete(announcementId, weddingId)
   if (!deleted) return c.json({ error: 'Announcement not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })

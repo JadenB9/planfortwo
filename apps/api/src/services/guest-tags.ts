@@ -27,6 +27,14 @@ export const guestTagService = {
     return tag!
   },
 
+  async getTag(id: string) {
+    const [tag] = await db
+      .select()
+      .from(guestTags)
+      .where(eq(guestTags.id, id))
+    return tag ?? null
+  },
+
   async deleteTag(id: string) {
     await db.delete(guestTags).where(eq(guestTags.id, id))
   },

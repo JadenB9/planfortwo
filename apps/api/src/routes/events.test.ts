@@ -58,6 +58,8 @@ vi.mock('../services/features.js', () => ({
 import { eventsRoute } from './events.js'
 import { eventService } from '../services/events.js'
 import { featureService } from '../services/features.js'
+import { userService } from '../services/users.js'
+import { weddingService } from '../services/weddings.js'
 
 const mockedService = vi.mocked(eventService)
 const mockedFeatureService = vi.mocked(featureService)
@@ -79,6 +81,12 @@ describe('Event Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
+    vi.mocked(userService.findByClerkId).mockResolvedValue({
+      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+    })
+    vi.mocked(weddingService.verifyMembership).mockResolvedValue({
+      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+    })
     mockedFeatureService.getFeatures.mockResolvedValue({
       tier: 'full', canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
       canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
@@ -182,7 +190,7 @@ describe('Event Routes', () => {
       ] as never)
 
       const app = createApp()
-      const res = await app.request(`/events/${EVENT_ID}/timeline`, { method: 'GET', headers: authHeaders() })
+      const res = await app.request(`/events/${EVENT_ID}/timeline?weddingId=${WEDDING_ID}`, { method: 'GET', headers: authHeaders() })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)

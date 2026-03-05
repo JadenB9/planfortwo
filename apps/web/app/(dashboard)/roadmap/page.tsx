@@ -18,12 +18,15 @@ export default function RoadmapPage() {
   useEffect(() => {
     async function loadWedding() {
       const token = await getToken()
-      if (!token) return
+      if (!token) {
+        setLoading(false)
+        return
+      }
       try {
         const res = await api.weddings.mine(token)
         setWeddingId(res.data.wedding.id)
       } catch {
-        // Wedding not found
+        setLoading(false)
       }
     }
     loadWedding()
@@ -56,8 +59,19 @@ export default function RoadmapPage() {
 
   if (!progress) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center gap-2">
-        <p className="text-gray-500">Unable to load planning progress.</p>
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
+        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <h2 className="font-serif text-xl font-semibold text-gray-900">Planning Roadmap</h2>
+          <p className="mt-2 text-sm text-gray-500">
+            Complete your wedding setup to see your planning progress here.
+          </p>
+          <a
+            href="/dashboard"
+            className="mt-4 inline-flex items-center rounded-xl bg-wedding-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-wedding-700"
+          >
+            Go to Dashboard
+          </a>
+        </div>
       </div>
     )
   }

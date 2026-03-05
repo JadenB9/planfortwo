@@ -50,8 +50,17 @@ guestTagsRoute.post(
 )
 
 // DELETE /guest-tags/:id — delete tag
-guestTagsRoute.delete('/:id', async (c) => {
+guestTagsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const id = c.req.param('id')
+  const weddingId = c.get('weddingId')
+
+  const tag = await guestTagService.getTag(id)
+  if (!tag || tag.weddingId !== weddingId) {
+    return c.json(
+      { error: 'Tag not found', code: 'NOT_FOUND', statusCode: 404 },
+      404,
+    )
+  }
 
   try {
     await guestTagService.deleteTag(id)

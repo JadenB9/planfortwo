@@ -51,8 +51,11 @@ const app = new Hono()
 app.use('*', logger())
 app.use('*', secureHeaders())
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL
 const allowedOrigins = [
-  process.env.NEXT_PUBLIC_APP_URL,
+  appUrl,
+  // Also allow the root domain (planfortwo.com from app.planfortwo.com)
+  appUrl ? appUrl.replace('://app.', '://') : undefined,
   ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : []),
 ].filter(Boolean) as string[]
 

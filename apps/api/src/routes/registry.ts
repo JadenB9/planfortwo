@@ -48,15 +48,14 @@ registryRoute.post(
   },
 )
 
-registryRoute.delete('/links/:id', async (c) => {
+registryRoute.delete('/links/:id', resolveWeddingMiddleware, async (c) => {
   const linkId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   await registryService.deleteLink(linkId, weddingId)
   return c.json({ data: { success: true } })
 })
 
-registryRoute.post('/links/:id/click', async (c) => {
+registryRoute.post('/links/:id/click', resolveWeddingMiddleware, async (c) => {
   const linkId = c.req.param('id')
   await registryService.trackClick(linkId)
   return c.json({ data: { success: true } })
@@ -83,13 +82,13 @@ registryRoute.post(
 
 registryRoute.put(
   '/funds/:id',
+  resolveWeddingMiddleware,
   zValidator('json', updateCashFundSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const fundId = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await registryService.updateFund(fundId, weddingId, data)
     if (!updated) return c.json({ error: 'Fund not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -97,10 +96,9 @@ registryRoute.put(
   },
 )
 
-registryRoute.delete('/funds/:id', async (c) => {
+registryRoute.delete('/funds/:id', resolveWeddingMiddleware, async (c) => {
   const fundId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   await registryService.deleteFund(fundId, weddingId)
   return c.json({ data: { success: true } })
 })
@@ -138,13 +136,13 @@ registryRoute.post(
 
 registryRoute.put(
   '/gifts/:id',
+  resolveWeddingMiddleware,
   zValidator('json', updateGiftSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const giftId = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await registryService.updateGift(giftId, weddingId, data)
     if (!updated) return c.json({ error: 'Gift not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -152,10 +150,9 @@ registryRoute.put(
   },
 )
 
-registryRoute.delete('/gifts/:id', async (c) => {
+registryRoute.delete('/gifts/:id', resolveWeddingMiddleware, async (c) => {
   const giftId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   await registryService.deleteGift(giftId, weddingId)
   return c.json({ data: { success: true } })
 })
@@ -179,33 +176,40 @@ registryRoute.post(
   },
 )
 
-registryRoute.delete('/mood-boards/:id', async (c) => {
+registryRoute.delete('/mood-boards/:id', resolveWeddingMiddleware, async (c) => {
   const boardId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   await registryService.deleteMoodBoard(boardId, weddingId)
   return c.json({ data: { success: true } })
 })
 
-registryRoute.get('/mood-boards/:id/items', async (c) => {
+registryRoute.get('/mood-boards/:id/items', resolveWeddingMiddleware, async (c) => {
   const boardId = c.req.param('id')
+  const weddingId = c.get('weddingId')
+  const board = await registryService.getMoodBoard(boardId, weddingId)
+  if (!board) return c.json({ error: 'Board not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   const items = await registryService.listBoardItems(boardId)
   return c.json({ data: items })
 })
 
 registryRoute.post(
   '/mood-boards/:id/items',
+  resolveWeddingMiddleware,
   zValidator('json', createMoodBoardItemSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
+    const boardId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const board = await registryService.getMoodBoard(boardId, weddingId)
+    if (!board) return c.json({ error: 'Board not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
     const item = await registryService.addBoardItem(data)
     return c.json({ data: item }, 201)
   },
 )
 
-registryRoute.delete('/mood-boards/items/:itemId', async (c) => {
+registryRoute.delete('/mood-boards/items/:itemId', resolveWeddingMiddleware, async (c) => {
   const itemId = c.req.param('itemId')
   await registryService.deleteBoardItem(itemId)
   return c.json({ data: { success: true } })

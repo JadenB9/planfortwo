@@ -61,6 +61,8 @@ vi.mock('../services/features.js', () => ({
 import { vendorsRoute } from './vendors.js'
 import { vendorService } from '../services/vendors.js'
 import { featureService } from '../services/features.js'
+import { userService } from '../services/users.js'
+import { weddingService } from '../services/weddings.js'
 
 const mockedService = vi.mocked(vendorService)
 const mockedFeatureService = vi.mocked(featureService)
@@ -104,6 +106,12 @@ describe('Vendor Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
+    vi.mocked(userService.findByClerkId).mockResolvedValue({
+      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+    })
+    vi.mocked(weddingService.verifyMembership).mockResolvedValue({
+      id: 'member-1', weddingId: WEDDING_ID, userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+    })
     mockedFeatureService.getFeatures.mockResolvedValue(FULL_GATES)
   })
 

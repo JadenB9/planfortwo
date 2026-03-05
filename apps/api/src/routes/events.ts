@@ -54,13 +54,13 @@ eventsRoute.post(
 
 eventsRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   zValidator('json', updateEventSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const eventId = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await eventService.update(eventId, weddingId, data)
     if (!updated) return c.json({ error: 'Event not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -68,27 +68,34 @@ eventsRoute.put(
   },
 )
 
-eventsRoute.delete('/:id', async (c) => {
+eventsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const eventId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   const deleted = await eventService.delete(eventId, weddingId)
   if (!deleted) return c.json({ error: 'Event not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
 
-eventsRoute.get('/:id/timeline', async (c) => {
+eventsRoute.get('/:id/timeline', resolveWeddingMiddleware, async (c) => {
   const eventId = c.req.param('id')
+  const weddingId = c.get('weddingId')
+  const event = await eventService.getById(eventId, weddingId)
+  if (!event) return c.json({ error: 'Event not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   const entries = await eventService.listTimeline(eventId)
   return c.json({ data: entries })
 })
 
 eventsRoute.post(
   '/:id/timeline',
+  resolveWeddingMiddleware,
   zValidator('json', createTimelineEntrySchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
+    const eventId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const event = await eventService.getById(eventId, weddingId)
+    if (!event) return c.json({ error: 'Event not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
     const entry = await eventService.createTimelineEntry(data)
     return c.json({ data: entry }, 201)
@@ -97,6 +104,7 @@ eventsRoute.post(
 
 eventsRoute.put(
   '/timeline/:entryId',
+  resolveWeddingMiddleware,
   zValidator('json', updateTimelineEntrySchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
@@ -109,7 +117,7 @@ eventsRoute.put(
   },
 )
 
-eventsRoute.delete('/timeline/:entryId', async (c) => {
+eventsRoute.delete('/timeline/:entryId', resolveWeddingMiddleware, async (c) => {
   const entryId = c.req.param('entryId')
   await eventService.deleteTimelineEntry(entryId)
   return c.json({ data: { success: true } })

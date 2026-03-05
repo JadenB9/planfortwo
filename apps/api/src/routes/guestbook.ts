@@ -52,6 +52,7 @@ guestbookRoute.put(
   '/:id/approve',
   authMiddleware,
   resolveUserMiddleware,
+  resolveWeddingMiddleware,
   zValidator('json', z.object({ approved: z.boolean() }), (result, c) => {
     if (!result.success) {
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -59,10 +60,7 @@ guestbookRoute.put(
   }),
   async (c) => {
     const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
-    }
+    const weddingId = c.get('weddingId')
 
     const { approved } = c.req.valid('json')
     const updated = await guestbookService.approve(id, weddingId, approved)
@@ -78,12 +76,10 @@ guestbookRoute.delete(
   '/:id',
   authMiddleware,
   resolveUserMiddleware,
+  resolveWeddingMiddleware,
   async (c) => {
     const id = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) {
-      return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
-    }
+    const weddingId = c.get('weddingId')
 
     try {
       await guestbookService.delete(id, weddingId)

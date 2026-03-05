@@ -107,6 +107,14 @@ export const vendorService = {
     return !!deleted
   },
 
+  async getCommunication(commId: string) {
+    const [comm] = await db
+      .select()
+      .from(vendorCommunications)
+      .where(eq(vendorCommunications.id, commId))
+    return comm ?? null
+  },
+
   async listCommunications(vendorId: string) {
     return db
       .select()
@@ -134,6 +142,14 @@ export const vendorService = {
 
   async deleteCommunication(commId: string) {
     await db.delete(vendorCommunications).where(eq(vendorCommunications.id, commId))
+  },
+
+  async getContract(contractId: string) {
+    const [contract] = await db
+      .select()
+      .from(vendorContracts)
+      .where(eq(vendorContracts.id, contractId))
+    return contract ?? null
   },
 
   async listContracts(vendorId: string) {

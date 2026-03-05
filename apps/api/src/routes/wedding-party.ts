@@ -55,13 +55,13 @@ weddingPartyRoute.post(
 
 weddingPartyRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   zValidator('json', updatePartyMemberSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     const memberId = c.req.param('id')
-    const weddingId = c.req.query('weddingId')
-    if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
     const updated = await weddingPartyService.update(memberId, weddingId, data)
     if (!updated) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -69,27 +69,34 @@ weddingPartyRoute.put(
   },
 )
 
-weddingPartyRoute.delete('/:id', async (c) => {
+weddingPartyRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
   const memberId = c.req.param('id')
-  const weddingId = c.req.query('weddingId')
-  if (!weddingId) return c.json({ error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 }, 400)
+  const weddingId = c.get('weddingId')
   const deleted = await weddingPartyService.delete(memberId, weddingId)
   if (!deleted) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
 
-weddingPartyRoute.get('/:id/tasks', async (c) => {
+weddingPartyRoute.get('/:id/tasks', resolveWeddingMiddleware, async (c) => {
   const memberId = c.req.param('id')
+  const weddingId = c.get('weddingId')
+  const member = await weddingPartyService.getById(memberId, weddingId)
+  if (!member) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   const tasks = await weddingPartyService.listTasks(memberId)
   return c.json({ data: tasks })
 })
 
 weddingPartyRoute.post(
   '/:id/tasks',
+  resolveWeddingMiddleware,
   zValidator('json', createPartyTaskSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
+    const memberId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const member = await weddingPartyService.getById(memberId, weddingId)
+    if (!member) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
     const task = await weddingPartyService.createTask(data)
     return c.json({ data: task }, 201)
@@ -98,6 +105,7 @@ weddingPartyRoute.post(
 
 weddingPartyRoute.put(
   '/tasks/:taskId',
+  resolveWeddingMiddleware,
   zValidator('json', updatePartyTaskSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
@@ -110,31 +118,39 @@ weddingPartyRoute.put(
   },
 )
 
-weddingPartyRoute.delete('/tasks/:taskId', async (c) => {
+weddingPartyRoute.delete('/tasks/:taskId', resolveWeddingMiddleware, async (c) => {
   const taskId = c.req.param('taskId')
   await weddingPartyService.deleteTask(taskId)
   return c.json({ data: { success: true } })
 })
 
-weddingPartyRoute.get('/:id/gifts', async (c) => {
+weddingPartyRoute.get('/:id/gifts', resolveWeddingMiddleware, async (c) => {
   const memberId = c.req.param('id')
+  const weddingId = c.get('weddingId')
+  const member = await weddingPartyService.getById(memberId, weddingId)
+  if (!member) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   const gifts = await weddingPartyService.listGifts(memberId)
   return c.json({ data: gifts })
 })
 
 weddingPartyRoute.post(
   '/:id/gifts',
+  resolveWeddingMiddleware,
   zValidator('json', createPartyGiftSchema, (result, c) => {
     if (!result.success) return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
+    const memberId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const member = await weddingPartyService.getById(memberId, weddingId)
+    if (!member) return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
     const gift = await weddingPartyService.createGift(data)
     return c.json({ data: gift }, 201)
   },
 )
 
-weddingPartyRoute.delete('/gifts/:giftId', async (c) => {
+weddingPartyRoute.delete('/gifts/:giftId', resolveWeddingMiddleware, async (c) => {
   const giftId = c.req.param('giftId')
   await weddingPartyService.deleteGift(giftId)
   return c.json({ data: { success: true } })

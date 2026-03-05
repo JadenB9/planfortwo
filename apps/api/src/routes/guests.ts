@@ -76,11 +76,12 @@ guestsRoute.get(
 )
 
 // GET /guests/:id — single guest
-guestsRoute.get('/:id', async (c) => {
+guestsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const guestId = c.req.param('id')
+  const weddingId = c.get('weddingId')
   const guest = await guestService.getGuest(guestId)
 
-  if (!guest) {
+  if (!guest || guest.weddingId !== weddingId) {
     return c.json(
       { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
       404,
@@ -114,6 +115,7 @@ guestsRoute.post(
 // PUT /guests/:id — update guest (gated)
 guestsRoute.put(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canEditGuests'),
   zValidator('json', updateGuestSchema, (result, c) => {
     if (!result.success) {
@@ -127,14 +129,7 @@ guestsRoute.put(
     const guestId = c.req.param('id')
     const data = c.req.valid('json')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     const updated = await guestService.updateGuest(guestId, data, dbUserId, weddingId)
 
@@ -152,18 +147,12 @@ guestsRoute.put(
 // DELETE /guests/:id — delete guest (gated)
 guestsRoute.delete(
   '/:id',
+  resolveWeddingMiddleware,
   requireFeature('canDeleteGuests'),
   async (c) => {
     const guestId = c.req.param('id')
     const dbUserId = c.get('dbUserId')
-    const weddingId = c.req.query('weddingId')
-
-    if (!weddingId) {
-      return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
-      )
-    }
+    const weddingId = c.get('weddingId')
 
     try {
       await guestService.deleteGuest(guestId, dbUserId, weddingId)
@@ -206,6 +195,7 @@ guestsRoute.post(
 // POST /guests/:id/tags — assign tags to guest
 guestsRoute.post(
   '/:id/tags',
+  resolveWeddingMiddleware,
   zValidator('json', z.object({
     tagIds: z.array(z.string().uuid()).min(1).max(20),
   }), (result, c) => {
@@ -218,7 +208,16 @@ guestsRoute.post(
   }),
   async (c) => {
     const guestId = c.req.param('id')
+    const weddingId = c.get('weddingId')
     const { tagIds } = c.req.valid('json')
+
+    const guest = await guestService.getGuest(guestId)
+    if (!guest || guest.weddingId !== weddingId) {
+      return c.json(
+        { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
+        404,
+      )
+    }
 
     await guestService.setTagsForGuest(guestId, tagIds)
     return c.json({ data: { success: true } })
@@ -226,11 +225,19 @@ guestsRoute.post(
 )
 
 // DELETE /guests/:id/tags/:tagId — remove tag from guest
-guestsRoute.delete('/:id/tags/:tagId', async (c) => {
+guestsRoute.delete('/:id/tags/:tagId', resolveWeddingMiddleware, async (c) => {
   const guestId = c.req.param('id')
   const tagId = c.req.param('tagId')
+  const weddingId = c.get('weddingId')
 
-  // Import inline to avoid loading full service at module level
+  const guest = await guestService.getGuest(guestId)
+  if (!guest || guest.weddingId !== weddingId) {
+    return c.json(
+      { error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 },
+      404,
+    )
+  }
+
   const { guestTagService } = await import('../services/guest-tags.js')
   await guestTagService.removeTag(guestId, tagId)
   return c.json({ data: { success: true } })
