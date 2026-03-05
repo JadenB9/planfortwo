@@ -24,6 +24,7 @@
     "postgres": "^3.4.0"
   },
   "devDependencies": {
+    "@planfortwo/config": "workspace:*",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "dotenv": "^16.4.0",

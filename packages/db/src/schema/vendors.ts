@@ -1,4 +1,4 @@
-import { integer, jsonb, numeric, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { integer, numeric, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { weddings } from './weddings'
 
 export const vendorStatusEnum = pgEnum('vendor_status', [

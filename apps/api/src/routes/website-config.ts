@@ -4,7 +4,6 @@ import {
   createWebsiteConfigSchema,
   updateWebsiteConfigSchema,
   websitePasswordSchema,
-  verifyWebsitePasswordSchema,
   subdomainSchema,
 } from '@planfortwo/validators'
 import { z } from 'zod'

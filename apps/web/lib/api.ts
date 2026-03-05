@@ -47,6 +47,7 @@ import type {
   CashFund,
   CashFundContribution,
   Gift,
+  PlanningProgress,
 } from '@planfortwo/types'
 import type {
   CreateTaskInput,
@@ -655,5 +656,9 @@ export const api = {
       fetchApi<{ data: NotificationPreference | null }>(`/notification-prefs?weddingId=${weddingId}`, { token }),
     update: (weddingId: string, data: UpdateNotificationPreferencesInput, token: string) =>
       fetchApi<{ data: NotificationPreference }>(`/notification-prefs?weddingId=${weddingId}`, { method: 'PUT', body: JSON.stringify(data), token }),
+  },
+  progress: {
+    get: (weddingId: string, token: string) =>
+      fetchApi<{ data: PlanningProgress }>(`/progress?weddingId=${weddingId}`, { token }),
   },
 }

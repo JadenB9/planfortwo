@@ -1,9 +1,9 @@
-import { eq, and, asc, desc } from 'drizzle-orm'
+import { eq, and, desc } from 'drizzle-orm'
 import { db, photos } from '@planfortwo/db'
 import type { CreatePhotoInput, UpdatePhotoInput } from '@planfortwo/validators'
 
 export const photoGalleryService = {
-  async list(weddingId: string, status?: string) {
+  async list(weddingId: string, _status?: string) {
     const query = db.select().from(photos).where(eq(photos.weddingId, weddingId))
     return query.orderBy(desc(photos.createdAt))
   },

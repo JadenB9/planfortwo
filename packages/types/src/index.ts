@@ -1009,6 +1009,24 @@ export interface Gift {
   updatedAt: Date
 }
 
+// ── Planning Progress ──
+export type FeatureStatus = 'not_started' | 'in_progress' | 'completed'
+
+export interface FeatureProgress {
+  key: string
+  label: string
+  href: string
+  status: FeatureStatus
+  progress: number
+  itemCount: number
+  description: string
+}
+
+export interface PlanningProgress {
+  features: FeatureProgress[]
+  overallProgress: number
+}
+
 // ── Health Check ──
 export interface HealthCheck {
   status: 'ok' | 'error'

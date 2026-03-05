@@ -45,17 +45,7 @@ export const seatingChartService = {
       .from(venueElements)
       .where(eq(venueElements.chartId, chartId))
 
-    const assignments = await db
-      .select()
-      .from(tableAssignments)
-      .where(
-        eq(
-          tableAssignments.tableId,
-          tables.length > 0 ? tables[0]!.id : '00000000-0000-0000-0000-000000000000',
-        ),
-      )
-
-    const allAssignments: typeof assignments = []
+    const allAssignments: (typeof tableAssignments.$inferSelect)[] = []
     for (const table of tables) {
       const tableAssigns = await db
         .select()

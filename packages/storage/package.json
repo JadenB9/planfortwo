@@ -17,6 +17,7 @@
     "@aws-sdk/s3-request-presigner": "^3.700.0"
   },
   "devDependencies": {
+    "@planfortwo/config": "workspace:*",
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",

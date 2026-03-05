@@ -1,4 +1,4 @@
-import { eq, and, asc, desc } from 'drizzle-orm'
+import { eq, and, desc } from 'drizzle-orm'
 import { db, emailCampaigns, emailRecipients, announcements } from '@planfortwo/db'
 import type {
   CreateEmailCampaignInput,

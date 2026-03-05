@@ -2,10 +2,10 @@ import { Resend } from 'resend'
 import { render } from '@react-email/components'
 import { WelcomeEmail, PartnerInviteEmail } from '@planfortwo/email'
 
-function getResendClient() {
+function getResendClient(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
-    throw new Error('RESEND_API_KEY environment variable is required')
+    return null
   }
   return new Resend(apiKey)
 }
@@ -15,6 +15,14 @@ const FROM_EMAIL = 'PlanForTwo <noreply@planfortwo.com>'
 export const emailService = {
   async sendWelcome(email: string, firstName: string) {
     const resend = getResendClient()
+    if (!resend) {
+      console.warn('[email] RESEND_API_KEY not configured — skipping welcome email', {
+        to: email,
+        subject: 'Welcome to PlanForTwo!',
+      })
+      return
+    }
+
     const html = await render(WelcomeEmail({ firstName }))
 
     const { error } = await resend.emails.send({
@@ -36,6 +44,15 @@ export const emailService = {
     inviteUrl: string,
   ) {
     const resend = getResendClient()
+    if (!resend) {
+      console.warn('[email] RESEND_API_KEY not configured — skipping partner invite email', {
+        to: email,
+        subject: `${inviterName} invited you to plan your wedding on PlanForTwo`,
+        inviteUrl,
+      })
+      return
+    }
+
     const html = await render(PartnerInviteEmail({ inviterName, inviteUrl }))
 
     const { error } = await resend.emails.send({

@@ -40,6 +40,7 @@ import { ceremonyRoute } from './routes/ceremony.js'
 import { playlistsRoute } from './routes/playlists.js'
 import { honeymoonRoute } from './routes/honeymoon.js'
 import { weatherRoute } from './routes/weather.js'
+import { progressRoute } from './routes/progress.js'
 import { rateLimit } from './middleware/rate-limit.js'
 import { inngest } from './inngest/client.js'
 import { onPaymentReminder } from './inngest/functions/onPaymentReminder.js'
@@ -101,6 +102,7 @@ app.route('/ceremony', ceremonyRoute)
 app.route('/playlists', playlistsRoute)
 app.route('/honeymoon', honeymoonRoute)
 app.route('/weather', weatherRoute)
+app.route('/progress', progressRoute)
 
 // ── Rate Limiting on Public Endpoints ──
 const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30 })

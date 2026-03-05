@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { db, households, guests, activityLog } from '@planfortwo/db'
+import { db, households, guests } from '@planfortwo/db'
 import type { CreateHouseholdInput, UpdateHouseholdInput } from '@planfortwo/validators'
 import { activityService } from './activity.js'
 

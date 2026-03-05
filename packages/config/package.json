@@ -2,11 +2,15 @@
   "name": "@planfortwo/config",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "exports": {
     "./eslint": "./eslint.js",
     "./tsconfig/base": "./tsconfig.base.json",
     "./tsconfig/nextjs": "./tsconfig.nextjs.json",
     "./tsconfig/node": "./tsconfig.node.json",
     "./tailwind": "./tailwind.preset.js"
+  },
+  "dependencies": {
+    "globals": "^17.4.0"
   }
 }

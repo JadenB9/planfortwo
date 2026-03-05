@@ -1,4 +1,4 @@
-import { eq, and, sql, asc, desc } from 'drizzle-orm'
+import { eq, and, sql, asc } from 'drizzle-orm'
 import { db, paymentSchedule, budgetItems } from '@planfortwo/db'
 import type { CreatePaymentScheduleInput, UpdatePaymentScheduleInput } from '@planfortwo/validators'
 import { activityService } from './activity.js'

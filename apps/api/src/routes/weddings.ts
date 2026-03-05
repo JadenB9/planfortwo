@@ -142,9 +142,22 @@ weddingsRoute.post(
     }
 
     const { email } = c.req.valid('json')
-    const invitation = await invitationService.createAndSend(weddingId, dbUserId, email)
 
-    return c.json({ data: invitation }, 201)
+    try {
+      const invitation = await invitationService.createAndSend(weddingId, dbUserId, email)
+      return c.json({ data: invitation }, 201)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to send invitation'
+      const code = message.toUpperCase().includes('RESEND')
+        ? 'EMAIL_NOT_CONFIGURED'
+        : 'EMAIL_SEND_FAILED'
+
+      console.error('Partner invite failed:', message)
+      return c.json(
+        { error: message, code, statusCode: 500 },
+        500,
+      )
+    }
   },
 )
 

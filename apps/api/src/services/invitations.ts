@@ -1,5 +1,5 @@
 import crypto from 'node:crypto'
-import { eq, and } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { db, partnerInvitations, weddingMembers } from '@planfortwo/db'
 import { userService } from './users.js'
 import { emailService } from './email.js'

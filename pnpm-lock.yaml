@@ -87,6 +87,9 @@ importers:
         specifier: ^3.23.0
         version: 3.25.76
     devDependencies:
+      '@planfortwo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.13
@@ -248,7 +251,11 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.19.13)(jsdom@25.0.1)
 
-  packages/config: {}
+  packages/config:
+    dependencies:
+      globals:
+        specifier: ^17.4.0
+        version: 17.4.0
 
   packages/db:
     dependencies:
@@ -262,6 +269,9 @@ importers:
         specifier: ^3.4.0
         version: 3.4.8
     devDependencies:
+      '@planfortwo/config':
+        specifier: workspace:*
+        version: link:../config
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.0.0
         version: 8.56.1(@typescript-eslint/parser@8.56.1(eslint@9.39.3(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.3(jiti@2.4.2))(typescript@5.9.3)
@@ -296,6 +306,9 @@ importers:
         specifier: ^5.2.9
         version: 5.2.9
     devDependencies:
+      '@planfortwo/config':
+        specifier: workspace:*
+        version: link:../config
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
@@ -321,6 +334,9 @@ importers:
         specifier: ^3.700.0
         version: 3.1001.0
     devDependencies:
+      '@planfortwo/config':
+        specifier: workspace:*
+        version: link:../config
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.13
@@ -339,6 +355,9 @@ importers:
 
   packages/types:
     devDependencies:
+      '@planfortwo/config':
+        specifier: workspace:*
+        version: link:../config
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.0.0
         version: 8.56.1(@typescript-eslint/parser@8.56.1(eslint@9.39.3(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.3(jiti@2.4.2))(typescript@5.9.3)
@@ -358,6 +377,9 @@ importers:
         specifier: ^3.23.0
         version: 3.25.76
     devDependencies:
+      '@planfortwo/config':
+        specifier: workspace:*
+        version: link:../config
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.0.0
         version: 8.56.1(@typescript-eslint/parser@8.56.1(eslint@9.39.3(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.3(jiti@2.4.2))(typescript@5.9.3)
@@ -4692,6 +4714,10 @@ packages:
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
+    engines: {node: '>=18'}
+
+  globals@17.4.0:
+    resolution: {integrity: sha512-hjrNztw/VajQwOLsMNT1cbJiH2muO3OROCHnbehc8eY5JyD2gqz4AcMHPqgaOR59DjgUjYAYLeH699g/eWi2jw==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -11431,6 +11457,8 @@ snapshots:
       path-scurry: 2.0.2
 
   globals@14.0.0: {}
+
+  globals@17.4.0: {}
 
   globalthis@1.0.4:
     dependencies:

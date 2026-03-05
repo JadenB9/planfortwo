@@ -1,6 +1,6 @@
 import { inngest } from '../client.js'
 import { db, paymentSchedule, budgetItems, weddings, users, weddingMembers } from '@planfortwo/db'
-import { eq, and, lte, sql } from 'drizzle-orm'
+import { eq, and, lte } from 'drizzle-orm'
 import { Resend } from 'resend'
 import { render } from '@react-email/components'
 import { PaymentReminderEmail } from '@planfortwo/email'
