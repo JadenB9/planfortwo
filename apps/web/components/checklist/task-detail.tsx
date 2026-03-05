@@ -59,7 +59,7 @@ export function TaskDetail({
     } finally {
       setLoading(false)
     }
-  }, [taskId, getToken])
+  }, [taskId, weddingId, getToken])
 
   useEffect(() => {
     void loadTask()

@@ -81,7 +81,7 @@ export default function EventsPage() {
         /* silent */
       }
     },
-    [getToken],
+    [getToken, weddingId],
   )
 
   const resetForm = () => {

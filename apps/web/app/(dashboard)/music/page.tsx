@@ -187,7 +187,7 @@ export default function MusicPage() {
     } catch {
       /* silent */
     }
-  }, [selectedPlaylist, getToken, songForm, loadPlaylistSongs])
+  }, [selectedPlaylist, getToken, songForm, weddingId, loadPlaylistSongs])
 
   const handleDeleteSong = useCallback(
     async (songId: string) => {
@@ -200,7 +200,7 @@ export default function MusicPage() {
         /* silent */
       }
     },
-    [getToken, selectedPlaylist, loadPlaylistSongs],
+    [getToken, weddingId, selectedPlaylist, loadPlaylistSongs],
   )
 
   const handleApproveRequest = useCallback(
@@ -214,7 +214,7 @@ export default function MusicPage() {
         /* silent */
       }
     },
-    [getToken, loadData],
+    [getToken, weddingId, loadData],
   )
 
   const handleRejectRequest = useCallback(
@@ -228,7 +228,7 @@ export default function MusicPage() {
         /* silent */
       }
     },
-    [getToken, loadData],
+    [getToken, weddingId, loadData],
   )
 
   if (loading) {
