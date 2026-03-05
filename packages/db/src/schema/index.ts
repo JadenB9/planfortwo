@@ -96,3 +96,6 @@ export {
   songStatusEnum,
 } from './playlists'
 export { honeymoonPlans, honeymoonActivities } from './honeymoon'
+
+// Inbox
+export { emailAddresses, emails, emailDirectionEnum } from './inbox'

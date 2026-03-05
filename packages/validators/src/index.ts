@@ -662,3 +662,6 @@ export * from './payments.js'
 export * from './ceremony.js'
 export * from './playlists.js'
 export * from './honeymoon.js'
+
+// Inbox
+export * from './inbox.js'

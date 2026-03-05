@@ -1048,6 +1048,37 @@ export interface PlanningProgress {
   overallProgress: number
 }
 
+// ── Inbox ──
+export type EmailDirection = 'inbound' | 'outbound'
+
+export interface EmailAddress {
+  id: string
+  userId: string
+  address: string
+  displayName: string
+  isAdmin: boolean
+  createdAt: Date
+}
+
+export interface Email {
+  id: string
+  emailAddressId: string
+  direction: EmailDirection
+  resendEmailId: string | null
+  fromAddress: string
+  fromName: string | null
+  toAddress: string
+  ccAddresses: string | null
+  subject: string
+  textBody: string | null
+  htmlBody: string | null
+  isRead: boolean
+  isStarred: boolean
+  messageId: string | null
+  inReplyToMessageId: string | null
+  createdAt: Date
+}
+
 // ── Health Check ──
 export interface HealthCheck {
   status: 'ok' | 'error'

@@ -48,6 +48,8 @@ import type {
   CashFundContribution,
   Gift,
   PlanningProgress,
+  Email,
+  EmailAddress,
 } from '@planfortwo/types'
 import type {
   CreateTaskInput,
@@ -95,6 +97,10 @@ import type {
   CreateEmailCampaignInput,
   UpdateEmailCampaignInput,
   UpdateNotificationPreferencesInput,
+  ClaimAddressInput,
+  ComposeEmailInput,
+  UpdateEmailInput,
+  InboxFiltersInput,
 } from '@planfortwo/validators'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
@@ -1213,5 +1219,47 @@ export const api = {
   progress: {
     get: (weddingId: string, token: string) =>
       fetchApi<{ data: PlanningProgress }>(`/progress?weddingId=${weddingId}`, { token }),
+  },
+  inbox: {
+    list: (token: string, filters?: Partial<InboxFiltersInput>) => {
+      const params = new URLSearchParams()
+      if (filters) {
+        for (const [k, v] of Object.entries(filters)) {
+          if (v !== undefined && v !== null && v !== '') params.set(k, String(v))
+        }
+      }
+      return fetchApi<PaginatedResponse<Email>>(`/inbox?${params}`, { token })
+    },
+    get: (id: string, token: string) => fetchApi<{ data: Email }>(`/inbox/${id}`, { token }),
+    send: (data: ComposeEmailInput, token: string) =>
+      fetchApi<{ data: Email }>('/inbox/send', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        token,
+      }),
+    update: (id: string, data: UpdateEmailInput, token: string) =>
+      fetchApi<{ data: Email }>(`/inbox/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+        token,
+      }),
+    delete: (id: string, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(`/inbox/${id}`, { method: 'DELETE', token }),
+    unreadCount: (token: string) =>
+      fetchApi<{ data: { count: number } }>('/inbox/unread-count', { token }),
+    addresses: {
+      list: (token: string) => fetchApi<{ data: EmailAddress[] }>('/inbox/addresses', { token }),
+      claim: (data: ClaimAddressInput, token: string) =>
+        fetchApi<{ data: EmailAddress }>('/inbox/addresses', {
+          method: 'POST',
+          body: JSON.stringify(data),
+          token,
+        }),
+      checkAvailability: (address: string, token: string) =>
+        fetchApi<{ data: { available: boolean; reason?: string } }>(
+          `/inbox/addresses/check?address=${encodeURIComponent(address)}`,
+          { token },
+        ),
+    },
   },
 }

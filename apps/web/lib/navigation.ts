@@ -14,6 +14,7 @@ import {
   Gift,
   Plane,
   Mail,
+  Inbox,
   Settings,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -36,6 +37,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, comingSoon: false },
       { href: '/roadmap', label: 'Roadmap', icon: Map, comingSoon: false },
+      { href: '/inbox', label: 'Inbox', icon: Inbox, comingSoon: false },
     ],
   },
   {
