@@ -31,6 +31,12 @@ playwright-report/
 test-results/
 blob-report/
 
+# Build cache
+*.tsbuildinfo
+
+# Claude Code
+.claude/
+
 # Misc
 *.log
 npm-debug.log*
