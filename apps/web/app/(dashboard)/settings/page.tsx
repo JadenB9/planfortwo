@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth, useUser } from '@clerk/nextjs'
+import { toast } from 'sonner'
 import { motion } from 'framer-motion'
 import { springSmooth } from '@/lib/animations'
 import { api } from '@/lib/api'
@@ -22,7 +23,7 @@ export default function SettingsPage() {
   const [wedding, setWedding] = useState<Wedding | null>(null)
   const [notifPrefs, setNotifPrefs] = useState<NotificationPreference | null>(null)
 
-  const [weddingForm, setWeddingForm] = useState({ name: '', date: '', venue: '' })
+  const [weddingForm, setWeddingForm] = useState({ name: '', date: '', venue: '', budgetTotal: '', guestCountEstimate: '' })
   const [saving, setSaving] = useState(false)
   const [notifSaving, setNotifSaving] = useState(false)
 
@@ -38,6 +39,8 @@ export default function SettingsPage() {
         name: w.name,
         date: w.date ? (new Date(w.date).toISOString().split('T')[0] ?? '') : '',
         venue: w.venue ?? '',
+        budgetTotal: w.budgetTotal ? String(w.budgetTotal) : '',
+        guestCountEstimate: w.guestCountEstimate ? String(w.guestCountEstimate) : '',
       })
 
       try {
@@ -47,7 +50,7 @@ export default function SettingsPage() {
         /* first time - no prefs */
       }
     } catch {
-      /* silent */
+      toast.error('Failed to load settings')
     } finally {
       setLoading(false)
     }
@@ -63,18 +66,23 @@ export default function SettingsPage() {
     try {
       const token = await getToken()
       if (!token) return
+      const budgetParsed = weddingForm.budgetTotal ? parseFloat(weddingForm.budgetTotal) : null
+      const guestParsed = weddingForm.guestCountEstimate ? parseInt(weddingForm.guestCountEstimate, 10) : null
       await api.weddings.update(
         weddingId,
         {
           name: weddingForm.name,
           date: weddingForm.date ? new Date(weddingForm.date).toISOString() : null,
           venue: weddingForm.venue || null,
+          budgetTotal: budgetParsed && !isNaN(budgetParsed) ? budgetParsed : null,
+          guestCountEstimate: guestParsed && !isNaN(guestParsed) ? guestParsed : null,
         },
         token,
       )
+      toast.success('Settings saved')
       void loadData()
     } catch {
-      /* silent */
+      toast.error('Failed to save settings')
     } finally {
       setSaving(false)
     }
@@ -89,8 +97,9 @@ export default function SettingsPage() {
         if (!token) return
         const { data } = await api.notificationPrefs.update(weddingId, { [key]: value }, token)
         setNotifPrefs(data)
+        toast.success('Notification preferences updated')
       } catch {
-        /* silent */
+        toast.error('Failed to update preferences')
       } finally {
         setNotifSaving(false)
       }
@@ -167,15 +176,23 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Guest Estimate</Label>
-                  <p className="font-medium text-gray-900">
-                    {wedding?.guestCountEstimate ?? 'Not set'}
-                  </p>
+                  <Input
+                    type="number"
+                    value={weddingForm.guestCountEstimate}
+                    onChange={(e) => setWeddingForm({ ...weddingForm, guestCountEstimate: e.target.value })}
+                    placeholder="150"
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Budget</Label>
-                  <p className="font-medium text-gray-900">
-                    {wedding?.budgetTotal ? `$${wedding.budgetTotal.toLocaleString()}` : 'Not set'}
-                  </p>
+                  <Input
+                    type="number"
+                    value={weddingForm.budgetTotal}
+                    onChange={(e) => setWeddingForm({ ...weddingForm, budgetTotal: e.target.value })}
+                    placeholder="30000"
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Style</Label>
@@ -315,7 +332,7 @@ export default function SettingsPage() {
                       a.click()
                       URL.revokeObjectURL(url)
                     } catch {
-                      /* silent */
+                      toast.error('Failed to export data')
                     }
                   }}
                 >

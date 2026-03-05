@@ -1,6 +1,7 @@
 'use client'
 
 import { type ReactNode } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 
 interface StatCardProps {
@@ -8,10 +9,11 @@ interface StatCardProps {
   value: string | number
   icon: ReactNode
   trend?: string
+  href?: string
 }
 
-export function StatCard({ label, value, icon, trend }: StatCardProps) {
-  return (
+export function StatCard({ label, value, icon, trend, href }: StatCardProps) {
+  const card = (
     <motion.div
       className="rounded-2xl border border-gray-200 bg-white p-6"
       whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
@@ -38,4 +40,10 @@ export function StatCard({ label, value, icon, trend }: StatCardProps) {
       <p className="mt-1 text-sm text-gray-600">{label}</p>
     </motion.div>
   )
+
+  if (href) {
+    return <Link href={href}>{card}</Link>
+  }
+
+  return card
 }

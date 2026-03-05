@@ -39,6 +39,7 @@ export default function EventsPage() {
   const [selectedEvent, setSelectedEvent] = useState<WeddingEvent | null>(null)
   const [timeline, setTimeline] = useState<TimelineEntry[]>([])
   const [showTimelineForm, setShowTimelineForm] = useState(false)
+  const [editingTimeline, setEditingTimeline] = useState<TimelineEntry | null>(null)
   const [form, setForm] = useState({
     name: '',
     type: 'ceremony' as EventType,
@@ -150,18 +151,33 @@ export default function EventsPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.events.createTimelineEntry(
-        selectedEvent.id,
-        {
-          eventId: selectedEvent.id,
-          time: tlForm.time,
-          title: tlForm.title.trim(),
-          description: tlForm.description || undefined,
-          duration: tlForm.duration ? parseInt(tlForm.duration) : undefined,
-        },
-        token,
-      )
+      if (editingTimeline) {
+        await api.events.updateTimelineEntry(
+          editingTimeline.id,
+          weddingId!,
+          {
+            time: tlForm.time,
+            title: tlForm.title.trim(),
+            description: tlForm.description || undefined,
+            duration: tlForm.duration ? parseInt(tlForm.duration) : undefined,
+          },
+          token,
+        )
+      } else {
+        await api.events.createTimelineEntry(
+          selectedEvent.id,
+          {
+            eventId: selectedEvent.id,
+            time: tlForm.time,
+            title: tlForm.title.trim(),
+            description: tlForm.description || undefined,
+            duration: tlForm.duration ? parseInt(tlForm.duration) : undefined,
+          },
+          token,
+        )
+      }
       setTlForm({ time: '', title: '', description: '', duration: '' })
+      setEditingTimeline(null)
       setShowTimelineForm(false)
       void loadTimeline(selectedEvent.id)
     } catch {
@@ -255,7 +271,14 @@ export default function EventsPage() {
                   selectedEvent.type}
               </Badge>
             </div>
-            <Button onClick={() => setShowTimelineForm(true)} variant="outline">
+            <Button
+              onClick={() => {
+                setEditingTimeline(null)
+                setTlForm({ time: '', title: '', description: '', duration: '' })
+                setShowTimelineForm(true)
+              }}
+              variant="outline"
+            >
               Add Timeline Entry
             </Button>
           </div>
@@ -331,12 +354,29 @@ export default function EventsPage() {
                         </div>
                         {entry.duration && <Badge variant="secondary">{entry.duration} min</Badge>}
                       </div>
-                      <button
-                        onClick={() => handleDeleteTimeline(entry.id)}
-                        className="text-xs text-red-500 hover:text-red-700"
-                      >
-                        Remove
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingTimeline(entry)
+                            setTlForm({
+                              time: entry.time,
+                              title: entry.title,
+                              description: entry.description ?? '',
+                              duration: entry.duration?.toString() ?? '',
+                            })
+                            setShowTimelineForm(true)
+                          }}
+                          className="text-wedding-600 hover:text-wedding-700 text-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTimeline(entry.id)}
+                          className="text-xs text-red-500 hover:text-red-700"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -547,10 +587,19 @@ export default function EventsPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showTimelineForm} onOpenChange={setShowTimelineForm}>
+      <Dialog
+        open={showTimelineForm}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingTimeline(null)
+            setTlForm({ time: '', title: '', description: '', duration: '' })
+          }
+          setShowTimelineForm(open)
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Timeline Entry</DialogTitle>
+            <DialogTitle>{editingTimeline ? 'Edit Timeline Entry' : 'Add Timeline Entry'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -590,7 +639,7 @@ export default function EventsPage() {
               />
             </div>
             <Button onClick={handleAddTimeline} className="w-full">
-              Add Entry
+              {editingTimeline ? 'Save Changes' : 'Add Entry'}
             </Button>
           </div>
         </DialogContent>

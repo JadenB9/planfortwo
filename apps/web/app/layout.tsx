@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Inter, Playfair_Display } from 'next/font/google'
+import { Toaster } from 'sonner'
 import { clerkAppearance } from '@/lib/clerk-theme'
 import './globals.css'
 
@@ -30,7 +31,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-screen font-sans">
-        <ClerkProvider appearance={clerkAppearance}>{children}</ClerkProvider>
+        <ClerkProvider appearance={clerkAppearance}>
+          {children}
+          <Toaster richColors position="bottom-right" />
+        </ClerkProvider>
       </body>
     </html>
   )

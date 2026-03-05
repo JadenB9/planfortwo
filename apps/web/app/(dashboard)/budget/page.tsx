@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useAuth } from '@clerk/nextjs'
+import { toast } from 'sonner'
 import { motion } from 'framer-motion'
 import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
@@ -54,6 +55,18 @@ export default function BudgetPage() {
   const [editingItem, setEditingItem] = useState<BudgetItemWithCategory | undefined>(undefined)
   const [showSetupWizard, setShowSetupWizard] = useState(false)
 
+  const handleEditBudget = useCallback(
+    async (newAmount: number) => {
+      if (!weddingId) return
+      const token = await getToken()
+      if (!token) return
+      await api.weddings.update(weddingId, { budgetTotal: newAmount }, token)
+      toast.success('Budget updated')
+      void refetch()
+    },
+    [weddingId, getToken, refetch],
+  )
+
   const handleDeleteExpense = useCallback(
     async (id: string) => {
       if (!weddingId) return
@@ -61,9 +74,10 @@ export default function BudgetPage() {
         const token = await getToken()
         if (!token) return
         await api.budgetItems.delete(id, weddingId, token)
+        toast.success('Expense deleted')
         void refetch()
       } catch {
-        /* silent */
+        toast.error('Failed to delete expense')
       }
     },
     [weddingId, getToken, refetch],
@@ -84,9 +98,10 @@ export default function BudgetPage() {
           },
           token,
         )
+        toast.success('Payment marked as paid')
         void refetch()
       } catch {
-        /* silent */
+        toast.error('Failed to update payment')
       }
     },
     [weddingId, getToken, refetch],
@@ -105,8 +120,9 @@ export default function BudgetPage() {
       a.download = 'budget-export.csv'
       a.click()
       URL.revokeObjectURL(url)
+      toast.success('CSV exported')
     } catch {
-      /* silent */
+      toast.error('Failed to export CSV')
     }
   }, [weddingId, getToken])
 
@@ -134,7 +150,7 @@ export default function BudgetPage() {
           <p className="mt-1 text-sm text-gray-600">Track every dollar for your wedding.</p>
         </div>
 
-        <BudgetOverview analytics={null} budgetTotal={weddingData?.wedding.budgetTotal ?? null} />
+        <BudgetOverview analytics={null} budgetTotal={weddingData?.wedding.budgetTotal ?? null} onEditBudget={handleEditBudget} />
 
         <div className="mt-6">
           <UpgradePrompt message="Upgrade to unlock full budget tracking, expense management, analytics, and more" />
@@ -217,6 +233,7 @@ export default function BudgetPage() {
           <BudgetOverview
             analytics={analytics}
             budgetTotal={weddingData?.wedding.budgetTotal ?? null}
+            onEditBudget={handleEditBudget}
           />
 
           {/* Tab navigation */}

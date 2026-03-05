@@ -12,6 +12,13 @@ import { StatCard } from '@/components/dashboard/stat-card'
 import { UpcomingTasks } from '@/components/dashboard/upcoming-tasks'
 import { ActivityFeed } from '@/components/dashboard/activity-feed'
 
+function formatBudgetValue(amount: number): string {
+  if (amount >= 100000) {
+    return `$${Math.round(amount / 1000)}k`
+  }
+  return `$${amount.toLocaleString()}`
+}
+
 export default function DashboardPage() {
   const { getToken } = useAuth()
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
@@ -230,6 +237,7 @@ export default function DashboardPage() {
                   ? `${Math.round((stats.tasksCompleted / stats.tasksTotal) * 100)}%`
                   : undefined
               }
+              href="/checklist"
             />
           </motion.div>
           <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
@@ -251,6 +259,7 @@ export default function DashboardPage() {
                   ? `${guestStats.rsvpPending} pending`
                   : undefined
               }
+              href="/guests"
             />
           </motion.div>
           <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
@@ -258,7 +267,7 @@ export default function DashboardPage() {
               label="Budget"
               value={
                 stats && stats.budgetTotal > 0
-                  ? `$${Math.round(stats.budgetSpent / 1000)}k / $${Math.round(stats.budgetTotal / 1000)}k`
+                  ? `${formatBudgetValue(stats.budgetSpent)} / ${formatBudgetValue(stats.budgetTotal)}`
                   : 'Not Set'
               }
               icon={
@@ -276,6 +285,7 @@ export default function DashboardPage() {
                   ? `${Math.round((stats.budgetSpent / stats.budgetTotal) * 100)}% used`
                   : undefined
               }
+              href="/budget"
             />
           </motion.div>
           <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
@@ -293,6 +303,7 @@ export default function DashboardPage() {
                 </svg>
               }
               trend={websiteStatus === 'Published' ? 'Live' : undefined}
+              href="/website"
             />
           </motion.div>
         </motion.div>

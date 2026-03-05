@@ -54,31 +54,32 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
         animate="visible"
       >
         {upcoming.map((task) => (
-          <motion.div
-            key={task.id}
-            className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3"
-            variants={listItem}
-            transition={{ duration: 0.3, ...springSmooth }}
-            whileHover={{ x: 3, borderColor: 'rgb(var(--wedding-200))' }}
-          >
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-gray-900">{task.title}</p>
-              {task.dueDate && (
-                <p className="mt-0.5 text-xs text-gray-500">
-                  Due{' '}
-                  {new Date(task.dueDate).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                </p>
-              )}
-            </div>
-            <span
-              className={`ml-3 flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}
+          <Link key={task.id} href="/checklist">
+            <motion.div
+              className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3"
+              variants={listItem}
+              transition={{ duration: 0.3, ...springSmooth }}
+              whileHover={{ x: 3, borderColor: 'rgb(var(--wedding-200))' }}
             >
-              {PRIORITY_LABELS[task.priority]}
-            </span>
-          </motion.div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-gray-900">{task.title}</p>
+                {task.dueDate && (
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    Due{' '}
+                    {new Date(task.dueDate).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </p>
+                )}
+              </div>
+              <span
+                className={`ml-3 flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}
+              >
+                {PRIORITY_LABELS[task.priority]}
+              </span>
+            </motion.div>
+          </Link>
         ))}
       </motion.div>
     </div>

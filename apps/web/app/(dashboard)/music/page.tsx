@@ -73,6 +73,7 @@ export default function MusicPage() {
   const [requests, setRequests] = useState<SongRequest[]>([])
 
   const [showPlaylistDialog, setShowPlaylistDialog] = useState(false)
+  const [editingPlaylist, setEditingPlaylist] = useState<Playlist | null>(null)
   const [playlistForm, setPlaylistForm] = useState({
     name: '',
     description: '',
@@ -124,28 +125,43 @@ export default function MusicPage() {
     [weddingId, getToken],
   )
 
-  const handleCreatePlaylist = useCallback(async () => {
+  const handleSavePlaylist = useCallback(async () => {
     if (!weddingId) return
     try {
       const token = await getToken()
       if (!token) return
-      await api.playlists.create(
-        {
+      if (editingPlaylist) {
+        await api.playlists.update(
+          editingPlaylist.id,
           weddingId,
-          name: playlistForm.name,
-          description: playlistForm.description || null,
-          spotifyUrl: playlistForm.spotifyUrl || null,
-          appleMusicUrl: playlistForm.appleMusicUrl || null,
-        },
-        token,
-      )
+          {
+            name: playlistForm.name,
+            description: playlistForm.description || null,
+            spotifyUrl: playlistForm.spotifyUrl || null,
+            appleMusicUrl: playlistForm.appleMusicUrl || null,
+          },
+          token,
+        )
+      } else {
+        await api.playlists.create(
+          {
+            weddingId,
+            name: playlistForm.name,
+            description: playlistForm.description || null,
+            spotifyUrl: playlistForm.spotifyUrl || null,
+            appleMusicUrl: playlistForm.appleMusicUrl || null,
+          },
+          token,
+        )
+      }
       setShowPlaylistDialog(false)
+      setEditingPlaylist(null)
       setPlaylistForm({ name: '', description: '', spotifyUrl: '', appleMusicUrl: '' })
       void loadData()
     } catch {
       /* silent */
     }
-  }, [weddingId, getToken, playlistForm, loadData])
+  }, [weddingId, getToken, editingPlaylist, playlistForm, loadData])
 
   const handleDeletePlaylist = useCallback(
     async (id: string) => {
@@ -278,7 +294,14 @@ export default function MusicPage() {
             <div className="space-y-3 lg:col-span-1">
               <div className="flex items-center justify-between">
                 <h2 className="font-serif text-lg font-semibold text-gray-900">Playlists</h2>
-                <Button size="sm" onClick={() => setShowPlaylistDialog(true)}>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setEditingPlaylist(null)
+                    setPlaylistForm({ name: '', description: '', spotifyUrl: '', appleMusicUrl: '' })
+                    setShowPlaylistDialog(true)
+                  }}
+                >
                   New
                 </Button>
               </div>
@@ -305,17 +328,36 @@ export default function MusicPage() {
                             <p className="mt-0.5 text-xs text-gray-500">{pl.description}</p>
                           )}
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-500"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeletePlaylist(pl.id)
-                          }}
-                        >
-                          Delete
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setEditingPlaylist(pl)
+                              setPlaylistForm({
+                                name: pl.name,
+                                description: pl.description ?? '',
+                                spotifyUrl: pl.spotifyUrl ?? '',
+                                appleMusicUrl: pl.appleMusicUrl ?? '',
+                              })
+                              setShowPlaylistDialog(true)
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-500"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeletePlaylist(pl.id)
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -444,10 +486,19 @@ export default function MusicPage() {
         )}
       </div>
 
-      <Dialog open={showPlaylistDialog} onOpenChange={setShowPlaylistDialog}>
+      <Dialog
+        open={showPlaylistDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingPlaylist(null)
+            setPlaylistForm({ name: '', description: '', spotifyUrl: '', appleMusicUrl: '' })
+          }
+          setShowPlaylistDialog(open)
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>New Playlist</DialogTitle>
+            <DialogTitle>{editingPlaylist ? 'Edit Playlist' : 'New Playlist'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -489,8 +540,8 @@ export default function MusicPage() {
             <Button variant="outline" onClick={() => setShowPlaylistDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreatePlaylist} disabled={!playlistForm.name}>
-              Create
+            <Button onClick={handleSavePlaylist} disabled={!playlistForm.name}>
+              {editingPlaylist ? 'Update' : 'Create'}
             </Button>
           </DialogFooter>
         </DialogContent>

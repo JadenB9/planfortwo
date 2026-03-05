@@ -82,6 +82,7 @@ export default function CeremonyPage() {
   })
 
   const [showProcessionalDialog, setShowProcessionalDialog] = useState(false)
+  const [editingProcessional, setEditingProcessional] = useState<ProcessionalEntry | null>(null)
   const [processionalForm, setProcessionalForm] = useState({ name: '', role: '' })
 
   const loadData = useCallback(async () => {
@@ -183,21 +184,31 @@ export default function CeremonyPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.ceremony.createProcessional(
-        {
+      if (editingProcessional) {
+        await api.ceremony.updateProcessional(
+          editingProcessional.id,
           weddingId,
-          name: processionalForm.name,
-          role: processionalForm.role || null,
-        },
-        token,
-      )
+          { name: processionalForm.name, role: processionalForm.role || null },
+          token,
+        )
+      } else {
+        await api.ceremony.createProcessional(
+          {
+            weddingId,
+            name: processionalForm.name,
+            role: processionalForm.role || null,
+          },
+          token,
+        )
+      }
       setShowProcessionalDialog(false)
+      setEditingProcessional(null)
       setProcessionalForm({ name: '', role: '' })
       void loadData()
     } catch {
       /* silent */
     }
-  }, [weddingId, getToken, processionalForm, loadData])
+  }, [weddingId, getToken, editingProcessional, processionalForm, loadData])
 
   const handleDeleteProcessional = useCallback(
     async (id: string) => {
@@ -372,6 +383,7 @@ export default function CeremonyPage() {
               <h2 className="font-serif text-lg font-semibold text-gray-900">Processional Order</h2>
               <Button
                 onClick={() => {
+                  setEditingProcessional(null)
                   setProcessionalForm({ name: '', role: '' })
                   setShowProcessionalDialog(true)
                 }}
@@ -409,14 +421,27 @@ export default function CeremonyPage() {
                               {entry.role && <p className="text-xs text-gray-500">{entry.role}</p>}
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 hover:text-red-700"
-                            onClick={() => handleDeleteProcessional(entry.id)}
-                          >
-                            Remove
-                          </Button>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingProcessional(entry)
+                                setProcessionalForm({ name: entry.name, role: entry.role ?? '' })
+                                setShowProcessionalDialog(true)
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => handleDeleteProcessional(entry.id)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
                         </CardContent>
                       </Card>
                     </motion.div>
@@ -485,10 +510,19 @@ export default function CeremonyPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showProcessionalDialog} onOpenChange={setShowProcessionalDialog}>
+      <Dialog
+        open={showProcessionalDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingProcessional(null)
+            setProcessionalForm({ name: '', role: '' })
+          }
+          setShowProcessionalDialog(open)
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Processional Entry</DialogTitle>
+            <DialogTitle>{editingProcessional ? 'Edit Processional Entry' : 'Add Processional Entry'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -513,7 +547,7 @@ export default function CeremonyPage() {
               Cancel
             </Button>
             <Button onClick={handleSaveProcessional} disabled={!processionalForm.name}>
-              Add
+              {editingProcessional ? 'Update' : 'Add'}
             </Button>
           </DialogFooter>
         </DialogContent>
