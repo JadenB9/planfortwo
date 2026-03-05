@@ -1,9 +1,11 @@
 # Shared Codebase Patterns for Phase Agents
 
 ## PROJECT ROOT
+
 /Users/jaden/Library/Mobile Documents/com~apple~CloudDocs/Projects/planfortwo
 
 ## CRITICAL RULES
+
 1. TypeScript strict, NO `any` types
 2. Create ONLY NEW files — do NOT modify any existing files
 3. Do NOT modify barrel/index files (schema/index.ts, types/index.ts, validators/index.ts, api/index.ts)
@@ -14,8 +16,18 @@
 8. Service layer pattern: routes -> services -> Drizzle
 
 ## DB SCHEMA PATTERN (packages/db/src/schema/budget-categories.ts)
+
 ```typescript
-import { boolean, integer, numeric, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  integer,
+  numeric,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { weddings } from './weddings'
 
 export const payerEnum = pgEnum('payer', ['couple', 'bride_family', 'groom_family', 'other'])
@@ -35,6 +47,7 @@ export type NewBudgetCategory = typeof budgetCategories.$inferInsert
 ```
 
 ## ROUTE PATTERN (apps/api/src/routes/budget-categories.ts)
+
 ```typescript
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
@@ -67,7 +80,9 @@ budgetCategoriesRoute.get('/', resolveWeddingMiddleware, async (c) => {
 })
 
 // POST — create (gated)
-budgetCategoriesRoute.post('/', requireFeature('canBudgetCategories'),
+budgetCategoriesRoute.post(
+  '/',
+  requireFeature('canBudgetCategories'),
   zValidator('json', createBudgetCategorySchema, (result, c) => {
     if (!result.success) {
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -78,11 +93,12 @@ budgetCategoriesRoute.post('/', requireFeature('canBudgetCategories'),
     const dbUserId = c.get('dbUserId')
     const item = await budgetCategoryService.create(data, dbUserId)
     return c.json({ data: item }, 201)
-  }
+  },
 )
 ```
 
 ## SERVICE PATTERN (apps/api/src/services/budget-categories.ts)
+
 ```typescript
 import { eq, and, asc, sql } from 'drizzle-orm'
 import { db, budgetCategories } from '@planfortwo/db'
@@ -104,6 +120,7 @@ export const budgetCategoryService = {
 ```
 
 ## TEST PATTERN (apps/api/src/routes/budget-categories.test.ts)
+
 ```typescript
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Hono } from 'hono'
@@ -115,10 +132,16 @@ vi.mock('@clerk/backend', () => ({
 vi.mock('../services/users.js', () => ({
   userService: {
     findByClerkId: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
     findById: vi.fn().mockResolvedValue({
-      id: 'db-user-id', email: 'test@example.com', firstName: 'Jane', lastName: 'Doe',
+      id: 'db-user-id',
+      email: 'test@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     }),
   },
 }))
@@ -126,8 +149,11 @@ vi.mock('../services/users.js', () => ({
 vi.mock('../services/weddings.js', () => ({
   weddingService: {
     verifyMembership: vi.fn().mockResolvedValue({
-      id: 'member-1', weddingId: 'a0000000-0000-0000-0000-000000000001',
-      userId: 'db-user-id', role: 'owner', joinedAt: new Date(),
+      id: 'member-1',
+      weddingId: 'a0000000-0000-0000-0000-000000000001',
+      userId: 'db-user-id',
+      role: 'owner',
+      joinedAt: new Date(),
     }),
     findByUserId: vi.fn(),
   },
@@ -140,7 +166,9 @@ vi.mock('../services/YOUR_SERVICE.js', () => ({
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
-      tier: 'full', canSeatingChart: true, canVendorManagement: true,
+      tier: 'full',
+      canSeatingChart: true,
+      canVendorManagement: true,
       // ... all gates set to true
     }),
   },
@@ -178,26 +206,45 @@ describe('Your Routes', () => {
 ```
 
 ## FEATURE GATES (all keys needed in test mocks)
+
 ```typescript
 const FULL_GATES = {
   tier: 'full' as const,
-  canAddTasks: true, canEditChecklist: true, canDeleteTasks: true,
-  canReorderTasks: true, canCustomizeCategories: true, canAddNotes: true,
-  canAddAttachments: true, maxGuests: null, canEditGuests: true,
-  canDeleteGuests: true, canBulkImport: true, canRsvp: true,
-  canSeatingChart: true, canVendorManagement: true, canCustomDomain: true,
-  canDataExport: true, canBudgetCategories: true, canBudgetExpenses: true,
-  canBudgetAnalytics: true, canBudgetExport: true, canPaymentSchedule: true,
-  canWebsiteBuilder: true, canWebsiteAnalytics: true, canWebsiteCustomSections: true,
+  canAddTasks: true,
+  canEditChecklist: true,
+  canDeleteTasks: true,
+  canReorderTasks: true,
+  canCustomizeCategories: true,
+  canAddNotes: true,
+  canAddAttachments: true,
+  maxGuests: null,
+  canEditGuests: true,
+  canDeleteGuests: true,
+  canBulkImport: true,
+  canRsvp: true,
+  canSeatingChart: true,
+  canVendorManagement: true,
+  canCustomDomain: true,
+  canDataExport: true,
+  canBudgetCategories: true,
+  canBudgetExpenses: true,
+  canBudgetAnalytics: true,
+  canBudgetExport: true,
+  canPaymentSchedule: true,
+  canWebsiteBuilder: true,
+  canWebsiteAnalytics: true,
+  canWebsiteCustomSections: true,
 }
 ```
 
 ## EXISTING DB TABLES (for foreign key references)
+
 - weddings (id, name, date, ...)
 - guests (id, weddingId, firstName, lastName, householdId, ...)
 - budgetItems (id, weddingId, categoryId, ...)
 
 ## FILE NAMING CONVENTION
+
 - Schema: packages/db/src/schema/your-table.ts
 - Types: packages/types/src/your-types.ts (or add to index.ts)
 - Validators: packages/validators/src/your-validators.ts (or add to index.ts)

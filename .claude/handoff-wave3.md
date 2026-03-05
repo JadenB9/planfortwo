@@ -1,10 +1,12 @@
 # Wave 3+ Handoff — Remaining Work
 
 ## Status
+
 - **Waves 1-2.5 COMPLETE and COMMITTED** (all tests passing, 260 tests across 34 files)
 - **Waves 3-4 NOT STARTED** — context ran out
 
 ## Commits So Far
+
 - `886a581` — Wave 1: Phases 6-9 (seating, vendors, events, comms, photos, registry)
 - `84a01ca` — Wave 2: Phases 10-11 (post-wedding, payments, referrals, contact)
 - `4723e01` — Wave 2.5: framer-motion animation polish
@@ -12,6 +14,7 @@
 ## Remaining Execution Order
 
 ### Pre-Wave 3: Features/Pricing Page
+
 - `apps/web/app/features/page.tsx` already exists but needs updating
 - Must show ALL features organized by category (Checklist, Guest List, Budget, Website Builder, Seating Chart, Communication, Vendors, Photos/Registry, etc.)
 - FREE TIER vs PAID TIER ($200 one-time) comparison table
@@ -21,13 +24,15 @@
 - Landing page (apps/web/app/page.tsx) must have "See Features" link to /features
 
 ### Pre-Wave 3: Navigation & Auth Flow Verification
+
 - Landing "/" -> "Get Started" -> /dashboard (requires Clerk auth)
 - Landing "/" -> "See Features" -> /features
 - All sidebar links must work for ALL phases (dashboard, checklist, guests, budget, website, seating, vendors, party, events, photos, registry, communication, settings)
-- Clerk middleware protects /dashboard/* routes
+- Clerk middleware protects /dashboard/\* routes
 - Public routes: /w/[slug], /rsvp/[token], /features, /
 
 ### Wave 3: Phase 12 Hardening (from docs/planfortwo.md)
+
 1. **Ceremony Planning Tools** — ceremony outlines, vow workspace, processional order
 2. **Music/Playlist Management** — playlist builder, song requests from guests
 3. **SMS Notifications** (section 12.2)
@@ -37,7 +42,9 @@
 7. **Accessibility** — WCAG compliance review
 
 ### Wave 4: Final Verification Agent (THOROUGH)
+
 Spawn ONE agent that checks:
+
 - `pnpm type-check` passes
 - `pnpm test` all pass
 - `pnpm build` clean
@@ -54,6 +61,7 @@ Spawn ONE agent that checks:
 ### After Wave 4 passes: `git push origin main`
 
 ## Patterns to Follow
+
 - Service layer pattern: routes -> services -> Drizzle queries
 - DB schemas in `packages/db/src/schema/`, validators in `packages/validators/src/`
 - Types in `packages/types/src/index.ts`, routes in `apps/api/src/routes/`
@@ -64,9 +72,11 @@ Spawn ONE agent that checks:
 - Animation variants in apps/web/lib/animations.ts, wrappers in apps/web/components/ui/motion.tsx
 
 ## Current Test Count
+
 - 260 tests passing (251 API + 9 web) across 34 test files
 
 ## Architecture Quick Ref
+
 - `apps/web` — Next.js 15 App Router (port 3000)
 - `apps/api` — Hono.js (port 3001)
 - `packages/db` — Drizzle ORM + Supabase
