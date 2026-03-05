@@ -698,16 +698,22 @@ export const api = {
         token,
       }),
     addSong: (data: CreatePlaylistSongInput, weddingId: string, token: string) =>
-      fetchApi<{ data: Record<string, unknown> }>(`/playlists/${data.playlistId}/songs?weddingId=${weddingId}`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        token,
-      }),
+      fetchApi<{ data: Record<string, unknown> }>(
+        `/playlists/${data.playlistId}/songs?weddingId=${weddingId}`,
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+          token,
+        },
+      ),
     deleteSong: (songId: string, weddingId: string, token: string) =>
-      fetchApi<{ data: { success: boolean } }>(`/playlists/songs/${songId}?weddingId=${weddingId}`, {
-        method: 'DELETE',
-        token,
-      }),
+      fetchApi<{ data: { success: boolean } }>(
+        `/playlists/songs/${songId}?weddingId=${weddingId}`,
+        {
+          method: 'DELETE',
+          token,
+        },
+      ),
     listRequests: (weddingId: string, token: string) =>
       fetchApi<{
         data: Array<{
@@ -721,10 +727,13 @@ export const api = {
         }>
       }>(`/playlists/requests/all?weddingId=${weddingId}`, { token }),
     approveRequest: (id: string, weddingId: string, token: string) =>
-      fetchApi<{ data: Record<string, unknown> }>(`/playlists/requests/${id}/approve?weddingId=${weddingId}`, {
-        method: 'PUT',
-        token,
-      }),
+      fetchApi<{ data: Record<string, unknown> }>(
+        `/playlists/requests/${id}/approve?weddingId=${weddingId}`,
+        {
+          method: 'PUT',
+          token,
+        },
+      ),
     deleteRequest: (id: string, weddingId: string, token: string) =>
       fetchApi<{ data: { success: boolean } }>(`/playlists/requests/${id}?weddingId=${weddingId}`, {
         method: 'DELETE',
@@ -900,28 +909,43 @@ export const api = {
         body: JSON.stringify(data),
         token,
       }),
-    updateTable: (tableId: string, weddingId: string, data: { label?: string; capacity?: number }, token: string) =>
+    updateTable: (
+      tableId: string,
+      weddingId: string,
+      data: { label?: string; capacity?: number },
+      token: string,
+    ) =>
       fetchApi<{ data: SeatingTable }>(`/seating-charts/tables/${tableId}?weddingId=${weddingId}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         token,
       }),
     deleteTable: (tableId: string, weddingId: string, token: string) =>
-      fetchApi<{ data: { success: boolean } }>(`/seating-charts/tables/${tableId}?weddingId=${weddingId}`, {
-        method: 'DELETE',
-        token,
-      }),
-    assignGuest: (data: { tableId: string; guestId: string; seatNumber?: number }, weddingId: string, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(
+        `/seating-charts/tables/${tableId}?weddingId=${weddingId}`,
+        {
+          method: 'DELETE',
+          token,
+        },
+      ),
+    assignGuest: (
+      data: { tableId: string; guestId: string; seatNumber?: number },
+      weddingId: string,
+      token: string,
+    ) =>
       fetchApi<{ data: SeatingAssignment }>(`/seating-charts/assignments?weddingId=${weddingId}`, {
         method: 'POST',
         body: JSON.stringify(data),
         token,
       }),
     unassignGuest: (guestId: string, weddingId: string, token: string) =>
-      fetchApi<{ data: { success: boolean } }>(`/seating-charts/assignments/${guestId}?weddingId=${weddingId}`, {
-        method: 'DELETE',
-        token,
-      }),
+      fetchApi<{ data: { success: boolean } }>(
+        `/seating-charts/assignments/${guestId}?weddingId=${weddingId}`,
+        {
+          method: 'DELETE',
+          token,
+        },
+      ),
   },
   vendors: {
     list: (weddingId: string, token: string) =>
@@ -956,18 +980,24 @@ export const api = {
         token,
       }),
     listCommunications: (vendorId: string, weddingId: string, token: string) =>
-      fetchApi<{ data: VendorCommunication[] }>(`/vendors/${vendorId}/communications?weddingId=${weddingId}`, { token }),
+      fetchApi<{ data: VendorCommunication[] }>(
+        `/vendors/${vendorId}/communications?weddingId=${weddingId}`,
+        { token },
+      ),
     addCommunication: (
       vendorId: string,
       weddingId: string,
       data: { vendorId: string; type: string; subject?: string; body?: string; date: string },
       token: string,
     ) =>
-      fetchApi<{ data: VendorCommunication }>(`/vendors/${vendorId}/communications?weddingId=${weddingId}`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        token,
-      }),
+      fetchApi<{ data: VendorCommunication }>(
+        `/vendors/${vendorId}/communications?weddingId=${weddingId}`,
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+          token,
+        },
+      ),
   },
   events: {
     list: (weddingId: string, token: string) =>
@@ -1006,7 +1036,9 @@ export const api = {
         token,
       }),
     listTimeline: (eventId: string, weddingId: string, token: string) =>
-      fetchApi<{ data: TimelineEntry[] }>(`/events/${eventId}/timeline?weddingId=${weddingId}`, { token }),
+      fetchApi<{ data: TimelineEntry[] }>(`/events/${eventId}/timeline?weddingId=${weddingId}`, {
+        token,
+      }),
     createTimelineEntry: (
       eventId: string,
       data: {
@@ -1035,10 +1067,13 @@ export const api = {
         token,
       }),
     deleteTimelineEntry: (entryId: string, weddingId: string, token: string) =>
-      fetchApi<{ data: { success: boolean } }>(`/events/timeline/${entryId}?weddingId=${weddingId}`, {
-        method: 'DELETE',
-        token,
-      }),
+      fetchApi<{ data: { success: boolean } }>(
+        `/events/timeline/${entryId}?weddingId=${weddingId}`,
+        {
+          method: 'DELETE',
+          token,
+        },
+      ),
   },
   photoGallery: {
     list: (weddingId: string, token: string) =>

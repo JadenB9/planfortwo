@@ -331,7 +331,11 @@ describe('RSVP Routes', () => {
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN, householdId: 'h-1' }]),
+            limit: vi
+              .fn()
+              .mockResolvedValue([
+                { weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN, householdId: 'h-1' },
+              ]),
           }),
         }),
       })
@@ -363,7 +367,11 @@ describe('RSVP Routes', () => {
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN, householdId: null }]),
+            limit: vi
+              .fn()
+              .mockResolvedValue([
+                { weddingId: WEDDING_ID, rsvpToken: RSVP_TOKEN, householdId: null },
+              ]),
           }),
         }),
       })

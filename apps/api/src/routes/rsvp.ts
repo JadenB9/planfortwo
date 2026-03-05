@@ -98,7 +98,10 @@ rsvpRoute.post(
     // Require rsvpToken to prevent unauthenticated RSVP modifications
     const token = c.req.query('token')
     if (!token || token !== guest.rsvpToken) {
-      return c.json({ error: 'Invalid or missing RSVP token', code: 'UNAUTHORIZED', statusCode: 403 }, 403)
+      return c.json(
+        { error: 'Invalid or missing RSVP token', code: 'UNAUTHORIZED', statusCode: 403 },
+        403,
+      )
     }
 
     try {
@@ -127,7 +130,11 @@ rsvpRoute.post(
 
     // Verify the first guest exists and the rsvpToken matches
     const [firstGuest] = await db
-      .select({ weddingId: guests.weddingId, rsvpToken: guests.rsvpToken, householdId: guests.householdId })
+      .select({
+        weddingId: guests.weddingId,
+        rsvpToken: guests.rsvpToken,
+        householdId: guests.householdId,
+      })
       .from(guests)
       .where(eq(guests.id, submissions[0]!.guestId))
       .limit(1)
@@ -139,7 +146,10 @@ rsvpRoute.post(
     // Require rsvpToken to prevent unauthenticated batch modifications
     const token = c.req.query('token')
     if (!token || token !== firstGuest.rsvpToken) {
-      return c.json({ error: 'Invalid or missing RSVP token', code: 'UNAUTHORIZED', statusCode: 403 }, 403)
+      return c.json(
+        { error: 'Invalid or missing RSVP token', code: 'UNAUTHORIZED', statusCode: 403 },
+        403,
+      )
     }
 
     try {
