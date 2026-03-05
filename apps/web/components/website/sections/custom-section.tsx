@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import DOMPurify from 'dompurify'
 import type { CustomSectionContent } from '@planfortwo/types'
 import { useTemplateStyles } from '../template-context'
 
@@ -32,7 +33,7 @@ export function CustomSection({ title, content }: CustomSectionProps) {
             transition={{ delay: 0.2 }}
             className={`prose mx-auto max-w-none ${fontPair.bodyClass}`}
             style={{ color: colors.primary }}
-            dangerouslySetInnerHTML={{ __html: content.body }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.body) }}
           />
         )}
       </div>

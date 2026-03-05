@@ -2,6 +2,14 @@ import type { Context, Next } from 'hono'
 
 const store = new Map<string, { count: number; resetAt: number }>()
 
+// Clean up expired entries every 5 minutes
+setInterval(() => {
+  const now = Date.now()
+  for (const [key, entry] of store) {
+    if (entry.resetAt <= now) store.delete(key)
+  }
+}, 5 * 60 * 1000).unref()
+
 function getClientIp(c: Context): string {
   return (
     c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ??

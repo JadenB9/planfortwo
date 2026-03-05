@@ -60,20 +60,20 @@ export function PublicWebsiteClient({
   const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
 
   useEffect(() => {
-    fetch(`${API_URL}/website-public/${slug}/guestbook`)
+    fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`)
       .then((res) => res.ok ? res.json() : { data: [] })
       .then((json) => setGuestbookEntries(json.data ?? []))
       .catch(() => {})
   }, [slug])
 
   const handleGuestbookSubmit = async (authorName: string, message: string) => {
-    const res = await fetch(`${API_URL}/website-public/${slug}/guestbook`, {
+    const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ weddingId: '', authorName, message }),
     })
     if (res.ok) {
-      const refreshRes = await fetch(`${API_URL}/website-public/${slug}/guestbook`)
+      const refreshRes = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`)
       if (refreshRes.ok) {
         const json = await refreshRes.json()
         setGuestbookEntries(json.data ?? [])

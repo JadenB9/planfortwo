@@ -15,7 +15,7 @@ export function AnalyticsTracker({ slug }: AnalyticsTrackerProps) {
     if (tracked.current) return
     tracked.current = true
 
-    fetch(`${API_URL}/website-public/${slug}/track`, {
+    fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/track`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -30,7 +30,7 @@ export function AnalyticsTracker({ slug }: AnalyticsTrackerProps) {
           if (entry.isIntersecting) {
             const sectionType = entry.target.getAttribute('data-section-type')
             if (sectionType) {
-              fetch(`${API_URL}/website-public/${slug}/track`, {
+              fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/track`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

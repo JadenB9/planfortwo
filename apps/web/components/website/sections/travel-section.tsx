@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import DOMPurify from 'dompurify'
 import { ExternalLink, Phone, MapPin } from 'lucide-react'
 import type { TravelContent } from '@planfortwo/types'
 import { useTemplateStyles } from '../template-context'
@@ -32,7 +33,7 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             viewport={{ once: true }}
             className={`mb-10 text-center ${fontPair.bodyClass}`}
             style={{ color: `${colors.primary}CC` }}
-            dangerouslySetInnerHTML={{ __html: content.directions }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.directions) }}
           />
         )}
         {content.accommodations.length > 0 && (
@@ -90,7 +91,7 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             className="mt-10 overflow-hidden rounded-2xl"
-            dangerouslySetInnerHTML={{ __html: content.mapEmbed }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.mapEmbed, { ADD_TAGS: ['iframe'], ADD_ATTR: ['allowfullscreen', 'frameborder', 'loading'] }) }}
           />
         )}
       </div>

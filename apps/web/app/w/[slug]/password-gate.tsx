@@ -21,7 +21,7 @@ export function PasswordGate({ slug, weddingName }: PasswordGateProps) {
     setError('')
     setLoading(true)
     try {
-      const res = await fetch(`${API_URL}/website-public/${slug}/verify-password`, {
+      const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/verify-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),

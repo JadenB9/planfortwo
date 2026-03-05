@@ -50,10 +50,16 @@ const app = new Hono()
 // ── Global Middleware ──
 app.use('*', logger())
 app.use('*', secureHeaders())
+
+const allowedOrigins = [
+  process.env.NEXT_PUBLIC_APP_URL,
+  ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : []),
+].filter(Boolean) as string[]
+
 app.use(
   '*',
   cors({
-    origin: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
+    origin: (origin) => allowedOrigins.includes(origin) ? origin : undefined,
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

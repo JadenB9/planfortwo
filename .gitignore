@@ -10,8 +10,13 @@ out/
 
 # Environment
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+!.env.*.example
+
+# Keys/Certs
+*.pem
+*.key
 
 # IDE
 .vscode/
