@@ -23,7 +23,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white lg:flex">
+    <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-gray-200 bg-white lg:flex">
       <div className="flex h-16 items-center border-b border-gray-200 px-6">
         <Link href="/dashboard" className="font-serif text-xl font-bold text-gray-900">
           Plan<span className="text-wedding-600">For</span>Two
@@ -31,7 +31,7 @@ export function Sidebar() {
       </div>
 
       <motion.nav
-        className="mt-4 space-y-4 px-3"
+        className="mt-4 flex-1 space-y-4 overflow-y-auto px-3"
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
