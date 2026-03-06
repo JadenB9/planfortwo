@@ -25,10 +25,12 @@ vi.mock('@planfortwo/db', () => ({
   users: { clerkId: 'clerkId' },
   weddings: {},
   weddingMembers: {},
+  partnerInvitations: { email: 'email', status: 'status' },
 }))
 
 vi.mock('drizzle-orm', () => ({
   eq: vi.fn((col, val) => ({ col, val })),
+  and: vi.fn((...args: unknown[]) => ({ and: args })),
 }))
 
 import { headers } from 'next/headers'
@@ -128,35 +130,32 @@ describe('Clerk Webhook Route', () => {
 
     const { db } = await import('@planfortwo/db')
     vi.mocked(db.transaction).mockImplementation(async (fn) => {
-      const mockTx = {
-        insert: vi.fn().mockReturnValue({
-          values: vi.fn().mockReturnValue({
-            returning: vi
-              .fn()
-              .mockResolvedValueOnce([{ id: 'user-1', clerkId: 'user_clerk_abc' }])
-              .mockResolvedValueOnce([{ id: 'wedding-1' }]),
-          }),
-        }),
-      }
-      // The third insert (weddingMembers) doesn't need returning
+      // tx.select() for checking pending invitations -> returns empty (no pending invite)
+      const txSelectWhere = vi.fn().mockResolvedValue([])
+      const txSelectFrom = vi.fn(() => ({ where: txSelectWhere }))
+      const txSelect = vi.fn(() => ({ from: txSelectFrom }))
+
       let insertCount = 0
-      mockTx.insert = vi.fn().mockImplementation(() => ({
-        values: vi.fn().mockImplementation(() => {
-          insertCount++
-          if (insertCount <= 2) {
-            return {
-              returning: vi
-                .fn()
-                .mockResolvedValue(
-                  insertCount === 1
-                    ? [{ id: 'user-1', clerkId: 'user_clerk_abc' }]
-                    : [{ id: 'wedding-1' }],
-                ),
+      const mockTx = {
+        select: txSelect,
+        insert: vi.fn().mockImplementation(() => ({
+          values: vi.fn().mockImplementation(() => {
+            insertCount++
+            if (insertCount <= 2) {
+              return {
+                returning: vi
+                  .fn()
+                  .mockResolvedValue(
+                    insertCount === 1
+                      ? [{ id: 'user-1', clerkId: 'user_clerk_abc' }]
+                      : [{ id: 'wedding-1' }],
+                  ),
+              }
             }
-          }
-          return { returning: vi.fn().mockResolvedValue([]) }
-        }),
-      }))
+            return { returning: vi.fn().mockResolvedValue([]) }
+          }),
+        })),
+      }
       await fn(mockTx as never)
     })
 

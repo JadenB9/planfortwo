@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { onboardingSchema, invitePartnerSchema, updateWeddingSchema } from '@planfortwo/validators'
+import { onboardingSchema, invitePartnerSchema, inviteMemberSchema, updateWeddingSchema } from '@planfortwo/validators'
 import type { TimelineTemplate } from '@planfortwo/types'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
@@ -216,4 +216,93 @@ weddingsRoute.post('/accept-invite/:token', async (c) => {
 
     return c.json({ error: message, code: 'INVITATION_FAILED', statusCode: 400 }, 400)
   }
+})
+
+// GET /weddings/:id/members -- list all members of a wedding
+weddingsRoute.get('/:id/members', async (c) => {
+  const weddingId = c.req.param('id')
+  const dbUserId = c.get('dbUserId')
+
+  const membership = await weddingService.verifyMembership(weddingId, dbUserId)
+  if (!membership) {
+    return c.json(
+      { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  const members = await weddingService.getMembers(weddingId)
+  return c.json({ data: members })
+})
+
+// POST /weddings/:id/members -- add a planner/family member by email
+weddingsRoute.post(
+  '/:id/members',
+  zValidator('json', inviteMemberSchema, (result, c) => {
+    if (!result.success) {
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    }
+  }),
+  async (c) => {
+    const weddingId = c.req.param('id')
+    const dbUserId = c.get('dbUserId')
+
+    const membership = await weddingService.verifyMembership(weddingId, dbUserId)
+    if (!membership) {
+      return c.json(
+        { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+        403,
+      )
+    }
+
+    if (membership.role !== 'owner' && membership.role !== 'partner') {
+      return c.json(
+        { error: 'Only the couple can add team members', code: 'FORBIDDEN', statusCode: 403 },
+        403,
+      )
+    }
+
+    const { email, role } = c.req.valid('json')
+    const result = await weddingService.addMemberByEmail(weddingId, email, role)
+
+    if ('error' in result) {
+      return c.json({ error: result.error, code: 'ADD_MEMBER_FAILED', statusCode: 400 }, 400)
+    }
+
+    return c.json({ data: result }, 201)
+  },
+)
+
+// DELETE /weddings/:id/members/:memberId -- remove a member
+weddingsRoute.delete('/:id/members/:memberId', async (c) => {
+  const weddingId = c.req.param('id')
+  const memberId = c.req.param('memberId')
+  const dbUserId = c.get('dbUserId')
+
+  const membership = await weddingService.verifyMembership(weddingId, dbUserId)
+  if (!membership) {
+    return c.json(
+      { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  if (membership.role !== 'owner' && membership.role !== 'partner') {
+    return c.json(
+      { error: 'Only the couple can remove team members', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  const result = await weddingService.removeMember(weddingId, memberId)
+
+  if (!result) {
+    return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
+
+  if ('error' in result) {
+    return c.json({ error: result.error, code: 'REMOVE_FAILED', statusCode: 400 }, 400)
+  }
+
+  return c.json({ data: { removed: true } })
 })

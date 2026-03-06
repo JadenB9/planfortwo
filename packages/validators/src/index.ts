@@ -77,6 +77,14 @@ export const invitePartnerSchema = z.object({
 
 export type InvitePartnerInput = z.infer<typeof invitePartnerSchema>
 
+// ── Invite Member (planner/admin) ──
+export const inviteMemberSchema = z.object({
+  email: z.string().email(),
+  role: z.enum(['planner', 'family']).default('planner'),
+})
+
+export type InviteMemberInput = z.infer<typeof inviteMemberSchema>
+
 // ── Pagination ──
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -662,6 +670,33 @@ export * from './payments.js'
 export * from './ceremony.js'
 export * from './playlists.js'
 export * from './honeymoon.js'
+
+// Roadmap Preferences
+export const featureKeyEnum = z.enum([
+  'checklist',
+  'guests',
+  'budget',
+  'website',
+  'seating',
+  'vendors',
+  'events',
+  'photos',
+  'registry',
+  'ceremony',
+  'music',
+  'honeymoon',
+  'communication',
+])
+
+export type FeatureKey = z.infer<typeof featureKeyEnum>
+
+export const updateRoadmapPreferencesSchema = z.object({
+  weddingId: z.string().uuid(),
+  overrides: z.record(featureKeyEnum, z.number().int().min(0).max(100)).optional(),
+  hidden: z.array(featureKeyEnum).max(13).optional(),
+})
+
+export type UpdateRoadmapPreferencesInput = z.infer<typeof updateRoadmapPreferencesSchema>
 
 // Inbox
 export * from './inbox.js'

@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import type { Wedding, NotificationPreference } from '@planfortwo/types'
+import { UserPlus, Trash2, Crown, Heart, Users } from 'lucide-react'
 
 export default function SettingsPage() {
   const { getToken } = useAuth()
@@ -26,6 +27,13 @@ export default function SettingsPage() {
   const [weddingForm, setWeddingForm] = useState({ name: '', date: '', venue: '', budgetTotal: '', guestCountEstimate: '' })
   const [saving, setSaving] = useState(false)
   const [notifSaving, setNotifSaving] = useState(false)
+
+  // Team member management state
+  const [members, setMembers] = useState<Array<{ member: { id: string; role: string }; user: { id: string; email: string; firstName: string; lastName: string; avatarUrl: string | null } }>>([])
+  const [newMemberEmail, setNewMemberEmail] = useState('')
+  const [newMemberRole, setNewMemberRole] = useState<'planner' | 'family'>('planner')
+  const [addingMember, setAddingMember] = useState(false)
+  const [removingId, setRemovingId] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
     try {
@@ -48,6 +56,13 @@ export default function SettingsPage() {
         setNotifPrefs(prefs)
       } catch {
         /* first time - no prefs */
+      }
+
+      try {
+        const { data: memberList } = await api.weddings.getMembers(w.id, token)
+        setMembers(memberList)
+      } catch {
+        /* members will show empty */
       }
     } catch {
       toast.error('Failed to load settings')
@@ -107,6 +122,41 @@ export default function SettingsPage() {
     [weddingId, getToken],
   )
 
+  const handleAddMember = useCallback(async () => {
+    if (!weddingId || !newMemberEmail.trim()) return
+    setAddingMember(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.weddings.addMember(weddingId, { email: newMemberEmail, role: newMemberRole }, token)
+      toast.success('Team member added')
+      setNewMemberEmail('')
+      const { data: memberList } = await api.weddings.getMembers(weddingId, token)
+      setMembers(memberList)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to add member')
+    } finally {
+      setAddingMember(false)
+    }
+  }, [weddingId, getToken, newMemberEmail, newMemberRole])
+
+  const handleRemoveMember = useCallback(async (memberId: string) => {
+    if (!weddingId) return
+    setRemovingId(memberId)
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.weddings.removeMember(weddingId, memberId, token)
+      toast.success('Team member removed')
+      const { data: memberList } = await api.weddings.getMembers(weddingId, token)
+      setMembers(memberList)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to remove member')
+    } finally {
+      setRemovingId(null)
+    }
+  }, [weddingId, getToken])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -132,6 +182,7 @@ export default function SettingsPage() {
       <Tabs defaultValue="wedding">
         <TabsList className="mb-6">
           <TabsTrigger value="wedding">Wedding Details</TabsTrigger>
+          <TabsTrigger value="team">Planning Team</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
         </TabsList>
@@ -206,6 +257,110 @@ export default function SettingsPage() {
                 <Button onClick={handleSaveWedding} disabled={saving}>
                   {saving ? 'Saving...' : 'Save Changes'}
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="team">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Planning Team
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-sm text-gray-600">
+                Everyone on your planning team sees the same dashboard and can manage all wedding details together.
+              </p>
+
+              {/* Current Members */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-gray-900">Current Members</h3>
+                {members.map(({ member, user: memberUser }) => {
+                  const roleIcon = member.role === 'owner' ? (
+                    <Crown className="h-4 w-4 text-amber-500" />
+                  ) : member.role === 'partner' ? (
+                    <Heart className="h-4 w-4 text-pink-500" />
+                  ) : (
+                    <Users className="h-4 w-4 text-blue-500" />
+                  )
+
+                  const roleLabel = member.role === 'owner' ? 'Owner' : member.role === 'partner' ? 'Partner' : member.role === 'planner' ? 'Planner' : 'Family'
+
+                  return (
+                    <div key={member.id} className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        {memberUser.avatarUrl ? (
+                          <img src={memberUser.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
+                        ) : (
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-600">
+                            {memberUser.firstName?.[0]}{memberUser.lastName?.[0]}
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {memberUser.firstName} {memberUser.lastName}
+                          </p>
+                          <p className="text-xs text-gray-500">{memberUser.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                          {roleIcon}
+                          {roleLabel}
+                        </span>
+                        {member.role !== 'owner' && member.role !== 'partner' && (
+                          <button
+                            onClick={() => handleRemoveMember(member.id)}
+                            disabled={removingId === member.id}
+                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                            title="Remove member"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <Separator />
+
+              {/* Add New Member */}
+              <div className="space-y-3">
+                <h3 className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                  <UserPlus className="h-4 w-4" />
+                  Add Team Member
+                </h3>
+                <p className="text-xs text-gray-500">
+                  Add a wedding planner, coordinator, or family member to help plan. They must have a PlanForTwo account.
+                </p>
+                <div className="flex gap-3">
+                  <Input
+                    type="email"
+                    value={newMemberEmail}
+                    onChange={(e) => setNewMemberEmail(e.target.value)}
+                    placeholder="email@example.com"
+                    className="flex-1"
+                  />
+                  <select
+                    value={newMemberRole}
+                    onChange={(e) => setNewMemberRole(e.target.value as 'planner' | 'family')}
+                    className="rounded-xl border border-gray-300 px-3 py-2 text-sm"
+                  >
+                    <option value="planner">Planner</option>
+                    <option value="family">Family</option>
+                  </select>
+                  <Button
+                    onClick={handleAddMember}
+                    disabled={!newMemberEmail.trim() || addingMember}
+                  >
+                    {addingMember ? 'Adding...' : 'Add'}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

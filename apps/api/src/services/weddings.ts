@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm'
+import { eq, and, ne } from 'drizzle-orm'
 import { db, weddings, weddingMembers, users } from '@planfortwo/db'
 
 interface OnboardingData {
@@ -27,12 +27,23 @@ interface OnboardingData {
 export const weddingService = {
   async findByUserId(userId: string) {
     const results = await db
-      .select({ wedding: weddings })
+      .select({ wedding: weddings, role: weddingMembers.role })
       .from(weddingMembers)
       .innerJoin(weddings, eq(weddingMembers.weddingId, weddings.id))
       .where(eq(weddingMembers.userId, userId))
 
-    return results[0]?.wedding ?? null
+    if (results.length === 0) return null
+    if (results.length === 1) return results[0]!.wedding
+
+    // Prefer the wedding where onboarding is completed
+    const onboarded = results.find((r) => r.wedding.onboardingCompleted)
+    if (onboarded) return onboarded.wedding
+
+    // Prefer the wedding where the user is a partner (they were invited to it)
+    const asPartner = results.find((r) => r.role === 'partner')
+    if (asPartner) return asPartner.wedding
+
+    return results[0]!.wedding
   },
 
   async completeOnboarding(weddingId: string, data: OnboardingData) {
@@ -97,5 +108,50 @@ export const weddingService = {
       .where(eq(weddingMembers.weddingId, weddingId))
 
     return results
+  },
+
+  async addMemberByEmail(weddingId: string, email: string, role: 'planner' | 'family') {
+    const [user] = await db.select().from(users).where(eq(users.email, email))
+    if (!user) {
+      return { error: 'No user found with that email. They need to create an account first.' }
+    }
+
+    // Check if already a member
+    const existing = await this.verifyMembership(weddingId, user.id)
+    if (existing) {
+      return { error: 'This person is already a member of this wedding.' }
+    }
+
+    const [member] = await db
+      .insert(weddingMembers)
+      .values({
+        weddingId,
+        userId: user.id,
+        role,
+        joinedAt: new Date(),
+      })
+      .returning()
+
+    return { member, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, avatarUrl: user.avatarUrl } }
+  },
+
+  async removeMember(weddingId: string, memberId: string) {
+    const [member] = await db
+      .select()
+      .from(weddingMembers)
+      .where(and(eq(weddingMembers.id, memberId), eq(weddingMembers.weddingId, weddingId)))
+
+    if (!member) return null
+
+    // Prevent removing the owner
+    if (member.role === 'owner') {
+      return { error: 'Cannot remove the wedding owner.' }
+    }
+
+    await db
+      .delete(weddingMembers)
+      .where(and(eq(weddingMembers.id, memberId), eq(weddingMembers.weddingId, weddingId)))
+
+    return { removed: true }
   },
 }

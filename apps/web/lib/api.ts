@@ -157,6 +157,19 @@ export const api = {
         method: 'POST',
         token: authToken,
       }),
+    getMembers: (weddingId: string, token: string) =>
+      fetchApi<{ data: Array<{ member: { id: string; role: string }; user: { id: string; email: string; firstName: string; lastName: string; avatarUrl: string | null } }> }>(`/weddings/${weddingId}/members`, { token }),
+    addMember: (weddingId: string, data: { email: string; role: string }, token: string) =>
+      fetchApi<{ data: { member: { id: string; role: string }; user: { id: string; email: string; firstName: string; lastName: string } } }>(`/weddings/${weddingId}/members`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        token,
+      }),
+    removeMember: (weddingId: string, memberId: string, token: string) =>
+      fetchApi<{ data: { removed: boolean } }>(`/weddings/${weddingId}/members/${memberId}`, {
+        method: 'DELETE',
+        token,
+      }),
   },
   tasks: {
     list: (

@@ -1,8 +1,8 @@
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { Webhook } from 'svix'
-import { eq } from 'drizzle-orm'
-import { db, users, weddings, weddingMembers } from '@planfortwo/db'
+import { eq, and } from 'drizzle-orm'
+import { db, users, weddings, weddingMembers, partnerInvitations } from '@planfortwo/db'
 
 interface ClerkWebhookEvent {
   type: string
@@ -64,6 +64,23 @@ export async function POST(req: Request) {
 
           if (!user) {
             throw new Error('Failed to create user')
+          }
+
+          // Check if this user has a pending partner invitation — if so,
+          // skip creating a default wedding (they'll join the inviter's wedding)
+          const pendingInvites = await tx
+            .select()
+            .from(partnerInvitations)
+            .where(
+              and(
+                eq(partnerInvitations.email, primaryEmail),
+                eq(partnerInvitations.status, 'pending'),
+              ),
+            )
+
+          if (pendingInvites.length > 0) {
+            // Partner will join existing wedding via the accept-invite flow
+            return
           }
 
           const [wedding] = await tx.insert(weddings).values({ name: 'Our Wedding' }).returning()

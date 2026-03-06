@@ -1,5 +1,5 @@
-import { eq } from 'drizzle-orm'
-import { db, users, weddings, weddingMembers } from '@planfortwo/db'
+import { eq, and } from 'drizzle-orm'
+import { db, users, weddings, weddingMembers, partnerInvitations } from '@planfortwo/db'
 
 interface CreateUserData {
   clerkId: string
@@ -33,6 +33,22 @@ export const userService = {
 
       if (!user) {
         throw new Error('Failed to create user')
+      }
+
+      // Check if this user has a pending partner invitation — if so,
+      // skip creating a default wedding (they'll join the inviter's wedding)
+      const pendingInvites = await tx
+        .select()
+        .from(partnerInvitations)
+        .where(
+          and(
+            eq(partnerInvitations.email, data.email),
+            eq(partnerInvitations.status, 'pending'),
+          ),
+        )
+
+      if (pendingInvites.length > 0) {
+        return
       }
 
       const [wedding] = await tx.insert(weddings).values({ name: 'Our Wedding' }).returning()

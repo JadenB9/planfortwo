@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('drizzle-orm', () => ({
   eq: vi.fn((col: string, val: string) => ({ column: col, value: val })),
+  and: vi.fn((...args: unknown[]) => ({ and: args })),
 }))
 
 vi.mock('@planfortwo/db', () => {
@@ -47,6 +48,7 @@ vi.mock('@planfortwo/db', () => {
     users: { clerkId: 'clerk_id', id: 'id' },
     weddings: { id: 'id' },
     weddingMembers: { id: 'id' },
+    partnerInvitations: { email: 'email', status: 'status' },
   }
 })
 
@@ -90,6 +92,11 @@ describe('User Service', () => {
           const txValues = vi.fn()
           const txInsert = vi.fn(() => ({ values: txValues }))
 
+          // tx.select() for checking pending invitations -> returns empty (no pending invite)
+          const txSelectWhere = vi.fn().mockResolvedValue([])
+          const txSelectFrom = vi.fn(() => ({ where: txSelectWhere }))
+          const txSelect = vi.fn(() => ({ from: txSelectFrom }))
+
           // First call: insert user -> .values().returning() -> [mockUser]
           txValues.mockReturnValueOnce({ returning: txReturning })
           txReturning.mockResolvedValueOnce([mockUser])
@@ -101,7 +108,7 @@ describe('User Service', () => {
           // Third call: insert member -> .values() only (no returning)
           txValues.mockResolvedValueOnce(undefined)
 
-          const tx = { insert: txInsert }
+          const tx = { insert: txInsert, select: txSelect }
           await fn(tx)
 
           expect(txInsert).toHaveBeenCalledTimes(3)
