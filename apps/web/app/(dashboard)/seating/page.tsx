@@ -362,6 +362,7 @@ export default function SeatingPage() {
 
       await api.seatingCharts.addTable(
         selectedChart.id,
+        selectedChart.weddingId,
         {
           chartId: selectedChart.id,
           label: tableLabel.trim(),

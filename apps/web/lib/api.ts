@@ -913,6 +913,7 @@ export const api = {
       }),
     addTable: (
       chartId: string,
+      weddingId: string,
       data: {
         chartId: string
         label: string
@@ -923,7 +924,7 @@ export const api = {
       },
       token: string,
     ) =>
-      fetchApi<{ data: SeatingTable }>(`/seating-charts/${chartId}/tables`, {
+      fetchApi<{ data: SeatingTable }>(`/seating-charts/${chartId}/tables?weddingId=${weddingId}`, {
         method: 'POST',
         body: JSON.stringify(data),
         token,
@@ -1226,6 +1227,14 @@ export const api = {
   progress: {
     get: (weddingId: string, token: string) =>
       fetchApi<{ data: PlanningProgress }>(`/progress?weddingId=${weddingId}`, { token }),
+    updatePreferences: (
+      data: { weddingId: string; overrides?: Record<string, number>; hidden?: string[] },
+      token: string,
+    ) =>
+      fetchApi<{ data: { overrides: Record<string, number>; hidden: string[] } }>(
+        '/progress/preferences',
+        { method: 'PUT', body: JSON.stringify(data), token },
+      ),
   },
   inbox: {
     list: (token: string, filters?: Partial<InboxFiltersInput>) => {
