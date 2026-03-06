@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ChevronDown, Sparkles, ExternalLink, CheckCircle } from 'lucide-react'
+import { ChevronDown, Sparkles, ExternalLink, CheckCircle, Settings } from 'lucide-react'
 import { staggerContainer, navItem, springSmooth } from '@/lib/animations'
 import { NAV_GROUPS } from '@/lib/navigation'
 import { useWedding } from '@/hooks/use-wedding'
@@ -103,6 +103,19 @@ export function Sidebar() {
 
       {/* Bottom section */}
       <div className="mt-auto space-y-2 border-t border-gray-200 p-3">
+        <Link
+          href="/settings"
+          className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+            pathname === '/settings'
+              ? 'bg-wedding-50 text-wedding-700'
+              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+          }`}
+        >
+          <Settings
+            className={`h-4 w-4 flex-shrink-0 ${pathname === '/settings' ? 'text-wedding-600' : 'text-gray-400'}`}
+          />
+          Wedding Settings
+        </Link>
         {weddingLoading ? null : tier === 'full' ? (
           <div className="bg-sage-50 border-sage-200 text-sage-700 flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium">
             <CheckCircle className="h-4 w-4" />

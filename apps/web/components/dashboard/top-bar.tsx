@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
+import { Settings } from 'lucide-react'
 import { NAV_GROUPS } from '@/lib/navigation'
 
 export function TopBar() {
@@ -53,7 +54,15 @@ export function TopBar() {
             </Link>
           </div>
 
-          <UserButton />
+          <UserButton>
+            <UserButton.MenuItems>
+              <UserButton.Link
+                label="Wedding Settings"
+                labelIcon={<Settings className="h-4 w-4" />}
+                href="/settings"
+              />
+            </UserButton.MenuItems>
+          </UserButton>
         </div>
       </header>
 
@@ -91,7 +100,15 @@ export function TopBar() {
                 </Link>
               </div>
 
-              <UserButton />
+              <UserButton>
+                <UserButton.MenuItems>
+                  <UserButton.Link
+                    label="Wedding Settings"
+                    labelIcon={<Settings className="h-4 w-4" />}
+                    href="/settings"
+                  />
+                </UserButton.MenuItems>
+              </UserButton>
             </div>
 
             {/* Nav links */}
