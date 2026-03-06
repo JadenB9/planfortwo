@@ -182,9 +182,10 @@ websiteConfigRoute.post(
   },
 )
 
-// GET /website-config/check-subdomain?subdomain=X
+// GET /website-config/check-subdomain?subdomain=X&weddingId=X
 websiteConfigRoute.get('/check-subdomain', authMiddleware, resolveUserMiddleware, async (c) => {
   const subdomain = c.req.query('subdomain')
+  const weddingId = c.req.query('weddingId')
   if (!subdomain) {
     return c.json({ error: 'Subdomain required', code: 'MISSING_SUBDOMAIN', statusCode: 400 }, 400)
   }
@@ -194,6 +195,6 @@ websiteConfigRoute.get('/check-subdomain', authMiddleware, resolveUserMiddleware
     return c.json({ data: { available: false, reason: 'Invalid format' } })
   }
 
-  const available = await websiteConfigService.checkSubdomain(subdomain)
+  const available = await websiteConfigService.checkSubdomain(subdomain, weddingId ?? undefined)
   return c.json({ data: { available } })
 })

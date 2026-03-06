@@ -27,6 +27,8 @@ import { RsvpEditor } from '@/components/website/editor/rsvp-editor'
 import { ScheduleEditor } from '@/components/website/editor/schedule-editor'
 import { GuestbookEditor } from '@/components/website/editor/guestbook-editor'
 import { CustomEditor } from '@/components/website/editor/custom-editor'
+import { FaqEditor } from '@/components/website/editor/faq-editor'
+import { ThingsToDoEditor } from '@/components/website/editor/things-to-do-editor'
 import type { WebsiteSection } from '@planfortwo/types'
 import type {
   HeroContent,
@@ -36,6 +38,8 @@ import type {
   GalleryContent,
   TravelContent,
   RegistryContent,
+  FaqContent,
+  ThingsToDoContent,
   RsvpSectionContent,
   ScheduleContent,
   GuestbookSectionContent,
@@ -132,13 +136,13 @@ export default function WebsitePage() {
       const token = await getToken()
       if (!token) return false
       try {
-        const res = await api.websiteConfig.checkSubdomain(subdomain, token)
+        const res = await api.websiteConfig.checkSubdomain(subdomain, token, weddingId ?? undefined)
         return (res as { data: { available: boolean } }).data.available
       } catch {
         return false
       }
     },
-    [getToken],
+    [getToken, weddingId],
   )
 
   const handleSectionEdit = useCallback((section: WebsiteSection) => {
@@ -236,6 +240,20 @@ export default function WebsitePage() {
         return (
           <CustomEditor
             content={content as unknown as CustomSectionContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'faq':
+        return (
+          <FaqEditor
+            content={content as unknown as FaqContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'things_to_do':
+        return (
+          <ThingsToDoEditor
+            content={content as unknown as ThingsToDoContent}
             onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
           />
         )

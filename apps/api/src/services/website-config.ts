@@ -150,12 +150,14 @@ export const websiteConfigService = {
     return compare(password, config.passwordHash)
   },
 
-  async checkSubdomain(subdomain: string): Promise<boolean> {
+  async checkSubdomain(subdomain: string, excludeWeddingId?: string): Promise<boolean> {
     const [existing] = await db
-      .select({ id: websiteConfigs.id })
+      .select({ id: websiteConfigs.id, weddingId: websiteConfigs.weddingId })
       .from(websiteConfigs)
       .where(eq(websiteConfigs.subdomain, subdomain))
 
-    return !existing
+    if (!existing) return true
+    if (excludeWeddingId && existing.weddingId === excludeWeddingId) return true
+    return false
   },
 }

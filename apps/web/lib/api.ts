@@ -523,9 +523,9 @@ export const api = {
           token,
         },
       ),
-    checkSubdomain: (subdomain: string, token: string) =>
+    checkSubdomain: (subdomain: string, token: string, weddingId?: string) =>
       fetchApi<{ data: { available: boolean; reason?: string } }>(
-        `/website-config/check-subdomain?subdomain=${encodeURIComponent(subdomain)}`,
+        `/website-config/check-subdomain?subdomain=${encodeURIComponent(subdomain)}${weddingId ? `&weddingId=${encodeURIComponent(weddingId)}` : ''}`,
         {
           token,
         },
