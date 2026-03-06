@@ -88,3 +88,37 @@ export const navItem: Variants = {
   hidden: { opacity: 0, x: -16 },
   visible: { opacity: 1, x: 0 },
 }
+
+// Reveal from below with parallax feel
+export const revealUp: Variants = {
+  hidden: { opacity: 0, y: 60 },
+  visible: { opacity: 1, y: 0 },
+}
+
+// Subtle horizontal slide for alternating sections
+export const slideFromLeft: Variants = {
+  hidden: { opacity: 0, x: -40 },
+  visible: { opacity: 1, x: 0 },
+}
+
+export const slideFromRight: Variants = {
+  hidden: { opacity: 0, x: 40 },
+  visible: { opacity: 1, x: 0 },
+}
+
+// Draw-in line animation
+export const drawLine: Variants = {
+  hidden: { scaleX: 0 },
+  visible: { scaleX: 1 },
+}
+
+// Stagger with longer delays for dramatic reveals
+export const staggerSlow: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+}
