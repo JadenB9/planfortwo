@@ -239,7 +239,6 @@ export function RsvpEntry() {
             )}
           </button>
 
-          {/* Name Search Results */}
           {nameResults && nameResults.length > 0 && (
             <div className="mt-4 space-y-2">
               <p className="text-sm font-medium text-gray-700">

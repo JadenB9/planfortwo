@@ -102,7 +102,6 @@ export const paymentScheduleService = {
 
     if (!updated) return null
 
-    // If payment marked as paid, update parent budget item's paidAmount
     if (data.isPaid === true) {
       const paymentAmount = parseFloat(updated.amount)
 

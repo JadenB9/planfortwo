@@ -82,7 +82,6 @@ export const progressService = {
         .where(eq(emailCampaigns.weddingId, weddingId)),
     ])
 
-    // Safe extraction: if a query failed (e.g. table doesn't exist), return 0
     const cnt = (i: number): number => {
       const r = results[i]
       if (!r || r.status !== 'fulfilled') return 0

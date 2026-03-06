@@ -42,8 +42,6 @@ export const householdService = {
 
   async createHousehold(input: CreateHouseholdInput, userId: string) {
     let rsvpCode = generateRsvpCode(input.name)
-
-    // Ensure uniqueness by checking DB and appending random digits if needed
     let attempts = 0
     while (attempts < 10) {
       const [existing] = await db
@@ -115,7 +113,6 @@ export const householdService = {
       throw new Error('Household not found')
     }
 
-    // Nullify guest householdIds first
     await db.update(guests).set({ householdId: null }).where(eq(guests.householdId, id))
 
     await db.delete(households).where(eq(households.id, id))

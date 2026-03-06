@@ -96,7 +96,6 @@ export default function DashboardPage() {
       setInviteStatus('sent')
       setInviteEmail('')
     } catch (err) {
-      console.error('Invite partner error:', err)
       setInviteError(
         err instanceof Error
           ? err.message

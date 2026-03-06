@@ -167,12 +167,10 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
             key={form.guestId}
             className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
           >
-            {/* Guest Name */}
             <h3 className="font-serif text-xl font-semibold text-gray-900">
               {guest.firstName} {guest.lastName}
             </h3>
 
-            {/* RSVP Status Selection */}
             <div className="mt-6">
               <p className="mb-3 text-sm font-medium text-gray-700">Your Response</p>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -198,10 +196,8 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
               </div>
             </div>
 
-            {/* Details section — only show if accepted or maybe */}
             {(form.rsvpStatus === 'accepted' || form.rsvpStatus === 'maybe') && (
               <div className="mt-6 space-y-5">
-                {/* Meal Choice */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Meal Preference</label>
                   <select
@@ -218,7 +214,6 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                   </select>
                 </div>
 
-                {/* Dietary Restrictions */}
                 <div>
                   <p className="text-sm font-medium text-gray-700">Dietary Restrictions</p>
                   <div className="mt-2 flex flex-wrap gap-3">
@@ -256,7 +251,6 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                   />
                 </div>
 
-                {/* Song Request */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Song Request</label>
                   <input
@@ -268,7 +262,6 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                   />
                 </div>
 
-                {/* Notes */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Additional Notes
@@ -282,7 +275,6 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                   />
                 </div>
 
-                {/* Plus One Section */}
                 {showPlusOne && (
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
                     <h4 className="font-serif text-lg font-semibold text-gray-900">Plus One</h4>

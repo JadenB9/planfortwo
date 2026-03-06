@@ -1,10 +1,3 @@
-/**
- * Clerk appearance configuration for PlanForTwo.
- *
- * Uses the wedding palette (terracotta primary, cream background)
- * and the Inter font family to keep auth screens consistent
- * with the rest of the application.
- */
 export const clerkAppearance = {
   variables: {
     colorPrimary: '#c2674a',
