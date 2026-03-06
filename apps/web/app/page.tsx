@@ -1,21 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import {
   CheckSquare,
   Users,
   DollarSign,
   Globe,
   ArrowRight,
-  Menu,
-  X,
   Heart,
   Sparkles,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { NavBar } from '@/components/layout/nav-bar'
+import { SiteFooter } from '@/components/layout/site-footer'
 import {
   springSmooth,
   staggerSlow,
@@ -25,105 +25,152 @@ import {
   drawLine,
 } from '@/lib/animations'
 
+const rotatingWords = ['checklists', 'guest lists', 'budgets', 'websites', 'seating charts']
+
 function useParallax(offset: number = 50) {
   const { scrollYProgress } = useScroll()
   return useTransform(scrollYProgress, [0, 1], [0, -offset])
 }
 
-function NavBar() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+function RotatingText() {
+  const [index, setIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % rotatingWords.length)
+    }, 2400)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <nav className="fixed top-0 z-50 w-full">
-      <div className="mx-auto max-w-6xl px-5 py-4 sm:px-8">
-        <div className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-lg">
-          <Link href="/" className="font-serif text-lg font-bold tracking-tight text-gray-900">
-            PlanForTwo
-          </Link>
+    <span className="text-wedding-600 inline-block">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={rotatingWords[index]}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.35 }}
+          className="inline-block"
+        >
+          {rotatingWords[index]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  )
+}
 
-          {/* Desktop */}
-          <div className="hidden items-center gap-8 sm:flex">
-            <Link
-              href="/features"
-              className="text-[13px] font-medium tracking-wide text-gray-500 transition-colors hover:text-gray-900"
-            >
-              Features
-            </Link>
-            <Link
-              href="/features#pricing"
-              className="text-[13px] font-medium tracking-wide text-gray-500 transition-colors hover:text-gray-900"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/sign-in"
-              className="text-[13px] font-medium tracking-wide text-gray-500 transition-colors hover:text-gray-900"
-            >
-              Sign in
-            </Link>
-            <Button
-              asChild
-              size="sm"
-              className="bg-gray-900 hover:bg-gray-800 rounded-lg px-4 text-xs font-medium text-white"
-            >
-              <Link href="/sign-up">Start planning</Link>
-            </Button>
+function DashboardPreview() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.6, ...springSmooth }}
+      className="mx-auto mt-16 max-w-4xl"
+    >
+      <div className="rounded-2xl border border-gray-200/80 bg-white p-3 shadow-2xl shadow-gray-900/5 sm:p-4">
+        {/* Browser chrome */}
+        <div className="mb-3 flex items-center gap-2 px-1">
+          <div className="flex gap-1.5">
+            <div className="h-2.5 w-2.5 rounded-full bg-gray-200" />
+            <div className="h-2.5 w-2.5 rounded-full bg-gray-200" />
+            <div className="h-2.5 w-2.5 rounded-full bg-gray-200" />
           </div>
-
-          {/* Mobile toggle */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg p-1.5 text-gray-600 transition-colors hover:bg-gray-100 sm:hidden"
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="ml-4 h-5 flex-1 rounded-md bg-gray-50 px-3">
+            <span className="text-[10px] leading-5 text-gray-300">planfortwo.com/dashboard</span>
+          </div>
         </div>
-
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="mt-2 rounded-2xl border border-white/60 bg-white/95 p-4 shadow-lg backdrop-blur-lg sm:hidden"
-          >
-            <div className="flex flex-col gap-3">
-              <Link
-                href="/features"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-              >
-                Features
-              </Link>
-              <Link
-                href="/features#pricing"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-              >
-                Pricing
-              </Link>
-              <Link
-                href="/sign-in"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-              >
-                Sign in
-              </Link>
-              <Button
-                asChild
-                className="bg-gray-900 hover:bg-gray-800 mt-1 rounded-lg text-white"
-              >
-                <Link href="/sign-up" onClick={() => setMobileOpen(false)}>
-                  Start planning
-                </Link>
-              </Button>
+        {/* Dashboard mockup */}
+        <div className="overflow-hidden rounded-xl bg-[#FAFAF8]">
+          <div className="flex min-h-[280px] sm:min-h-[340px]">
+            {/* Sidebar */}
+            <div className="hidden w-48 border-r border-gray-100 bg-white p-4 sm:block">
+              <div className="font-serif text-sm font-bold text-gray-900">PlanForTwo</div>
+              <div className="mt-6 space-y-1">
+                {[
+                  { label: 'Dashboard', active: true },
+                  { label: 'Checklist', active: false },
+                  { label: 'Guests', active: false },
+                  { label: 'Budget', active: false },
+                  { label: 'Website', active: false },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className={`rounded-lg px-3 py-1.5 text-xs ${
+                      item.active
+                        ? 'bg-sage-50 text-sage-700 font-medium'
+                        : 'text-gray-400'
+                    }`}
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </div>
             </div>
-          </motion.div>
-        )}
+            {/* Main content */}
+            <div className="flex-1 p-4 sm:p-6">
+              <div className="text-sm font-medium text-gray-900">Welcome back</div>
+              <div className="mt-1 text-xs text-gray-400">142 days until your wedding</div>
+              {/* Stat cards */}
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  { label: 'Tasks done', value: '34/52', color: 'bg-sage-500' },
+                  { label: 'Guests', value: '87', color: 'bg-wedding-500' },
+                  { label: 'Budget left', value: '$8,420', color: 'bg-cream-600' },
+                  { label: 'RSVPs', value: '64', color: 'bg-sage-400' },
+                ].map((stat) => (
+                  <div key={stat.label} className="rounded-xl bg-white p-3 shadow-sm">
+                    <div className={`mb-1.5 h-1 w-6 rounded-full ${stat.color}`} />
+                    <div className="text-sm font-semibold text-gray-900">{stat.value}</div>
+                    <div className="text-[10px] text-gray-400">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+              {/* Checklist preview */}
+              <div className="mt-4 rounded-xl bg-white p-3 shadow-sm">
+                <div className="mb-2 text-xs font-medium text-gray-700">Upcoming tasks</div>
+                {[
+                  { done: true, text: 'Book photographer' },
+                  { done: true, text: 'Send save-the-dates' },
+                  { done: false, text: 'Finalize guest list' },
+                  { done: false, text: 'Schedule cake tasting' },
+                ].map((task) => (
+                  <div key={task.text} className="flex items-center gap-2 py-1">
+                    <div
+                      className={`h-3.5 w-3.5 rounded border ${
+                        task.done
+                          ? 'border-sage-500 bg-sage-500'
+                          : 'border-gray-200 bg-white'
+                      }`}
+                    >
+                      {task.done && (
+                        <svg viewBox="0 0 14 14" className="h-3.5 w-3.5 text-white">
+                          <path
+                            d="M3.5 7L6 9.5L10.5 5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <span
+                      className={`text-[11px] ${
+                        task.done ? 'text-gray-300 line-through' : 'text-gray-600'
+                      }`}
+                    >
+                      {task.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </nav>
+    </motion.div>
   )
 }
 
@@ -159,18 +206,13 @@ function FeatureShowcase({
         direction === 'right' ? 'lg:flex-row-reverse' : ''
       }`}
     >
-      {/* Visual side */}
       <div className="flex-1">
-        <div
-          className={`relative overflow-hidden rounded-3xl ${accent} p-8 sm:p-12`}
-        >
+        <div className={`relative overflow-hidden rounded-3xl ${accent} p-8 sm:p-12`}>
           <Icon className="h-16 w-16 text-white/90 sm:h-20 sm:w-20" strokeWidth={1.2} />
           <div className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-white/10" />
           <div className="absolute -top-4 right-12 h-16 w-16 rounded-full bg-white/5" />
         </div>
       </div>
-
-      {/* Text side */}
       <div className="flex-1">
         <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
           {label}
@@ -198,8 +240,7 @@ export default function HomePage() {
       <NavBar />
 
       {/* ─── Hero ─── */}
-      <section className="relative px-5 pb-20 pt-32 sm:px-8 sm:pt-40 lg:pt-48">
-        {/* Warm organic background shapes */}
+      <section className="relative px-5 pb-8 pt-32 sm:px-8 sm:pt-40 lg:pt-48">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <motion.div
             style={{ y: parallaxY }}
@@ -232,14 +273,14 @@ export default function HomePage() {
             </motion.p>
 
             <motion.h1
-              className="font-serif text-[2.75rem] font-bold leading-[1.1] tracking-tight text-gray-900 sm:text-6xl lg:text-7xl"
+              className="font-serif text-[2.75rem] leading-[1.1] tracking-tight text-gray-900 sm:text-6xl lg:text-7xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
             >
-              Plan your wedding,
+              Your <RotatingText />,
               <br />
-              <span className="text-wedding-600">not your stress.</span>
+              handled.
             </motion.h1>
 
             <motion.p
@@ -248,8 +289,8 @@ export default function HomePage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              Checklists, guest lists, budgets, and your wedding website &mdash;
-              all in one place. Built for two people, not an entire industry.
+              One place for your checklist, guest list, budget, and wedding website.
+              Built for two people, not an entire industry.
             </motion.p>
 
             <motion.div
@@ -262,7 +303,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-gray-900 hover:bg-gray-800 rounded-xl px-8 text-sm font-medium text-white shadow-lg shadow-gray-900/10"
+                  className="rounded-xl bg-gray-900 px-8 text-sm font-medium text-white shadow-lg shadow-gray-900/10 hover:bg-gray-800"
                 >
                   <Link href="/sign-up">
                     Start planning — it&apos;s free
@@ -282,12 +323,15 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
 
-          {/* Floating trust indicators */}
+          {/* Product preview */}
+          <DashboardPreview />
+
+          {/* Trust indicators */}
           <motion.div
-            className="mx-auto mt-16 flex max-w-md flex-wrap items-center justify-center gap-x-8 gap-y-3"
+            className="mx-auto mt-12 flex max-w-md flex-wrap items-center justify-center gap-x-8 gap-y-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
+            transition={{ delay: 1, duration: 0.6 }}
           >
             <span className="flex items-center gap-1.5 text-xs text-gray-400">
               <Heart className="h-3 w-3" /> Free to start
@@ -302,8 +346,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── Gentle separator ─── */}
-      <div className="mx-auto max-w-xs px-5">
+      {/* ─── Separator ─── */}
+      <div className="mx-auto max-w-xs px-5 py-20">
         <motion.div
           variants={drawLine}
           initial="hidden"
@@ -314,8 +358,8 @@ export default function HomePage() {
         />
       </div>
 
-      {/* ─── "How it works" — Conversational, not grid ─── */}
-      <section className="px-5 py-24 sm:px-8 lg:py-32">
+      {/* ─── Features ─── */}
+      <section className="px-5 pb-24 sm:px-8 lg:pb-32">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -354,7 +398,6 @@ export default function HomePage() {
               direction="left"
               accent="bg-sage-600"
             />
-
             <FeatureShowcase
               icon={Users}
               label="Guest list"
@@ -369,7 +412,6 @@ export default function HomePage() {
               direction="right"
               accent="bg-wedding-600"
             />
-
             <FeatureShowcase
               icon={DollarSign}
               label="Budget"
@@ -384,7 +426,6 @@ export default function HomePage() {
               direction="left"
               accent="bg-cream-700"
             />
-
             <FeatureShowcase
               icon={Globe}
               label="Wedding website"
@@ -403,8 +444,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── Value Proposition — Asymmetric layout ─── */}
-      <section className="bg-white px-5 py-24 sm:px-8 lg:py-32">
+      {/* ─── Value Props ─── */}
+      <section className="bg-[#FFFCF7] px-5 py-24 sm:px-8 lg:py-32">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -458,7 +499,7 @@ export default function HomePage() {
                 key={item.title}
                 variants={revealUp}
                 transition={{ duration: 0.6, ...springSmooth }}
-                className="group rounded-2xl border border-gray-100 bg-gray-50/50 p-7 transition-colors hover:border-gray-200 hover:bg-white"
+                className="group rounded-2xl border border-gray-100 bg-white/80 p-7 transition-colors hover:border-gray-200 hover:bg-white"
               >
                 <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-gray-500">{item.body}</p>
@@ -493,7 +534,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-gray-900 hover:bg-gray-800 rounded-xl px-8 text-sm font-medium text-white shadow-lg shadow-gray-900/10"
+                  className="rounded-xl bg-gray-900 px-8 text-sm font-medium text-white shadow-lg shadow-gray-900/10 hover:bg-gray-800"
                 >
                   <Link href="/sign-up">Start free</Link>
                 </Button>
@@ -519,7 +560,7 @@ export default function HomePage() {
             Your wedding deserves better than a spreadsheet.
           </h2>
           <p className="mt-4 text-base leading-relaxed text-gray-400">
-            Join PlanForTwo and start organizing everything in one place.
+            Start organizing everything in one place.
             Free account, no credit card, takes about 30 seconds.
           </p>
           <motion.div className="mt-10" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -537,70 +578,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* ─── Footer ─── */}
-      <footer className="border-t border-gray-100 bg-white px-5 py-12 sm:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <Link href="/" className="font-serif text-lg font-bold text-gray-900">
-                PlanForTwo
-              </Link>
-              <p className="mt-2 max-w-xs text-sm leading-relaxed text-gray-400">
-                Wedding planning software for couples who want simplicity over complexity.
-              </p>
-            </div>
-
-            <div className="flex gap-16">
-              <div>
-                <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
-                  Product
-                </h4>
-                <ul className="mt-3 space-y-2">
-                  <li>
-                    <Link href="/features" className="text-sm text-gray-500 hover:text-gray-900">
-                      Features
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/features#pricing" className="text-sm text-gray-500 hover:text-gray-900">
-                      Pricing
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/sign-up" className="text-sm text-gray-500 hover:text-gray-900">
-                      Get started
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
-                  Account
-                </h4>
-                <ul className="mt-3 space-y-2">
-                  <li>
-                    <Link href="/sign-in" className="text-sm text-gray-500 hover:text-gray-900">
-                      Sign in
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/sign-up" className="text-sm text-gray-500 hover:text-gray-900">
-                      Create account
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 border-t border-gray-100 pt-6">
-            <p className="text-xs text-gray-400">
-              &copy; {new Date().getFullYear()} PlanForTwo. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   )
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import {
   CheckSquare,
@@ -18,7 +20,8 @@ import {
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
+import { NavBar } from '@/components/layout/nav-bar'
+import { SiteFooter } from '@/components/layout/site-footer'
 import { AnimatedSection } from '@/components/features/animated-section'
 import { PricingCard, PricingCards } from '@/components/features/pricing-card'
 import { FaqSection } from '@/components/features/faq-section'
@@ -256,40 +259,21 @@ const fullPlanFeatures = [
 
 export default function FeaturesPage() {
   return (
-    <main className="min-h-screen">
-      {/* Navigation */}
-      <nav className="border-sage-100 sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/" className="font-serif text-xl font-bold text-gray-900">
-            PlanForTwo
-          </Link>
-          <div className="flex items-center gap-6">
-            <Link
-              href="/"
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
-            >
-              Home
-            </Link>
-            <Button
-              asChild
-              size="sm"
-              className="bg-wedding-600 hover:bg-wedding-700 rounded-lg text-white"
-            >
-              <Link href="/dashboard">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
+    <main className="min-h-screen bg-[#FAFAF8]">
+      <NavBar />
 
       {/* Hero */}
-      <section className="from-sage-50 bg-gradient-to-b to-white px-4 pb-20 pt-24 sm:px-6 lg:px-8">
+      <section className="px-5 pb-20 pt-32 sm:px-8 sm:pt-36">
         <div className="mx-auto max-w-4xl text-center">
           <AnimatedSection>
+            <p className="mb-4 text-sm font-medium tracking-wide text-gray-400">
+              Everything included
+            </p>
             <h1 className="font-serif text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-              Everything you need to plan your perfect wedding
+              Tools that actually help you plan
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-              From guest lists to budgets, checklists to websites — plan your wedding stress-free
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-gray-500">
+              From guest lists to budgets, checklists to websites — plan your wedding
               with tools designed for couples, not corporations.
             </p>
           </AnimatedSection>
@@ -297,38 +281,43 @@ export default function FeaturesPage() {
       </section>
 
       {/* Feature Grid */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
+      <section className="px-5 py-20 sm:px-8">
         <div className="mx-auto max-w-6xl">
-          <AnimatedSection className="text-center">
+          <AnimatedSection className="mb-16 max-w-2xl">
+            <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
+              14 feature areas
+            </span>
             <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Built for real couples
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+            <p className="mt-4 text-base leading-relaxed text-gray-500">
               Every feature is designed with couples in mind — no bloat, no complexity, just the
               tools you actually need.
             </p>
           </AnimatedSection>
 
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featureCategories.map((category, index) => {
               const Icon = category.icon
               return (
-                <AnimatedSection key={category.title} delay={index * 0.1}>
-                  <Card className="h-full transition-shadow hover:shadow-md">
+                <AnimatedSection key={category.title} delay={Math.min(index * 0.05, 0.4)}>
+                  <Card className="h-full border-gray-100 bg-white transition-shadow hover:shadow-md">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="bg-sage-100 flex h-10 w-10 items-center justify-center rounded-lg">
-                          <Icon className="text-sage-700 h-5 w-5" />
+                        <div className="bg-sage-50 flex h-10 w-10 items-center justify-center rounded-lg">
+                          <Icon className="text-sage-600 h-5 w-5" />
                         </div>
-                        <CardTitle className="text-lg">{category.title}</CardTitle>
+                        <CardTitle className="text-base">{category.title}</CardTitle>
                       </div>
-                      <p className="mt-2 text-sm text-gray-500">{category.description}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                        {category.description}
+                      </p>
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
                         {category.items.map((item) => (
                           <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
-                            <span className="bg-sage-400 mt-1 h-1.5 w-1.5 shrink-0 rounded-full" />
+                            <span className="bg-sage-300 mt-1.5 h-1 w-1 shrink-0 rounded-full" />
                             {item}
                           </li>
                         ))}
@@ -342,90 +331,94 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      <Separator className="mx-auto max-w-6xl" />
-
-      {/* Pricing Comparison */}
-      <section className="bg-cream-50 px-4 py-20 sm:px-6 lg:px-8">
+      {/* Pricing */}
+      <section id="pricing" className="scroll-mt-24 bg-[#FFFCF7] px-5 py-20 sm:px-8">
         <div className="mx-auto max-w-6xl">
-          <AnimatedSection className="text-center">
+          <AnimatedSection className="mb-16 text-center">
+            <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
+              Pricing
+            </span>
             <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Simple, honest pricing
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-gray-500">
               No subscriptions. No hidden fees. Pay once and plan your wedding with everything you
               need.
             </p>
           </AnimatedSection>
 
-          <div className="mt-16">
-            <PricingCards>
-              <PricingCard
-                title="Free"
-                price="Free"
-                description="Get a taste of PlanForTwo with essential planning tools."
-                features={freePlanFeatures}
-                cta="Start Free"
-                href="/dashboard"
-                delay={0.1}
-              />
-              <PricingCard
-                title="Full Access"
-                price="$200"
-                description="Everything unlimited. Every feature. One payment."
-                features={fullPlanFeatures}
-                cta="Get Full Access"
-                href="/upgrade"
-                highlighted
-                delay={0.2}
-              />
-            </PricingCards>
-          </div>
+          <PricingCards>
+            <PricingCard
+              title="Free"
+              price="Free"
+              description="Get a taste of PlanForTwo with essential planning tools."
+              features={freePlanFeatures}
+              cta="Start Free"
+              href="/sign-up"
+              delay={0.1}
+            />
+            <PricingCard
+              title="Full Access"
+              price="$200"
+              description="Everything unlimited. Every feature. One payment."
+              features={fullPlanFeatures}
+              cta="Get Full Access"
+              href="/upgrade"
+              highlighted
+              delay={0.2}
+            />
+          </PricingCards>
         </div>
       </section>
 
-      <Separator className="mx-auto max-w-6xl" />
-
       {/* FAQ */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
+      <section className="px-5 py-20 sm:px-8">
         <div className="mx-auto max-w-3xl">
-          <AnimatedSection className="text-center">
+          <AnimatedSection className="mb-12 text-center">
+            <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
+              FAQ
+            </span>
             <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Frequently asked questions
+              Common questions
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-              Everything you need to know about PlanForTwo pricing and features.
-            </p>
           </AnimatedSection>
 
-          <AnimatedSection className="mt-12" delay={0.1}>
+          <AnimatedSection delay={0.1}>
             <FaqSection />
           </AnimatedSection>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="to-sage-50 bg-gradient-to-b from-white px-4 py-20 sm:px-6 lg:px-8">
+      <section className="bg-gray-900 px-5 py-20 sm:px-8">
         <AnimatedSection className="mx-auto max-w-2xl text-center">
-          <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Ready to start planning?
           </h2>
-          <p className="mt-4 text-gray-600">
-            Join thousands of couples who chose a simpler way to plan their wedding.
+          <p className="mt-4 text-base leading-relaxed text-gray-400">
+            Create your free account and start organizing your wedding in one place.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
               asChild
               size="lg"
-              className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-8 text-white"
+              className="rounded-xl bg-white px-8 text-sm font-medium text-gray-900 hover:bg-gray-100"
             >
-              <Link href="/dashboard">Start Free</Link>
+              <Link href="/sign-up">Start Free</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="rounded-xl px-8">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="rounded-xl border-gray-700 px-8 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
+            >
               <Link href="/upgrade">Get Full Access</Link>
             </Button>
           </div>
         </AnimatedSection>
       </section>
+
+      <SiteFooter />
     </main>
   )
 }
