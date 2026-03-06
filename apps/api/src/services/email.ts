@@ -1,6 +1,6 @@
 import { Resend } from 'resend'
 import { render } from '@react-email/components'
-import { WelcomeEmail, PartnerInviteEmail } from '@planfortwo/email'
+import { WelcomeEmail, PartnerInviteEmail, TeamMemberInviteEmail } from '@planfortwo/email'
 
 function getResendClient(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
@@ -61,6 +61,37 @@ export const emailService = {
     if (error) {
       console.error('Failed to send partner invite email:', error)
       throw new Error(`Failed to send partner invite email: ${error.message}`)
+    }
+  },
+
+  async sendTeamMemberInvite(
+    email: string,
+    inviterName: string,
+    roleLabel: string,
+    inviteUrl: string,
+  ) {
+    const resend = getResendClient()
+    if (!resend) {
+      console.warn('[email] RESEND_API_KEY not configured — skipping team member invite email', {
+        to: email,
+        subject: `${inviterName} invited you to join their wedding planning team`,
+        inviteUrl,
+      })
+      return
+    }
+
+    const html = await render(TeamMemberInviteEmail({ inviterName, roleLabel, inviteUrl }))
+
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: `${inviterName} invited you to join their wedding planning team`,
+      html,
+    })
+
+    if (error) {
+      console.error('Failed to send team member invite email:', error)
+      throw new Error(`Failed to send team member invite email: ${error.message}`)
     }
   },
 }

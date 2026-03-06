@@ -2,12 +2,14 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function NavBar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { isSignedIn } = useAuth()
 
   return (
     <nav className="fixed top-0 z-50 w-full">
@@ -31,19 +33,31 @@ export function NavBar() {
             >
               Pricing
             </Link>
-            <Link
-              href="/sign-in"
-              className="text-[13px] font-medium tracking-wide text-gray-500 transition-colors hover:text-gray-900"
-            >
-              Sign in
-            </Link>
-            <Button
-              asChild
-              size="sm"
-              className="rounded-lg bg-gray-900 px-4 text-xs font-medium text-white hover:bg-gray-800"
-            >
-              <Link href="/sign-up">Start planning</Link>
-            </Button>
+            {isSignedIn ? (
+              <Button
+                asChild
+                size="sm"
+                className="rounded-lg bg-gray-900 px-4 text-xs font-medium text-white hover:bg-gray-800"
+              >
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  className="text-[13px] font-medium tracking-wide text-gray-500 transition-colors hover:text-gray-900"
+                >
+                  Sign in
+                </Link>
+                <Button
+                  asChild
+                  size="sm"
+                  className="rounded-lg bg-gray-900 px-4 text-xs font-medium text-white hover:bg-gray-800"
+                >
+                  <Link href="/sign-up">Start planning</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile toggle */}
@@ -80,18 +94,34 @@ export function NavBar() {
               >
                 Pricing
               </Link>
-              <Link
-                href="/sign-in"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-              >
-                Sign in
-              </Link>
-              <Button asChild className="mt-1 rounded-lg bg-gray-900 text-white hover:bg-gray-800">
-                <Link href="/sign-up" onClick={() => setMobileOpen(false)}>
-                  Start planning
-                </Link>
-              </Button>
+              {isSignedIn ? (
+                <Button
+                  asChild
+                  className="mt-1 rounded-lg bg-gray-900 text-white hover:bg-gray-800"
+                >
+                  <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
+                    Dashboard
+                  </Link>
+                </Button>
+              ) : (
+                <>
+                  <Link
+                    href="/sign-in"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                  >
+                    Sign in
+                  </Link>
+                  <Button
+                    asChild
+                    className="mt-1 rounded-lg bg-gray-900 text-white hover:bg-gray-800"
+                  >
+                    <Link href="/sign-up" onClick={() => setMobileOpen(false)}>
+                      Start planning
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </motion.div>
         )}

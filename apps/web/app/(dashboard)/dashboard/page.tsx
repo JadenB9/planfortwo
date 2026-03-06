@@ -320,7 +320,11 @@ export default function DashboardPage() {
           >
             <StatCard
               label="Guests"
-              value={guestStats ? `${guestStats.rsvpAccepted}/${guestStats.totalGuests}` : '0/0'}
+              value={
+                guestStats
+                  ? `${guestStats.totalGuests}/${dashboardData?.wedding?.guestCountEstimate ?? 100}`
+                  : '0/0'
+              }
               icon={
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -332,8 +336,8 @@ export default function DashboardPage() {
                 </svg>
               }
               trend={
-                guestStats && guestStats.totalGuests > 0
-                  ? `${guestStats.rsvpPending} pending`
+                guestStats && guestStats.rsvpAccepted > 0
+                  ? `${guestStats.rsvpAccepted} confirmed`
                   : undefined
               }
               href="/guests"

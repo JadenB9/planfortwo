@@ -173,8 +173,10 @@ export const api = {
     addMember: (weddingId: string, data: { email: string; role: string }, token: string) =>
       fetchApi<{
         data: {
-          member: { id: string; role: string }
-          user: { id: string; email: string; firstName: string; lastName: string }
+          member?: { id: string; role: string }
+          user?: { id: string; email: string; firstName: string; lastName: string }
+          invited?: boolean
+          message?: string
         }
       }>(`/weddings/${weddingId}/members`, {
         method: 'POST',

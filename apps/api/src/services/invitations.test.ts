@@ -39,7 +39,10 @@ vi.mock('./users.js', () => ({
 }))
 
 vi.mock('./email.js', () => ({
-  emailService: { sendPartnerInvite: vi.fn().mockResolvedValue(undefined) },
+  emailService: {
+    sendPartnerInvite: vi.fn().mockResolvedValue(undefined),
+    sendTeamMemberInvite: vi.fn().mockResolvedValue(undefined),
+  },
 }))
 
 import { invitationService } from './invitations.js'
@@ -62,6 +65,7 @@ describe('Invitation Service', () => {
         invitedByUserId: 'c0000000-0000-0000-0000-000000000001',
         email: 'partner@example.com',
         token: 'some-token',
+        role: 'partner',
         status: 'pending',
         expiresAt: new Date(),
       }
@@ -109,6 +113,7 @@ describe('Invitation Service', () => {
         weddingId: 'b0000000-0000-0000-0000-000000000001',
         token: 'valid-token',
         email: 'partner@example.com',
+        role: 'partner',
         status: 'pending',
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       }
@@ -143,6 +148,7 @@ describe('Invitation Service', () => {
         weddingId: 'b0000000-0000-0000-0000-000000000001',
         token: 'accepted-token',
         email: 'partner@example.com',
+        role: 'partner',
         status: 'accepted',
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       }
@@ -164,6 +170,7 @@ describe('Invitation Service', () => {
         weddingId: 'b0000000-0000-0000-0000-000000000001',
         token: 'expired-token',
         email: 'partner@example.com',
+        role: 'partner',
         status: 'pending',
         expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
       }
@@ -191,6 +198,7 @@ describe('Invitation Service', () => {
         weddingId: 'b0000000-0000-0000-0000-000000000001',
         token: 'pending-token',
         email: 'partner@example.com',
+        role: 'partner',
         status: 'pending',
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       }

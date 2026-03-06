@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+vi.mock('./invitations.js', () => ({
+  invitationService: {
+    createAndSend: vi.fn(),
+  },
+}))
+
 vi.mock('@planfortwo/db', () => {
   const mockDb = {
     select: vi.fn().mockReturnThis(),
@@ -51,6 +57,7 @@ vi.mock('@planfortwo/db', () => {
 })
 
 import { weddingService } from './weddings.js'
+import { invitationService } from './invitations.js'
 import { db } from '@planfortwo/db'
 
 const mockedDb = vi.mocked(db)
@@ -361,7 +368,18 @@ describe('Wedding Service', () => {
   })
 
   describe('addMemberByEmail', () => {
-    it('should return error when user not found', async () => {
+    beforeEach(() => {
+      ;(invitationService.createAndSend as ReturnType<typeof vi.fn>).mockResolvedValue({
+        id: 'a0000000-0000-0000-0000-000000000001',
+        weddingId: 'b0000000-0000-0000-0000-000000000001',
+        email: 'unknown@example.com',
+        token: 'invite-token',
+        role: 'planner',
+        status: 'pending',
+      })
+    })
+
+    it('should send invitation when user not found', async () => {
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockResolvedValue([]),
@@ -372,11 +390,37 @@ describe('Wedding Service', () => {
         'b0000000-0000-0000-0000-000000000001',
         'unknown@example.com',
         'planner',
+        'c0000000-0000-0000-0000-000000000001',
       )
 
-      expect(result).toEqual({
-        error: 'No user found with that email. They need to create an account first.',
+      expect(result).toHaveProperty('invited', true)
+      expect(result).toHaveProperty('message')
+      expect(invitationService.createAndSend).toHaveBeenCalledWith(
+        'b0000000-0000-0000-0000-000000000001',
+        'c0000000-0000-0000-0000-000000000001',
+        'unknown@example.com',
+        'planner',
+      )
+    })
+
+    it('should return error when invitation sending fails', async () => {
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([]),
+        }),
       })
+      ;(invitationService.createAndSend as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error('Failed to send'),
+      )
+
+      const result = await weddingService.addMemberByEmail(
+        'b0000000-0000-0000-0000-000000000001',
+        'unknown@example.com',
+        'planner',
+        'c0000000-0000-0000-0000-000000000001',
+      )
+
+      expect(result).toEqual({ error: 'Failed to send' })
     })
 
     it('should return error when user is already a member', async () => {
@@ -413,6 +457,7 @@ describe('Wedding Service', () => {
         'b0000000-0000-0000-0000-000000000001',
         'existing@example.com',
         'planner',
+        'c0000000-0000-0000-0000-000000000001',
       )
 
       expect(result).toEqual({
@@ -460,6 +505,7 @@ describe('Wedding Service', () => {
         'b0000000-0000-0000-0000-000000000001',
         'new@example.com',
         'family',
+        'c0000000-0000-0000-0000-000000000001',
       )
 
       expect(result).toEqual({

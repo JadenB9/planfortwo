@@ -270,7 +270,7 @@ weddingsRoute.post(
     }
 
     const { email, role } = c.req.valid('json')
-    const result = await weddingService.addMemberByEmail(weddingId, email, role)
+    const result = await weddingService.addMemberByEmail(weddingId, email, role, dbUserId)
 
     if ('error' in result) {
       return c.json({ error: result.error, code: 'ADD_MEMBER_FAILED', statusCode: 400 }, 400)

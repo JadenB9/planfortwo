@@ -7,7 +7,12 @@ import { emailService } from './email.js'
 const INVITATION_EXPIRY_DAYS = 7
 
 export const invitationService = {
-  async createAndSend(weddingId: string, invitedByUserId: string, email: string) {
+  async createAndSend(
+    weddingId: string,
+    invitedByUserId: string,
+    email: string,
+    role: 'partner' | 'planner' | 'family' = 'partner',
+  ) {
     const token = crypto.randomUUID()
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + INVITATION_EXPIRY_DAYS)
@@ -19,6 +24,7 @@ export const invitationService = {
         invitedByUserId,
         email,
         token,
+        role,
         status: 'pending',
         expiresAt,
       })
@@ -34,7 +40,12 @@ export const invitationService = {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
     const inviteUrl = `${appUrl}/invite/${token}`
 
-    await emailService.sendPartnerInvite(email, inviterName, inviteUrl)
+    if (role === 'partner') {
+      await emailService.sendPartnerInvite(email, inviterName, inviteUrl)
+    } else {
+      const roleLabel = role === 'planner' ? 'wedding planner' : 'family member'
+      await emailService.sendTeamMemberInvite(email, inviterName, roleLabel, inviteUrl)
+    }
 
     return invitation
   },
@@ -59,13 +70,14 @@ export const invitationService = {
       throw new Error('Invitation has expired')
     }
 
-    // Add user as partner member, update invitation, and clean up any
+    // Add user as member with the invitation's role, update invitation, and clean up any
     // auto-created empty wedding the user may have (race condition safety)
+    const memberRole = invitation.role ?? 'partner'
     const result = await db.transaction(async (tx) => {
       await tx.insert(weddingMembers).values({
         weddingId: invitation.weddingId,
         userId,
-        role: 'partner',
+        role: memberRole,
         joinedAt: new Date(),
       })
 
@@ -74,8 +86,12 @@ export const invitationService = {
         .set({ status: 'accepted' })
         .where(eq(partnerInvitations.id, invitation.id))
 
-      // Delete any auto-created empty weddings the user owns (not the one they're joining)
+      // Delete any auto-created empty weddings the user owns (only for partner invites)
       // Only delete weddings where the user is the sole member and onboarding was never completed
+      if (memberRole !== 'partner') {
+        return invitation.weddingId
+      }
+
       const ownedMemberships = await tx
         .select({ weddingId: weddingMembers.weddingId })
         .from(weddingMembers)

@@ -1,5 +1,6 @@
 import { eq, and } from 'drizzle-orm'
 import { db, weddings, weddingMembers, users } from '@planfortwo/db'
+import { invitationService } from './invitations.js'
 
 interface OnboardingData {
   name?: string
@@ -111,10 +112,32 @@ export const weddingService = {
     return results
   },
 
-  async addMemberByEmail(weddingId: string, email: string, role: 'planner' | 'family') {
+  async addMemberByEmail(
+    weddingId: string,
+    email: string,
+    role: 'planner' | 'family',
+    invitedByUserId: string,
+  ) {
     const [user] = await db.select().from(users).where(eq(users.email, email))
+
     if (!user) {
-      return { error: 'No user found with that email. They need to create an account first.' }
+      // User doesn't have an account — send an invitation email
+      try {
+        const invitation = await invitationService.createAndSend(
+          weddingId,
+          invitedByUserId,
+          email,
+          role,
+        )
+        return {
+          invited: true,
+          invitation,
+          message: "Invitation sent! They'll receive an email to create their account.",
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to send invitation'
+        return { error: message }
+      }
     }
 
     // Check if already a member

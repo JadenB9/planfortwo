@@ -225,15 +225,26 @@ export const inboxService = {
       throw new Error('Email service not configured')
     }
 
-    const { data: sent, error } = await resend.emails.send({
+    const sendPayload: {
+      from: string
+      to: string
+      subject: string
+      text: string
+      html?: string
+    } = {
       from: fromEmail,
       to: data.toAddress,
       subject: data.subject,
       text: data.textBody,
-      html: data.htmlBody,
-    })
+    }
+    if (data.htmlBody) {
+      sendPayload.html = data.htmlBody
+    }
+
+    const { data: sent, error } = await resend.emails.send(sendPayload)
 
     if (error) {
+      console.error('[inbox] Resend send error:', error)
       throw new Error(`Failed to send email: ${error.message}`)
     }
 

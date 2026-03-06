@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function SignUpPage() {
-  return <SignUp appearance={clerkAppearance} />
+  return <SignUp appearance={clerkAppearance} forceRedirectUrl="/dashboard" />
 }

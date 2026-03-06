@@ -10,6 +10,8 @@ export const invitationStatusEnum = pgEnum('invitation_status', [
   'cancelled',
 ])
 
+export const invitationRoleEnum = pgEnum('invitation_role', ['partner', 'planner', 'family'])
+
 export const partnerInvitations = pgTable('partner_invitations', {
   id: uuid('id').primaryKey().defaultRandom(),
   weddingId: uuid('wedding_id')
@@ -20,6 +22,7 @@ export const partnerInvitations = pgTable('partner_invitations', {
     .references(() => users.id, { onDelete: 'cascade' }),
   email: text('email').notNull(),
   token: text('token').notNull().unique(),
+  role: invitationRoleEnum('role').notNull().default('partner'),
   status: invitationStatusEnum('status').notNull().default('pending'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),

@@ -147,8 +147,16 @@ export default function SettingsPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.weddings.addMember(weddingId, { email: newMemberEmail, role: newMemberRole }, token)
-      toast.success('Team member added')
+      const { data } = await api.weddings.addMember(
+        weddingId,
+        { email: newMemberEmail, role: newMemberRole },
+        token,
+      )
+      if (data.invited) {
+        toast.success('Invitation sent! They\u2019ll receive an email to join your team.')
+      } else {
+        toast.success('Team member added')
+      }
       setNewMemberEmail('')
       const { data: memberList } = await api.weddings.getMembers(weddingId, token)
       setMembers(memberList)
@@ -350,7 +358,7 @@ export default function SettingsPage() {
                           {roleIcon}
                           {roleLabel}
                         </span>
-                        {member.role !== 'owner' && member.role !== 'partner' && (
+                        {member.role !== 'owner' && (
                           <button
                             onClick={() => handleRemoveMember(member.id)}
                             disabled={removingId === member.id}
@@ -375,8 +383,8 @@ export default function SettingsPage() {
                   Add Team Member
                 </h3>
                 <p className="text-xs text-gray-500">
-                  Add a wedding planner, coordinator, or family member to help plan. They must have
-                  a PlanForTwo account.
+                  Add a wedding planner, coordinator, or family member to help plan. They&apos;ll
+                  receive an email invitation to join your planning team.
                 </p>
                 <div className="flex gap-3">
                   <Input
