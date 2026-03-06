@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import type { ActivityLogEntry, ActivityAction } from '@planfortwo/types'
 import { staggerContainer, listItem, springSmooth } from '@/lib/animations'
@@ -40,6 +41,40 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   website_section_updated: 'updated a website section',
   website_template_changed: 'changed the website template',
   guestbook_entry_created: 'left a guestbook message',
+}
+
+const ACTION_LINKS: Record<ActivityAction, string> = {
+  task_created: '/checklist',
+  task_completed: '/checklist',
+  task_uncompleted: '/checklist',
+  task_updated: '/checklist',
+  task_deleted: '/checklist',
+  task_assigned: '/checklist',
+  note_added: '/checklist',
+  attachment_uploaded: '/checklist',
+  category_created: '/checklist',
+  category_deleted: '/checklist',
+  checklist_seeded: '/checklist',
+  guest_created: '/guests',
+  guest_updated: '/guests',
+  guest_deleted: '/guests',
+  guest_imported: '/guests',
+  rsvp_submitted: '/guests',
+  household_created: '/guests',
+  household_deleted: '/guests',
+  budget_category_created: '/budget',
+  budget_category_deleted: '/budget',
+  expense_created: '/budget',
+  expense_updated: '/budget',
+  expense_deleted: '/budget',
+  payment_scheduled: '/budget',
+  payment_completed: '/budget',
+  website_created: '/website',
+  website_published: '/website',
+  website_unpublished: '/website',
+  website_section_updated: '/website',
+  website_template_changed: '/website',
+  guestbook_entry_created: '/website',
 }
 
 function formatTimestamp(date: Date): string {
@@ -83,28 +118,30 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
           const taskName = (entry.metadata as Record<string, unknown> | null)?.taskTitle as
             | string
             | undefined
+          const href = ACTION_LINKS[entry.action]
 
           return (
-            <motion.div
-              key={entry.id}
-              className="flex items-start gap-3"
-              variants={listItem}
-              transition={{ duration: 0.3, ...springSmooth }}
-            >
+            <Link key={entry.id} href={href}>
               <motion.div
-                className="bg-wedding-400 mt-1.5 h-2 w-2 flex-shrink-0 rounded-full"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-700">
-                  <span className="font-medium">{ACTION_LABELS[entry.action]}</span>
-                  {taskName && <span className="text-gray-500">{` - ${taskName}`}</span>}
-                </p>
-                <p className="mt-0.5 text-xs text-gray-400">{formatTimestamp(entry.createdAt)}</p>
-              </div>
-            </motion.div>
+                className="flex items-start gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-gray-50"
+                variants={listItem}
+                transition={{ duration: 0.3, ...springSmooth }}
+              >
+                <motion.div
+                  className="bg-wedding-400 mt-1.5 h-2 w-2 flex-shrink-0 rounded-full"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-gray-700">
+                    <span className="font-medium">{ACTION_LABELS[entry.action]}</span>
+                    {taskName && <span className="text-gray-500">{` - ${taskName}`}</span>}
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-400">{formatTimestamp(entry.createdAt)}</p>
+                </div>
+              </motion.div>
+            </Link>
           )
         })}
       </motion.div>

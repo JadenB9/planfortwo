@@ -250,6 +250,13 @@ export const api = {
     get: (weddingId: string, token: string) =>
       fetchApi<{ data: FeatureGates }>(`/features?weddingId=${weddingId}`, { token }),
   },
+  purchases: {
+    checkout: (weddingId: string, token: string) =>
+      fetchApi<{ data: { url: string } }>(`/purchases/checkout?weddingId=${weddingId}`, {
+        method: 'POST',
+        token,
+      }),
+  },
   guests: {
     list: (weddingId: string, token: string, filters?: object) => {
       const searchParams = new URLSearchParams({ weddingId })

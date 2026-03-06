@@ -42,6 +42,21 @@ purchasesRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   return c.json({ data: purchase })
 })
 
+purchasesRoute.post('/checkout', resolveWeddingMiddleware, async (c) => {
+  const weddingId = c.get('weddingId')
+  const userId = c.get('dbUserId')
+  try {
+    const result = await purchaseService.createCheckoutSession(weddingId, userId)
+    return c.json({ data: result })
+  } catch (err) {
+    console.error('Checkout session creation failed:', err)
+    return c.json(
+      { error: 'Failed to create checkout session', code: 'CHECKOUT_ERROR', statusCode: 500 },
+      500,
+    )
+  }
+})
+
 // ── Referrals ──
 referralsRoute.use('*', authMiddleware, resolveUserMiddleware)
 

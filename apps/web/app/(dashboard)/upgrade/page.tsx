@@ -1,9 +1,14 @@
 'use client'
 
+import { Suspense, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
-import { Check, ArrowLeft, Sparkles } from 'lucide-react'
+import { Check, ArrowLeft, Sparkles, Loader2 } from 'lucide-react'
 import { fadeInUp, staggerContainer, springSmooth } from '@/lib/animations'
+import { useWedding } from '@/hooks/use-wedding'
+import { api } from '@/lib/api'
 
 const FREE_FEATURES = [
   'Checklist with default tasks',
@@ -30,6 +35,40 @@ const FULL_FEATURES = [
 
 export default function UpgradePage() {
   return (
+    <Suspense>
+      <UpgradePageContent />
+    </Suspense>
+  )
+}
+
+function UpgradePageContent() {
+  const { getToken } = useAuth()
+  const { data: weddingData } = useWedding()
+  const searchParams = useSearchParams()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const canceled = searchParams.get('canceled') === 'true'
+  const tier = weddingData?.wedding.tier
+
+  async function handleCheckout() {
+    if (!weddingData?.wedding.id) return
+    setLoading(true)
+    setError(null)
+
+    try {
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+      const { data } = await api.purchases.checkout(weddingData.wedding.id, token)
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start checkout')
+      setLoading(false)
+    }
+  }
+
+  return (
     <motion.div
       className="mx-auto max-w-4xl"
       initial={{ opacity: 0, y: 16 }}
@@ -51,6 +90,18 @@ export default function UpgradePage() {
         </p>
       </div>
 
+      {canceled && (
+        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-800">
+          Checkout was canceled. You can try again whenever you&apos;re ready.
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-800">
+          {error}
+        </div>
+      )}
+
       <motion.div
         className="grid gap-8 md:grid-cols-2"
         variants={staggerContainer}
@@ -71,7 +122,7 @@ export default function UpgradePage() {
           </p>
 
           <div className="mt-6 rounded-xl bg-gray-50 px-4 py-2.5 text-center text-sm font-medium text-gray-500">
-            Current Plan
+            {tier === 'free' ? 'Current Plan' : 'Limited Access'}
           </div>
 
           <ul className="mt-8 space-y-3">
@@ -101,10 +152,29 @@ export default function UpgradePage() {
             <span className="ml-1 text-sm text-gray-500">one-time</span>
           </p>
 
-          <button className="bg-wedding-600 hover:bg-wedding-700 mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors">
-            <Sparkles className="h-4 w-4" />
-            Purchase Full Plan
-          </button>
+          {tier === 'full' ? (
+            <div className="bg-sage-50 border-sage-200 text-sage-700 mt-6 rounded-xl border px-4 py-2.5 text-center text-sm font-medium">
+              Active — Full Access
+            </div>
+          ) : (
+            <button
+              onClick={handleCheckout}
+              disabled={loading || !weddingData}
+              className="bg-wedding-600 hover:bg-wedding-700 mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Redirecting to Stripe...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Purchase Full Plan
+                </>
+              )}
+            </button>
+          )}
 
           <ul className="mt-8 space-y-3">
             {FULL_FEATURES.map((feature) => (

@@ -374,7 +374,7 @@ export default function FeaturesPage() {
                 description="Everything unlimited. Every feature. One payment."
                 features={fullPlanFeatures}
                 cta="Get Full Access"
-                href="/dashboard"
+                href="/upgrade"
                 highlighted
                 delay={0.2}
               />
@@ -421,7 +421,7 @@ export default function FeaturesPage() {
               <Link href="/dashboard">Start Free</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-xl px-8">
-              <Link href="/dashboard">Get Full Access</Link>
+              <Link href="/upgrade">Get Full Access</Link>
             </Button>
           </div>
         </AnimatedSection>

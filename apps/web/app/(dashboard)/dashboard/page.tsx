@@ -7,10 +7,11 @@ import type { DashboardData, DashboardStats, GuestStats } from '@planfortwo/type
 import { api } from '@/lib/api'
 import { staggerGrid, fadeInUp, springSmooth } from '@/lib/animations'
 import Link from 'next/link'
-import { Map, ArrowRight } from 'lucide-react'
+import { Map, ArrowRight, Calendar, Pencil, Check, X } from 'lucide-react'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { UpcomingTasks } from '@/components/dashboard/upcoming-tasks'
 import { ActivityFeed } from '@/components/dashboard/activity-feed'
+import { toast } from 'sonner'
 
 function formatBudgetValue(amount: number): string {
   if (amount >= 100000) {
@@ -29,6 +30,9 @@ export default function DashboardPage() {
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteStatus, setInviteStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [inviteError, setInviteError] = useState<string | null>(null)
+  const [editingDate, setEditingDate] = useState(false)
+  const [dateInput, setDateInput] = useState('')
+  const [savingDate, setSavingDate] = useState(false)
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -105,6 +109,23 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleSaveDate() {
+    if (!dashboardData || !dateInput) return
+    setSavingDate(true)
+    try {
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+      await api.weddings.update(dashboardData.wedding.id, { date: dateInput }, token)
+      await loadDashboard()
+      setEditingDate(false)
+      toast.success('Wedding date updated')
+    } catch {
+      toast.error('Failed to update date')
+    } finally {
+      setSavingDate(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -125,7 +146,7 @@ export default function DashboardPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ...springSmooth }}
     >
-      {/* Welcome + Countdown */}
+      {/* Welcome + Countdown + Date */}
       <motion.div
         className="mb-8"
         initial={{ opacity: 0, y: 10 }}
@@ -148,6 +169,57 @@ export default function DashboardPage() {
             days until the big day
           </p>
         )}
+        <div className="mt-2 flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-gray-400" />
+          {editingDate ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={dateInput}
+                onChange={(e) => setDateInput(e.target.value)}
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:ring-2"
+                min={new Date().toISOString().split('T')[0]}
+              />
+              <button
+                onClick={handleSaveDate}
+                disabled={savingDate || !dateInput}
+                className="text-wedding-600 hover:text-wedding-700 rounded-lg p-1 transition-colors disabled:opacity-50"
+              >
+                <Check className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setEditingDate(false)}
+                className="rounded-lg p-1 text-gray-400 transition-colors hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setDateInput(
+                  wedding?.date
+                    ? new Date(wedding.date).toISOString().split('T')[0] ?? ''
+                    : '',
+                )
+                setEditingDate(true)
+              }}
+              className="group flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-700"
+            >
+              <span>
+                {wedding?.date
+                  ? new Date(wedding.date).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
+                  : 'Set your wedding date'}
+              </span>
+              <Pencil className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
+            </button>
+          )}
+        </div>
       </motion.div>
 
       {/* Roadmap Quick Link */}
@@ -159,11 +231,11 @@ export default function DashboardPage() {
       >
         <Link
           href="/roadmap"
-          className="border-sage-200 from-sage-50 to-cream-50 group flex items-center justify-between rounded-2xl border bg-gradient-to-r p-5 shadow-sm transition-all hover:shadow-md"
+          className="border-wedding-200 from-wedding-50 to-cream-50 group flex items-center justify-between rounded-2xl border bg-gradient-to-r p-5 shadow-sm transition-all hover:shadow-md"
         >
           <div className="flex items-center gap-3">
-            <div className="bg-sage-100 flex h-10 w-10 items-center justify-center rounded-xl">
-              <Map className="text-sage-700 h-5 w-5" />
+            <div className="bg-wedding-100 flex h-10 w-10 items-center justify-center rounded-xl">
+              <Map className="text-wedding-700 h-5 w-5" />
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-900">Planning Roadmap</p>
@@ -217,7 +289,7 @@ export default function DashboardPage() {
           initial="hidden"
           animate="visible"
         >
-          <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+          <motion.div className="flex" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Tasks"
               value={stats ? `${stats.tasksCompleted}/${stats.tasksTotal}` : '0/0'}
@@ -239,7 +311,7 @@ export default function DashboardPage() {
               href="/checklist"
             />
           </motion.div>
-          <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+          <motion.div className="flex" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Guests"
               value={guestStats ? `${guestStats.rsvpAccepted}/${guestStats.totalGuests}` : '0/0'}
@@ -261,7 +333,7 @@ export default function DashboardPage() {
               href="/guests"
             />
           </motion.div>
-          <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+          <motion.div className="flex" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Budget"
               value={
@@ -287,7 +359,7 @@ export default function DashboardPage() {
               href="/budget"
             />
           </motion.div>
-          <motion.div variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+          <motion.div className="flex" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Website"
               value={websiteStatus}

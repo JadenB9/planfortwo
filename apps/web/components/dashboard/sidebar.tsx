@@ -4,12 +4,15 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ChevronDown, Sparkles, ExternalLink } from 'lucide-react'
+import { ChevronDown, Sparkles, ExternalLink, CheckCircle } from 'lucide-react'
 import { staggerContainer, navItem, springSmooth } from '@/lib/animations'
 import { NAV_GROUPS } from '@/lib/navigation'
+import { useWedding } from '@/hooks/use-wedding'
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { data: weddingData, loading: weddingLoading } = useWedding()
+  const tier = weddingData?.wedding.tier
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
     Details: true,
     More: true,
@@ -100,13 +103,20 @@ export function Sidebar() {
 
       {/* Bottom section */}
       <div className="mt-auto space-y-2 border-t border-gray-200 p-3">
-        <Link
-          href="/upgrade"
-          className="bg-wedding-600 hover:bg-wedding-700 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
-        >
-          <Sparkles className="h-4 w-4" />
-          Upgrade Plan
-        </Link>
+        {weddingLoading ? null : tier === 'full' ? (
+          <div className="bg-sage-50 border-sage-200 flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium text-sage-700">
+            <CheckCircle className="h-4 w-4" />
+            Full Plan Active
+          </div>
+        ) : (
+          <Link
+            href="/upgrade"
+            className="bg-wedding-600 hover:bg-wedding-700 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
+          >
+            <Sparkles className="h-4 w-4" />
+            Upgrade Plan
+          </Link>
+        )}
         <Link
           href="/"
           className="flex items-center gap-2 px-3 py-2 text-xs text-gray-400 transition-colors hover:text-gray-600"
