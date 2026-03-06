@@ -244,10 +244,6 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs text-gray-500">Tier</Label>
-                  <p className="font-medium capitalize text-gray-900">{wedding?.tier ?? 'free'}</p>
-                </div>
-                <div>
                   <Label className="text-xs text-gray-500">Guest Estimate</Label>
                   <Input
                     type="number"
@@ -258,6 +254,10 @@ export default function SettingsPage() {
                     placeholder="150"
                     className="mt-1"
                   />
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-500">Tier</Label>
+                  <p className="font-medium capitalize text-gray-900">{wedding?.tier ?? 'free'}</p>
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Budget</Label>
