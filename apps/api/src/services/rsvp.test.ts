@@ -105,8 +105,77 @@ describe('RSVP Service', () => {
   })
 
   describe('lookupByName', () => {
-    it('should return matching guests (case-insensitive)', async () => {
-      const mockGuests = [{ id: 'g1', firstName: 'Alice', lastName: 'Smith', weddingId: 'w1' }]
+    it('should return single result when one guest matches', async () => {
+      const mockGuest = {
+        id: 'g1',
+        firstName: 'Alice',
+        lastName: 'Smith',
+        weddingId: 'w1',
+        householdId: null,
+        email: 'alice@example.com',
+        phone: '555-1234',
+        rsvpToken: 'tok_abc',
+      }
+      const mockWedding = {
+        id: 'w1',
+        name: 'Smith Wedding',
+        date: '2026-09-15',
+        rsvpDeadline: '2099-12-31',
+      }
+
+      // First call: lookupByName query (no .limit)
+      // Second call: buildLookupResult -> weddings query (with .limit)
+      // Third call: buildLookupResult -> isDeadlinePassed (with .limit)
+      let callCount = 0
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockImplementation(() => {
+        callCount++
+        if (callCount === 1) {
+          // lookupByName: select().from(guests).where(...)
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([mockGuest]),
+            }),
+          }
+        }
+        // buildLookupResult + isDeadlinePassed: select().from(weddings).where(...).limit(1)
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([mockWedding]),
+            }),
+          }),
+        }
+      })
+
+      const result = await rsvpService.lookupByName('w1', 'alice', 'smith')
+      expect(result.type).toBe('single')
+      if (result.type === 'single') {
+        expect(result.result.guest.firstName).toBe('Alice')
+        expect(result.result.weddingName).toBe('Smith Wedding')
+      }
+    })
+
+    it('should return multiple when several guests match', async () => {
+      const mockGuests = [
+        {
+          id: 'g1',
+          firstName: 'Alice',
+          lastName: 'Smith',
+          weddingId: 'w1',
+          email: 'a1@example.com',
+          phone: '555-1111',
+          rsvpToken: 'tok_1',
+        },
+        {
+          id: 'g2',
+          firstName: 'Alice',
+          lastName: 'Smith',
+          weddingId: 'w1',
+          email: 'a2@example.com',
+          phone: '555-2222',
+          rsvpToken: 'tok_2',
+        },
+      ]
 
       ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
         from: vi.fn().mockReturnValue({
@@ -115,8 +184,21 @@ describe('RSVP Service', () => {
       })
 
       const result = await rsvpService.lookupByName('w1', 'alice', 'smith')
-      expect(result).toHaveLength(1)
-      expect(result[0].firstName).toBe('Alice')
+      expect(result.type).toBe('multiple')
+      if (result.type === 'multiple') {
+        expect(result.guests).toHaveLength(2)
+      }
+    })
+
+    it('should return none when no guests match', async () => {
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([]),
+        }),
+      })
+
+      const result = await rsvpService.lookupByName('w1', 'nobody', 'here')
+      expect(result.type).toBe('none')
     })
   })
 

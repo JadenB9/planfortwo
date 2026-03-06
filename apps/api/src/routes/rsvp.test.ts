@@ -45,6 +45,7 @@ vi.mock('../services/rsvp.js', () => ({
     lookupByToken: vi.fn(),
     lookupByCode: vi.fn(),
     lookupByName: vi.fn(),
+    lookupByGuestId: vi.fn(),
     submitRsvp: vi.fn(),
     submitBatchRsvp: vi.fn(),
     isDeadlinePassed: vi.fn(),
@@ -195,9 +196,20 @@ describe('RSVP Routes', () => {
   })
 
   describe('POST /rsvp/lookup-by-name (public)', () => {
-    it('should lookup by name', async () => {
-      const mockGuests = [{ id: GUEST_ID, firstName: 'Alice', lastName: 'Smith' }]
-      mockedRsvpService.lookupByName.mockResolvedValue(mockGuests as never)
+    it('should return single result when one guest matches', async () => {
+      const mockResult = {
+        type: 'single' as const,
+        result: {
+          guest: { id: GUEST_ID, firstName: 'Alice', lastName: 'Smith' },
+          household: null,
+          householdGuests: [],
+          weddingName: 'Smith Wedding',
+          weddingDate: '2026-09-15',
+          rsvpDeadline: '2026-08-01',
+          isExpired: false,
+        },
+      }
+      mockedRsvpService.lookupByName.mockResolvedValue(mockResult as never)
 
       const app = createApp()
       const res = await app.request('/rsvp/lookup-by-name', {
@@ -212,8 +224,123 @@ describe('RSVP Routes', () => {
 
       expect(res.status).toBe(200)
       const body = await res.json()
-      expect(body.data).toHaveLength(1)
-      expect(body.data[0].firstName).toBe('Alice')
+      expect(body.data.type).toBe('single')
+      expect(body.data.result.guest.firstName).toBe('Alice')
+    })
+
+    it('should return multiple guests when several match', async () => {
+      const mockResult = {
+        type: 'multiple' as const,
+        guests: [
+          { id: GUEST_ID, firstName: 'Alice', lastName: 'Smith' },
+          { id: GUEST_ID_2, firstName: 'Alice', lastName: 'Smith' },
+        ],
+      }
+      mockedRsvpService.lookupByName.mockResolvedValue(mockResult as never)
+
+      const app = createApp()
+      const res = await app.request('/rsvp/lookup-by-name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          firstName: 'Alice',
+          lastName: 'Smith',
+        }),
+      })
+
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      expect(body.data.type).toBe('multiple')
+      expect(body.data.guests).toHaveLength(2)
+    })
+
+    it('should return 404 when no guests match', async () => {
+      const mockResult = { type: 'none' as const }
+      mockedRsvpService.lookupByName.mockResolvedValue(mockResult as never)
+
+      const app = createApp()
+      const res = await app.request('/rsvp/lookup-by-name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weddingId: WEDDING_ID,
+          firstName: 'Nobody',
+          lastName: 'Here',
+        }),
+      })
+
+      expect(res.status).toBe(404)
+      const body = await res.json()
+      expect(body.code).toBe('GUEST_NOT_FOUND')
+      expect(body.error).toBe('No guests found matching that name')
+    })
+  })
+
+  describe('POST /rsvp/lookup-by-guest-id (public)', () => {
+    it('should return guest lookup result', async () => {
+      mockedRsvpService.isDeadlinePassed.mockResolvedValue(false)
+      const mockResult = {
+        guest: { id: GUEST_ID, firstName: 'Alice', lastName: 'Smith' },
+        household: null,
+        householdGuests: [],
+        weddingName: 'Smith Wedding',
+        weddingDate: '2026-09-15',
+        rsvpDeadline: '2026-08-01',
+        isExpired: false,
+      }
+      mockedRsvpService.lookupByGuestId.mockResolvedValue(mockResult as never)
+
+      const app = createApp()
+      const res = await app.request('/rsvp/lookup-by-guest-id', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guestId: GUEST_ID,
+          weddingId: WEDDING_ID,
+        }),
+      })
+
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      expect(body.data.guest.firstName).toBe('Alice')
+    })
+
+    it('should return 404 when guest not found', async () => {
+      mockedRsvpService.isDeadlinePassed.mockResolvedValue(false)
+      mockedRsvpService.lookupByGuestId.mockResolvedValue(null)
+
+      const app = createApp()
+      const res = await app.request('/rsvp/lookup-by-guest-id', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guestId: GUEST_ID,
+          weddingId: WEDDING_ID,
+        }),
+      })
+
+      expect(res.status).toBe(404)
+      const body = await res.json()
+      expect(body.code).toBe('GUEST_NOT_FOUND')
+    })
+
+    it('should return 410 when deadline has passed', async () => {
+      mockedRsvpService.isDeadlinePassed.mockResolvedValue(true)
+
+      const app = createApp()
+      const res = await app.request('/rsvp/lookup-by-guest-id', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guestId: GUEST_ID,
+          weddingId: WEDDING_ID,
+        }),
+      })
+
+      expect(res.status).toBe(410)
+      const body = await res.json()
+      expect(body.code).toBe('RSVP_EXPIRED')
     })
   })
 

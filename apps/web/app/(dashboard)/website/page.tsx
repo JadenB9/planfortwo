@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import { useWebsite } from '@/hooks/use-website'
@@ -15,7 +15,32 @@ import { SectionManager } from '@/components/website/editor/section-manager'
 import { SettingsPanel } from '@/components/website/editor/settings-panel'
 import { PublishToggle } from '@/components/website/editor/publish-toggle'
 import { AnalyticsDashboard } from '@/components/website/analytics/analytics-dashboard'
+import { SectionEditorModal } from '@/components/website/editor/section-editor-modal'
+import { HeroEditor } from '@/components/website/editor/hero-editor'
+import { OurStoryEditor } from '@/components/website/editor/our-story-editor'
+import { EventDetailsEditor } from '@/components/website/editor/event-details-editor'
+import { WeddingPartyEditor } from '@/components/website/editor/wedding-party-editor'
+import { GalleryEditor } from '@/components/website/editor/gallery-editor'
+import { TravelEditor } from '@/components/website/editor/travel-editor'
+import { RegistryEditor } from '@/components/website/editor/registry-editor'
+import { RsvpEditor } from '@/components/website/editor/rsvp-editor'
+import { ScheduleEditor } from '@/components/website/editor/schedule-editor'
+import { GuestbookEditor } from '@/components/website/editor/guestbook-editor'
+import { CustomEditor } from '@/components/website/editor/custom-editor'
 import type { WebsiteSection } from '@planfortwo/types'
+import type {
+  HeroContent,
+  OurStoryContent,
+  EventDetailsContent,
+  WeddingPartyContent,
+  GalleryContent,
+  TravelContent,
+  RegistryContent,
+  RsvpSectionContent,
+  ScheduleContent,
+  GuestbookSectionContent,
+  CustomSectionContent,
+} from '@planfortwo/types'
 
 export default function WebsitePage() {
   const { data, features } = useWedding()
@@ -24,7 +49,16 @@ export default function WebsitePage() {
   const weddingId = wedding?.id ?? null
   const { config, sections, loading, refetch, analytics } = useWebsite({ weddingId })
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null)
+  const [editorContent, setEditorContent] = useState<Record<string, unknown>>({})
+  const [authToken, setAuthToken] = useState('')
   const [activeTab, setActiveTab] = useState('design')
+
+  useEffect(() => {
+    if (editingSection) {
+      setEditorContent((editingSection.content ?? {}) as Record<string, unknown>)
+      void getToken().then((t) => setAuthToken(t ?? ''))
+    }
+  }, [editingSection, getToken])
 
   const handleCreate = useCallback(async () => {
     if (!weddingId) return
@@ -122,6 +156,94 @@ export default function WebsitePage() {
     [weddingId, getToken, refetch],
   )
 
+  const renderEditor = (
+    sectionType: string,
+    content: Record<string, unknown>,
+    onChange: (c: Record<string, unknown>) => void,
+  ) => {
+    switch (sectionType) {
+      case 'hero':
+        return (
+          <HeroEditor
+            content={content as unknown as HeroContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'our_story':
+        return (
+          <OurStoryEditor
+            content={content as unknown as OurStoryContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'event_details':
+        return (
+          <EventDetailsEditor
+            content={content as unknown as EventDetailsContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'wedding_party':
+        return (
+          <WeddingPartyEditor
+            content={content as unknown as WeddingPartyContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'gallery':
+        return (
+          <GalleryEditor
+            content={content as unknown as GalleryContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'travel':
+        return (
+          <TravelEditor
+            content={content as unknown as TravelContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'registry':
+        return (
+          <RegistryEditor
+            content={content as unknown as RegistryContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'rsvp':
+        return (
+          <RsvpEditor
+            content={content as unknown as RsvpSectionContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'schedule':
+        return (
+          <ScheduleEditor
+            content={content as unknown as ScheduleContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'guestbook':
+        return (
+          <GuestbookEditor
+            content={content as unknown as GuestbookSectionContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'custom':
+        return (
+          <CustomEditor
+            content={content as unknown as CustomSectionContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      default:
+        return <p className="text-sm text-gray-500">No editor available for this section type.</p>
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-4 p-6">
@@ -186,21 +308,22 @@ export default function WebsitePage() {
             onEdit={handleSectionEdit}
             onReorder={handleSectionReorder}
           />
-          {editingSection && (
-            <div className="mt-4 rounded-xl border bg-white p-4">
-              <p className="text-sm text-gray-500">
-                Section editor for &ldquo;{editingSection.title}&rdquo; — coming in next iteration
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2"
-                onClick={() => setEditingSection(null)}
-              >
-                Close
-              </Button>
-            </div>
-          )}
+          <SectionEditorModal
+            open={!!editingSection}
+            onClose={() => setEditingSection(null)}
+            onSaved={() => {
+              setEditingSection(null)
+              void refetch()
+            }}
+            sectionId={editingSection?.id ?? ''}
+            sectionTitle={editingSection?.title ?? ''}
+            sectionType={editingSection?.sectionType ?? ''}
+            content={editorContent}
+            authToken={authToken}
+          >
+            {editingSection &&
+              renderEditor(editingSection.sectionType, editorContent, setEditorContent)}
+          </SectionEditorModal>
         </TabsContent>
 
         <TabsContent value="settings" className="mt-6">

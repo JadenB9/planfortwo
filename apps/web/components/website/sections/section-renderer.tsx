@@ -119,7 +119,7 @@ export function SectionRenderer({
         <RsvpSection
           title={section.title}
           content={section.content as unknown as RsvpSectionContent}
-          rsvpSlug={slug}
+          weddingId={section.weddingId}
         />
       )
     case 'schedule':

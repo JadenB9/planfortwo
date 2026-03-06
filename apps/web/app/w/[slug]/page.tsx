@@ -65,7 +65,7 @@ interface PublicWebsiteData {
 async function getWebsiteData(slug: string): Promise<PublicWebsiteData | null> {
   try {
     const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
     })
     if (!res.ok) return null
     const json = (await res.json()) as { data: PublicWebsiteData }

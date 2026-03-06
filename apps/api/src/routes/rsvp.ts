@@ -7,6 +7,7 @@ import {
   rsvpNameLookupSchema,
   rsvpSubmissionSchema,
   rsvpBatchSubmissionSchema,
+  rsvpGuestIdLookupSchema,
 } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
@@ -67,9 +68,45 @@ rsvpRoute.post(
   async (c) => {
     const { weddingId, firstName, lastName } = c.req.valid('json')
 
-    const results = await rsvpService.lookupByName(weddingId, firstName, lastName)
+    const result = await rsvpService.lookupByName(weddingId, firstName, lastName)
 
-    return c.json({ data: results })
+    if (result.type === 'none') {
+      return c.json(
+        { error: 'No guests found matching that name', code: 'GUEST_NOT_FOUND', statusCode: 404 },
+        404,
+      )
+    }
+
+    return c.json({ data: result })
+  },
+)
+
+// POST /rsvp/lookup-by-guest-id
+rsvpRoute.post(
+  '/lookup-by-guest-id',
+  zValidator('json', rsvpGuestIdLookupSchema, (result, c) => {
+    if (!result.success) {
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    }
+  }),
+  async (c) => {
+    const { guestId, weddingId } = c.req.valid('json')
+
+    const expired = await rsvpService.isDeadlinePassed(weddingId)
+    if (expired) {
+      return c.json(
+        { error: 'RSVP deadline has passed', code: 'RSVP_EXPIRED', statusCode: 410 },
+        410,
+      )
+    }
+
+    const result = await rsvpService.lookupByGuestId(guestId, weddingId)
+
+    if (!result) {
+      return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    return c.json({ data: result })
   },
 )
 

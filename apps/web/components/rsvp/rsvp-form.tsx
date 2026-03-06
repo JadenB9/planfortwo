@@ -81,9 +81,18 @@ const MEAL_OPTIONS = ['Chicken', 'Beef', 'Fish', 'Vegetarian', 'Vegan', 'Kids Me
 interface RsvpFormProps {
   lookupResult: RsvpLookupResult
   onSuccess: () => void
+  showMealChoice?: boolean
+  showDietary?: boolean
+  showSongRequest?: boolean
 }
 
-export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
+export function RsvpForm({
+  lookupResult,
+  onSuccess,
+  showMealChoice = true,
+  showDietary = true,
+  showSongRequest = true,
+}: RsvpFormProps) {
   const isBatch = lookupResult.householdGuests.length > 1
   const guestsToRsvp = isBatch ? lookupResult.householdGuests : [lookupResult.guest]
 
@@ -198,69 +207,77 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
 
             {(form.rsvpStatus === 'accepted' || form.rsvpStatus === 'maybe') && (
               <div className="mt-6 space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Meal Preference</label>
-                  <select
-                    value={form.mealChoice}
-                    onChange={(e) => updateForm(index, { mealChoice: e.target.value })}
-                    className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                  >
-                    <option value="">Select a meal...</option>
-                    {MEAL_OPTIONS.map((meal) => (
-                      <option key={meal} value={meal}>
-                        {meal}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Dietary Restrictions</p>
-                  <div className="mt-2 flex flex-wrap gap-3">
-                    {(['vegetarian', 'vegan', 'glutenFree', 'kosher', 'halal'] as const).map(
-                      (key) => (
-                        <label key={key} className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={!!form.dietary[key]}
-                            onChange={(e) => updateDietary(index, key, e.target.checked)}
-                            className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
-                          />
-                          <span className="text-sm capitalize text-gray-700">
-                            {key === 'glutenFree' ? 'Gluten Free' : key}
-                          </span>
-                        </label>
-                      ),
-                    )}
+                {showMealChoice && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Meal Preference
+                    </label>
+                    <select
+                      value={form.mealChoice}
+                      onChange={(e) => updateForm(index, { mealChoice: e.target.value })}
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    >
+                      <option value="">Select a meal...</option>
+                      {MEAL_OPTIONS.map((meal) => (
+                        <option key={meal} value={meal}>
+                          {meal}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  <input
-                    type="text"
-                    value={(form.dietary.allergies ?? []).join(', ')}
-                    onChange={(e) =>
-                      updateDietary(
-                        index,
-                        'allergies',
-                        e.target.value
-                          .split(',')
-                          .map((s) => s.trim())
-                          .filter(Boolean),
-                      )
-                    }
-                    placeholder="Allergies (comma separated)"
-                    className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                  />
-                </div>
+                )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Song Request</label>
-                  <input
-                    type="text"
-                    value={form.songRequest}
-                    onChange={(e) => updateForm(index, { songRequest: e.target.value })}
-                    placeholder="What song will get you on the dance floor?"
-                    className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                  />
-                </div>
+                {showDietary && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Dietary Restrictions</p>
+                    <div className="mt-2 flex flex-wrap gap-3">
+                      {(['vegetarian', 'vegan', 'glutenFree', 'kosher', 'halal'] as const).map(
+                        (key) => (
+                          <label key={key} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={!!form.dietary[key]}
+                              onChange={(e) => updateDietary(index, key, e.target.checked)}
+                              className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
+                            />
+                            <span className="text-sm capitalize text-gray-700">
+                              {key === 'glutenFree' ? 'Gluten Free' : key}
+                            </span>
+                          </label>
+                        ),
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      value={(form.dietary.allergies ?? []).join(', ')}
+                      onChange={(e) =>
+                        updateDietary(
+                          index,
+                          'allergies',
+                          e.target.value
+                            .split(',')
+                            .map((s) => s.trim())
+                            .filter(Boolean),
+                        )
+                      }
+                      placeholder="Allergies (comma separated)"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    />
+                  </div>
+                )}
+
+                {showSongRequest && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Song Request</label>
+                    <input
+                      type="text"
+                      value={form.songRequest}
+                      onChange={(e) => updateForm(index, { songRequest: e.target.value })}
+                      placeholder="What song will get you on the dance floor?"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    />
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
@@ -307,50 +324,54 @@ export function RsvpForm({ lookupResult, onSuccess }: RsvpFormProps) {
                             />
                           </div>
 
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Their Meal Preference
-                            </label>
-                            <select
-                              value={form.plusOneMealChoice}
-                              onChange={(e) =>
-                                updateForm(index, { plusOneMealChoice: e.target.value })
-                              }
-                              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                            >
-                              <option value="">Select a meal...</option>
-                              {MEAL_OPTIONS.map((meal) => (
-                                <option key={meal} value={meal}>
-                                  {meal}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div>
-                            <p className="text-sm font-medium text-gray-700">
-                              Their Dietary Restrictions
-                            </p>
-                            <div className="mt-2 flex flex-wrap gap-3">
-                              {(
-                                ['vegetarian', 'vegan', 'glutenFree', 'kosher', 'halal'] as const
-                              ).map((key) => (
-                                <label key={key} className="flex items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    checked={!!form.plusOneDietary[key]}
-                                    onChange={(e) =>
-                                      updatePlusOneDietary(index, key, e.target.checked)
-                                    }
-                                    className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
-                                  />
-                                  <span className="text-sm capitalize text-gray-700">
-                                    {key === 'glutenFree' ? 'Gluten Free' : key}
-                                  </span>
-                                </label>
-                              ))}
+                          {showMealChoice && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Their Meal Preference
+                              </label>
+                              <select
+                                value={form.plusOneMealChoice}
+                                onChange={(e) =>
+                                  updateForm(index, { plusOneMealChoice: e.target.value })
+                                }
+                                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                              >
+                                <option value="">Select a meal...</option>
+                                {MEAL_OPTIONS.map((meal) => (
+                                  <option key={meal} value={meal}>
+                                    {meal}
+                                  </option>
+                                ))}
+                              </select>
                             </div>
-                          </div>
+                          )}
+
+                          {showDietary && (
+                            <div>
+                              <p className="text-sm font-medium text-gray-700">
+                                Their Dietary Restrictions
+                              </p>
+                              <div className="mt-2 flex flex-wrap gap-3">
+                                {(
+                                  ['vegetarian', 'vegan', 'glutenFree', 'kosher', 'halal'] as const
+                                ).map((key) => (
+                                  <label key={key} className="flex items-center gap-2">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!form.plusOneDietary[key]}
+                                      onChange={(e) =>
+                                        updatePlusOneDietary(index, key, e.target.checked)
+                                      }
+                                      className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
+                                    />
+                                    <span className="text-sm capitalize text-gray-700">
+                                      {key === 'glutenFree' ? 'Gluten Free' : key}
+                                    </span>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </>
                       )}
                     </div>

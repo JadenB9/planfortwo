@@ -339,6 +339,14 @@ export const rsvpBatchSubmissionSchema = z.object({
 
 export type RsvpBatchSubmissionInput = z.infer<typeof rsvpBatchSubmissionSchema>
 
+// ── RSVP: Guest ID Lookup ──
+export const rsvpGuestIdLookupSchema = z.object({
+  guestId: z.string().uuid(),
+  weddingId: z.string().uuid(),
+})
+
+export type RsvpGuestIdLookupInput = z.infer<typeof rsvpGuestIdLookupSchema>
+
 // ── CSV Import ──
 export const csvImportSchema = z.object({
   weddingId: z.string().uuid(),

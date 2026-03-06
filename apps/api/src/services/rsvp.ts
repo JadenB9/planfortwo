@@ -50,11 +50,27 @@ export const rsvpService = {
     }
   },
 
+  async lookupByGuestId(guestId: string, weddingId: string): Promise<RsvpLookupResult | null> {
+    const [guest] = await db
+      .select()
+      .from(guests)
+      .where(and(eq(guests.id, guestId), eq(guests.weddingId, weddingId)))
+      .limit(1)
+
+    if (!guest) return null
+
+    return this.buildLookupResult(guest)
+  },
+
   async lookupByName(
     weddingId: string,
     firstName: string,
     lastName: string,
-  ): Promise<Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[]> {
+  ): Promise<
+    | { type: 'single'; result: RsvpLookupResult }
+    | { type: 'multiple'; guests: Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[] }
+    | { type: 'none' }
+  > {
     const results = await db
       .select()
       .from(guests)
@@ -66,10 +82,22 @@ export const rsvpService = {
         ),
       )
 
-    return results.map(({ email: _e, phone: _p, rsvpToken: _t, ...rest }) => rest) as Omit<
-      Guest,
-      'email' | 'phone' | 'rsvpToken'
-    >[]
+    if (results.length === 0) {
+      return { type: 'none' }
+    }
+
+    if (results.length === 1) {
+      const result = await this.buildLookupResult(results[0]!)
+      return { type: 'single', result }
+    }
+
+    return {
+      type: 'multiple',
+      guests: results.map((g) => this.stripSensitiveFields(g)) as Omit<
+        Guest,
+        'email' | 'phone' | 'rsvpToken'
+      >[],
+    }
   },
 
   async submitRsvp(submission: RsvpSubmissionInput, weddingId: string): Promise<Guest> {
