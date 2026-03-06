@@ -12,7 +12,14 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 export default function PhotosPage() {
   const { getToken } = useAuth()
@@ -27,6 +34,7 @@ export default function PhotosPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'favorites'>(
     'all',
   )
+  const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null)
 
   const loadPhotos = useCallback(async () => {
     if (!weddingId) return
@@ -36,7 +44,7 @@ export default function PhotosPage() {
       const { data } = await api.photoGallery.list(weddingId, token)
       setPhotos(data)
     } catch {
-      /* silent */
+      toast.error('Failed to load photos')
     } finally {
       setLoading(false)
     }
@@ -55,12 +63,13 @@ export default function PhotosPage() {
         { weddingId, url: urlInput.trim(), caption: captionInput || undefined },
         token,
       )
+      toast.success('Photo added')
       setUrlInput('')
       setCaptionInput('')
       setShowUpload(false)
       void loadPhotos()
     } catch {
-      /* silent */
+      toast.error('Failed to add photo')
     }
   }
 
@@ -70,9 +79,10 @@ export default function PhotosPage() {
       const token = await getToken()
       if (!token) return
       await api.photoGallery.moderate(id, weddingId, status, token)
+      toast.success(`Photo ${status}`)
       void loadPhotos()
     } catch {
-      /* silent */
+      toast.error('Failed to moderate photo')
     }
   }
 
@@ -82,9 +92,10 @@ export default function PhotosPage() {
       const token = await getToken()
       if (!token) return
       await api.photoGallery.update(photo.id, weddingId, { isFavorite: !photo.isFavorite }, token)
+      toast.success(photo.isFavorite ? 'Removed from favorites' : 'Added to favorites')
       void loadPhotos()
     } catch {
-      /* silent */
+      toast.error('Failed to update photo')
     }
   }
 
@@ -94,9 +105,11 @@ export default function PhotosPage() {
       const token = await getToken()
       if (!token) return
       await api.photoGallery.delete(id, weddingId, token)
+      toast.success('Photo deleted')
+      setDeletingPhotoId(null)
       void loadPhotos()
     } catch {
-      /* silent */
+      toast.error('Failed to delete photo')
     }
   }
 
@@ -217,7 +230,7 @@ export default function PhotosPage() {
                       &#9733;
                     </button>
                     <button
-                      onClick={() => handleDelete(photo.id)}
+                      onClick={() => setDeletingPhotoId(photo.id)}
                       className="rounded-full bg-white/90 p-1.5 text-xs text-red-600"
                       title="Delete"
                     >
@@ -294,6 +307,36 @@ export default function PhotosPage() {
               Add Photo
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deletingPhotoId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeletingPhotoId(null)
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Photo</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600">
+            Are you sure you want to delete this photo? This action cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletingPhotoId(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (deletingPhotoId) handleDelete(deletingPhotoId)
+              }}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </motion.div>

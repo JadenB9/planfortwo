@@ -6,13 +6,14 @@ import { motion } from 'framer-motion'
 import { springSmooth, staggerContainer, fadeInUp } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
 import { api } from '@/lib/api'
-import type { Vendor, VendorCategory, VendorStatus } from '@planfortwo/types'
+import type { Vendor, VendorCategory, VendorStatus, VendorCommunication } from '@planfortwo/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 const VENDOR_CATEGORIES: { value: VendorCategory; label: string }[] = [
   { value: 'venue', label: 'Venue' },
@@ -63,6 +64,15 @@ export default function VendorsPage() {
     notes: '',
   })
 
+  const [communications, setCommunications] = useState<VendorCommunication[]>([])
+  const [showCommForm, setShowCommForm] = useState(false)
+  const [commForm, setCommForm] = useState({
+    type: 'email',
+    subject: '',
+    body: '',
+    date: new Date().toISOString().split('T')[0] ?? '',
+  })
+
   const loadVendors = useCallback(async () => {
     if (!weddingId) return
     try {
@@ -71,7 +81,7 @@ export default function VendorsPage() {
       const { data } = await api.vendors.list(weddingId, token)
       setVendors(data)
     } catch {
-      /* silent */
+      toast.error('Failed to load vendors')
     } finally {
       setLoading(false)
     }
@@ -115,14 +125,16 @@ export default function VendorsPage() {
       }
       if (editingVendor) {
         await api.vendors.update(editingVendor.id, weddingId, payload, token)
+        toast.success('Vendor updated')
       } else {
         await api.vendors.create(payload, token)
+        toast.success('Vendor added')
       }
       resetForm()
       setShowForm(false)
       void loadVendors()
     } catch {
-      /* silent */
+      toast.error('Failed to save vendor')
     }
   }
 
@@ -132,9 +144,56 @@ export default function VendorsPage() {
       const token = await getToken()
       if (!token) return
       await api.vendors.delete(id, weddingId, token)
+      toast.success('Vendor deleted')
       void loadVendors()
     } catch {
-      /* silent */
+      toast.error('Failed to delete vendor')
+    }
+  }
+
+  const loadCommunications = useCallback(
+    async (vendorId: string) => {
+      if (!weddingId) return
+      try {
+        const token = await getToken()
+        if (!token) return
+        const { data } = await api.vendors.listCommunications(vendorId, weddingId, token)
+        setCommunications(data)
+      } catch {
+        toast.error('Failed to load communications')
+      }
+    },
+    [weddingId, getToken],
+  )
+
+  const handleAddCommunication = async () => {
+    if (!weddingId || !editingVendor) return
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.vendors.addCommunication(
+        editingVendor.id,
+        weddingId,
+        {
+          vendorId: editingVendor.id,
+          type: commForm.type,
+          subject: commForm.subject || undefined,
+          body: commForm.body || undefined,
+          date: commForm.date,
+        },
+        token,
+      )
+      toast.success('Communication logged')
+      setShowCommForm(false)
+      setCommForm({
+        type: 'email',
+        subject: '',
+        body: '',
+        date: new Date().toISOString().split('T')[0] ?? '',
+      })
+      void loadCommunications(editingVendor.id)
+    } catch {
+      toast.error('Failed to log communication')
     }
   }
 
@@ -151,6 +210,8 @@ export default function VendorsPage() {
       cost: vendor.cost?.toString() ?? '',
       notes: vendor.notes ?? '',
     })
+    setCommunications([])
+    void loadCommunications(vendor.id)
     setShowForm(true)
   }
 
@@ -436,7 +497,125 @@ export default function VendorsPage() {
             <Button onClick={handleSave} className="w-full">
               {editingVendor ? 'Save Changes' : 'Add Vendor'}
             </Button>
+
+            {editingVendor && (
+              <div className="border-t pt-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-gray-900">Communication Log</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowCommForm(true)}
+                  >
+                    Log Communication
+                  </Button>
+                </div>
+                {communications.length === 0 ? (
+                  <p className="text-center text-xs text-gray-400 py-4">
+                    No communications logged yet.
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {[...communications]
+                      .sort(
+                        (a, b) =>
+                          new Date(b.date).getTime() - new Date(a.date).getTime(),
+                      )
+                      .map((comm) => (
+                        <div
+                          key={comm.id}
+                          className="rounded-lg border border-gray-100 bg-gray-50 p-3"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium capitalize text-gray-700 border">
+                              {comm.type}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {new Date(comm.date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })}
+                            </span>
+                          </div>
+                          {comm.subject && (
+                            <p className="mt-1 text-sm font-medium text-gray-800">
+                              {comm.subject}
+                            </p>
+                          )}
+                          {comm.body && (
+                            <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">
+                              {comm.body}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Log Communication Dialog */}
+      <Dialog open={showCommForm} onOpenChange={setShowCommForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Log Communication</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="comm-type">Type</Label>
+              <select
+                id="comm-type"
+                value={commForm.type}
+                onChange={(e) => setCommForm({ ...commForm, type: e.target.value })}
+                className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
+              >
+                <option value="email">Email</option>
+                <option value="phone">Phone</option>
+                <option value="meeting">Meeting</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="comm-subject">Subject</Label>
+              <Input
+                id="comm-subject"
+                value={commForm.subject}
+                onChange={(e) => setCommForm({ ...commForm, subject: e.target.value })}
+                placeholder="e.g., Discussed floral arrangements"
+              />
+            </div>
+            <div>
+              <Label htmlFor="comm-body">Notes</Label>
+              <Textarea
+                id="comm-body"
+                value={commForm.body}
+                onChange={(e) => setCommForm({ ...commForm, body: e.target.value })}
+                placeholder="Details about this communication..."
+                rows={4}
+              />
+            </div>
+            <div>
+              <Label htmlFor="comm-date">Date</Label>
+              <Input
+                id="comm-date"
+                type="date"
+                value={commForm.date}
+                onChange={(e) => setCommForm({ ...commForm, date: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCommForm(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddCommunication} disabled={!commForm.date}>
+              Save
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </motion.div>

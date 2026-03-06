@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 type Tab = 'playlists' | 'requests'
 
@@ -99,7 +100,7 @@ export default function MusicPage() {
       setPlaylists(playlistRes.data)
       setRequests(requestsRes.data)
     } catch {
-      /* silent */
+      toast.error('Failed to load music data')
     } finally {
       setLoading(false)
     }
@@ -119,7 +120,7 @@ export default function MusicPage() {
         setSongs(data.songs ?? [])
         setSelectedPlaylist(playlistId)
       } catch {
-        /* silent */
+        toast.error('Failed to load playlist songs')
       }
     },
     [weddingId, getToken],
@@ -154,12 +155,13 @@ export default function MusicPage() {
           token,
         )
       }
+      toast.success(editingPlaylist ? 'Playlist updated' : 'Playlist created')
       setShowPlaylistDialog(false)
       setEditingPlaylist(null)
       setPlaylistForm({ name: '', description: '', spotifyUrl: '', appleMusicUrl: '' })
       void loadData()
     } catch {
-      /* silent */
+      toast.error('Failed to save playlist')
     }
   }, [weddingId, getToken, editingPlaylist, playlistForm, loadData])
 
@@ -170,13 +172,14 @@ export default function MusicPage() {
         const token = await getToken()
         if (!token) return
         await api.playlists.delete(id, weddingId, token)
+        toast.success('Playlist deleted')
         if (selectedPlaylist === id) {
           setSelectedPlaylist(null)
           setSongs([])
         }
         void loadData()
       } catch {
-        /* silent */
+        toast.error('Failed to delete playlist')
       }
     },
     [weddingId, getToken, selectedPlaylist, loadData],
@@ -197,11 +200,12 @@ export default function MusicPage() {
         weddingId!,
         token,
       )
+      toast.success('Song added')
       setShowSongDialog(false)
       setSongForm({ title: '', artist: '', category: '' })
       void loadPlaylistSongs(selectedPlaylist)
     } catch {
-      /* silent */
+      toast.error('Failed to add song')
     }
   }, [selectedPlaylist, getToken, songForm, weddingId, loadPlaylistSongs])
 
@@ -211,9 +215,10 @@ export default function MusicPage() {
         const token = await getToken()
         if (!token) return
         await api.playlists.deleteSong(songId, weddingId!, token)
+        toast.success('Song removed')
         if (selectedPlaylist) void loadPlaylistSongs(selectedPlaylist)
       } catch {
-        /* silent */
+        toast.error('Failed to remove song')
       }
     },
     [getToken, weddingId, selectedPlaylist, loadPlaylistSongs],
@@ -225,9 +230,10 @@ export default function MusicPage() {
         const token = await getToken()
         if (!token) return
         await api.playlists.approveRequest(id, weddingId!, token)
+        toast.success('Song request approved')
         void loadData()
       } catch {
-        /* silent */
+        toast.error('Failed to approve request')
       }
     },
     [getToken, weddingId, loadData],
@@ -239,9 +245,10 @@ export default function MusicPage() {
         const token = await getToken()
         if (!token) return
         await api.playlists.deleteRequest(id, weddingId!, token)
+        toast.success('Song request rejected')
         void loadData()
       } catch {
-        /* silent */
+        toast.error('Failed to reject request')
       }
     },
     [getToken, weddingId, loadData],

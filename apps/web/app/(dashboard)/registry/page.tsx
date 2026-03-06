@@ -13,7 +13,15 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Pencil } from 'lucide-react'
+import { toast } from 'sonner'
 
 type Tab = 'links' | 'funds' | 'gifts'
 
@@ -50,6 +58,7 @@ export default function RegistryPage() {
     estimatedValue: '',
     notes: '',
   })
+  const [editingFund, setEditingFund] = useState<CashFund | null>(null)
   const [editingGift, setEditingGift] = useState<Gift | null>(null)
 
   const loadAll = useCallback(async () => {
@@ -66,7 +75,7 @@ export default function RegistryPage() {
       setFunds(fundsRes.data)
       setGifts(giftsRes.data)
     } catch {
-      /* silent */
+      toast.error('Failed to load registry data')
     } finally {
       setLoading(false)
     }
@@ -90,11 +99,12 @@ export default function RegistryPage() {
         },
         token,
       )
+      toast.success('Registry link added')
       setLinkForm({ storeName: '', url: '', logoUrl: '' })
       setShowLinkForm(false)
       void loadAll()
     } catch {
-      /* silent */
+      toast.error('Failed to add registry link')
     }
   }
 
@@ -104,32 +114,72 @@ export default function RegistryPage() {
       const token = await getToken()
       if (!token) return
       await api.registry.deleteLink(id, weddingId, token)
+      toast.success('Registry link removed')
       void loadAll()
     } catch {
-      /* silent */
+      toast.error('Failed to delete registry link')
     }
   }
 
-  const handleAddFund = async () => {
+  const handleSaveFund = async () => {
     if (!weddingId || !fundForm.name.trim() || !fundForm.goalAmount) return
     try {
       const token = await getToken()
       if (!token) return
-      await api.registry.createFund(
-        {
+      if (editingFund) {
+        await api.registry.updateFund(
+          editingFund.id,
           weddingId,
-          name: fundForm.name.trim(),
-          description: fundForm.description || undefined,
-          goalAmount: parseFloat(fundForm.goalAmount),
-        },
-        token,
-      )
+          {
+            name: fundForm.name.trim(),
+            description: fundForm.description || undefined,
+            goalAmount: parseFloat(fundForm.goalAmount),
+          },
+          token,
+        )
+        toast.success('Cash fund updated')
+      } else {
+        await api.registry.createFund(
+          {
+            weddingId,
+            name: fundForm.name.trim(),
+            description: fundForm.description || undefined,
+            goalAmount: parseFloat(fundForm.goalAmount),
+          },
+          token,
+        )
+        toast.success('Cash fund created')
+      }
       setFundForm({ name: '', description: '', goalAmount: '' })
+      setEditingFund(null)
       setShowFundForm(false)
       void loadAll()
     } catch {
-      /* silent */
+      toast.error('Failed to save cash fund')
     }
+  }
+
+  const handleToggleFundActive = async (fund: CashFund) => {
+    if (!weddingId) return
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.registry.updateFund(fund.id, weddingId, { isActive: !fund.isActive }, token)
+      toast.success(fund.isActive ? 'Fund closed' : 'Fund reopened')
+      void loadAll()
+    } catch {
+      toast.error('Failed to update fund status')
+    }
+  }
+
+  const openEditFund = (fund: CashFund) => {
+    setEditingFund(fund)
+    setFundForm({
+      name: fund.name,
+      description: fund.description ?? '',
+      goalAmount: fund.goalAmount.toString(),
+    })
+    setShowFundForm(true)
   }
 
   const handleDeleteFund = async (id: string) => {
@@ -138,9 +188,10 @@ export default function RegistryPage() {
       const token = await getToken()
       if (!token) return
       await api.registry.deleteFund(id, weddingId, token)
+      toast.success('Cash fund deleted')
       void loadAll()
     } catch {
-      /* silent */
+      toast.error('Failed to delete cash fund')
     }
   }
 
@@ -172,12 +223,13 @@ export default function RegistryPage() {
           token,
         )
       }
+      toast.success(editingGift ? 'Gift updated' : 'Gift logged')
       setGiftForm({ guestName: '', description: '', estimatedValue: '', notes: '' })
       setEditingGift(null)
       setShowGiftForm(false)
       void loadAll()
     } catch {
-      /* silent */
+      toast.error('Failed to save gift')
     }
   }
 
@@ -187,9 +239,10 @@ export default function RegistryPage() {
       const token = await getToken()
       if (!token) return
       await api.registry.updateGift(gift.id, weddingId, { thankYouStatus: status }, token)
+      toast.success('Thank-you status updated')
       void loadAll()
     } catch {
-      /* silent */
+      toast.error('Failed to update thank-you status')
     }
   }
 
@@ -199,9 +252,10 @@ export default function RegistryPage() {
       const token = await getToken()
       if (!token) return
       await api.registry.deleteGift(id, weddingId, token)
+      toast.success('Gift deleted')
       void loadAll()
     } catch {
-      /* silent */
+      toast.error('Failed to delete gift')
     }
   }
 
@@ -232,8 +286,11 @@ export default function RegistryPage() {
         <Button
           onClick={() => {
             if (activeTab === 'links') setShowLinkForm(true)
-            else if (activeTab === 'funds') setShowFundForm(true)
-            else {
+            else if (activeTab === 'funds') {
+              setEditingFund(null)
+              setFundForm({ name: '', description: '', goalAmount: '' })
+              setShowFundForm(true)
+            } else {
               setEditingGift(null)
               setGiftForm({ guestName: '', description: '', estimatedValue: '', notes: '' })
               setShowGiftForm(true)
@@ -353,7 +410,14 @@ export default function RegistryPage() {
               <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
                 Create cash funds for your honeymoon, house, or anything else.
               </p>
-              <Button className="mt-6" onClick={() => setShowFundForm(true)}>
+              <Button
+                className="mt-6"
+                onClick={() => {
+                  setEditingFund(null)
+                  setFundForm({ name: '', description: '', goalAmount: '' })
+                  setShowFundForm(true)
+                }}
+              >
                 Create First Fund
               </Button>
             </CardContent>
@@ -376,9 +440,18 @@ export default function RegistryPage() {
                     <CardHeader className="pb-2">
                       <div className="flex items-start justify-between">
                         <CardTitle className="text-base">{fund.name}</CardTitle>
-                        <Badge variant={fund.isActive ? 'default' : 'secondary'}>
-                          {fund.isActive ? 'Active' : 'Closed'}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => openEditFund(fund)}
+                            className="text-gray-400 hover:text-gray-600"
+                            title="Edit fund"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <Badge variant={fund.isActive ? 'default' : 'secondary'}>
+                            {fund.isActive ? 'Active' : 'Closed'}
+                          </Badge>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -400,12 +473,24 @@ export default function RegistryPage() {
                         />
                       </div>
                       <p className="mt-1 text-xs text-gray-500">{Math.round(pct)}% funded</p>
-                      <button
-                        onClick={() => handleDeleteFund(fund.id)}
-                        className="mt-3 text-xs text-red-500 hover:text-red-700"
-                      >
-                        Delete
-                      </button>
+                      <div className="mt-3 flex items-center gap-3">
+                        <button
+                          onClick={() => handleToggleFundActive(fund)}
+                          className={`text-xs font-medium ${
+                            fund.isActive
+                              ? 'text-amber-600 hover:text-amber-700'
+                              : 'text-green-600 hover:text-green-700'
+                          }`}
+                        >
+                          {fund.isActive ? 'Close Fund' : 'Reopen Fund'}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFund(fund.id)}
+                          className="text-xs text-red-500 hover:text-red-700"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -529,10 +614,18 @@ export default function RegistryPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showFundForm} onOpenChange={setShowFundForm}>
+      <Dialog
+        open={showFundForm}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingFund(null)
+            setShowFundForm(false)
+          } else setShowFundForm(true)
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Cash Fund</DialogTitle>
+            <DialogTitle>{editingFund ? 'Edit Cash Fund' : 'Create Cash Fund'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -564,10 +657,21 @@ export default function RegistryPage() {
                 placeholder="5000"
               />
             </div>
-            <Button onClick={handleAddFund} className="w-full">
-              Create Fund
-            </Button>
           </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditingFund(null)
+                setShowFundForm(false)
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSaveFund} disabled={!fundForm.name.trim() || !fundForm.goalAmount}>
+              {editingFund ? 'Save Changes' : 'Create Fund'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

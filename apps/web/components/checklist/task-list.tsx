@@ -33,12 +33,14 @@ interface TaskListProps {
 function SortableItem({
   task,
   categoryColor,
+  categoryName,
   features,
   onToggleComplete,
   onSelect,
 }: {
   task: ChecklistTask
   categoryColor: string
+  categoryName: string
   features: FeatureGates
   onToggleComplete: (id: string) => void
   onSelect: (id: string) => void
@@ -55,6 +57,7 @@ function SortableItem({
       <TaskCard
         task={task}
         categoryColor={categoryColor}
+        categoryName={categoryName}
         features={features}
         onToggleComplete={onToggleComplete}
         onSelect={onSelect}
@@ -78,6 +81,7 @@ export function TaskList({
   )
 
   const categoryColorMap = new Map(categories.map((c) => [c.id, c.color]))
+  const categoryNameMap = new Map(categories.map((c) => [c.id, c.name]))
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -114,6 +118,7 @@ export function TaskList({
       key={task.id}
       task={task}
       categoryColor={categoryColorMap.get(task.categoryId) ?? '#9CA3AF'}
+      categoryName={categoryNameMap.get(task.categoryId) ?? ''}
       features={features}
       onToggleComplete={onToggleComplete}
       onSelect={onSelect}

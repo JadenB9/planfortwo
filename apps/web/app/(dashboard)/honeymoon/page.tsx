@@ -18,6 +18,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { Pencil } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface HoneymoonPlan {
   id: string
@@ -53,8 +55,10 @@ export default function HoneymoonPage() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [packingList, setPackingList] = useState<string[]>([])
   const [packingInput, setPackingInput] = useState('')
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set())
 
   const [showPlanDialog, setShowPlanDialog] = useState(false)
+  const [editingPlan, setEditingPlan] = useState<HoneymoonPlan | null>(null)
   const [planForm, setPlanForm] = useState({
     destination: '',
     startDate: '',
@@ -64,6 +68,7 @@ export default function HoneymoonPage() {
   })
 
   const [showActivityDialog, setShowActivityDialog] = useState(false)
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null)
   const [activityForm, setActivityForm] = useState({
     dayNumber: '1',
     title: '',
@@ -73,6 +78,36 @@ export default function HoneymoonPage() {
     endTime: '',
     cost: '',
   })
+
+  // Load checked packing items from localStorage
+  useEffect(() => {
+    if (weddingId) {
+      try {
+        const stored = localStorage.getItem(`packing-checked-${weddingId}`)
+        if (stored) {
+          const parsed = JSON.parse(stored) as string[]
+          setCheckedItems(new Set(parsed))
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+  }, [weddingId])
+
+  const togglePackingCheck = (item: string) => {
+    setCheckedItems((prev) => {
+      const next = new Set(prev)
+      if (next.has(item)) {
+        next.delete(item)
+      } else {
+        next.add(item)
+      }
+      if (weddingId) {
+        localStorage.setItem(`packing-checked-${weddingId}`, JSON.stringify([...next]))
+      }
+      return next
+    })
+  }
 
   const loadData = useCallback(async () => {
     try {
@@ -84,7 +119,7 @@ export default function HoneymoonPage() {
       const { data } = await api.honeymoon.list(wId, token)
       setPlans(data)
     } catch {
-      /* silent */
+      toast.error('Failed to load honeymoon plans')
     } finally {
       setLoading(false)
     }
@@ -105,7 +140,7 @@ export default function HoneymoonPage() {
         setPackingList(data.packingList ?? [])
         setSelectedPlan(planId)
       } catch {
-        /* silent */
+        toast.error('Failed to load plan details')
       }
     },
     [weddingId, getToken],
@@ -122,18 +157,48 @@ export default function HoneymoonPage() {
           destination: planForm.destination,
           startDate: planForm.startDate ? new Date(planForm.startDate).toISOString() : null,
           endDate: planForm.endDate ? new Date(planForm.endDate).toISOString() : null,
-          budget: planForm.budget ? parseInt(planForm.budget) : null,
+          budget: planForm.budget ? parseFloat(planForm.budget) : null,
           notes: planForm.notes || null,
         },
         token,
       )
+      toast.success('Destination created')
       setShowPlanDialog(false)
+      setEditingPlan(null)
       setPlanForm({ destination: '', startDate: '', endDate: '', budget: '', notes: '' })
       void loadData()
     } catch {
-      /* silent */
+      toast.error('Failed to create destination')
     }
   }, [weddingId, getToken, planForm, loadData])
+
+  const handleUpdatePlan = useCallback(async () => {
+    if (!weddingId || !editingPlan) return
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.honeymoon.update(
+        editingPlan.id,
+        weddingId,
+        {
+          destination: planForm.destination,
+          startDate: planForm.startDate ? new Date(planForm.startDate).toISOString() : null,
+          endDate: planForm.endDate ? new Date(planForm.endDate).toISOString() : null,
+          budget: planForm.budget ? parseFloat(planForm.budget) : null,
+          notes: planForm.notes || null,
+        },
+        token,
+      )
+      toast.success('Destination updated')
+      setShowPlanDialog(false)
+      setEditingPlan(null)
+      setPlanForm({ destination: '', startDate: '', endDate: '', budget: '', notes: '' })
+      void loadData()
+      if (selectedPlan === editingPlan.id) void loadPlanDetails(editingPlan.id)
+    } catch {
+      toast.error('Failed to update destination')
+    }
+  }, [weddingId, getToken, editingPlan, planForm, loadData, selectedPlan, loadPlanDetails])
 
   const handleDeletePlan = useCallback(
     async (id: string) => {
@@ -142,6 +207,7 @@ export default function HoneymoonPage() {
         const token = await getToken()
         if (!token) return
         await api.honeymoon.delete(id, weddingId, token)
+        toast.success('Destination deleted')
         if (selectedPlan === id) {
           setSelectedPlan(null)
           setActivities([])
@@ -149,7 +215,7 @@ export default function HoneymoonPage() {
         }
         void loadData()
       } catch {
-        /* silent */
+        toast.error('Failed to delete destination')
       }
     },
     [weddingId, getToken, selectedPlan, loadData],
@@ -170,11 +236,13 @@ export default function HoneymoonPage() {
           location: activityForm.location || null,
           startTime: activityForm.startTime || null,
           endTime: activityForm.endTime || null,
-          cost: activityForm.cost ? parseInt(activityForm.cost) : null,
+          cost: activityForm.cost ? parseFloat(activityForm.cost) : null,
         },
         token,
       )
+      toast.success('Activity added')
       setShowActivityDialog(false)
+      setEditingActivity(null)
       setActivityForm({
         dayNumber: '1',
         title: '',
@@ -186,9 +254,45 @@ export default function HoneymoonPage() {
       })
       void loadPlanDetails(selectedPlan)
     } catch {
-      /* silent */
+      toast.error('Failed to add activity')
     }
   }, [selectedPlan, getToken, activityForm, loadPlanDetails])
+
+  const handleUpdateActivity = useCallback(async () => {
+    if (!editingActivity) return
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.honeymoon.updateActivity(
+        editingActivity.id,
+        {
+          dayNumber: parseInt(activityForm.dayNumber),
+          title: activityForm.title,
+          description: activityForm.description || null,
+          location: activityForm.location || null,
+          startTime: activityForm.startTime || null,
+          endTime: activityForm.endTime || null,
+          cost: activityForm.cost ? parseFloat(activityForm.cost) : null,
+        },
+        token,
+      )
+      toast.success('Activity updated')
+      setShowActivityDialog(false)
+      setEditingActivity(null)
+      setActivityForm({
+        dayNumber: '1',
+        title: '',
+        description: '',
+        location: '',
+        startTime: '',
+        endTime: '',
+        cost: '',
+      })
+      if (selectedPlan) void loadPlanDetails(selectedPlan)
+    } catch {
+      toast.error('Failed to update activity')
+    }
+  }, [editingActivity, getToken, activityForm, selectedPlan, loadPlanDetails])
 
   const handleDeleteActivity = useCallback(
     async (activityId: string) => {
@@ -196,9 +300,10 @@ export default function HoneymoonPage() {
         const token = await getToken()
         if (!token) return
         await api.honeymoon.deleteActivity(activityId, token)
+        toast.success('Activity removed')
         if (selectedPlan) void loadPlanDetails(selectedPlan)
       } catch {
-        /* silent */
+        toast.error('Failed to delete activity')
       }
     },
     [getToken, selectedPlan, loadPlanDetails],
@@ -214,25 +319,63 @@ export default function HoneymoonPage() {
       setPackingList(newList)
       setPackingInput('')
     } catch {
-      /* silent */
+      toast.error('Failed to add packing item')
     }
   }, [selectedPlan, weddingId, getToken, packingInput, packingList])
 
   const handleRemovePackingItem = useCallback(
     async (index: number) => {
       if (!selectedPlan || !weddingId) return
+      const removedItem = packingList[index]
       const newList = packingList.filter((_, i) => i !== index)
       try {
         const token = await getToken()
         if (!token) return
         await api.honeymoon.update(selectedPlan, weddingId, { packingList: newList }, token)
         setPackingList(newList)
+        // Remove from checked set if it was checked
+        if (removedItem && checkedItems.has(removedItem)) {
+          setCheckedItems((prev) => {
+            const next = new Set(prev)
+            next.delete(removedItem)
+            if (weddingId) {
+              localStorage.setItem(`packing-checked-${weddingId}`, JSON.stringify([...next]))
+            }
+            return next
+          })
+        }
       } catch {
-        /* silent */
+        toast.error('Failed to remove packing item')
       }
     },
-    [selectedPlan, weddingId, getToken, packingList],
+    [selectedPlan, weddingId, getToken, packingList, checkedItems],
   )
+
+  const openEditPlan = (plan: HoneymoonPlan) => {
+    setEditingPlan(plan)
+    setPlanForm({
+      destination: plan.destination,
+      startDate: plan.startDate ? plan.startDate.split('T')[0] ?? '' : '',
+      endDate: plan.endDate ? plan.endDate.split('T')[0] ?? '' : '',
+      budget: plan.budget?.toString() ?? '',
+      notes: plan.notes ?? '',
+    })
+    setShowPlanDialog(true)
+  }
+
+  const openEditActivity = (activity: Activity) => {
+    setEditingActivity(activity)
+    setActivityForm({
+      dayNumber: activity.dayNumber.toString(),
+      title: activity.title,
+      description: activity.description ?? '',
+      location: activity.location ?? '',
+      startTime: activity.startTime ?? '',
+      endTime: activity.endTime ?? '',
+      cost: activity.cost?.toString() ?? '',
+    })
+    setShowActivityDialog(true)
+  }
 
   if (loading) {
     return (
@@ -259,7 +402,15 @@ export default function HoneymoonPage() {
             Plan your dream getaway with itineraries and packing lists.
           </p>
         </div>
-        <Button onClick={() => setShowPlanDialog(true)}>New Destination</Button>
+        <Button
+          onClick={() => {
+            setEditingPlan(null)
+            setPlanForm({ destination: '', startDate: '', endDate: '', budget: '', notes: '' })
+            setShowPlanDialog(true)
+          }}
+        >
+          New Destination
+        </Button>
       </div>
 
       {plans.length === 0 ? (
@@ -311,17 +462,29 @@ export default function HoneymoonPage() {
                         </p>
                       )}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeletePlan(plan.id)
-                      }}
-                    >
-                      Delete
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          openEditPlan(plan)
+                        }}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeletePlan(plan.id)
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -356,7 +519,22 @@ export default function HoneymoonPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Itinerary</CardTitle>
-                    <Button size="sm" onClick={() => setShowActivityDialog(true)}>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setEditingActivity(null)
+                        setActivityForm({
+                          dayNumber: '1',
+                          title: '',
+                          description: '',
+                          location: '',
+                          startTime: '',
+                          endTime: '',
+                          cost: '',
+                        })
+                        setShowActivityDialog(true)
+                      }}
+                    >
                       Add Activity
                     </Button>
                   </CardHeader>
@@ -398,14 +576,23 @@ export default function HoneymoonPage() {
                                   {act.cost != null && act.cost > 0 && <span>${act.cost}</span>}
                                 </div>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500"
-                                onClick={() => handleDeleteActivity(act.id)}
-                              >
-                                Remove
-                              </Button>
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openEditActivity(act)}
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-500"
+                                  onClick={() => handleDeleteActivity(act.id)}
+                                >
+                                  Remove
+                                </Button>
+                              </div>
                             </motion.div>
                           ))}
                       </motion.div>
@@ -444,7 +631,21 @@ export default function HoneymoonPage() {
                             key={idx}
                             className="flex items-center justify-between rounded px-2 py-1 text-sm hover:bg-gray-50"
                           >
-                            <span>{item}</span>
+                            <label className="flex cursor-pointer items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={checkedItems.has(item)}
+                                onChange={() => togglePackingCheck(item)}
+                                className="h-4 w-4 rounded border-gray-300 text-rose-500 focus:ring-rose-500"
+                              />
+                              <span
+                                className={
+                                  checkedItems.has(item) ? 'text-gray-400 line-through' : ''
+                                }
+                              >
+                                {item}
+                              </span>
+                            </label>
                             <button
                               onClick={() => handleRemovePackingItem(idx)}
                               className="text-xs text-red-400 hover:text-red-600"
@@ -471,10 +672,20 @@ export default function HoneymoonPage() {
         </div>
       )}
 
-      <Dialog open={showPlanDialog} onOpenChange={setShowPlanDialog}>
+      <Dialog
+        open={showPlanDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingPlan(null)
+            setShowPlanDialog(false)
+          } else setShowPlanDialog(true)
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>New Honeymoon Destination</DialogTitle>
+            <DialogTitle>
+              {editingPlan ? 'Edit Destination' : 'New Honeymoon Destination'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -522,20 +733,37 @@ export default function HoneymoonPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPlanDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditingPlan(null)
+                setShowPlanDialog(false)
+              }}
+            >
               Cancel
             </Button>
-            <Button onClick={handleCreatePlan} disabled={!planForm.destination}>
-              Create
+            <Button
+              onClick={editingPlan ? handleUpdatePlan : handleCreatePlan}
+              disabled={!planForm.destination}
+            >
+              {editingPlan ? 'Save Changes' : 'Create'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showActivityDialog} onOpenChange={setShowActivityDialog}>
+      <Dialog
+        open={showActivityDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingActivity(null)
+            setShowActivityDialog(false)
+          } else setShowActivityDialog(true)
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Activity</DialogTitle>
+            <DialogTitle>{editingActivity ? 'Edit Activity' : 'Add Activity'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -601,11 +829,20 @@ export default function HoneymoonPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowActivityDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditingActivity(null)
+                setShowActivityDialog(false)
+              }}
+            >
               Cancel
             </Button>
-            <Button onClick={handleAddActivity} disabled={!activityForm.title}>
-              Add
+            <Button
+              onClick={editingActivity ? handleUpdateActivity : handleAddActivity}
+              disabled={!activityForm.title}
+            >
+              {editingActivity ? 'Save Changes' : 'Add'}
             </Button>
           </DialogFooter>
         </DialogContent>

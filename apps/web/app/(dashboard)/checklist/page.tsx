@@ -14,6 +14,7 @@ import { TaskList } from '@/components/checklist/task-list'
 import { TaskDetail } from '@/components/checklist/task-detail'
 import { AddTaskForm } from '@/components/checklist/add-task-form'
 import { UpgradePrompt } from '@/components/checklist/upgrade-prompt'
+import { toast } from 'sonner'
 
 export default function ChecklistPage() {
   const { getToken } = useAuth()
@@ -50,7 +51,7 @@ export default function ChecklistPage() {
       setCategories(categoriesRes.data)
       setTasks(tasksRes.data)
     } catch {
-      /* silent */
+      toast.error('Failed to load checklist')
     } finally {
       setLoadingTasks(false)
     }
@@ -66,9 +67,10 @@ export default function ChecklistPage() {
       const token = await getToken()
       if (!token) return
       const { data: updated } = await api.tasks.toggleComplete(taskId, weddingId, token)
+      toast.success(updated.completedAt ? 'Task completed' : 'Task marked incomplete')
       setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
     } catch {
-      /* silent */
+      toast.error('Failed to update task')
     }
   }
 

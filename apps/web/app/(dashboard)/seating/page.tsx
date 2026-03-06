@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 const CANVAS_W = 2000
 const CANVAS_H = 2000
@@ -280,7 +281,7 @@ export default function SeatingPage() {
       const { data } = await api.seatingCharts.list(weddingId, token)
       setCharts(data)
     } catch {
-      /* silent */
+      toast.error('Failed to load seating charts')
     } finally {
       setLoading(false)
     }
@@ -309,7 +310,7 @@ export default function SeatingPage() {
 
         setSelectedChart({ ...data, tables })
       } catch {
-        /* silent */
+        toast.error('Failed to load chart details')
       }
     },
     [weddingId, getToken],
@@ -323,7 +324,7 @@ export default function SeatingPage() {
       const { data } = await api.guests.list(weddingId, token)
       setGuests(data)
     } catch {
-      /* silent */
+      toast.error('Failed to load guests')
     }
   }, [weddingId, getToken])
 
@@ -338,11 +339,12 @@ export default function SeatingPage() {
       const token = await getToken()
       if (!token) return
       await api.seatingCharts.create({ weddingId, name: chartName.trim() }, token)
+      toast.success('Chart created')
       setChartName('')
       setShowNewChart(false)
       void loadCharts()
     } catch {
-      /* silent */
+      toast.error('Failed to create chart')
     }
   }
 
@@ -370,12 +372,13 @@ export default function SeatingPage() {
         },
         token,
       )
+      toast.success('Table added')
       setTableLabel('')
       setTableCapacity('8')
       setShowAddTable(false)
       void loadChartDetail(selectedChart.id)
     } catch {
-      /* silent */
+      toast.error('Failed to add table')
     }
   }
 
@@ -385,10 +388,11 @@ export default function SeatingPage() {
       const token = await getToken()
       if (!token) return
       await api.seatingCharts.delete(id, weddingId, token)
+      toast.success('Chart deleted')
       if (selectedChart?.id === id) setSelectedChart(null)
       void loadCharts()
     } catch {
-      /* silent */
+      toast.error('Failed to delete chart')
     }
   }
 
@@ -398,9 +402,10 @@ export default function SeatingPage() {
       const token = await getToken()
       if (!token) return
       await api.seatingCharts.deleteTable(tableId, weddingId, token)
+      toast.success('Table removed')
       void loadChartDetail(selectedChart.id)
     } catch {
-      /* silent */
+      toast.error('Failed to delete table')
     }
   }
 
@@ -414,7 +419,7 @@ export default function SeatingPage() {
         posY: Math.round(newY),
       }, token)
     } catch {
-      /* silent */
+      toast.error('Failed to move table')
     }
   }
 
@@ -428,10 +433,11 @@ export default function SeatingPage() {
         weddingId,
         token,
       )
+      toast.success('Guest seated')
       setSeatPopover(null)
       void loadChartDetail(selectedChart!.id)
     } catch {
-      /* silent */
+      toast.error('Failed to assign guest')
     }
   }
 
@@ -441,10 +447,11 @@ export default function SeatingPage() {
       const token = await getToken()
       if (!token) return
       await api.seatingCharts.unassignGuest(guestId, weddingId, token)
+      toast.success('Guest unassigned')
       setSeatPopover(null)
       void loadChartDetail(selectedChart!.id)
     } catch {
-      /* silent */
+      toast.error('Failed to unassign guest')
     }
   }
 

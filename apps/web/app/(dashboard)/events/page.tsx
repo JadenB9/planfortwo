@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 const EVENT_TYPES: { value: EventType; label: string }[] = [
   { value: 'ceremony', label: 'Ceremony' },
@@ -61,7 +62,7 @@ export default function EventsPage() {
       const { data } = await api.events.list(weddingId, token)
       setEvents(data)
     } catch {
-      /* silent */
+      toast.error('Failed to load events')
     } finally {
       setLoading(false)
     }
@@ -79,7 +80,7 @@ export default function EventsPage() {
         const { data } = await api.events.listTimeline(eventId, weddingId!, token)
         setTimeline(data)
       } catch {
-        /* silent */
+        toast.error('Failed to load timeline')
       }
     },
     [getToken, weddingId],
@@ -119,14 +120,16 @@ export default function EventsPage() {
       }
       if (editingEvent) {
         await api.events.update(editingEvent.id, weddingId, payload, token)
+        toast.success('Event updated')
       } else {
         await api.events.create(payload, token)
+        toast.success('Event created')
       }
       resetForm()
       setShowForm(false)
       void loadEvents()
     } catch {
-      /* silent */
+      toast.error('Failed to save event')
     }
   }
 
@@ -136,13 +139,14 @@ export default function EventsPage() {
       const token = await getToken()
       if (!token) return
       await api.events.delete(id, weddingId, token)
+      toast.success('Event deleted')
       if (selectedEvent?.id === id) {
         setSelectedEvent(null)
         setTimeline([])
       }
       void loadEvents()
     } catch {
-      /* silent */
+      toast.error('Failed to delete event')
     }
   }
 
@@ -176,12 +180,13 @@ export default function EventsPage() {
           token,
         )
       }
+      toast.success(editingTimeline ? 'Timeline entry updated' : 'Timeline entry added')
       setTlForm({ time: '', title: '', description: '', duration: '' })
       setEditingTimeline(null)
       setShowTimelineForm(false)
       void loadTimeline(selectedEvent.id)
     } catch {
-      /* silent */
+      toast.error('Failed to save timeline entry')
     }
   }
 
@@ -191,9 +196,10 @@ export default function EventsPage() {
       const token = await getToken()
       if (!token) return
       await api.events.deleteTimelineEntry(entryId, weddingId!, token)
+      toast.success('Timeline entry removed')
       void loadTimeline(selectedEvent.id)
     } catch {
-      /* silent */
+      toast.error('Failed to delete timeline entry')
     }
   }
 

@@ -36,6 +36,7 @@ import {
   AtSign,
 } from 'lucide-react'
 import type { Email, EmailAddress } from '@planfortwo/types'
+import { toast } from 'sonner'
 
 type TabFilter = 'all' | 'inbound' | 'outbound' | 'starred'
 
@@ -76,7 +77,7 @@ export default function InboxPage() {
       const res = await api.inbox.addresses.list(token)
       setAddresses(res.data)
     } catch {
-      // no addresses yet
+      toast.error('Failed to load email addresses')
     }
   }, [getToken])
 
@@ -95,6 +96,7 @@ export default function InboxPage() {
       setTotalEmails(res.total)
       setHasMore(res.hasMore)
     } catch {
+      toast.error('Failed to load emails')
       setEmailList([])
     }
   }, [getToken, page, activeTab])
@@ -174,7 +176,7 @@ export default function InboxPage() {
         setEmailList((prev) => prev.map((e) => (e.id === email.id ? { ...e, isRead: true } : e)))
       }
     } catch {
-      // fallback to list version
+      toast.error('Failed to load email')
       setSelectedEmail(email)
     }
   }
@@ -189,7 +191,7 @@ export default function InboxPage() {
       setEmailList((prev) => prev.map((em) => (em.id === email.id ? res.data : em)))
       if (selectedEmail?.id === email.id) setSelectedEmail(res.data)
     } catch {
-      // ignore
+      toast.error('Failed to update email')
     }
   }
 
@@ -199,10 +201,11 @@ export default function InboxPage() {
 
     try {
       await api.inbox.delete(emailId, token)
+      toast.success('Email deleted')
       setEmailList((prev) => prev.filter((e) => e.id !== emailId))
       if (selectedEmail?.id === emailId) setSelectedEmail(null)
     } catch {
-      // ignore
+      toast.error('Failed to delete email')
     }
   }
 
@@ -221,11 +224,12 @@ export default function InboxPage() {
         },
         token,
       )
+      toast.success('Email sent')
       setShowCompose(false)
       setComposeForm({ toAddress: '', subject: '', textBody: '' })
       await fetchEmails()
     } catch {
-      // ignore
+      toast.error('Failed to send email')
     } finally {
       setSending(false)
     }
@@ -494,7 +498,9 @@ export default function InboxPage() {
                 >
                   Previous
                 </Button>
-                <span className="text-xs text-gray-400">Page {page}</span>
+                <span className="text-xs text-gray-400">
+                  Page {page} of {Math.max(1, Math.ceil(totalEmails / 20))}
+                </span>
                 <Button
                   variant="ghost"
                   size="sm"

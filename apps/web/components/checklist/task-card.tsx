@@ -1,11 +1,42 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
 import type { ChecklistTask, FeatureGates } from '@planfortwo/types'
+
+const CATEGORY_PAGE_MAP: Record<string, string> = {
+  venue: '/vendors',
+  vendors: '/vendors',
+  budget: '/budget',
+  finance: '/budget',
+  'guest list': '/guests',
+  guests: '/guests',
+  invitations: '/guests',
+  website: '/website',
+  ceremony: '/ceremony',
+  music: '/music',
+  entertainment: '/music',
+  photography: '/photos',
+  videography: '/photos',
+  photos: '/photos',
+  registry: '/registry',
+  honeymoon: '/honeymoon',
+  seating: '/seating',
+  events: '/events',
+  timeline: '/events',
+  communication: '/communication',
+}
+
+function getCategoryPageLink(categoryName: string): string | null {
+  const key = categoryName.toLowerCase().trim()
+  return CATEGORY_PAGE_MAP[key] ?? null
+}
 
 interface TaskCardProps {
   task: ChecklistTask
   categoryColor: string
+  categoryName: string
   features: FeatureGates
   onToggleComplete: (id: string) => void
   onSelect: (id: string) => void
@@ -42,6 +73,7 @@ const PRIORITY_LABELS: Record<string, string> = {
 export function TaskCard({
   task,
   categoryColor,
+  categoryName,
   features,
   onToggleComplete,
   onSelect,
@@ -49,6 +81,7 @@ export function TaskCard({
 }: TaskCardProps) {
   const isCompleted = task.completedAt !== null
   const dueDateInfo = getDueDateStyle(task.dueDate)
+  const sectionLink = getCategoryPageLink(categoryName)
 
   return (
     <motion.div
@@ -130,6 +163,17 @@ export function TaskCard({
           <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: categoryColor }} />
         </div>
       </button>
+
+      {sectionLink && !isCompleted && (
+        <Link
+          href={sectionLink}
+          onClick={(e) => e.stopPropagation()}
+          className="text-wedding-600 hover:text-wedding-700 flex flex-shrink-0 items-center gap-1 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100"
+        >
+          Go to section
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      )}
     </motion.div>
   )
 }

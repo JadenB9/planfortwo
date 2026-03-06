@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 const TEMPLATE_LABELS: Record<string, string> = {
   save_the_date: 'Save the Date',
@@ -73,7 +74,7 @@ export default function CommunicationPage() {
       const { data } = await api.emailCampaigns.list(wId, token)
       setCampaigns(data)
     } catch {
-      /* silent */
+      toast.error('Failed to load campaigns')
     } finally {
       setLoading(false)
     }
@@ -112,12 +113,13 @@ export default function CommunicationPage() {
           token,
         )
       }
+      toast.success(editingCampaign ? 'Campaign updated' : 'Campaign saved')
       setShowComposeDialog(false)
       setEditingCampaign(null)
       setForm({ subject: '', body: '', templateType: 'custom', scheduledAt: '' })
       void loadData()
     } catch {
-      /* silent */
+      toast.error('Failed to save campaign')
     }
   }, [weddingId, getToken, editingCampaign, form, loadData])
 
@@ -128,9 +130,10 @@ export default function CommunicationPage() {
         const token = await getToken()
         if (!token) return
         await api.emailCampaigns.delete(id, weddingId, token)
+        toast.success('Campaign deleted')
         void loadData()
       } catch {
-        /* silent */
+        toast.error('Failed to delete campaign')
       }
     },
     [weddingId, getToken, loadData],
@@ -222,11 +225,29 @@ export default function CommunicationPage() {
                     <div className="mt-1 flex items-center gap-4 text-xs text-gray-400">
                       {campaign.scheduledAt && (
                         <span>
-                          Scheduled: {new Date(campaign.scheduledAt).toLocaleDateString()}
+                          Scheduled:{' '}
+                          {new Date(campaign.scheduledAt).toLocaleString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true,
+                          })}
                         </span>
                       )}
                       {campaign.sentAt && (
-                        <span>Sent: {new Date(campaign.sentAt).toLocaleDateString()}</span>
+                        <span>
+                          Sent:{' '}
+                          {new Date(campaign.sentAt).toLocaleString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true,
+                          })}
+                        </span>
                       )}
                     </div>
                   </div>

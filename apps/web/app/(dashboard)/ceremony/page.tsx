@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 type Tab = 'outline' | 'vows' | 'processional'
 
@@ -102,7 +103,7 @@ export default function CeremonyPage() {
       if (vowRes.data) setVowContent(vowRes.data.content)
       setProcessional(processRes.data)
     } catch {
-      /* silent */
+      toast.error('Failed to load ceremony data')
     } finally {
       setLoading(false)
     }
@@ -141,12 +142,13 @@ export default function CeremonyPage() {
           token,
         )
       }
+      toast.success(editingOutline ? 'Moment updated' : 'Moment added')
       setShowOutlineDialog(false)
       setEditingOutline(null)
       setOutlineForm({ moment: 'welcome', title: '', description: '', duration: '' })
       void loadData()
     } catch {
-      /* silent */
+      toast.error('Failed to save ceremony moment')
     }
   }, [weddingId, getToken, editingOutline, outlineForm, loadData])
 
@@ -157,9 +159,10 @@ export default function CeremonyPage() {
         const token = await getToken()
         if (!token) return
         await api.ceremony.deleteOutline(id, weddingId, token)
+        toast.success('Moment deleted')
         void loadData()
       } catch {
-        /* silent */
+        toast.error('Failed to delete moment')
       }
     },
     [weddingId, getToken, loadData],
@@ -172,8 +175,9 @@ export default function CeremonyPage() {
       const token = await getToken()
       if (!token) return
       await api.ceremony.upsertVow(weddingId, { content: vowContent }, token)
+      toast.success('Vows saved')
     } catch {
-      /* silent */
+      toast.error('Failed to save vows')
     } finally {
       setVowSaving(false)
     }
@@ -201,12 +205,13 @@ export default function CeremonyPage() {
           token,
         )
       }
+      toast.success(editingProcessional ? 'Entry updated' : 'Entry added')
       setShowProcessionalDialog(false)
       setEditingProcessional(null)
       setProcessionalForm({ name: '', role: '' })
       void loadData()
     } catch {
-      /* silent */
+      toast.error('Failed to save processional entry')
     }
   }, [weddingId, getToken, editingProcessional, processionalForm, loadData])
 
@@ -217,9 +222,10 @@ export default function CeremonyPage() {
         const token = await getToken()
         if (!token) return
         await api.ceremony.deleteProcessional(id, weddingId, token)
+        toast.success('Entry removed')
         void loadData()
       } catch {
-        /* silent */
+        toast.error('Failed to delete processional entry')
       }
     },
     [weddingId, getToken, loadData],
