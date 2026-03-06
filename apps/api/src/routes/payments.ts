@@ -72,11 +72,19 @@ purchasesRoute.post(
   async (c) => {
     const userId = c.get('dbUserId')
     const { weddingId, promoCode } = c.req.valid('json')
-    const result = await purchaseService.redeemPromoCode(weddingId, userId, promoCode)
-    if (!result.success) {
-      return c.json({ error: result.error, code: 'INVALID_PROMO', statusCode: 400 }, 400)
+    try {
+      const result = await purchaseService.redeemPromoCode(weddingId, userId, promoCode)
+      if (!result.success) {
+        return c.json({ error: result.error, code: 'INVALID_PROMO', statusCode: 400 }, 400)
+      }
+      return c.json({ data: { success: true } })
+    } catch (err) {
+      console.error('Promo code redemption failed:', err)
+      return c.json(
+        { error: 'Failed to redeem promo code', code: 'PROMO_ERROR', statusCode: 500 },
+        500,
+      )
     }
-    return c.json({ data: { success: true } })
   },
 )
 
