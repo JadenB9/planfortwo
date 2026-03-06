@@ -605,7 +605,9 @@ export default function EventsPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingTimeline ? 'Edit Timeline Entry' : 'Add Timeline Entry'}</DialogTitle>
+            <DialogTitle>
+              {editingTimeline ? 'Edit Timeline Entry' : 'Add Timeline Entry'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>

@@ -104,7 +104,7 @@ export function Sidebar() {
       {/* Bottom section */}
       <div className="mt-auto space-y-2 border-t border-gray-200 p-3">
         {weddingLoading ? null : tier === 'full' ? (
-          <div className="bg-sage-50 border-sage-200 flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium text-sage-700">
+          <div className="bg-sage-50 border-sage-200 text-sage-700 flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium">
             <CheckCircle className="h-4 w-4" />
             Full Plan Active
           </div>

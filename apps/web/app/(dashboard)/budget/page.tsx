@@ -150,7 +150,11 @@ export default function BudgetPage() {
           <p className="mt-1 text-sm text-gray-600">Track every dollar for your wedding.</p>
         </div>
 
-        <BudgetOverview analytics={null} budgetTotal={weddingData?.wedding.budgetTotal ?? null} onEditBudget={handleEditBudget} />
+        <BudgetOverview
+          analytics={null}
+          budgetTotal={weddingData?.wedding.budgetTotal ?? null}
+          onEditBudget={handleEditBudget}
+        />
 
         <div className="mt-6">
           <UpgradePrompt message="Upgrade to unlock full budget tracking, expense management, analytics, and more" />

@@ -80,18 +80,19 @@ categoriesRoute.delete(
   resolveWeddingMiddleware,
   requireFeature('canCustomizeCategories'),
   async (c) => {
-  const categoryId = c.req.param('id')
-  const dbUserId = c.get('dbUserId')
-  const weddingId = c.get('weddingId')
+    const categoryId = c.req.param('id')
+    const dbUserId = c.get('dbUserId')
+    const weddingId = c.get('weddingId')
 
-  try {
-    await checklistService.deleteCategory(categoryId, dbUserId, weddingId)
-    return c.json({ data: { success: true } })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Delete failed'
-    const code = message.includes('default') ? 'DEFAULT_CATEGORY' : 'DELETE_FAILED'
-    const status = message.includes('default') ? 400 : 404
+    try {
+      await checklistService.deleteCategory(categoryId, dbUserId, weddingId)
+      return c.json({ data: { success: true } })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Delete failed'
+      const code = message.includes('default') ? 'DEFAULT_CATEGORY' : 'DELETE_FAILED'
+      const status = message.includes('default') ? 400 : 404
 
-    return c.json({ error: message, code, statusCode: status }, status)
-  }
-})
+      return c.json({ error: message, code, statusCode: status }, status)
+    }
+  },
+)

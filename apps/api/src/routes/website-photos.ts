@@ -65,17 +65,18 @@ websitePhotosRoute.delete(
   resolveWeddingMiddleware,
   requireFeature('canWebsiteBuilder'),
   async (c) => {
-  const id = c.req.param('id')
-  const weddingId = c.get('weddingId')
+    const id = c.req.param('id')
+    const weddingId = c.get('weddingId')
 
-  try {
-    await websitePhotoService.delete(id, weddingId)
-    return c.json({ data: { success: true } })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Delete failed'
-    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
-  }
-})
+    try {
+      await websitePhotoService.delete(id, weddingId)
+      return c.json({ data: { success: true } })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Delete failed'
+      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+    }
+  },
+)
 
 // POST /website-photos/reorder
 websitePhotosRoute.post(

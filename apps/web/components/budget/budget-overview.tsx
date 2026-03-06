@@ -67,7 +67,7 @@ export function BudgetOverview({ analytics, budgetTotal, onEditBudget }: BudgetO
               type="number"
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-2 py-1 text-lg font-bold text-gray-900 focus:border-wedding-600 focus:outline-none focus:ring-1 focus:ring-wedding-600"
+              className="focus:border-wedding-600 focus:ring-wedding-600 w-full rounded-lg border border-gray-300 px-2 py-1 text-lg font-bold text-gray-900 focus:outline-none focus:ring-1"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') void saveEdit()
@@ -77,7 +77,7 @@ export function BudgetOverview({ analytics, budgetTotal, onEditBudget }: BudgetO
             <button
               onClick={() => void saveEdit()}
               disabled={saving}
-              className="rounded-lg p-1 text-sage-600 hover:bg-sage-50"
+              className="text-sage-600 hover:bg-sage-50 rounded-lg p-1"
             >
               <Check className="h-4 w-4" />
             </button>

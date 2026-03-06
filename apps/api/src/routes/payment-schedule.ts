@@ -99,15 +99,16 @@ paymentScheduleRoute.delete(
   resolveWeddingMiddleware,
   requireFeature('canPaymentSchedule'),
   async (c) => {
-  const paymentId = c.req.param('id')
-  const dbUserId = c.get('dbUserId')
-  const weddingId = c.get('weddingId')
+    const paymentId = c.req.param('id')
+    const dbUserId = c.get('dbUserId')
+    const weddingId = c.get('weddingId')
 
-  try {
-    await paymentScheduleService.delete(paymentId, weddingId, dbUserId)
-    return c.json({ data: { success: true } })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Delete failed'
-    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
-  }
-})
+    try {
+      await paymentScheduleService.delete(paymentId, weddingId, dbUserId)
+      return c.json({ data: { success: true } })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Delete failed'
+      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+    }
+  },
+)

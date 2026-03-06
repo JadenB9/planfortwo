@@ -305,7 +305,12 @@ export default function MusicPage() {
                   size="sm"
                   onClick={() => {
                     setEditingPlaylist(null)
-                    setPlaylistForm({ name: '', description: '', spotifyUrl: '', appleMusicUrl: '' })
+                    setPlaylistForm({
+                      name: '',
+                      description: '',
+                      spotifyUrl: '',
+                      appleMusicUrl: '',
+                    })
                     setShowPlaylistDialog(true)
                   }}
                 >

@@ -528,7 +528,9 @@ export default function CeremonyPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingProcessional ? 'Edit Processional Entry' : 'Add Processional Entry'}</DialogTitle>
+            <DialogTitle>
+              {editingProcessional ? 'Edit Processional Entry' : 'Add Processional Entry'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>

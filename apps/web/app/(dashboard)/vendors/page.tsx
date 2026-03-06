@@ -12,7 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { toast } from 'sonner'
 
 const VENDOR_CATEGORIES: { value: VendorCategory; label: string }[] = [
@@ -502,32 +508,25 @@ export default function VendorsPage() {
               <div className="border-t pt-4">
                 <div className="mb-3 flex items-center justify-between">
                   <h3 className="text-sm font-semibold text-gray-900">Communication Log</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowCommForm(true)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setShowCommForm(true)}>
                     Log Communication
                   </Button>
                 </div>
                 {communications.length === 0 ? (
-                  <p className="text-center text-xs text-gray-400 py-4">
+                  <p className="py-4 text-center text-xs text-gray-400">
                     No communications logged yet.
                   </p>
                 ) : (
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className="max-h-48 space-y-2 overflow-y-auto">
                     {[...communications]
-                      .sort(
-                        (a, b) =>
-                          new Date(b.date).getTime() - new Date(a.date).getTime(),
-                      )
+                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                       .map((comm) => (
                         <div
                           key={comm.id}
                           className="rounded-lg border border-gray-100 bg-gray-50 p-3"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium capitalize text-gray-700 border">
+                            <span className="rounded-full border bg-white px-2 py-0.5 text-xs font-medium capitalize text-gray-700">
                               {comm.type}
                             </span>
                             <span className="text-xs text-gray-400">
@@ -539,14 +538,10 @@ export default function VendorsPage() {
                             </span>
                           </div>
                           {comm.subject && (
-                            <p className="mt-1 text-sm font-medium text-gray-800">
-                              {comm.subject}
-                            </p>
+                            <p className="mt-1 text-sm font-medium text-gray-800">{comm.subject}</p>
                           )}
                           {comm.body && (
-                            <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">
-                              {comm.body}
-                            </p>
+                            <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">{comm.body}</p>
                           )}
                         </div>
                       ))}

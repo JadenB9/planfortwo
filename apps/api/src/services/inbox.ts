@@ -85,7 +85,12 @@ export const inboxService = {
     }
 
     const addressIds = userAddresses.map((a) => a.id)
-    const conditions = [sql`${emails.emailAddressId} IN (${sql.join(addressIds.map((id) => sql`${id}`), sql`, `)})`]
+    const conditions = [
+      sql`${emails.emailAddressId} IN (${sql.join(
+        addressIds.map((id) => sql`${id}`),
+        sql`, `,
+      )})`,
+    ]
 
     if (filters.emailAddressId) {
       if (!addressIds.includes(filters.emailAddressId)) {
@@ -124,10 +129,7 @@ export const inboxService = {
 
     const whereClause = and(...conditions)
 
-    const [totalResult] = await db
-      .select({ value: count() })
-      .from(emails)
-      .where(whereClause)
+    const [totalResult] = await db.select({ value: count() }).from(emails).where(whereClause)
 
     const total = totalResult?.value ?? 0
     const offset = (filters.page - 1) * filters.pageSize
@@ -177,11 +179,7 @@ export const inboxService = {
 
     if (result.length === 0) return null
 
-    const [updated] = await db
-      .update(emails)
-      .set(data)
-      .where(eq(emails.id, emailId))
-      .returning()
+    const [updated] = await db.update(emails).set(data).where(eq(emails.id, emailId)).returning()
 
     return updated
   },
@@ -273,7 +271,10 @@ export const inboxService = {
       .from(emails)
       .where(
         and(
-          sql`${emails.emailAddressId} IN (${sql.join(addressIds.map((id) => sql`${id}`), sql`, `)})`,
+          sql`${emails.emailAddressId} IN (${sql.join(
+            addressIds.map((id) => sql`${id}`),
+            sql`, `,
+          )})`,
           eq(emails.direction, 'inbound'),
           eq(emails.isRead, false),
         ),

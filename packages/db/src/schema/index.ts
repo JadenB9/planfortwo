@@ -97,5 +97,8 @@ export {
 } from './playlists'
 export { honeymoonPlans, honeymoonActivities } from './honeymoon'
 
+// Roadmap Preferences
+export { roadmapPreferences } from './roadmap-preferences'
+
 // Inbox
 export { emailAddresses, emails, emailDirectionEnum } from './inbox'

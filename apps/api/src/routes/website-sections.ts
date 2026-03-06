@@ -114,14 +114,15 @@ websiteSectionsRoute.delete(
   resolveWeddingMiddleware,
   requireFeature('canWebsiteCustomSections'),
   async (c) => {
-  const id = c.req.param('id')
-  const weddingId = c.get('weddingId')
+    const id = c.req.param('id')
+    const weddingId = c.get('weddingId')
 
-  try {
-    await websiteSectionService.deleteCustom(id, weddingId)
-    return c.json({ data: { success: true } })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Delete failed'
-    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 400 }, 400)
-  }
-})
+    try {
+      await websiteSectionService.deleteCustom(id, weddingId)
+      return c.json({ data: { success: true } })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Delete failed'
+      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 400 }, 400)
+    }
+  },
+)

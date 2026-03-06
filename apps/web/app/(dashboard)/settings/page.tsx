@@ -24,12 +24,29 @@ export default function SettingsPage() {
   const [wedding, setWedding] = useState<Wedding | null>(null)
   const [notifPrefs, setNotifPrefs] = useState<NotificationPreference | null>(null)
 
-  const [weddingForm, setWeddingForm] = useState({ name: '', date: '', venue: '', budgetTotal: '', guestCountEstimate: '' })
+  const [weddingForm, setWeddingForm] = useState({
+    name: '',
+    date: '',
+    venue: '',
+    budgetTotal: '',
+    guestCountEstimate: '',
+  })
   const [saving, setSaving] = useState(false)
   const [notifSaving, setNotifSaving] = useState(false)
 
   // Team member management state
-  const [members, setMembers] = useState<Array<{ member: { id: string; role: string }; user: { id: string; email: string; firstName: string; lastName: string; avatarUrl: string | null } }>>([])
+  const [members, setMembers] = useState<
+    Array<{
+      member: { id: string; role: string }
+      user: {
+        id: string
+        email: string
+        firstName: string
+        lastName: string
+        avatarUrl: string | null
+      }
+    }>
+  >([])
   const [newMemberEmail, setNewMemberEmail] = useState('')
   const [newMemberRole, setNewMemberRole] = useState<'planner' | 'family'>('planner')
   const [addingMember, setAddingMember] = useState(false)
@@ -82,7 +99,9 @@ export default function SettingsPage() {
       const token = await getToken()
       if (!token) return
       const budgetParsed = weddingForm.budgetTotal ? parseFloat(weddingForm.budgetTotal) : null
-      const guestParsed = weddingForm.guestCountEstimate ? parseInt(weddingForm.guestCountEstimate, 10) : null
+      const guestParsed = weddingForm.guestCountEstimate
+        ? parseInt(weddingForm.guestCountEstimate, 10)
+        : null
       await api.weddings.update(
         weddingId,
         {
@@ -140,22 +159,25 @@ export default function SettingsPage() {
     }
   }, [weddingId, getToken, newMemberEmail, newMemberRole])
 
-  const handleRemoveMember = useCallback(async (memberId: string) => {
-    if (!weddingId) return
-    setRemovingId(memberId)
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.weddings.removeMember(weddingId, memberId, token)
-      toast.success('Team member removed')
-      const { data: memberList } = await api.weddings.getMembers(weddingId, token)
-      setMembers(memberList)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to remove member')
-    } finally {
-      setRemovingId(null)
-    }
-  }, [weddingId, getToken])
+  const handleRemoveMember = useCallback(
+    async (memberId: string) => {
+      if (!weddingId) return
+      setRemovingId(memberId)
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.weddings.removeMember(weddingId, memberId, token)
+        toast.success('Team member removed')
+        const { data: memberList } = await api.weddings.getMembers(weddingId, token)
+        setMembers(memberList)
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to remove member')
+      } finally {
+        setRemovingId(null)
+      }
+    },
+    [weddingId, getToken],
+  )
 
   if (loading) {
     return (
@@ -230,7 +252,9 @@ export default function SettingsPage() {
                   <Input
                     type="number"
                     value={weddingForm.guestCountEstimate}
-                    onChange={(e) => setWeddingForm({ ...weddingForm, guestCountEstimate: e.target.value })}
+                    onChange={(e) =>
+                      setWeddingForm({ ...weddingForm, guestCountEstimate: e.target.value })
+                    }
                     placeholder="150"
                     className="mt-1"
                   />
@@ -240,7 +264,9 @@ export default function SettingsPage() {
                   <Input
                     type="number"
                     value={weddingForm.budgetTotal}
-                    onChange={(e) => setWeddingForm({ ...weddingForm, budgetTotal: e.target.value })}
+                    onChange={(e) =>
+                      setWeddingForm({ ...weddingForm, budgetTotal: e.target.value })
+                    }
                     placeholder="30000"
                     className="mt-1"
                   />
@@ -272,31 +298,44 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <p className="text-sm text-gray-600">
-                Everyone on your planning team sees the same dashboard and can manage all wedding details together.
+                Everyone on your planning team sees the same dashboard and can manage all wedding
+                details together.
               </p>
 
               {/* Current Members */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-gray-900">Current Members</h3>
                 {members.map(({ member, user: memberUser }) => {
-                  const roleIcon = member.role === 'owner' ? (
-                    <Crown className="h-4 w-4 text-amber-500" />
-                  ) : member.role === 'partner' ? (
-                    <Heart className="h-4 w-4 text-pink-500" />
-                  ) : (
-                    <Users className="h-4 w-4 text-blue-500" />
-                  )
+                  const roleIcon =
+                    member.role === 'owner' ? (
+                      <Crown className="h-4 w-4 text-amber-500" />
+                    ) : member.role === 'partner' ? (
+                      <Heart className="h-4 w-4 text-pink-500" />
+                    ) : (
+                      <Users className="h-4 w-4 text-blue-500" />
+                    )
 
-                  const roleLabel = member.role === 'owner' ? 'Owner' : member.role === 'partner' ? 'Partner' : member.role === 'planner' ? 'Planner' : 'Family'
+                  const roleLabel =
+                    member.role === 'owner'
+                      ? 'Owner'
+                      : member.role === 'partner'
+                        ? 'Partner'
+                        : member.role === 'planner'
+                          ? 'Planner'
+                          : 'Family'
 
                   return (
-                    <div key={member.id} className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3">
+                    <div
+                      key={member.id}
+                      className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3"
+                    >
                       <div className="flex items-center gap-3">
                         {memberUser.avatarUrl ? (
                           <img src={memberUser.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
                         ) : (
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-600">
-                            {memberUser.firstName?.[0]}{memberUser.lastName?.[0]}
+                            {memberUser.firstName?.[0]}
+                            {memberUser.lastName?.[0]}
                           </div>
                         )}
                         <div>
@@ -336,7 +375,8 @@ export default function SettingsPage() {
                   Add Team Member
                 </h3>
                 <p className="text-xs text-gray-500">
-                  Add a wedding planner, coordinator, or family member to help plan. They must have a PlanForTwo account.
+                  Add a wedding planner, coordinator, or family member to help plan. They must have
+                  a PlanForTwo account.
                 </p>
                 <div className="flex gap-3">
                   <Input

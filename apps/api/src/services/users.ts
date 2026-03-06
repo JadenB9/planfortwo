@@ -41,10 +41,7 @@ export const userService = {
         .select()
         .from(partnerInvitations)
         .where(
-          and(
-            eq(partnerInvitations.email, data.email),
-            eq(partnerInvitations.status, 'pending'),
-          ),
+          and(eq(partnerInvitations.email, data.email), eq(partnerInvitations.status, 'pending')),
         )
 
       if (pendingInvites.length > 0) {

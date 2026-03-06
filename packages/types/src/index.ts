@@ -1039,13 +1039,21 @@ export interface FeatureProgress {
   href: string
   status: FeatureStatus
   progress: number
+  autoProgress: number
   itemCount: number
   description: string
+  isHidden: boolean
+}
+
+export interface RoadmapPreferences {
+  overrides: Record<string, number>
+  hidden: string[]
 }
 
 export interface PlanningProgress {
   features: FeatureProgress[]
   overallProgress: number
+  preferences: RoadmapPreferences | null
 }
 
 // ── Inbox ──

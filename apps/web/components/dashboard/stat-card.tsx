@@ -44,7 +44,11 @@ export function StatCard({ label, value, icon, trend, href }: StatCardProps) {
   )
 
   if (href) {
-    return <Link href={href} className="block h-full">{card}</Link>
+    return (
+      <Link href={href} className="block h-full">
+        {card}
+      </Link>
+    )
   }
 
   return card

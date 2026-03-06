@@ -355,8 +355,8 @@ export default function HoneymoonPage() {
     setEditingPlan(plan)
     setPlanForm({
       destination: plan.destination,
-      startDate: plan.startDate ? plan.startDate.split('T')[0] ?? '' : '',
-      endDate: plan.endDate ? plan.endDate.split('T')[0] ?? '' : '',
+      startDate: plan.startDate ? (plan.startDate.split('T')[0] ?? '') : '',
+      endDate: plan.endDate ? (plan.endDate.split('T')[0] ?? '') : '',
       budget: plan.budget?.toString() ?? '',
       notes: plan.notes ?? '',
     })

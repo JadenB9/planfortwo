@@ -72,10 +72,13 @@ describe('Resend Webhook Route', () => {
     })
 
     // Mock global fetch for Resend API content fetch
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ text: 'Email body text', html: '<p>Email body</p>' }),
-    }))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ text: 'Email body text', html: '<p>Email body</p>' }),
+      }),
+    )
   })
 
   it('stores email for known address', async () => {
@@ -98,11 +101,14 @@ describe('Resend Webhook Route', () => {
     const json = await res.json()
     expect(json.received).toBe(true)
     expect(inboxService.findAddressByLocalPart).toHaveBeenCalledWith('jabby')
-    expect(inboxService.storeInboundEmail).toHaveBeenCalledWith('addr-1', expect.objectContaining({
-      resendEmailId: 'resend-email-123',
-      fromAddress: 'sender@example.com',
-      subject: 'Test inbound email',
-    }))
+    expect(inboxService.storeInboundEmail).toHaveBeenCalledWith(
+      'addr-1',
+      expect.objectContaining({
+        resendEmailId: 'resend-email-123',
+        fromAddress: 'sender@example.com',
+        subject: 'Test inbound email',
+      }),
+    )
   })
 
   it('skips gracefully for unknown address', async () => {
@@ -142,9 +148,14 @@ describe('Resend Webhook Route', () => {
 
   it('returns 400 for invalid signature', async () => {
     const { Webhook } = await import('svix')
-    vi.mocked(Webhook).mockImplementation(() => ({
-      verify: () => { throw new Error('Invalid signature') },
-    }) as never)
+    vi.mocked(Webhook).mockImplementation(
+      () =>
+        ({
+          verify: () => {
+            throw new Error('Invalid signature')
+          },
+        }) as never,
+    )
 
     const app = createApp()
     const res = await app.request('/webhooks/resend', {

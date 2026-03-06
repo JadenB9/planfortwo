@@ -1,4 +1,4 @@
-import { eq, and, ne } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { db, weddings, weddingMembers, users } from '@planfortwo/db'
 
 interface OnboardingData {
@@ -67,7 +67,8 @@ export const weddingService = {
     if (data.city !== undefined) updateData.city = data.city
     if (data.state !== undefined) updateData.state = data.state
     if (data.country !== undefined) updateData.country = data.country
-    if (data.guestCountEstimate !== undefined) updateData.guestCountEstimate = data.guestCountEstimate
+    if (data.guestCountEstimate !== undefined)
+      updateData.guestCountEstimate = data.guestCountEstimate
     if (data.budgetTotal !== undefined) updateData.budgetTotal = data.budgetTotal
     if (data.style !== undefined) updateData.style = data.style
 
@@ -132,7 +133,16 @@ export const weddingService = {
       })
       .returning()
 
-    return { member, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, avatarUrl: user.avatarUrl } }
+    return {
+      member,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatarUrl: user.avatarUrl,
+      },
+    }
   },
 
   async removeMember(weddingId: string, memberId: string) {

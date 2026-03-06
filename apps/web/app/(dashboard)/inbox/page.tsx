@@ -250,7 +250,7 @@ export default function InboxPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-rose-400" />
       </div>
     )
@@ -260,7 +260,7 @@ export default function InboxPage() {
   if (addresses.length === 0) {
     return (
       <motion.div
-        className="max-w-lg mx-auto mt-16"
+        className="mx-auto mt-16 max-w-lg"
         variants={fadeInUp}
         initial="hidden"
         animate="visible"
@@ -268,11 +268,11 @@ export default function InboxPage() {
       >
         <Card>
           <CardContent className="p-8">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="mb-6 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
                 <AtSign className="h-8 w-8 text-rose-500" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Claim Your Email Address</h1>
+              <h1 className="mb-2 text-2xl font-bold text-gray-900">Claim Your Email Address</h1>
               <p className="text-gray-500">
                 Get your own <span className="font-medium">@planfortwo.com</span> email address to
                 send and receive messages.
@@ -282,7 +282,7 @@ export default function InboxPage() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="address">Email Address</Label>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="mt-1 flex items-center gap-2">
                   <Input
                     id="address"
                     placeholder="yourname"
@@ -290,14 +290,14 @@ export default function InboxPage() {
                     onChange={(e) => setClaimAddress(e.target.value.toLowerCase())}
                     className="flex-1"
                   />
-                  <span className="text-gray-500 text-sm whitespace-nowrap">@planfortwo.com</span>
+                  <span className="whitespace-nowrap text-sm text-gray-500">@planfortwo.com</span>
                 </div>
                 {checkingAvailability && (
-                  <p className="text-sm text-gray-400 mt-1">Checking availability...</p>
+                  <p className="mt-1 text-sm text-gray-400">Checking availability...</p>
                 )}
                 {availability && !checkingAvailability && (
                   <p
-                    className={`text-sm mt-1 ${availability.available ? 'text-green-600' : 'text-red-500'}`}
+                    className={`mt-1 text-sm ${availability.available ? 'text-green-600' : 'text-red-500'}`}
                   >
                     {availability.available ? (
                       <span className="flex items-center gap-1">
@@ -322,7 +322,7 @@ export default function InboxPage() {
               </div>
 
               {claimAddress && claimDisplayName && (
-                <div className="bg-gray-50 rounded-lg p-3 text-sm">
+                <div className="rounded-lg bg-gray-50 p-3 text-sm">
                   <span className="text-gray-500">Preview: </span>
                   <span className="font-medium">
                     {claimDisplayName} &lt;{claimAddress}@planfortwo.com&gt;
@@ -343,9 +343,9 @@ export default function InboxPage() {
                 className="w-full bg-rose-500 hover:bg-rose-600"
               >
                 {claimLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <Mail className="h-4 w-4 mr-2" />
+                  <Mail className="mr-2 h-4 w-4" />
                 )}
                 Claim Address
               </Button>
@@ -368,7 +368,7 @@ export default function InboxPage() {
       <motion.div
         variants={fadeInUp}
         transition={springSmooth}
-        className="flex items-center justify-between mb-4"
+        className="mb-4 flex items-center justify-between"
       >
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Inbox</h1>
@@ -385,7 +385,7 @@ export default function InboxPage() {
             className="bg-rose-500 hover:bg-rose-600"
             onClick={() => setShowCompose(true)}
           >
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="mr-1 h-4 w-4" />
             Compose
           </Button>
         </div>
@@ -404,15 +404,15 @@ export default function InboxPage() {
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="inbound">
-              <Inbox className="h-3 w-3 mr-1" />
+              <Inbox className="mr-1 h-3 w-3" />
               Inbox
             </TabsTrigger>
             <TabsTrigger value="outbound">
-              <Send className="h-3 w-3 mr-1" />
+              <Send className="mr-1 h-3 w-3" />
               Sent
             </TabsTrigger>
             <TabsTrigger value="starred">
-              <Star className="h-3 w-3 mr-1" />
+              <Star className="mr-1 h-3 w-3" />
               Starred
             </TabsTrigger>
           </TabsList>
@@ -423,14 +423,14 @@ export default function InboxPage() {
       <motion.div
         variants={fadeInUp}
         transition={springSmooth}
-        className="flex gap-4 h-[calc(100%-7rem)]"
+        className="flex h-[calc(100%-7rem)] gap-4"
       >
         {/* Email list */}
-        <Card className="w-full md:w-[380px] flex-shrink-0 overflow-hidden">
-          <div className="overflow-y-auto h-full">
+        <Card className="w-full flex-shrink-0 overflow-hidden md:w-[380px]">
+          <div className="h-full overflow-y-auto">
             {emailList.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400 p-8">
-                <Inbox className="h-12 w-12 mb-3" />
+              <div className="flex h-full flex-col items-center justify-center p-8 text-gray-400">
+                <Inbox className="mb-3 h-12 w-12" />
                 <p className="text-sm">No emails yet</p>
               </div>
             ) : (
@@ -440,7 +440,7 @@ export default function InboxPage() {
                     key={email.id}
                     variants={listItem}
                     transition={springSmooth}
-                    className={`flex items-start gap-3 p-3 border-b cursor-pointer transition-colors ${
+                    className={`flex cursor-pointer items-start gap-3 border-b p-3 transition-colors ${
                       selectedEmail?.id === email.id ? 'bg-rose-50' : 'hover:bg-gray-50'
                     } ${!email.isRead ? 'bg-blue-50/50' : ''}`}
                     onClick={() => handleSelectEmail(email)}
@@ -452,32 +452,32 @@ export default function InboxPage() {
                         <Mail className="h-4 w-4 text-blue-500" />
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
                         <p
-                          className={`text-sm truncate ${!email.isRead ? 'font-semibold text-gray-900' : 'text-gray-700'}`}
+                          className={`truncate text-sm ${!email.isRead ? 'font-semibold text-gray-900' : 'text-gray-700'}`}
                         >
                           {email.direction === 'inbound'
                             ? (email.fromName ?? email.fromAddress)
                             : `To: ${email.toAddress}`}
                         </p>
-                        <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
+                        <span className="ml-2 flex-shrink-0 text-xs text-gray-400">
                           {formatDate(email.createdAt)}
                         </span>
                       </div>
                       <p
-                        className={`text-sm truncate ${!email.isRead ? 'font-medium' : 'text-gray-600'}`}
+                        className={`truncate text-sm ${!email.isRead ? 'font-medium' : 'text-gray-600'}`}
                       >
                         {email.subject}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">{getSnippet(email)}</p>
+                      <p className="truncate text-xs text-gray-400">{getSnippet(email)}</p>
                     </div>
                     <button
                       onClick={(e) => handleToggleStar(email, e)}
-                      className="pt-1 flex-shrink-0"
+                      className="flex-shrink-0 pt-1"
                     >
                       {email.isStarred ? (
-                        <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       ) : (
                         <StarOff className="h-4 w-4 text-gray-300 hover:text-yellow-400" />
                       )}
@@ -489,7 +489,7 @@ export default function InboxPage() {
 
             {/* Pagination */}
             {(page > 1 || hasMore) && (
-              <div className="flex items-center justify-between p-3 border-t">
+              <div className="flex items-center justify-between border-t p-3">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -515,13 +515,13 @@ export default function InboxPage() {
         </Card>
 
         {/* Email detail */}
-        <Card className="flex-1 overflow-hidden hidden md:block">
+        <Card className="hidden flex-1 overflow-hidden md:block">
           {selectedEmail ? (
-            <div className="h-full flex flex-col">
+            <div className="flex h-full flex-col">
               {/* Detail header */}
-              <div className="p-4 border-b flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-start justify-between border-b p-4">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
                     <Badge
                       variant="outline"
                       className={
@@ -537,7 +537,7 @@ export default function InboxPage() {
                     </span>
                   </div>
                   <h2 className="text-lg font-semibold text-gray-900">{selectedEmail.subject}</h2>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="mt-1 text-sm text-gray-600">
                     <span className="font-medium">From:</span>{' '}
                     {selectedEmail.fromName
                       ? `${selectedEmail.fromName} <${selectedEmail.fromAddress}>`
@@ -552,11 +552,13 @@ export default function InboxPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() =>
-                      handleToggleStar(selectedEmail, { stopPropagation: () => {} } as React.MouseEvent)
+                      handleToggleStar(selectedEmail, {
+                        stopPropagation: () => {},
+                      } as React.MouseEvent)
                     }
                   >
                     {selectedEmail.isStarred ? (
-                      <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     ) : (
                       <StarOff className="h-4 w-4 text-gray-400" />
                     )}
@@ -566,7 +568,10 @@ export default function InboxPage() {
                     size="sm"
                     onClick={() => {
                       setComposeForm({
-                        toAddress: selectedEmail.direction === 'inbound' ? selectedEmail.fromAddress : selectedEmail.toAddress,
+                        toAddress:
+                          selectedEmail.direction === 'inbound'
+                            ? selectedEmail.fromAddress
+                            : selectedEmail.toAddress,
                         subject: selectedEmail.subject.startsWith('Re:')
                           ? selectedEmail.subject
                           : `Re: ${selectedEmail.subject}`,
@@ -598,15 +603,15 @@ export default function InboxPage() {
                     }}
                   />
                 ) : (
-                  <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans">
+                  <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700">
                     {selectedEmail.textBody ?? '(No content)'}
                   </pre>
                 )}
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400">
-              <Mail className="h-16 w-16 mb-3" />
+            <div className="flex h-full flex-col items-center justify-center text-gray-400">
+              <Mail className="mb-3 h-16 w-16" />
               <p className="text-sm">Select an email to read</p>
             </div>
           )}
@@ -666,7 +671,11 @@ export default function InboxPage() {
               }
               className="bg-rose-500 hover:bg-rose-600"
             >
-              {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+              {sending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
               Send
             </Button>
           </DialogFooter>

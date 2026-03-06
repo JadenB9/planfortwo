@@ -105,13 +105,9 @@ function getSeatPositions(
 function renderTableShape(tableType: string, cx: number, cy: number) {
   switch (tableType) {
     case 'round':
-      return (
-        <circle cx={cx} cy={cy} r={40} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
-      )
+      return <circle cx={cx} cy={cy} r={40} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
     case 'sweetheart':
-      return (
-        <circle cx={cx} cy={cy} r={30} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
-      )
+      return <circle cx={cx} cy={cy} r={30} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
     case 'rectangular':
     case 'banquet':
       return (
@@ -140,9 +136,7 @@ function renderTableShape(tableType: string, cx: number, cy: number) {
         />
       )
     default:
-      return (
-        <circle cx={cx} cy={cy} r={40} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
-      )
+      return <circle cx={cx} cy={cy} r={40} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
   }
 }
 
@@ -269,7 +263,13 @@ export default function SeatingPage() {
   const isPanningRef = useRef(false)
   const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 })
   const isDraggingTableRef = useRef(false)
-  const dragTableRef = useRef<{ id: string; startX: number; startY: number; origPosX: number; origPosY: number } | null>(null)
+  const dragTableRef = useRef<{
+    id: string
+    startX: number
+    startY: number
+    origPosX: number
+    origPosY: number
+  } | null>(null)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const hasDraggedRef = useRef(false)
 
@@ -415,10 +415,15 @@ export default function SeatingPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.seatingCharts.updateTable(tableId, weddingId, {
-        posX: Math.round(newX),
-        posY: Math.round(newY),
-      }, token)
+      await api.seatingCharts.updateTable(
+        tableId,
+        weddingId,
+        {
+          posX: Math.round(newX),
+          posY: Math.round(newY),
+        },
+        token,
+      )
     } catch {
       toast.error('Failed to move table')
     }
@@ -429,11 +434,7 @@ export default function SeatingPage() {
     try {
       const token = await getToken()
       if (!token) return
-      await api.seatingCharts.assignGuest(
-        { tableId, guestId, seatNumber },
-        weddingId,
-        token,
-      )
+      await api.seatingCharts.assignGuest({ tableId, guestId, seatNumber }, weddingId, token)
       toast.success('Guest seated')
       setSeatPopover(null)
       void loadChartDetail(selectedChart!.id)
@@ -640,7 +641,10 @@ export default function SeatingPage() {
           <div
             ref={canvasContainerRef}
             className="relative overflow-hidden rounded-xl border-2 border-gray-200 bg-gray-50"
-            style={{ height: 'calc(100vh - 260px)', cursor: isPanningRef.current ? 'grabbing' : 'grab' }}
+            style={{
+              height: 'calc(100vh - 260px)',
+              cursor: isPanningRef.current ? 'grabbing' : 'grab',
+            }}
             onMouseDown={handleCanvasMouseDown}
             onMouseMove={handleCanvasMouseMove}
             onMouseUp={handleCanvasMouseUp}
@@ -662,18 +666,8 @@ export default function SeatingPage() {
                 style={{ position: 'absolute', top: 0, left: 0 }}
               >
                 <defs>
-                  <pattern
-                    id="grid"
-                    width={40}
-                    height={40}
-                    patternUnits="userSpaceOnUse"
-                  >
-                    <path
-                      d="M 40 0 L 0 0 0 40"
-                      fill="none"
-                      stroke="#e5e7eb"
-                      strokeWidth={0.5}
-                    />
+                  <pattern id="grid" width={40} height={40} patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e5e7eb" strokeWidth={0.5} />
                   </pattern>
                 </defs>
                 <rect width={CANVAS_W} height={CANVAS_H} fill="url(#grid)" />
@@ -686,7 +680,9 @@ export default function SeatingPage() {
                   return (
                     <g
                       key={table.id}
-                      onMouseDown={(e) => handleTableMouseDown(e as unknown as React.MouseEvent, table)}
+                      onMouseDown={(e) =>
+                        handleTableMouseDown(e as unknown as React.MouseEvent, table)
+                      }
                       style={{ cursor: 'move' }}
                     >
                       {renderTableShape(table.tableType, cx, cy)}
@@ -701,13 +697,7 @@ export default function SeatingPage() {
                       >
                         {table.label}
                       </text>
-                      <text
-                        x={cx}
-                        y={cy + 10}
-                        textAnchor="middle"
-                        fill="#9ca3af"
-                        fontSize={9}
-                      >
+                      <text x={cx} y={cy + 10} textAnchor="middle" fill="#9ca3af" fontSize={9}>
                         {table.assignments.length}/{table.capacity}
                       </text>
 
@@ -718,7 +708,9 @@ export default function SeatingPage() {
                         return (
                           <g
                             key={i}
-                            onClick={(e) => handleSeatClick(e as unknown as React.MouseEvent, table.id, i)}
+                            onClick={(e) =>
+                              handleSeatClick(e as unknown as React.MouseEvent, table.id, i)
+                            }
                             style={{ cursor: 'pointer' }}
                           >
                             <circle
@@ -730,7 +722,9 @@ export default function SeatingPage() {
                               strokeWidth={1.5}
                             />
                             {isFilled && guest && (
-                              <title>{guest.firstName} {guest.lastName ?? ''}</title>
+                              <title>
+                                {guest.firstName} {guest.lastName ?? ''}
+                              </title>
                             )}
                             <text
                               x={seat.x}
@@ -757,16 +751,44 @@ export default function SeatingPage() {
                         style={{ cursor: 'pointer' }}
                       >
                         <circle
-                          cx={cx + (table.tableType === 'banquet' || table.tableType === 'head_table' ? 60 : 40) + 5}
-                          cy={cy - (table.tableType === 'rectangular' ? 30 : table.tableType === 'banquet' || table.tableType === 'head_table' ? 20 : 40) - 5}
+                          cx={
+                            cx +
+                            (table.tableType === 'banquet' || table.tableType === 'head_table'
+                              ? 60
+                              : 40) +
+                            5
+                          }
+                          cy={
+                            cy -
+                            (table.tableType === 'rectangular'
+                              ? 30
+                              : table.tableType === 'banquet' || table.tableType === 'head_table'
+                                ? 20
+                                : 40) -
+                            5
+                          }
                           r={8}
                           fill="white"
                           stroke="#ef4444"
                           strokeWidth={1}
                         />
                         <text
-                          x={cx + (table.tableType === 'banquet' || table.tableType === 'head_table' ? 60 : 40) + 5}
-                          y={cy - (table.tableType === 'rectangular' ? 30 : table.tableType === 'banquet' || table.tableType === 'head_table' ? 20 : 40) - 1}
+                          x={
+                            cx +
+                            (table.tableType === 'banquet' || table.tableType === 'head_table'
+                              ? 60
+                              : 40) +
+                            5
+                          }
+                          y={
+                            cy -
+                            (table.tableType === 'rectangular'
+                              ? 30
+                              : table.tableType === 'banquet' || table.tableType === 'head_table'
+                                ? 20
+                                : 40) -
+                            1
+                          }
                           textAnchor="middle"
                           fill="#ef4444"
                           fontSize={10}
@@ -782,30 +804,31 @@ export default function SeatingPage() {
               </svg>
             </div>
 
-            {seatPopover && (() => {
-              const table = selectedChart.tables.find((t) => t.id === seatPopover.tableId)
-              if (!table) return null
-              const assignment = table.assignments.find(
-                (a) => a.seatNumber === seatPopover.seatIndex + 1,
-              )
-              return (
-                <SeatPopover
-                  x={seatPopover.screenX}
-                  y={seatPopover.screenY}
-                  assignment={assignment}
-                  guests={guests}
-                  assignedGuestIds={assignedGuestIds}
-                  guestMap={guestMap}
-                  onAssign={(guestId) =>
-                    handleAssignGuest(seatPopover.tableId, guestId, seatPopover.seatIndex + 1)
-                  }
-                  onUnassign={() => {
-                    if (assignment) void handleUnassignGuest(assignment.guestId)
-                  }}
-                  onClose={() => setSeatPopover(null)}
-                />
-              )
-            })()}
+            {seatPopover &&
+              (() => {
+                const table = selectedChart.tables.find((t) => t.id === seatPopover.tableId)
+                if (!table) return null
+                const assignment = table.assignments.find(
+                  (a) => a.seatNumber === seatPopover.seatIndex + 1,
+                )
+                return (
+                  <SeatPopover
+                    x={seatPopover.screenX}
+                    y={seatPopover.screenY}
+                    assignment={assignment}
+                    guests={guests}
+                    assignedGuestIds={assignedGuestIds}
+                    guestMap={guestMap}
+                    onAssign={(guestId) =>
+                      handleAssignGuest(seatPopover.tableId, guestId, seatPopover.seatIndex + 1)
+                    }
+                    onUnassign={() => {
+                      if (assignment) void handleUnassignGuest(assignment.guestId)
+                    }}
+                    onClose={() => setSeatPopover(null)}
+                  />
+                )
+              })()}
           </div>
         </div>
       ) : charts.length === 0 ? (

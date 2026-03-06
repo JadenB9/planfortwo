@@ -668,7 +668,10 @@ export default function RegistryPage() {
             >
               Cancel
             </Button>
-            <Button onClick={handleSaveFund} disabled={!fundForm.name.trim() || !fundForm.goalAmount}>
+            <Button
+              onClick={handleSaveFund}
+              disabled={!fundForm.name.trim() || !fundForm.goalAmount}
+            >
               {editingFund ? 'Save Changes' : 'Create Fund'}
             </Button>
           </DialogFooter>

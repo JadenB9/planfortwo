@@ -30,12 +30,10 @@ export function Paywall({ children }: { children: React.ReactNode }) {
         <Lock className="h-8 w-8 text-amber-600" />
       </div>
 
-      <h2 className="mt-6 font-serif text-2xl font-bold text-gray-900">
-        Full Plan Required
-      </h2>
+      <h2 className="mt-6 font-serif text-2xl font-bold text-gray-900">Full Plan Required</h2>
       <p className="mt-3 max-w-sm text-gray-600">
-        This feature is available on the Full Plan. Upgrade for a one-time payment of $200 to
-        unlock unlimited access to every PlanForTwo feature.
+        This feature is available on the Full Plan. Upgrade for a one-time payment of $200 to unlock
+        unlimited access to every PlanForTwo feature.
       </p>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">

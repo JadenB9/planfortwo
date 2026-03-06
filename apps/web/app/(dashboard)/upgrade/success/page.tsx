@@ -23,8 +23,8 @@ export default function UpgradeSuccessPage() {
 
       <h1 className="mt-6 font-serif text-3xl font-bold text-gray-900">You&apos;re all set!</h1>
       <p className="mt-3 text-gray-600">
-        Your payment was successful. You now have full access to every PlanForTwo feature.
-        Start planning your perfect wedding!
+        Your payment was successful. You now have full access to every PlanForTwo feature. Start
+        planning your perfect wedding!
       </p>
 
       <div className="mt-10 flex flex-col gap-3 sm:flex-row">

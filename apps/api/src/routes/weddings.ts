@@ -1,6 +1,11 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { onboardingSchema, invitePartnerSchema, inviteMemberSchema, updateWeddingSchema } from '@planfortwo/validators'
+import {
+  onboardingSchema,
+  invitePartnerSchema,
+  inviteMemberSchema,
+  updateWeddingSchema,
+} from '@planfortwo/validators'
 import type { TimelineTemplate } from '@planfortwo/types'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
@@ -77,8 +82,10 @@ weddingsRoute.put(
     if (data.city !== undefined) updateData.city = data.city
     if (data.state !== undefined) updateData.state = data.state
     if (data.country !== undefined) updateData.country = data.country
-    if (data.guestCountEstimate !== undefined) updateData.guestCountEstimate = data.guestCountEstimate
-    if (data.budgetTotal !== undefined) updateData.budgetTotal = data.budgetTotal != null ? String(data.budgetTotal) : null
+    if (data.guestCountEstimate !== undefined)
+      updateData.guestCountEstimate = data.guestCountEstimate
+    if (data.budgetTotal !== undefined)
+      updateData.budgetTotal = data.budgetTotal != null ? String(data.budgetTotal) : null
     if (data.style !== undefined) updateData.style = data.style
 
     const updated = await weddingService.update(weddingId, updateData)

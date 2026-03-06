@@ -45,7 +45,10 @@ export function TopBar() {
               </svg>
             </button>
 
-            <Link href="/dashboard" className="font-serif text-lg font-bold text-gray-900 lg:hidden">
+            <Link
+              href="/dashboard"
+              className="font-serif text-lg font-bold text-gray-900 lg:hidden"
+            >
               Plan<span className="text-wedding-600">For</span>Two
             </Link>
           </div>
@@ -60,9 +63,9 @@ export function TopBar() {
           <div className="absolute inset-0 bg-black/20" onClick={closeMenu} />
 
           {/* Menu panel */}
-          <div className="absolute inset-x-0 top-0 bottom-0 flex flex-col bg-white shadow-xl overflow-y-auto">
+          <div className="absolute inset-x-0 bottom-0 top-0 flex flex-col overflow-y-auto bg-white shadow-xl">
             {/* Header with close button */}
-            <div className="flex h-16 items-center justify-between px-4 sm:px-6 border-b border-gray-200">
+            <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 sm:px-6">
               <div className="flex items-center gap-3">
                 <button
                   onClick={closeMenu}
@@ -92,7 +95,7 @@ export function TopBar() {
             </div>
 
             {/* Nav links */}
-            <nav className="flex-1 px-4 py-4 overflow-y-auto">
+            <nav className="flex-1 overflow-y-auto px-4 py-4">
               <div className="space-y-4">
                 {NAV_GROUPS.map((group) => (
                   <div key={group.label}>
