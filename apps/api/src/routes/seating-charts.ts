@@ -187,12 +187,12 @@ seatingChartsRoute.post(
 )
 
 seatingChartsRoute.delete(
-  '/assignments/:guestId',
+  '/assignments/:id',
   resolveWeddingMiddleware,
   requireFeature('canSeatingChart'),
   async (c) => {
-    const guestId = c.req.param('guestId')
-    await seatingChartService.unassignGuest(guestId)
+    const id = c.req.param('id')
+    await seatingChartService.unassignSeat(id)
     return c.json({ data: { success: true } })
   },
 )

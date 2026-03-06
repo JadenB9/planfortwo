@@ -159,24 +159,31 @@ export const seatingChartService = {
   },
 
   async assignGuest(data: AssignGuestInput) {
-    const existing = await db
-      .select()
-      .from(tableAssignments)
-      .where(eq(tableAssignments.guestId, data.guestId))
+    if (data.guestId) {
+      const existing = await db
+        .select()
+        .from(tableAssignments)
+        .where(eq(tableAssignments.guestId, data.guestId))
 
-    if (existing.length > 0) {
-      await db.delete(tableAssignments).where(eq(tableAssignments.guestId, data.guestId))
+      if (existing.length > 0) {
+        await db.delete(tableAssignments).where(eq(tableAssignments.guestId, data.guestId))
+      }
     }
 
     const [assignment] = await db
       .insert(tableAssignments)
       .values({
         tableId: data.tableId,
-        guestId: data.guestId,
+        guestId: data.guestId ?? null,
+        guestName: data.guestName ?? null,
         seatNumber: data.seatNumber,
       })
       .returning()
     return assignment!
+  },
+
+  async unassignSeat(assignmentId: string) {
+    await db.delete(tableAssignments).where(eq(tableAssignments.id, assignmentId))
   },
 
   async unassignGuest(guestId: string) {
@@ -186,7 +193,12 @@ export const seatingChartService = {
   async getAssignments(chartId: string) {
     const tables = await db.select().from(seatingTables).where(eq(seatingTables.chartId, chartId))
 
-    const result: { tableId: string; guestId: string; seatNumber: number | null }[] = []
+    const result: {
+      tableId: string
+      guestId: string | null
+      guestName: string | null
+      seatNumber: number | null
+    }[] = []
     for (const table of tables) {
       const assigns = await db
         .select()
@@ -196,6 +208,7 @@ export const seatingChartService = {
         ...assigns.map((a) => ({
           tableId: a.tableId,
           guestId: a.guestId,
+          guestName: a.guestName,
           seatNumber: a.seatNumber,
         })),
       )
@@ -240,7 +253,7 @@ export const seatingChartService = {
         .from(tableAssignments)
         .where(eq(tableAssignments.tableId, table.id))
       for (const a of assigns) {
-        guestTableMap.set(a.guestId, table.id)
+        if (a.guestId) guestTableMap.set(a.guestId, table.id)
       }
     }
 
@@ -334,7 +347,8 @@ export const seatingChartService = {
       for (const assign of assigns) {
         await db.insert(tableAssignments).values({
           tableId: newTable!.id,
-          guestId: assign.guestId,
+          guestId: assign.guestId ?? null,
+          guestName: assign.guestName ?? null,
           seatNumber: assign.seatNumber,
         })
       }

@@ -978,7 +978,12 @@ export const api = {
         },
       ),
     assignGuest: (
-      data: { tableId: string; guestId: string; seatNumber?: number },
+      data: {
+        tableId: string
+        guestId?: string | null
+        guestName?: string | null
+        seatNumber?: number
+      },
       weddingId: string,
       token: string,
     ) =>
@@ -987,9 +992,9 @@ export const api = {
         body: JSON.stringify(data),
         token,
       }),
-    unassignGuest: (guestId: string, weddingId: string, token: string) =>
+    unassignSeat: (assignmentId: string, weddingId: string, token: string) =>
       fetchApi<{ data: { success: boolean } }>(
-        `/seating-charts/assignments/${guestId}?weddingId=${weddingId}`,
+        `/seating-charts/assignments/${assignmentId}?weddingId=${weddingId}`,
         {
           method: 'DELETE',
           token,

@@ -80,7 +80,8 @@ export const tableAssignments = pgTable('table_assignments', {
   tableId: uuid('table_id')
     .notNull()
     .references(() => seatingTables.id, { onDelete: 'cascade' }),
-  guestId: uuid('guest_id').notNull(),
+  guestId: uuid('guest_id'),
+  guestName: text('guest_name'),
   seatNumber: integer('seat_number'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })

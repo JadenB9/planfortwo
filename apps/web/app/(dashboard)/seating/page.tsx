@@ -12,7 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { toast } from 'sonner'
 
 const CANVAS_W = 2000
@@ -40,7 +46,8 @@ interface TableData {
 interface AssignmentData {
   id: string
   tableId: string
-  guestId: string
+  guestId: string | null
+  guestName: string | null
   seatNumber: number | null
 }
 
@@ -71,8 +78,14 @@ function getSeatPositions(
       })
     }
   } else {
-    const hw = tableType === 'banquet' ? 70 : 50
-    const hh = tableType === 'banquet' ? 30 : 40
+    const minSpacing = 22
+    const baseHw = tableType === 'banquet' || tableType === 'head_table' ? 70 : 50
+    const baseHh = tableType === 'banquet' || tableType === 'head_table' ? 30 : 40
+    const minPerimeter = capacity * minSpacing
+    const basePerimeter = 2 * (baseHw + baseHh)
+    const scale = minPerimeter > basePerimeter ? minPerimeter / basePerimeter : 1
+    const hw = baseHw * scale
+    const hh = baseHh * scale
     const perimeter = 2 * (hw + hh)
     const spacing = perimeter / capacity
 
@@ -102,7 +115,17 @@ function getSeatPositions(
   return seats
 }
 
-function renderTableShape(tableType: string, cx: number, cy: number) {
+function getRectDimensions(tableType: string, capacity: number) {
+  const minSpacing = 22
+  const baseHw = tableType === 'banquet' || tableType === 'head_table' ? 70 : 50
+  const baseHh = tableType === 'banquet' || tableType === 'head_table' ? 30 : 40
+  const minPerimeter = capacity * minSpacing
+  const basePerimeter = 2 * (baseHw + baseHh)
+  const scale = minPerimeter > basePerimeter ? minPerimeter / basePerimeter : 1
+  return { hw: baseHw * scale, hh: baseHh * scale }
+}
+
+function renderTableShape(tableType: string, cx: number, cy: number, capacity: number) {
   switch (tableType) {
     case 'round':
       return <circle cx={cx} cy={cy} r={40} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
@@ -110,31 +133,21 @@ function renderTableShape(tableType: string, cx: number, cy: number) {
       return <circle cx={cx} cy={cy} r={30} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
     case 'rectangular':
     case 'banquet':
+    case 'head_table': {
+      const { hw, hh } = getRectDimensions(tableType, capacity)
       return (
         <rect
-          x={cx - (tableType === 'banquet' ? 60 : 40)}
-          y={cy - (tableType === 'banquet' ? 22 : 30)}
-          width={tableType === 'banquet' ? 120 : 80}
-          height={tableType === 'banquet' ? 44 : 60}
+          x={cx - hw}
+          y={cy - hh}
+          width={hw * 2}
+          height={hh * 2}
           rx={6}
           fill="#fdf8f6"
           stroke={TABLE_COLOR}
-          strokeWidth={2}
+          strokeWidth={tableType === 'head_table' ? 2.5 : 2}
         />
       )
-    case 'head_table':
-      return (
-        <rect
-          x={cx - 60}
-          y={cy - 20}
-          width={120}
-          height={40}
-          rx={6}
-          fill="#fdf8f6"
-          stroke={TABLE_COLOR}
-          strokeWidth={2.5}
-        />
-      )
+    }
     default:
       return <circle cx={cx} cy={cy} r={40} fill="#fdf8f6" stroke={TABLE_COLOR} strokeWidth={2} />
   }
@@ -148,6 +161,7 @@ function SeatPopover({
   assignedGuestIds,
   guestMap,
   onAssign,
+  onAssignCustom,
   onUnassign,
   onClose,
 }: {
@@ -158,6 +172,7 @@ function SeatPopover({
   assignedGuestIds: Set<string>
   guestMap: Map<string, Guest>
   onAssign: (guestId: string) => void
+  onAssignCustom: (name: string) => void
   onUnassign: () => void
   onClose: () => void
 }) {
@@ -181,16 +196,19 @@ function SeatPopover({
   })
 
   if (assignment) {
-    const guest = guestMap.get(assignment.guestId)
+    const guest = assignment.guestId ? guestMap.get(assignment.guestId) : null
+    const displayName = assignment.guestName
+      ? assignment.guestName
+      : guest
+        ? `${guest.firstName} ${guest.lastName ?? ''}`
+        : 'Assigned Guest'
     return (
       <div
         ref={ref}
         style={{ left: x, top: y }}
         className="absolute z-50 w-52 rounded-lg border border-gray-200 bg-white p-3 shadow-lg"
       >
-        <p className="text-sm font-medium text-gray-900">
-          {guest ? `${guest.firstName} ${guest.lastName ?? ''}` : 'Assigned Guest'}
-        </p>
+        <p className="text-sm font-medium text-gray-900">{displayName}</p>
         <button
           onClick={onUnassign}
           className="mt-2 text-xs font-medium text-red-600 hover:text-red-700"
@@ -208,25 +226,34 @@ function SeatPopover({
       className="absolute z-50 w-56 rounded-lg border border-gray-200 bg-white p-2 shadow-lg"
     >
       <Input
-        placeholder="Search guests..."
+        placeholder="Search guests or type a name..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && search.trim() && filtered.length === 0) {
+            onAssignCustom(search.trim())
+          }
+        }}
         className="mb-2 h-8 text-xs"
         autoFocus
       />
       <div className="max-h-40 overflow-y-auto">
-        {filtered.length === 0 ? (
-          <p className="py-2 text-center text-xs text-gray-400">No available guests</p>
-        ) : (
-          filtered.slice(0, 20).map((g) => (
-            <button
-              key={g.id}
-              onClick={() => onAssign(g.id)}
-              className="flex w-full items-center rounded px-2 py-1.5 text-left text-xs hover:bg-gray-50"
-            >
-              {g.firstName} {g.lastName ?? ''}
-            </button>
-          ))
+        {filtered.slice(0, 20).map((g) => (
+          <button
+            key={g.id}
+            onClick={() => onAssign(g.id)}
+            className="flex w-full items-center rounded px-2 py-1.5 text-left text-xs hover:bg-gray-50"
+          >
+            {g.firstName} {g.lastName ?? ''}
+          </button>
+        ))}
+        {search.trim() && (
+          <button
+            onClick={() => onAssignCustom(search.trim())}
+            className="text-wedding-600 hover:bg-wedding-50 flex w-full items-center rounded px-2 py-1.5 text-left text-xs font-medium"
+          >
+            + Add &quot;{search.trim()}&quot; as custom name
+          </button>
         )}
       </div>
     </div>
@@ -443,17 +470,35 @@ export default function SeatingPage() {
     }
   }
 
-  const handleUnassignGuest = async (guestId: string) => {
+  const handleAssignCustom = async (tableId: string, name: string, seatNumber: number) => {
     if (!weddingId) return
     try {
       const token = await getToken()
       if (!token) return
-      await api.seatingCharts.unassignGuest(guestId, weddingId, token)
-      toast.success('Guest unassigned')
+      await api.seatingCharts.assignGuest(
+        { tableId, guestName: name, seatNumber },
+        weddingId,
+        token,
+      )
+      toast.success('Seat assigned')
       setSeatPopover(null)
       void loadChartDetail(selectedChart!.id)
     } catch {
-      toast.error('Failed to unassign guest')
+      toast.error('Failed to assign seat')
+    }
+  }
+
+  const handleUnassignSeat = async (assignmentId: string) => {
+    if (!weddingId) return
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.seatingCharts.unassignSeat(assignmentId, weddingId, token)
+      toast.success('Seat unassigned')
+      setSeatPopover(null)
+      void loadChartDetail(selectedChart!.id)
+    } catch {
+      toast.error('Failed to unassign seat')
     }
   }
 
@@ -519,11 +564,17 @@ export default function SeatingPage() {
     }
   }
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault()
-    const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP
-    setZoom((z) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z + delta)))
-  }
+  useEffect(() => {
+    const el = canvasContainerRef.current
+    if (!el) return
+    const handler = (e: WheelEvent) => {
+      e.preventDefault()
+      const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP
+      setZoom((z) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z + delta)))
+    }
+    el.addEventListener('wheel', handler, { passive: false })
+    return () => el.removeEventListener('wheel', handler)
+  }, [])
 
   const handleSeatClick = (e: React.MouseEvent, tableId: string, seatIndex: number) => {
     e.stopPropagation()
@@ -553,7 +604,7 @@ export default function SeatingPage() {
   if (selectedChart) {
     for (const table of selectedChart.tables) {
       for (const a of table.assignments) {
-        assignedGuestIds.add(a.guestId)
+        if (a.guestId) assignedGuestIds.add(a.guestId)
       }
     }
   }
@@ -649,7 +700,6 @@ export default function SeatingPage() {
             onMouseMove={handleCanvasMouseMove}
             onMouseUp={handleCanvasMouseUp}
             onMouseLeave={handleCanvasMouseUp}
-            onWheel={handleWheel}
           >
             <div
               style={{
@@ -685,7 +735,7 @@ export default function SeatingPage() {
                       }
                       style={{ cursor: 'move' }}
                     >
-                      {renderTableShape(table.tableType, cx, cy)}
+                      {renderTableShape(table.tableType, cx, cy, table.capacity)}
 
                       <text
                         x={cx}
@@ -704,7 +754,24 @@ export default function SeatingPage() {
                       {seats.map((seat, i) => {
                         const assignment = table.assignments.find((a) => a.seatNumber === i + 1)
                         const isFilled = !!assignment
-                        const guest = isFilled ? guestMap.get(assignment.guestId) : undefined
+                        const guest =
+                          isFilled && assignment.guestId
+                            ? guestMap.get(assignment.guestId)
+                            : undefined
+                        const displayName = assignment?.guestName
+                          ? assignment.guestName
+                          : guest
+                            ? `${guest.firstName} ${guest.lastName ?? ''}`
+                            : null
+                        const initials = assignment?.guestName
+                          ? assignment.guestName
+                              .split(' ')
+                              .map((w) => w.charAt(0))
+                              .join('')
+                              .slice(0, 2)
+                          : guest
+                            ? guest.firstName.charAt(0) + (guest.lastName?.charAt(0) ?? '')
+                            : null
                         return (
                           <g
                             key={i}
@@ -721,11 +788,7 @@ export default function SeatingPage() {
                               stroke={isFilled ? '#a0522d' : '#9ca3af'}
                               strokeWidth={1.5}
                             />
-                            {isFilled && guest && (
-                              <title>
-                                {guest.firstName} {guest.lastName ?? ''}
-                              </title>
-                            )}
+                            {isFilled && displayName && <title>{displayName}</title>}
                             <text
                               x={seat.x}
                               y={seat.y + 3}
@@ -735,69 +798,56 @@ export default function SeatingPage() {
                               fontWeight={500}
                               pointerEvents="none"
                             >
-                              {isFilled && guest
-                                ? guest.firstName.charAt(0) + (guest.lastName?.charAt(0) ?? '')
-                                : i + 1}
+                              {isFilled && initials ? initials : i + 1}
                             </text>
                           </g>
                         )
                       })}
 
-                      <g
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteTable(table.id)
-                        }}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <circle
-                          cx={
-                            cx +
-                            (table.tableType === 'banquet' || table.tableType === 'head_table'
-                              ? 60
-                              : 40) +
-                            5
-                          }
-                          cy={
-                            cy -
-                            (table.tableType === 'rectangular'
-                              ? 30
-                              : table.tableType === 'banquet' || table.tableType === 'head_table'
-                                ? 20
-                                : 40) -
-                            5
-                          }
-                          r={8}
-                          fill="white"
-                          stroke="#ef4444"
-                          strokeWidth={1}
-                        />
-                        <text
-                          x={
-                            cx +
-                            (table.tableType === 'banquet' || table.tableType === 'head_table'
-                              ? 60
-                              : 40) +
-                            5
-                          }
-                          y={
-                            cy -
-                            (table.tableType === 'rectangular'
-                              ? 30
-                              : table.tableType === 'banquet' || table.tableType === 'head_table'
-                                ? 20
-                                : 40) -
-                            1
-                          }
-                          textAnchor="middle"
-                          fill="#ef4444"
-                          fontSize={10}
-                          fontWeight={700}
-                          pointerEvents="none"
-                        >
-                          x
-                        </text>
-                      </g>
+                      {(() => {
+                        let delCx: number, delCy: number
+                        if (
+                          table.tableType === 'rectangular' ||
+                          table.tableType === 'banquet' ||
+                          table.tableType === 'head_table'
+                        ) {
+                          const { hw, hh } = getRectDimensions(table.tableType, table.capacity)
+                          delCx = cx + hw + 5
+                          delCy = cy - hh - 5
+                        } else {
+                          delCx = cx + 45
+                          delCy = cy - 45
+                        }
+                        return (
+                          <g
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteTable(table.id)
+                            }}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <circle
+                              cx={delCx}
+                              cy={delCy}
+                              r={8}
+                              fill="white"
+                              stroke="#ef4444"
+                              strokeWidth={1}
+                            />
+                            <text
+                              x={delCx}
+                              y={delCy + 4}
+                              textAnchor="middle"
+                              fill="#ef4444"
+                              fontSize={10}
+                              fontWeight={700}
+                              pointerEvents="none"
+                            >
+                              x
+                            </text>
+                          </g>
+                        )
+                      })()}
                     </g>
                   )
                 })}
@@ -822,8 +872,11 @@ export default function SeatingPage() {
                     onAssign={(guestId) =>
                       handleAssignGuest(seatPopover.tableId, guestId, seatPopover.seatIndex + 1)
                     }
+                    onAssignCustom={(name) =>
+                      handleAssignCustom(seatPopover.tableId, name, seatPopover.seatIndex + 1)
+                    }
                     onUnassign={() => {
-                      if (assignment) void handleUnassignGuest(assignment.guestId)
+                      if (assignment) void handleUnassignSeat(assignment.id)
                     }}
                     onClose={() => setSeatPopover(null)}
                   />
@@ -899,6 +952,7 @@ export default function SeatingPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>New Seating Chart</DialogTitle>
+            <DialogDescription>Create a new seating arrangement for your event.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -921,6 +975,7 @@ export default function SeatingPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Table</DialogTitle>
+            <DialogDescription>Configure the table shape, size, and capacity.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>

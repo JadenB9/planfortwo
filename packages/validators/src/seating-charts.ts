@@ -70,7 +70,8 @@ export type CreateVenueElementInput = z.infer<typeof createVenueElementSchema>
 
 export const assignGuestSchema = z.object({
   tableId: z.string().uuid(),
-  guestId: z.string().uuid(),
+  guestId: z.string().uuid().nullable().optional(),
+  guestName: z.string().min(1).max(200).nullable().optional(),
   seatNumber: z.number().int().min(1).nullable().optional(),
 })
 export type AssignGuestInput = z.infer<typeof assignGuestSchema>
