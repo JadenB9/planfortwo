@@ -864,7 +864,8 @@ export interface SeatingTable {
 export interface SeatingAssignment {
   id: string
   tableId: string
-  guestId: string
+  guestId: string | null
+  guestName: string | null
   seatNumber: number | null
   createdAt: Date
 }
