@@ -85,12 +85,12 @@ export function TaskCard({
 
   return (
     <motion.div
-      className={`hover:border-wedding-200 group flex items-center gap-3 rounded-xl border bg-white px-4 py-3 transition-colors ${
-        isCompleted ? 'border-gray-100 opacity-70' : 'border-gray-200'
+      className={`hover:border-wedding-200 group flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-gray-900 transition-colors ${
+        isCompleted ? 'border-gray-100' : 'border-gray-200'
       }`}
       layout
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: isCompleted ? 0.7 : 1, x: 0 }}
+      initial={false}
+      animate={{ opacity: isCompleted ? 0.7 : 1 }}
       transition={{ duration: 0.25 }}
       whileHover={{ x: 2 }}
     >

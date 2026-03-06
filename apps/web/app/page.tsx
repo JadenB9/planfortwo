@@ -97,9 +97,7 @@ function DashboardPreview() {
                   <div
                     key={item.label}
                     className={`rounded-lg px-3 py-1.5 text-xs ${
-                      item.active
-                        ? 'bg-sage-50 text-sage-700 font-medium'
-                        : 'text-gray-400'
+                      item.active ? 'bg-sage-50 text-sage-700 font-medium' : 'text-gray-400'
                     }`}
                   >
                     {item.label}
@@ -138,9 +136,7 @@ function DashboardPreview() {
                   <div key={task.text} className="flex items-center gap-2 py-1">
                     <div
                       className={`h-3.5 w-3.5 rounded border ${
-                        task.done
-                          ? 'border-sage-500 bg-sage-500'
-                          : 'border-gray-200 bg-white'
+                        task.done ? 'border-sage-500 bg-sage-500' : 'border-gray-200 bg-white'
                       }`}
                     >
                       {task.done && (
@@ -289,8 +285,8 @@ export default function HomePage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              One place for your checklist, guest list, budget, and wedding website.
-              Built for two people, not an entire industry.
+              One place for your checklist, guest list, budget, and wedding website. Built for two
+              people, not an entire industry.
             </motion.p>
 
             <motion.div
@@ -377,9 +373,9 @@ export default function HomePage() {
               Nothing you don&apos;t.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-gray-500">
-              We kept the feature list tight on purpose. No venue directories, no
-              vendor marketplaces, no algorithm recommending you things to buy.
-              Just the tools that help two people plan a wedding together.
+              We kept the feature list tight on purpose. No venue directories, no vendor
+              marketplaces, no algorithm recommending you things to buy. Just the tools that help
+              two people plan a wedding together.
             </p>
           </motion.div>
 
@@ -480,11 +476,11 @@ export default function HomePage() {
               },
               {
                 title: 'No ads, no upsells',
-                body: 'We don\'t sell your data or show you ads. The product is the product.',
+                body: "We don't sell your data or show you ads. The product is the product.",
               },
               {
                 title: 'Private by default',
-                body: 'Your guest list, budget, and details are yours. We don\'t share with vendors.',
+                body: "Your guest list, budget, and details are yours. We don't share with vendors.",
               },
               {
                 title: 'Works on everything',
@@ -492,7 +488,7 @@ export default function HomePage() {
               },
               {
                 title: 'Real export options',
-                body: 'Download your data anytime — CSV, PDF, whatever you need. It\'s your wedding.',
+                body: "Download your data anytime — CSV, PDF, whatever you need. It's your wedding.",
               },
             ].map((item) => (
               <motion.div
@@ -525,9 +521,9 @@ export default function HomePage() {
               Free to start. One upgrade if you want it all.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-gray-500">
-              The free plan gives you the checklist, 15 guests, and one website template.
-              Ready for more? A single $200 payment unlocks everything — unlimited guests,
-              all templates, budget tools, seating charts, and every feature we ever build.
+              The free plan gives you the checklist, 15 guests, and one website template. Ready for
+              more? A single $200 payment unlocks everything — unlimited guests, all templates,
+              budget tools, seating charts, and every feature we ever build.
             </p>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-5">
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -539,7 +535,12 @@ export default function HomePage() {
                   <Link href="/sign-up">Start free</Link>
                 </Button>
               </motion.div>
-              <Button asChild variant="outline" size="lg" className="rounded-xl border-gray-200 px-8 text-sm">
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="rounded-xl border-gray-200 px-8 text-sm"
+              >
                 <Link href="/features#pricing">Compare plans</Link>
               </Button>
             </div>
@@ -560,8 +561,8 @@ export default function HomePage() {
             Your wedding deserves better than a spreadsheet.
           </h2>
           <p className="mt-4 text-base leading-relaxed text-gray-400">
-            Start organizing everything in one place.
-            Free account, no credit card, takes about 30 seconds.
+            Start organizing everything in one place. Free account, no credit card, takes about 30
+            seconds.
           </p>
           <motion.div className="mt-10" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Button

@@ -273,8 +273,8 @@ export default function FeaturesPage() {
               Tools that actually help you plan
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-gray-500">
-              From guest lists to budgets, checklists to websites — plan your wedding
-              with tools designed for couples, not corporations.
+              From guest lists to budgets, checklists to websites — plan your wedding with tools
+              designed for couples, not corporations.
             </p>
           </AnimatedSection>
         </div>

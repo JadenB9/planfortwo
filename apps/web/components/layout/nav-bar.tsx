@@ -87,10 +87,7 @@ export function NavBar() {
               >
                 Sign in
               </Link>
-              <Button
-                asChild
-                className="mt-1 rounded-lg bg-gray-900 text-white hover:bg-gray-800"
-              >
+              <Button asChild className="mt-1 rounded-lg bg-gray-900 text-white hover:bg-gray-800">
                 <Link href="/sign-up" onClick={() => setMobileOpen(false)}>
                   Start planning
                 </Link>
