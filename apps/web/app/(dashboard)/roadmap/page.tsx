@@ -14,6 +14,7 @@ export default function RoadmapPage() {
   const { getToken } = useAuth()
   const [progress, setProgress] = useState<PlanningProgress | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [weddingId, setWeddingId] = useState<string | null>(null)
   const [settingsMode, setSettingsMode] = useState(false)
   const [localOverrides, setLocalOverrides] = useState<Record<string, number>>({})
@@ -30,7 +31,8 @@ export default function RoadmapPage() {
       try {
         const res = await api.weddings.mine(token)
         setWeddingId(res.data.wedding.id)
-      } catch {
+      } catch (err) {
+        console.error('loadWedding error:', err)
         setLoading(false)
       }
     }
@@ -49,8 +51,9 @@ export default function RoadmapPage() {
           setLocalOverrides(res.data.preferences.overrides)
           setLocalHidden(res.data.preferences.hidden)
         }
-      } catch {
-        // Progress fetch failed
+      } catch (err) {
+        console.error('loadProgress error:', err)
+        setError('Unable to load your planning progress. Please try again.')
       } finally {
         setLoading(false)
       }
@@ -127,6 +130,27 @@ export default function RoadmapPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+          <h2 className="font-serif text-xl font-semibold text-gray-900">Something went wrong</h2>
+          <p className="mt-2 text-sm text-red-600">{error}</p>
+          <button
+            onClick={() => {
+              setError(null)
+              setLoading(true)
+              window.location.reload()
+            }}
+            className="bg-wedding-600 hover:bg-wedding-700 mt-4 inline-flex items-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     )
   }

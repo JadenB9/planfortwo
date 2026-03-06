@@ -76,4 +76,10 @@ export const storageClient = {
     const ext = sanitized.split('.').pop() ?? 'file'
     return `og-images/${weddingId}/${Date.now()}.${ext}`
   },
+
+  buildGalleryPhotoKey(weddingId: string, photoId: string, fileName: string): string {
+    const sanitized = fileName.replace(/[^a-zA-Z0-9._-]/g, '')
+    const ext = sanitized.split('.').pop() ?? 'file'
+    return `gallery/${weddingId}/${photoId}.${ext}`
+  },
 }

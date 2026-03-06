@@ -15,7 +15,7 @@ interface StatCardProps {
 export function StatCard({ label, value, icon, trend, href }: StatCardProps) {
   const card = (
     <motion.div
-      className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6"
+      className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
       whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
       transition={{ duration: 0.2 }}
     >

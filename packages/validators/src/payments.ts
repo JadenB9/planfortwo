@@ -18,6 +18,12 @@ export const redeemReferralSchema = z.object({
 })
 export type RedeemReferralInput = z.infer<typeof redeemReferralSchema>
 
+export const redeemPromoSchema = z.object({
+  weddingId: z.string().uuid(),
+  promoCode: z.string().min(1).max(64),
+})
+export type RedeemPromoInput = z.infer<typeof redeemPromoSchema>
+
 export const createContactSubmissionSchema = z.object({
   name: z.string().min(1).max(200),
   email: z.string().email(),

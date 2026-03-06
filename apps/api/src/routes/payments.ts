@@ -4,10 +4,12 @@ import {
   createContactSubmissionSchema,
   createReferralSchema,
   redeemReferralSchema,
+  redeemPromoSchema,
 } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
+import { rateLimit } from '../middleware/rate-limit.js'
 import { purchaseService, referralService, contactService } from '../services/payments.js'
 
 type Env = {
@@ -56,6 +58,27 @@ purchasesRoute.post('/checkout', resolveWeddingMiddleware, async (c) => {
     )
   }
 })
+
+const promoRateLimit = rateLimit({ windowMs: 3_600_000, max: 5 })
+
+purchasesRoute.post(
+  '/redeem-promo',
+  promoRateLimit,
+  resolveWeddingMiddleware,
+  zValidator('json', redeemPromoSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const userId = c.get('dbUserId')
+    const { weddingId, promoCode } = c.req.valid('json')
+    const result = await purchaseService.redeemPromoCode(weddingId, userId, promoCode)
+    if (!result.success) {
+      return c.json({ error: result.error, code: 'INVALID_PROMO', statusCode: 400 }, 400)
+    }
+    return c.json({ data: { success: true } })
+  },
+)
 
 // ── Referrals ──
 referralsRoute.use('*', authMiddleware, resolveUserMiddleware)

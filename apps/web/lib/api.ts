@@ -285,6 +285,12 @@ export const api = {
         method: 'POST',
         token,
       }),
+    redeemPromo: (weddingId: string, promoCode: string, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(`/purchases/redeem-promo?weddingId=${weddingId}`, {
+        method: 'POST',
+        body: JSON.stringify({ weddingId, promoCode }),
+        token,
+      }),
   },
   guests: {
     list: (weddingId: string, token: string, filters?: object) => {
@@ -708,6 +714,7 @@ export const api = {
           description: string | null
           spotifyUrl: string | null
           appleMusicUrl: string | null
+          youtubeMusicUrl: string | null
           createdAt: Date
         }>
       }>(`/playlists?weddingId=${weddingId}`, { token }),
@@ -719,6 +726,7 @@ export const api = {
           description: string | null
           spotifyUrl: string | null
           appleMusicUrl: string | null
+          youtubeMusicUrl: string | null
           songs: Array<{
             id: string
             title: string
@@ -1134,7 +1142,27 @@ export const api = {
       fetchApi<{ data: GalleryPhoto[] }>(`/photos?weddingId=${weddingId}`, { token }),
     get: (id: string, weddingId: string, token: string) =>
       fetchApi<{ data: GalleryPhoto }>(`/photos/${id}?weddingId=${weddingId}`, { token }),
-    create: (data: { weddingId: string; url: string; caption?: string }, token: string) =>
+    getUploadUrl: (
+      data: { weddingId: string; fileName: string; mimeType: string },
+      token: string,
+    ) =>
+      fetchApi<{ data: { uploadUrl: string; r2Key: string; url: string; photoId: string } }>(
+        '/photos/upload-url',
+        { method: 'POST', body: JSON.stringify(data), token },
+      ),
+    create: (
+      data: {
+        weddingId: string
+        r2Key: string
+        url: string
+        fileName: string
+        mimeType: string
+        fileSize: number
+        caption?: string
+        source?: 'guest' | 'professional' | 'couple'
+      },
+      token: string,
+    ) =>
       fetchApi<{ data: GalleryPhoto }>('/photos', {
         method: 'POST',
         body: JSON.stringify(data),

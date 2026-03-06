@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
-import { Check, ArrowLeft, Sparkles, Loader2 } from 'lucide-react'
+import { Check, ArrowLeft, Sparkles, Loader2, ChevronDown, Gift } from 'lucide-react'
+import { toast } from 'sonner'
 import { fadeInUp, staggerContainer, springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
 import { api } from '@/lib/api'
@@ -43,12 +44,36 @@ export default function UpgradePage() {
 
 function UpgradePageContent() {
   const { getToken } = useAuth()
-  const { data: weddingData } = useWedding()
+  const { data: weddingData, refetch } = useWedding()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [promoOpen, setPromoOpen] = useState(false)
+  const [promoCode, setPromoCode] = useState('')
+  const [promoLoading, setPromoLoading] = useState(false)
   const canceled = searchParams.get('canceled') === 'true'
   const tier = weddingData?.wedding.tier
+
+  async function handleRedeemPromo() {
+    if (!weddingData?.wedding.id || !promoCode.trim()) return
+    setPromoLoading(true)
+    setError(null)
+
+    try {
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+      await api.purchases.redeemPromo(weddingData.wedding.id, promoCode.trim(), token)
+      toast.success('Promo code applied! You now have full access.')
+      setPromoCode('')
+      setPromoOpen(false)
+      await refetch()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Invalid promo code'
+      setError(msg)
+    } finally {
+      setPromoLoading(false)
+    }
+  }
 
   async function handleCheckout() {
     if (!weddingData?.wedding.id) return
@@ -186,6 +211,45 @@ function UpgradePageContent() {
           </ul>
         </motion.div>
       </motion.div>
+
+      {tier !== 'full' && (
+        <div className="mt-8">
+          <button
+            onClick={() => setPromoOpen(!promoOpen)}
+            className="mx-auto flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-700"
+          >
+            <Gift className="h-4 w-4" />
+            Have a promo code?
+            <ChevronDown
+              className={`h-3.5 w-3.5 transition-transform ${promoOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {promoOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="mt-3 flex items-center justify-center gap-2"
+            >
+              <input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleRedeemPromo()}
+                placeholder="Enter code"
+                className="focus:border-wedding-300 focus:ring-wedding-100 w-48 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2"
+              />
+              <button
+                onClick={handleRedeemPromo}
+                disabled={promoLoading || !promoCode.trim()}
+                className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {promoLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Apply'}
+              </button>
+            </motion.div>
+          )}
+        </div>
+      )}
 
       <p className="mt-8 text-center text-xs text-gray-400">
         Payment handled securely through Stripe. One-time purchase, no recurring fees.

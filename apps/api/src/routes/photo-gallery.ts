@@ -1,6 +1,11 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { createPhotoSchema, updatePhotoSchema, moderatePhotoSchema } from '@planfortwo/validators'
+import {
+  createPhotoSchema,
+  updatePhotoSchema,
+  moderatePhotoSchema,
+  requestGalleryUploadSchema,
+} from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -25,6 +30,20 @@ photoGalleryRoute.get('/', resolveWeddingMiddleware, async (c) => {
   const list = await photoGalleryService.list(weddingId)
   return c.json({ data: list })
 })
+
+photoGalleryRoute.post(
+  '/upload-url',
+  resolveWeddingMiddleware,
+  zValidator('json', requestGalleryUploadSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const { weddingId, fileName, mimeType } = c.req.valid('json')
+    const result = await photoGalleryService.getUploadUrl(weddingId, fileName, mimeType)
+    return c.json({ data: result })
+  },
+)
 
 photoGalleryRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
   const photoId = c.req.param('id')

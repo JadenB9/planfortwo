@@ -75,7 +75,23 @@ export default function OnboardingPage() {
       const token = await getToken()
       if (!token) throw new Error('Not authenticated')
 
-      const { data: dashboardData } = await api.weddings.mine(token)
+      let dashboardData: Awaited<ReturnType<typeof api.weddings.mine>>['data'] | null = null
+      for (let attempt = 0; attempt < 5; attempt++) {
+        try {
+          const res = await api.weddings.mine(token)
+          dashboardData = res.data
+          break
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : ''
+          if (attempt < 4 && (msg.includes('not found') || msg.includes('Not Found'))) {
+            await new Promise((r) => setTimeout(r, 1000))
+            continue
+          }
+          throw err
+        }
+      }
+      if (!dashboardData) throw new Error('Unable to load your wedding. Please try again.')
+
       const onboardingData: OnboardingData = {
         partnerFirstName: parsed.partnerFirstName,
         partnerLastName: parsed.partnerLastName,

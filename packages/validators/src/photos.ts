@@ -30,3 +30,10 @@ export const moderatePhotoSchema = z.object({
   status: z.enum(['approved', 'rejected']),
 })
 export type ModeratePhotoInput = z.infer<typeof moderatePhotoSchema>
+
+export const requestGalleryUploadSchema = z.object({
+  weddingId: z.string().uuid(),
+  fileName: z.string().min(1).max(255),
+  mimeType: z.string().min(1),
+})
+export type RequestGalleryUploadInput = z.infer<typeof requestGalleryUploadSchema>

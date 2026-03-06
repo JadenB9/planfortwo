@@ -1,4 +1,5 @@
 import { eq, and } from 'drizzle-orm'
+import { timingSafeEqual } from 'node:crypto'
 import Stripe from 'stripe'
 import { db, purchases, referrals, contactSubmissions, weddings } from '@planfortwo/db'
 import type { CreateContactSubmissionInput } from '@planfortwo/validators'
@@ -105,6 +106,36 @@ export const purchaseService = {
       .where(eq(purchases.id, purchaseId))
 
     await db.update(weddings).set({ tier: 'full' }).where(eq(weddings.id, weddingId))
+  },
+
+  async redeemPromoCode(weddingId: string, userId: string, promoCode: string) {
+    const expectedCode = process.env.PROMO_CODE
+    if (!expectedCode) throw new Error('Promo codes are not configured')
+
+    const codeBuffer = Buffer.from(promoCode)
+    const expectedBuffer = Buffer.from(expectedCode)
+    if (
+      codeBuffer.length !== expectedBuffer.length ||
+      !timingSafeEqual(codeBuffer, expectedBuffer)
+    ) {
+      return { success: false as const, error: 'Invalid promo code' }
+    }
+
+    const [purchase] = await db
+      .insert(purchases)
+      .values({
+        weddingId,
+        userId,
+        amount: '0.00',
+        currency: 'usd',
+        status: 'completed',
+        completedAt: new Date(),
+      })
+      .returning()
+
+    await db.update(weddings).set({ tier: 'full' }).where(eq(weddings.id, weddingId))
+
+    return { success: true as const, purchase: purchase! }
   },
 
   getStripe,

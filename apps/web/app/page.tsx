@@ -178,6 +178,7 @@ interface FeatureShowcaseProps {
   details: string[]
   direction: 'left' | 'right'
   accent: string
+  className?: string
 }
 
 function FeatureShowcase({
@@ -188,6 +189,7 @@ function FeatureShowcase({
   details,
   direction,
   accent,
+  className,
 }: FeatureShowcaseProps) {
   const variants = direction === 'left' ? slideFromLeft : slideFromRight
 
@@ -200,7 +202,7 @@ function FeatureShowcase({
       transition={{ duration: 0.7, ...springSmooth }}
       className={`flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-16 ${
         direction === 'right' ? 'lg:flex-row-reverse' : ''
-      }`}
+      } ${className ?? ''}`}
     >
       <div className="flex-1">
         <div className={`relative overflow-hidden rounded-3xl ${accent} p-8 sm:p-12`}>
@@ -407,6 +409,7 @@ export default function HomePage() {
               ]}
               direction="right"
               accent="bg-wedding-600"
+              className="rounded-3xl bg-white/60 p-6 sm:p-10"
             />
             <FeatureShowcase
               icon={DollarSign}
@@ -435,6 +438,7 @@ export default function HomePage() {
               ]}
               direction="right"
               accent="bg-sage-700"
+              className="rounded-3xl bg-white/60 p-6 sm:p-10"
             />
           </div>
         </div>

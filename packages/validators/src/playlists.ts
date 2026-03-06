@@ -20,6 +20,7 @@ export const createPlaylistSchema = z.object({
   description: z.string().max(2000).nullable().optional(),
   spotifyUrl: z.string().url().nullable().optional(),
   appleMusicUrl: z.string().url().nullable().optional(),
+  youtubeMusicUrl: z.string().url().nullable().optional(),
 })
 
 export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>
@@ -29,6 +30,7 @@ export const updatePlaylistSchema = z.object({
   description: z.string().max(2000).nullable().optional(),
   spotifyUrl: z.string().url().nullable().optional(),
   appleMusicUrl: z.string().url().nullable().optional(),
+  youtubeMusicUrl: z.string().url().nullable().optional(),
 })
 
 export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>
