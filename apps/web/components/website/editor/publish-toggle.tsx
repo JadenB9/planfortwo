@@ -20,7 +20,7 @@ export function PublishToggle({
 
   return (
     <div className="rounded-xl border bg-white p-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           {isPublished ? (
             <Globe className="h-5 w-5 text-green-600" />

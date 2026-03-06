@@ -24,6 +24,7 @@ export default function WebsitePage() {
   const weddingId = wedding?.id ?? null
   const { config, sections, loading, refetch, analytics } = useWebsite({ weddingId })
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null)
+  const [activeTab, setActiveTab] = useState('design')
 
   const handleCreate = useCallback(async () => {
     if (!weddingId) return
@@ -166,7 +167,7 @@ export default function WebsitePage() {
         />
       </div>
 
-      <Tabs defaultValue="design">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="design">Design</TabsTrigger>
           <TabsTrigger value="sections">Sections</TabsTrigger>

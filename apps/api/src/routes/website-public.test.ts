@@ -174,11 +174,11 @@ describe('Website Public Routes', () => {
 
       expect(res.status).toBe(200)
       const body = await res.json()
-      expect(body.data.templateId).toBe('garden-party')
+      expect(body.data.config.templateId).toBe('garden-party')
       expect(body.data.weddingName).toBe('Jane & John')
       expect(body.data.sections).toHaveLength(1)
       expect(body.data.photos).toHaveLength(1)
-      expect(body.data.passwordHash).toBeUndefined()
+      expect(body.data.config.passwordHash).toBeUndefined()
     })
   })
 

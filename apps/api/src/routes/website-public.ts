@@ -62,7 +62,16 @@ websitePublicRoute.get('/:slug', async (c) => {
   return c.json(
     {
       data: {
-        ...safeConfig,
+        config: {
+          templateId: safeConfig.templateId,
+          customColors: safeConfig.customColors,
+          fontPair: safeConfig.fontPair,
+          privacyMode: safeConfig.privacyMode,
+          metaTitle: safeConfig.metaTitle,
+          metaDescription: safeConfig.metaDescription,
+          ogImageUrl: safeConfig.ogImageUrl,
+          subdomain: safeConfig.subdomain,
+        },
         sections,
         photos,
         weddingName: wedding?.name ?? '',
