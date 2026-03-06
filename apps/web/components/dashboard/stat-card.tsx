@@ -31,7 +31,7 @@ export function StatCard({ label, value, icon, trend, href }: StatCardProps) {
       </div>
       <div className="mt-auto pt-4">
         <motion.p
-          className="text-2xl font-bold text-gray-900"
+          className="truncate text-2xl font-bold text-gray-900"
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}

@@ -289,7 +289,7 @@ export default function DashboardPage() {
           initial="hidden"
           animate="visible"
         >
-          <motion.div className="flex" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+          <motion.div className="min-w-0" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Tasks"
               value={stats ? `${stats.tasksCompleted}/${stats.tasksTotal}` : '0/0'}
@@ -311,7 +311,7 @@ export default function DashboardPage() {
               href="/checklist"
             />
           </motion.div>
-          <motion.div className="flex" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+          <motion.div className="min-w-0" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Guests"
               value={guestStats ? `${guestStats.rsvpAccepted}/${guestStats.totalGuests}` : '0/0'}
@@ -333,7 +333,7 @@ export default function DashboardPage() {
               href="/guests"
             />
           </motion.div>
-          <motion.div className="flex" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+          <motion.div className="min-w-0" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Budget"
               value={
@@ -359,7 +359,7 @@ export default function DashboardPage() {
               href="/budget"
             />
           </motion.div>
-          <motion.div className="flex" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
+          <motion.div className="min-w-0" variants={fadeInUp} transition={{ duration: 0.4, ...springSmooth }}>
             <StatCard
               label="Website"
               value={websiteStatus}
