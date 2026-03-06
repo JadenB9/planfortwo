@@ -8,6 +8,9 @@ import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
 import { requireFeature } from '../middleware/require-feature.js'
 import { requireGuestLimit } from '../middleware/require-guest-limit.js'
 import { guestService } from '../services/guests.js'
+import { emailService } from '../services/email.js'
+import { db, weddings } from '@planfortwo/db'
+import { eq } from 'drizzle-orm'
 
 type Env = {
   Variables: {
@@ -164,6 +167,143 @@ guestsRoute.post(
 
     const result = await guestService.bulkImportCsv(weddingId, csvContent, dbUserId)
     return c.json({ data: result })
+  },
+)
+
+// POST /guests/:id/send-invite — send RSVP invite email to a single guest
+guestsRoute.post('/:id/send-invite', resolveWeddingMiddleware, async (c) => {
+  const guestId = c.req.param('id')
+  const weddingId = c.get('weddingId')
+
+  const guest = await guestService.getGuest(guestId)
+  if (!guest || guest.weddingId !== weddingId) {
+    return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
+  }
+
+  if (!guest.email) {
+    return c.json({ error: 'Guest has no email address', code: 'NO_EMAIL', statusCode: 400 }, 400)
+  }
+
+  const [wedding] = await db.select().from(weddings).where(eq(weddings.id, weddingId))
+  if (!wedding) {
+    return c.json({ error: 'Wedding not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const rsvpUrl = `${appUrl}/rsvp/${guest.rsvpToken}`
+
+  const weddingDateStr = wedding.date
+    ? new Date(wedding.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : null
+
+  const rsvpDeadlineStr = wedding.rsvpDeadline
+    ? new Date(wedding.rsvpDeadline).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : null
+
+  try {
+    await emailService.sendRsvpInvite(
+      guest.email,
+      `${guest.firstName} ${guest.lastName}`,
+      wedding.name,
+      weddingDateStr,
+      wedding.venue,
+      rsvpUrl,
+      rsvpDeadlineStr,
+    )
+
+    await guestService.markInviteSent(guestId)
+
+    return c.json({ data: { success: true } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to send invite'
+    return c.json({ error: message, code: 'EMAIL_FAILED', statusCode: 500 }, 500)
+  }
+})
+
+// POST /guests/send-invites — bulk send RSVP invites to all uninvited guests with email
+guestsRoute.post(
+  '/send-invites',
+  resolveWeddingMiddleware,
+  zValidator(
+    'json',
+    z.object({
+      weddingId: z.string().uuid(),
+      guestIds: z.array(z.string().uuid()).min(1).max(200).optional(),
+    }),
+    (result, c) => {
+      if (!result.success) {
+        return c.json(
+          { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
+          400,
+        )
+      }
+    },
+  ),
+  async (c) => {
+    const { weddingId, guestIds } = c.req.valid('json')
+
+    const [wedding] = await db.select().from(weddings).where(eq(weddings.id, weddingId))
+    if (!wedding) {
+      return c.json({ error: 'Wedding not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    const uninvitedGuests = await guestService.getGuestsForInvite(weddingId)
+    const toSend = guestIds
+      ? uninvitedGuests.filter((g) => guestIds.includes(g.id))
+      : uninvitedGuests
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+
+    const weddingDateStr = wedding.date
+      ? new Date(wedding.date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : null
+
+    const rsvpDeadlineStr = wedding.rsvpDeadline
+      ? new Date(wedding.rsvpDeadline).toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : null
+
+    let sent = 0
+    let failed = 0
+
+    for (const guest of toSend) {
+      if (!guest.email) continue
+      const rsvpUrl = `${appUrl}/rsvp/${guest.rsvpToken}`
+      try {
+        await emailService.sendRsvpInvite(
+          guest.email,
+          `${guest.firstName} ${guest.lastName}`,
+          wedding.name,
+          weddingDateStr,
+          wedding.venue,
+          rsvpUrl,
+          rsvpDeadlineStr,
+        )
+        await guestService.markInviteSent(guest.id)
+        sent++
+      } catch {
+        failed++
+      }
+    }
+
+    return c.json({ data: { sent, failed, total: toSend.length } })
   },
 )
 

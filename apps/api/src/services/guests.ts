@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto'
-import { eq, and, or, ilike, count, desc, asc, inArray } from 'drizzle-orm'
-import { db, guests, guestTags, guestTagAssignments, households } from '@planfortwo/db'
+import { eq, and, or, ilike, count, desc, asc, inArray, isNull, isNotNull } from 'drizzle-orm'
+import { db, guests, guestTags, guestTagAssignments, households, weddings } from '@planfortwo/db'
 import type {
   GuestWithTags,
   GuestStats,
@@ -458,5 +458,23 @@ export const guestService = {
     }
 
     return result
+  },
+
+  async markInviteSent(guestId: string) {
+    const [updated] = await db
+      .update(guests)
+      .set({ inviteSentAt: new Date() })
+      .where(eq(guests.id, guestId))
+      .returning()
+    return updated ?? null
+  },
+
+  async getGuestsForInvite(weddingId: string) {
+    return db
+      .select()
+      .from(guests)
+      .where(
+        and(eq(guests.weddingId, weddingId), isNotNull(guests.email), isNull(guests.inviteSentAt)),
+      )
   },
 }

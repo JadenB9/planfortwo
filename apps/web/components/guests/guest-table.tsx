@@ -2,10 +2,13 @@
 
 import type { GuestWithTags } from '@planfortwo/types'
 import { GuestTagBadge } from './guest-tag-badge'
+import { Mail, MailCheck, Send } from 'lucide-react'
 
 interface GuestTableProps {
   guests: GuestWithTags[]
   onSelectGuest: (guest: GuestWithTags) => void
+  onSendInvite?: (guest: GuestWithTags) => void
+  sendingInviteId?: string | null
 }
 
 const RSVP_BADGE: Record<string, string> = {
@@ -15,7 +18,12 @@ const RSVP_BADGE: Record<string, string> = {
   maybe: 'bg-blue-50 text-blue-700',
 }
 
-export function GuestTable({ guests, onSelectGuest }: GuestTableProps) {
+export function GuestTable({
+  guests,
+  onSelectGuest,
+  onSendInvite,
+  sendingInviteId,
+}: GuestTableProps) {
   if (guests.length === 0) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
@@ -46,8 +54,8 @@ export function GuestTable({ guests, onSelectGuest }: GuestTableProps) {
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50/50">
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">Name</th>
-              <th className="px-4 py-3 font-serif font-semibold text-gray-900">Household</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">RSVP</th>
+              <th className="px-4 py-3 font-serif font-semibold text-gray-900">Invite</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">Meal</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">Tags</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">+1</th>
@@ -57,10 +65,9 @@ export function GuestTable({ guests, onSelectGuest }: GuestTableProps) {
             {guests.map((guest) => (
               <tr
                 key={guest.id}
-                onClick={() => onSelectGuest(guest)}
                 className="hover:bg-wedding-50/30 cursor-pointer transition-colors"
               >
-                <td className="px-4 py-3">
+                <td className="px-4 py-3" onClick={() => onSelectGuest(guest)}>
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900">
                       {guest.firstName} {guest.lastName}
@@ -78,27 +85,53 @@ export function GuestTable({ guests, onSelectGuest }: GuestTableProps) {
                   </div>
                   {guest.email && <p className="text-xs text-gray-500">{guest.email}</p>}
                 </td>
-                <td className="px-4 py-3 text-gray-600">
-                  {guest.household?.name ?? <span className="text-gray-400">--</span>}
-                </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3" onClick={() => onSelectGuest(guest)}>
                   <span
                     className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize ${RSVP_BADGE[guest.rsvpStatus] ?? ''}`}
                   >
                     {guest.rsvpStatus}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-4 py-3">
+                  {guest.inviteSentAt ? (
+                    <span className="flex items-center gap-1 text-xs text-green-600">
+                      <MailCheck className="h-3.5 w-3.5" />
+                      Sent
+                    </span>
+                  ) : guest.email ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onSendInvite?.(guest)
+                      }}
+                      disabled={sendingInviteId === guest.id}
+                      className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50"
+                    >
+                      {sendingInviteId === guest.id ? (
+                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                      ) : (
+                        <Send className="h-3.5 w-3.5" />
+                      )}
+                      Send
+                    </button>
+                  ) : (
+                    <span className="flex items-center gap-1 text-xs text-gray-400">
+                      <Mail className="h-3.5 w-3.5" />
+                      No email
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-gray-600" onClick={() => onSelectGuest(guest)}>
                   {guest.mealChoice ?? <span className="text-gray-400">--</span>}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3" onClick={() => onSelectGuest(guest)}>
                   <div className="flex flex-wrap gap-1">
                     {guest.tags.map((tag) => (
                       <GuestTagBadge key={tag.id} tag={tag} />
                     ))}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-4 py-3 text-gray-600" onClick={() => onSelectGuest(guest)}>
                   {guest.hasPlusOne ? (
                     <span className="text-green-600">{guest.plusOneName ?? 'Yes'}</span>
                   ) : (

@@ -174,6 +174,7 @@ export interface Guest {
   age: number | null
   side: GuestSide | null
   isVip: boolean
+  inviteSentAt: Date | null
   sortOrder: number
   createdAt: Date
   updatedAt: Date

@@ -333,6 +333,17 @@ export const api = {
         token,
       })
     },
+    sendInvite: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: { success: boolean } }>(`/guests/${id}/send-invite?weddingId=${weddingId}`, {
+        method: 'POST',
+        token,
+      }),
+    sendInvites: (weddingId: string, token: string, guestIds?: string[]) =>
+      fetchApi<{ data: { sent: number; failed: number; total: number } }>('/guests/send-invites', {
+        method: 'POST',
+        body: JSON.stringify({ weddingId, guestIds }),
+        token,
+      }),
   },
   households: {
     list: (weddingId: string, token: string) =>

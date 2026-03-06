@@ -41,6 +41,7 @@ export const guests = pgTable('guests', {
   age: integer('age'),
   side: guestSideEnum('side'),
   isVip: boolean('is_vip').notNull().default(false),
+  inviteSentAt: timestamp('invite_sent_at', { withTimezone: true }),
   sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })

@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { toast } from 'sonner'
+import { Send } from 'lucide-react'
 import type { GuestWithTags } from '@planfortwo/types'
 import { api } from '@/lib/api'
 import { springSmooth } from '@/lib/animations'
@@ -37,6 +39,8 @@ export default function GuestsPage() {
 
   const [selectedGuest, setSelectedGuest] = useState<GuestWithTags | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [sendingInviteId, setSendingInviteId] = useState<string | null>(null)
+  const [sendingBulk, setSendingBulk] = useState(false)
 
   const handleCreateGuest = useCallback(
     async (data: GuestFormData) => {
@@ -48,21 +52,22 @@ export default function GuestsPage() {
           weddingId,
           firstName: data.firstName,
           lastName: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          householdId: data.householdId,
-          side: data.side,
+          email: data.email || null,
+          phone: data.phone || null,
+          householdId: data.householdId || null,
+          side: data.side || null,
           isChild: data.isChild ?? false,
           isVip: data.isVip ?? false,
           hasPlusOne: data.hasPlusOne ?? false,
-          plusOneName: data.plusOneName,
-          mealChoice: data.mealChoice,
+          plusOneName: data.plusOneName || null,
+          mealChoice: data.mealChoice || null,
           dietary: data.dietary,
           tagIds: data.tagIds,
         },
         token,
       )
       setShowAddForm(false)
+      toast.success('Guest added')
       await refetch()
     },
     [weddingId, getToken, refetch],
@@ -75,6 +80,7 @@ export default function GuestsPage() {
       if (!token) return
       await api.guests.update(selectedGuest.id, data, weddingId, token)
       setSelectedGuest(null)
+      toast.success('Guest updated')
       await refetch()
     },
     [weddingId, selectedGuest, getToken, refetch],
@@ -86,8 +92,50 @@ export default function GuestsPage() {
     if (!token) return
     await api.guests.delete(selectedGuest.id, weddingId, token)
     setSelectedGuest(null)
+    toast.success('Guest removed')
     await refetch()
   }, [weddingId, selectedGuest, getToken, refetch])
+
+  const handleSendInvite = useCallback(
+    async (guest: GuestWithTags) => {
+      if (!weddingId) return
+      setSendingInviteId(guest.id)
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.guests.sendInvite(guest.id, weddingId, token)
+        toast.success(`Invitation sent to ${guest.firstName} ${guest.lastName}`)
+        await refetch()
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to send invitation')
+      } finally {
+        setSendingInviteId(null)
+      }
+    },
+    [weddingId, getToken, refetch],
+  )
+
+  const handleSendAllInvites = useCallback(async () => {
+    if (!weddingId) return
+    setSendingBulk(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      const { data } = await api.guests.sendInvites(weddingId, token)
+      if (data.sent === 0 && data.total === 0) {
+        toast.info('No uninvited guests with email addresses found')
+      } else {
+        toast.success(
+          `Sent ${data.sent} invitation${data.sent !== 1 ? 's' : ''}${data.failed > 0 ? ` (${data.failed} failed)` : ''}`,
+        )
+      }
+      await refetch()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to send invitations')
+    } finally {
+      setSendingBulk(false)
+    }
+  }, [weddingId, getToken, refetch])
 
   const apiError = weddingError || featuresError
 
@@ -124,6 +172,8 @@ export default function GuestsPage() {
     stats !== null &&
     stats.totalGuests >= features.maxGuests
 
+  const uninvitedWithEmail = guests.filter((g) => g.email && !g.inviteSentAt)
+
   return (
     <motion.div
       className="mx-auto max-w-5xl"
@@ -138,6 +188,16 @@ export default function GuestsPage() {
           <p className="mt-1 text-sm text-gray-600">Manage your guests, households, and RSVPs.</p>
         </div>
         <div className="flex gap-3">
+          {uninvitedWithEmail.length > 0 && (
+            <button
+              onClick={handleSendAllInvites}
+              disabled={sendingBulk}
+              className="flex items-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            >
+              <Send className="h-4 w-4" />
+              {sendingBulk ? 'Sending...' : `Send All Invites (${uninvitedWithEmail.length})`}
+            </button>
+          )}
           {features?.canBulkImport && (
             <Link
               href="/guests/import"
@@ -186,7 +246,12 @@ export default function GuestsPage() {
             <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
           </div>
         ) : (
-          <GuestTable guests={guests} onSelectGuest={setSelectedGuest} />
+          <GuestTable
+            guests={guests}
+            onSelectGuest={setSelectedGuest}
+            onSendInvite={handleSendInvite}
+            sendingInviteId={sendingInviteId}
+          />
         )}
 
         {/* Dietary Summary */}
