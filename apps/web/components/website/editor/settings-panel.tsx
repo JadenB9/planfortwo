@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import type { WebsiteConfig } from '@planfortwo/types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,10 +20,45 @@ interface SettingsPanelProps {
   onCheckSubdomain: (subdomain: string) => Promise<boolean>
 }
 
+function useDebouncedUpdate(onUpdate: (data: Record<string, unknown>) => void, delay = 600) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pending = useRef<Record<string, unknown>>({})
+
+  const flush = useCallback(() => {
+    if (timer.current) clearTimeout(timer.current)
+    if (Object.keys(pending.current).length > 0) {
+      onUpdate({ ...pending.current })
+      pending.current = {}
+    }
+  }, [onUpdate])
+
+  const update = useCallback(
+    (data: Record<string, unknown>) => {
+      pending.current = { ...pending.current, ...data }
+      if (timer.current) clearTimeout(timer.current)
+      timer.current = setTimeout(flush, delay)
+    },
+    [flush, delay],
+  )
+
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current)
+    }
+  }, [])
+
+  return { update, flush }
+}
+
 export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPanelProps) {
   const [subdomain, setSubdomain] = useState(config.subdomain ?? '')
   const [subdomainAvailable, setSubdomainAvailable] = useState<boolean | null>(null)
   const [checking, setChecking] = useState(false)
+  const [metaTitle, setMetaTitle] = useState(config.metaTitle ?? '')
+  const [metaDescription, setMetaDescription] = useState(config.metaDescription ?? '')
+  const [hashtag, setHashtag] = useState(config.hashtag ?? '')
+
+  const { update: debouncedUpdate, flush } = useDebouncedUpdate(onUpdate)
 
   const handleCheckSubdomain = async () => {
     if (!subdomain.trim()) return
@@ -84,8 +119,12 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
       <div className="space-y-2">
         <Label>Meta Title</Label>
         <Input
-          value={config.metaTitle ?? ''}
-          onChange={(e) => onUpdate({ metaTitle: e.target.value || null })}
+          value={metaTitle}
+          onChange={(e) => {
+            setMetaTitle(e.target.value)
+            debouncedUpdate({ metaTitle: e.target.value || null })
+          }}
+          onBlur={flush}
           placeholder="Our Wedding"
         />
       </div>
@@ -93,8 +132,12 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
       <div className="space-y-2">
         <Label>Meta Description</Label>
         <Textarea
-          value={config.metaDescription ?? ''}
-          onChange={(e) => onUpdate({ metaDescription: e.target.value || null })}
+          value={metaDescription}
+          onChange={(e) => {
+            setMetaDescription(e.target.value)
+            debouncedUpdate({ metaDescription: e.target.value || null })
+          }}
+          onBlur={flush}
           placeholder="Join us to celebrate..."
           rows={2}
         />
@@ -103,8 +146,12 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
       <div className="space-y-2">
         <Label>Wedding Hashtag</Label>
         <Input
-          value={config.hashtag ?? ''}
-          onChange={(e) => onUpdate({ hashtag: e.target.value || null })}
+          value={hashtag}
+          onChange={(e) => {
+            setHashtag(e.target.value)
+            debouncedUpdate({ hashtag: e.target.value || null })
+          }}
+          onBlur={flush}
           placeholder="#SmithWedding2026"
         />
       </div>

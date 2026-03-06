@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import type {
   WebsiteConfig,
@@ -23,13 +23,15 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
   const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
   const [analytics, setAnalytics] = useState<WebsiteAnalyticsSummary | null>(null)
   const [loading, setLoading] = useState(true)
+  const hasLoadedOnce = useRef(false)
 
   const loadData = useCallback(async () => {
     if (!weddingId) {
       setLoading(false)
       return
     }
-    setLoading(true)
+    // Only show loading skeleton on first load, not on refetches
+    if (!hasLoadedOnce.current) setLoading(true)
     try {
       const token = await getToken()
       if (!token) return
@@ -66,6 +68,7 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
     } catch {
       /* silent */
     } finally {
+      hasLoadedOnce.current = true
       setLoading(false)
     }
   }, [weddingId, getToken])
