@@ -11,10 +11,25 @@ export const emailLocalPartSchema = z
 
 export const claimAddressSchema = z.object({
   address: emailLocalPartSchema,
-  displayName: z.string().min(1).max(100),
+  displayName: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[^\r\n]+$/, 'Display name cannot contain line breaks'),
 })
 
 export type ClaimAddressInput = z.infer<typeof claimAddressSchema>
+
+export const emailAttachmentSchema = z.object({
+  id: z.string().uuid(),
+  filename: z.string().min(1).max(255),
+  contentType: z.string().min(1).max(255),
+  size: z.number().int().min(0).max(25_000_000),
+  r2Key: z.string().optional(),
+  url: z.string().url().optional(),
+})
+
+export type EmailAttachmentInput = z.infer<typeof emailAttachmentSchema>
 
 export const composeEmailSchema = z.object({
   emailAddressId: z.string().uuid(),
@@ -22,6 +37,7 @@ export const composeEmailSchema = z.object({
   subject: z.string().min(1).max(500),
   textBody: z.string().min(1).max(50_000),
   htmlBody: z.string().max(200_000).optional(),
+  attachments: z.array(emailAttachmentSchema).max(10).optional(),
 })
 
 export type ComposeEmailInput = z.infer<typeof composeEmailSchema>

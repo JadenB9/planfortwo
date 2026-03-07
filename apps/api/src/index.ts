@@ -85,6 +85,8 @@ app.use('/guestbook/*', publicRateLimit)
 app.use('/rsvp/*', publicRateLimit)
 app.use('/contact/*', publicRateLimit)
 app.use('/website-config/verify-password', strictRateLimit)
+app.use('/inbox/send', strictRateLimit)
+app.use('/inbox/addresses', strictRateLimit)
 
 // ── Routes ──
 app.route('/health', healthRoute)

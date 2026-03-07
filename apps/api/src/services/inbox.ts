@@ -5,6 +5,10 @@ import type { InboxFiltersInput, UpdateEmailInput } from '@planfortwo/validators
 
 const RESERVED_ADDRESSES = ['admin', 'support', 'noreply', 'postmaster', 'abuse', 'webmaster']
 
+function sanitizeDisplayName(name: string): string {
+  return name.replace(/[\r\n\t]/g, ' ').trim()
+}
+
 function getResendClient(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) return null
@@ -48,7 +52,7 @@ export const inboxService = {
       .values({
         userId,
         address: localPart,
-        displayName: data.displayName,
+        displayName: sanitizeDisplayName(data.displayName),
       })
       .returning()
 
@@ -118,11 +122,12 @@ export const inboxService = {
     }
 
     if (filters.search) {
+      const escaped = filters.search.replace(/[%_\\]/g, '\\$&')
       conditions.push(
         or(
-          ilike(emails.subject, `%${filters.search}%`),
-          ilike(emails.fromAddress, `%${filters.search}%`),
-          ilike(emails.toAddress, `%${filters.search}%`),
+          ilike(emails.subject, `%${escaped}%`),
+          ilike(emails.fromAddress, `%${escaped}%`),
+          ilike(emails.toAddress, `%${escaped}%`),
         )!,
       )
     }
@@ -206,6 +211,14 @@ export const inboxService = {
       subject: string
       textBody: string
       htmlBody?: string
+      attachments?: Array<{
+        id: string
+        filename: string
+        contentType: string
+        size: number
+        r2Key?: string
+        url?: string
+      }>
     },
   ) {
     const [address] = await db
@@ -218,7 +231,8 @@ export const inboxService = {
       throw new Error('Email address not found or not owned by you')
     }
 
-    const fromEmail = `${address.displayName} <${address.address}@planfortwo.com>`
+    const safeName = sanitizeDisplayName(address.displayName)
+    const fromEmail = `${safeName} <${address.address}@planfortwo.com>`
     const resend = getResendClient()
 
     if (!resend) {
@@ -231,6 +245,7 @@ export const inboxService = {
       subject: string
       text: string
       html?: string
+      attachments?: Array<{ path: string; filename: string }>
     } = {
       from: fromEmail,
       to: data.toAddress,
@@ -239,6 +254,14 @@ export const inboxService = {
     }
     if (data.htmlBody) {
       sendPayload.html = data.htmlBody
+    }
+    if (data.attachments && data.attachments.length > 0) {
+      sendPayload.attachments = data.attachments
+        .filter((att) => att.url)
+        .map((att) => ({
+          path: att.url!,
+          filename: att.filename,
+        }))
     }
 
     const { data: sent, error } = await resend.emails.send(sendPayload)
@@ -260,6 +283,7 @@ export const inboxService = {
         subject: data.subject,
         textBody: data.textBody,
         htmlBody: data.htmlBody ?? null,
+        attachments: data.attachments ?? [],
         isRead: true,
       })
       .returning()
@@ -306,6 +330,14 @@ export const inboxService = {
       textBody?: string
       htmlBody?: string
       messageId?: string
+      attachments?: Array<{
+        id: string
+        filename: string
+        contentType: string
+        size: number
+        url?: string
+        r2Key?: string
+      }>
     },
   ) {
     const [email] = await db
@@ -322,6 +354,7 @@ export const inboxService = {
         textBody: data.textBody ?? null,
         htmlBody: data.htmlBody ?? null,
         messageId: data.messageId ?? null,
+        attachments: data.attachments ?? [],
       })
       .returning()
 

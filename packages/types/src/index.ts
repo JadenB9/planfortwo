@@ -1073,6 +1073,15 @@ export interface EmailAddress {
   createdAt: Date
 }
 
+export interface EmailAttachment {
+  id: string
+  filename: string
+  contentType: string
+  size: number
+  r2Key?: string
+  url?: string
+}
+
 export interface Email {
   id: string
   emailAddressId: string
@@ -1088,6 +1097,7 @@ export interface Email {
   isRead: boolean
   isStarred: boolean
   messageId: string | null
+  attachments: EmailAttachment[]
   inReplyToMessageId: string | null
   createdAt: Date
 }

@@ -101,4 +101,4 @@ export { honeymoonPlans, honeymoonActivities } from './honeymoon'
 export { roadmapPreferences } from './roadmap-preferences'
 
 // Inbox
-export { emailAddresses, emails, emailDirectionEnum } from './inbox'
+export { emailAddresses, emails, emailDirectionEnum, type EmailAttachment } from './inbox'

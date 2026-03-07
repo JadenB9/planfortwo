@@ -1,4 +1,4 @@
-import { boolean, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { boolean, jsonb, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { users } from './users'
 
 export const emailDirectionEnum = pgEnum('email_direction', ['inbound', 'outbound'])
@@ -16,6 +16,15 @@ export const emailAddresses = pgTable('email_addresses', {
 
 export type EmailAddressRecord = typeof emailAddresses.$inferSelect
 export type NewEmailAddress = typeof emailAddresses.$inferInsert
+
+export interface EmailAttachment {
+  id: string
+  filename: string
+  contentType: string
+  size: number
+  r2Key?: string
+  url?: string
+}
 
 export const emails = pgTable('emails', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -35,6 +44,7 @@ export const emails = pgTable('emails', {
   isStarred: boolean('is_starred').notNull().default(false),
   messageId: text('message_id'),
   inReplyToMessageId: text('in_reply_to_message_id'),
+  attachments: jsonb('attachments').$type<EmailAttachment[]>().default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
