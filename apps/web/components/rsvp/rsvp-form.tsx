@@ -133,8 +133,11 @@ export function RsvpForm({
     try {
       const submissions = forms.map(buildSubmission)
 
+      const token = lookupResult.guest.rsvpToken
+      const tokenParam = token ? `?token=${encodeURIComponent(token)}` : ''
+
       if (isBatch) {
-        const res = await fetch(`${API_URL}/rsvp/submit-batch`, {
+        const res = await fetch(`${API_URL}/rsvp/submit-batch${tokenParam}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ submissions }),
@@ -145,7 +148,7 @@ export function RsvpForm({
           throw new Error(err.error ?? 'Failed to submit RSVP')
         }
       } else {
-        const res = await fetch(`${API_URL}/rsvp/submit`, {
+        const res = await fetch(`${API_URL}/rsvp/submit${tokenParam}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(submissions[0]),

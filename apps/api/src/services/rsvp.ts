@@ -219,8 +219,11 @@ export const rsvpService = {
 
     const isExpired = await this.isDeadlinePassed(wedding.id)
 
+    // Keep rsvpToken on primary guest so the frontend can pass it back on submit
+    const { email: _e, phone: _p, ...primarySafe } = guest
+
     return {
-      guest: this.stripSensitiveFields(guest) as Guest,
+      guest: primarySafe as Guest,
       household,
       householdGuests: householdGuests as Guest[],
       weddingName: wedding.name,

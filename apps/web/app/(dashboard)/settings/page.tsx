@@ -64,6 +64,7 @@ export default function SettingsPage() {
   const [invitingPartner, setInvitingPartner] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [cancellingInvite, setCancellingInvite] = useState(false)
+  const [cancelTeamDialogId, setCancelTeamDialogId] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
     try {
@@ -180,6 +181,13 @@ export default function SettingsPage() {
       setNewMemberEmail('')
       const { data: memberList } = await api.weddings.getMembers(weddingId, token)
       setMembers(memberList)
+      // Re-fetch pending invitations so new team invites appear
+      try {
+        const { data: invites } = await api.weddings.getPendingInvitations(weddingId, token)
+        setPendingInvitations(invites)
+      } catch {
+        /* ignore */
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to add member')
     } finally {
@@ -211,6 +219,9 @@ export default function SettingsPage() {
   const pendingPartnerInvite = pendingInvitations.find(
     (i) => i.status === 'pending' && i.role === 'partner',
   )
+  const pendingTeamInvites = pendingInvitations.filter(
+    (i) => i.status === 'pending' && i.role !== 'partner',
+  )
   const isOwner = members.some(
     ({ member, user: u }) =>
       member.role === 'owner' && u.email === user?.primaryEmailAddress?.emailAddress,
@@ -237,22 +248,27 @@ export default function SettingsPage() {
     }
   }, [weddingId, getToken, partnerEmail])
 
-  const handleCancelInvitation = useCallback(async () => {
-    if (!weddingId || !pendingPartnerInvite) return
-    setCancellingInvite(true)
-    try {
-      const token = await getToken()
-      if (!token) return
-      await api.weddings.cancelInvitation(weddingId, pendingPartnerInvite.id, token)
-      setPendingInvitations((prev) => prev.filter((i) => i.id !== pendingPartnerInvite.id))
-      setCancelDialogOpen(false)
-      toast.success('Invitation cancelled')
-    } catch {
-      toast.error('Failed to cancel invitation')
-    } finally {
-      setCancellingInvite(false)
-    }
-  }, [weddingId, getToken, pendingPartnerInvite])
+  const handleCancelInvitation = useCallback(
+    async (invitationId?: string) => {
+      const targetId = invitationId ?? pendingPartnerInvite?.id
+      if (!weddingId || !targetId) return
+      setCancellingInvite(true)
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.weddings.cancelInvitation(weddingId, targetId, token)
+        setPendingInvitations((prev) => prev.filter((i) => i.id !== targetId))
+        setCancelDialogOpen(false)
+        setCancelTeamDialogId(null)
+        toast.success('Invitation cancelled')
+      } catch {
+        toast.error('Failed to cancel invitation')
+      } finally {
+        setCancellingInvite(false)
+      }
+    },
+    [weddingId, getToken, pendingPartnerInvite],
+  )
 
   if (loading) {
     return (
@@ -498,7 +514,7 @@ export default function SettingsPage() {
                               </Button>
                               <Button
                                 variant="destructive"
-                                onClick={handleCancelInvitation}
+                                onClick={() => handleCancelInvitation()}
                                 disabled={cancellingInvite}
                               >
                                 {cancellingInvite ? 'Cancelling...' : 'Cancel Invitation'}
@@ -535,6 +551,86 @@ export default function SettingsPage() {
               )}
 
               <Separator />
+
+              {/* Pending Team Invitations */}
+              {pendingTeamInvites.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                    <Clock className="h-4 w-4 text-amber-500" />
+                    Pending Team Invitations
+                  </h3>
+                  {pendingTeamInvites.map((invite) => (
+                    <div
+                      key={invite.id}
+                      className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+                    >
+                      <Clock className="h-4 w-4 shrink-0 text-amber-600" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-900">Invitation Pending</p>
+                        <p className="truncate text-xs text-gray-500">
+                          Sent to <span className="font-medium text-gray-700">{invite.email}</span>{' '}
+                          &mdash; waiting for them to accept.
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium capitalize text-gray-700">
+                          {invite.role === 'planner' ? (
+                            <Users className="h-3.5 w-3.5 text-blue-500" />
+                          ) : (
+                            <Users className="h-3.5 w-3.5 text-purple-500" />
+                          )}
+                          {invite.role}
+                        </span>
+                        <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1">
+                          <Mail className="h-3.5 w-3.5 text-amber-600" />
+                          <span className="text-xs font-medium text-amber-700">Sent</span>
+                        </div>
+                        <button
+                          onClick={() => setCancelTeamDialogId(invite.id)}
+                          className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                          title="Cancel invitation"
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Cancel team invite dialog */}
+                  <Dialog
+                    open={cancelTeamDialogId !== null}
+                    onOpenChange={(open) => {
+                      if (!open) setCancelTeamDialogId(null)
+                    }}
+                  >
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Cancel Team Invitation</DialogTitle>
+                        <DialogDescription>
+                          Are you sure you want to cancel the invitation sent to{' '}
+                          <span className="font-medium text-gray-700">
+                            {pendingTeamInvites.find((i) => i.id === cancelTeamDialogId)?.email}
+                          </span>
+                          ? They will no longer be able to accept it, but you can send a new one
+                          afterward.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setCancelTeamDialogId(null)}>
+                          Keep Invitation
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleCancelInvitation(cancelTeamDialogId!)}
+                          disabled={cancellingInvite}
+                        >
+                          {cancellingInvite ? 'Cancelling...' : 'Cancel Invitation'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              )}
 
               {/* Add New Member */}
               <div className="space-y-3">
