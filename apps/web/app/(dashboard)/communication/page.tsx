@@ -113,6 +113,138 @@ interface LocalAttachment {
   size: number
 }
 
+function buildEmailSrcDoc(html: string): string {
+  const sanitized = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: [
+      'html',
+      'head',
+      'body',
+      'style',
+      'a',
+      'b',
+      'i',
+      'u',
+      'em',
+      'strong',
+      'p',
+      'br',
+      'div',
+      'span',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'dl',
+      'dt',
+      'dd',
+      'table',
+      'thead',
+      'tbody',
+      'tfoot',
+      'tr',
+      'th',
+      'td',
+      'caption',
+      'colgroup',
+      'col',
+      'img',
+      'picture',
+      'source',
+      'hr',
+      'sub',
+      'sup',
+      'small',
+      'del',
+      'ins',
+      'mark',
+      'abbr',
+      'blockquote',
+      'pre',
+      'code',
+      'section',
+      'header',
+      'footer',
+      'nav',
+      'main',
+      'article',
+      'figure',
+      'figcaption',
+      'center',
+      'font',
+    ],
+    ALLOWED_ATTR: [
+      'href',
+      'src',
+      'alt',
+      'title',
+      'class',
+      'id',
+      'style',
+      'target',
+      'rel',
+      'width',
+      'height',
+      'colspan',
+      'rowspan',
+      'cellpadding',
+      'cellspacing',
+      'border',
+      'align',
+      'valign',
+      'bgcolor',
+      'color',
+      'face',
+      'size',
+      'role',
+      'aria-label',
+      'aria-hidden',
+      'dir',
+      'lang',
+      'type',
+      'media',
+    ],
+    ALLOW_DATA_ATTR: false,
+    ADD_ATTR: ['target'],
+    WHOLE_DOCUMENT: true,
+  })
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base target="_blank">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      padding: 16px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    a { color: #6d28d9; }
+    img { max-width: 100%; height: auto; }
+    table { max-width: 100%; }
+    pre { overflow-x: auto; }
+    blockquote {
+      border-left: 3px solid #d1d5db;
+      margin: 8px 0;
+      padding: 4px 12px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>${sanitized}</body>
+</html>`
+}
+
 export default function CommunicationPage() {
   const { getToken } = useAuth()
   const [mainTab, setMainTab] = useState<'inbox' | 'campaigns'>('inbox')
@@ -152,6 +284,22 @@ export default function CommunicationPage() {
   const [composeAttachments, setComposeAttachments] = useState<LocalAttachment[]>([])
   const [sendingEmail, setSendingEmail] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  const handleIframeLoad = useCallback(() => {
+    const iframe = iframeRef.current
+    if (!iframe) return
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow?.document
+      if (doc?.body) {
+        const height = doc.body.scrollHeight + 32
+        iframe.style.height = `${Math.max(200, Math.min(height, 800))}px`
+      }
+    } catch {
+      // sandbox may block access in some cases
+      iframe.style.height = '500px'
+    }
+  }, [])
 
   // ══════════════════════════════════════════════
   //  CAMPAIGN STATE
@@ -974,6 +1122,23 @@ export default function CommunicationPage() {
                                   {selectedEmail.ccAddresses}
                                 </p>
                               )}
+                              {selectedEmail.replyTo && (
+                                <p>
+                                  <span className="font-medium text-gray-700">Reply-To:</span>{' '}
+                                  {selectedEmail.replyTo}
+                                </p>
+                              )}
+                              <p>
+                                <span className="font-medium text-gray-700">Date:</span>{' '}
+                                {new Date(selectedEmail.createdAt).toLocaleString([], {
+                                  weekday: 'short',
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                })}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
@@ -1029,11 +1194,13 @@ export default function CommunicationPage() {
                         <div className="flex-1 overflow-y-auto p-4">
                           {selectedEmail.htmlBody ? (
                             <iframe
-                              sandbox=""
-                              srcDoc={`<!DOCTYPE html><html><head><style>body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#374151;margin:0;padding:0;}a{color:#8b5cf6;}img{max-width:100%;height:auto;}</style></head><body>${DOMPurify.sanitize(selectedEmail.htmlBody, { ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'p', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'small', 'del', 'sub', 'sup'], ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'target', 'rel', 'width', 'height', 'colspan', 'rowspan', 'border', 'align', 'valign'], ALLOW_DATA_ATTR: false, ADD_ATTR: ['target'] })}</body></html>`}
-                              className="h-full w-full border-0"
+                              ref={iframeRef}
+                              sandbox="allow-same-origin allow-popups"
+                              srcDoc={buildEmailSrcDoc(selectedEmail.htmlBody)}
+                              className="w-full border-0"
                               title="Email content"
-                              style={{ minHeight: '300px' }}
+                              style={{ minHeight: '200px' }}
+                              onLoad={handleIframeLoad}
                             />
                           ) : (
                             <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-gray-700">
@@ -1128,8 +1295,8 @@ export default function CommunicationPage() {
                           variant="outline"
                           className={
                             selectedEmail.direction === 'inbound'
-                              ? 'border-blue-200 text-blue-700'
-                              : 'border-green-200 text-green-700'
+                              ? 'border-blue-200 bg-blue-50 text-blue-700'
+                              : 'border-green-200 bg-green-50 text-green-700'
                           }
                         >
                           {selectedEmail.direction === 'inbound' ? 'Received' : 'Sent'}
@@ -1137,26 +1304,65 @@ export default function CommunicationPage() {
                         <h2 className="mt-2 font-serif text-lg font-semibold text-gray-900">
                           {selectedEmail.subject || '(No subject)'}
                         </h2>
-                        <p className="mt-1 text-sm text-gray-600">
-                          {selectedEmail.fromName
-                            ? `${selectedEmail.fromName} <${selectedEmail.fromAddress}>`
-                            : selectedEmail.fromAddress}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {new Date(selectedEmail.createdAt).toLocaleString()}
-                        </p>
+                        <div className="mt-2 space-y-0.5 text-sm text-gray-600">
+                          <p>
+                            <span className="font-medium text-gray-700">From:</span>{' '}
+                            {selectedEmail.fromName
+                              ? `${selectedEmail.fromName} <${selectedEmail.fromAddress}>`
+                              : selectedEmail.fromAddress}
+                          </p>
+                          <p>
+                            <span className="font-medium text-gray-700">To:</span>{' '}
+                            {selectedEmail.toAddress}
+                          </p>
+                          {selectedEmail.ccAddresses && (
+                            <p>
+                              <span className="font-medium text-gray-700">CC:</span>{' '}
+                              {selectedEmail.ccAddresses}
+                            </p>
+                          )}
+                          {selectedEmail.replyTo && (
+                            <p>
+                              <span className="font-medium text-gray-700">Reply-To:</span>{' '}
+                              {selectedEmail.replyTo}
+                            </p>
+                          )}
+                          <p>
+                            <span className="font-medium text-gray-700">Date:</span>{' '}
+                            {new Date(selectedEmail.createdAt).toLocaleString([], {
+                              weekday: 'short',
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: 'numeric',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                        </div>
                       </div>
                       <div className="border-t p-4">
                         {selectedEmail.htmlBody ? (
                           <iframe
-                            sandbox=""
-                            srcDoc={`<!DOCTYPE html><html><head><style>body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#374151;margin:0;padding:0;}a{color:#8b5cf6;}img{max-width:100%;height:auto;}</style></head><body>${DOMPurify.sanitize(selectedEmail.htmlBody, { ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'p', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'small', 'del', 'sub', 'sup'], ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'target', 'rel', 'width', 'height', 'colspan', 'rowspan', 'border', 'align', 'valign'], ALLOW_DATA_ATTR: false, ADD_ATTR: ['target'] })}</body></html>`}
+                            sandbox="allow-same-origin allow-popups"
+                            srcDoc={buildEmailSrcDoc(selectedEmail.htmlBody)}
                             className="w-full border-0"
                             title="Email content"
                             style={{ minHeight: '200px' }}
+                            onLoad={(e) => {
+                              const iframe = e.currentTarget
+                              try {
+                                const doc = iframe.contentDocument || iframe.contentWindow?.document
+                                if (doc?.body) {
+                                  const height = doc.body.scrollHeight + 32
+                                  iframe.style.height = `${Math.max(200, Math.min(height, 800))}px`
+                                }
+                              } catch {
+                                iframe.style.height = '500px'
+                              }
+                            }}
                           />
                         ) : (
-                          <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700">
+                          <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-gray-700">
                             {selectedEmail.textBody ?? '(No content)'}
                           </pre>
                         )}

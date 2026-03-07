@@ -1099,6 +1099,7 @@ export interface Email {
   messageId: string | null
   attachments: EmailAttachment[]
   inReplyToMessageId: string | null
+  replyTo: string | null
   createdAt: Date
 }
 

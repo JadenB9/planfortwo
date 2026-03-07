@@ -27,6 +27,7 @@ vi.mock('../services/inbox.js', () => ({
     deleteEmail: vi.fn(),
     sendEmail: vi.fn(),
     getUnreadCount: vi.fn(),
+    getAttachmentDownloadUrl: vi.fn(),
   },
 }))
 
@@ -69,6 +70,7 @@ const MOCK_EMAIL = {
   isStarred: false,
   messageId: null,
   inReplyToMessageId: null,
+  replyTo: null,
   createdAt: new Date(),
 }
 
@@ -100,6 +102,9 @@ describe('Inbox Routes', () => {
       toAddress: 'recipient@example.com',
     })
     vi.mocked(inboxService.getUnreadCount).mockResolvedValue(3)
+    vi.mocked(inboxService.getAttachmentDownloadUrl).mockResolvedValue({
+      url: 'https://r2.example.com/file.pdf',
+    })
   })
 
   // ── Addresses ──

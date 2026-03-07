@@ -82,4 +82,25 @@ export const storageClient = {
     const ext = sanitized.split('.').pop() ?? 'file'
     return `gallery/${weddingId}/${photoId}.${ext}`
   },
+
+  buildEmailAttachmentKey(emailAddressId: string, attachmentId: string, fileName: string): string {
+    const sanitized = fileName.replace(/[^a-zA-Z0-9._-]/g, '')
+    const ext = sanitized.split('.').pop() ?? 'file'
+    return `email-attachments/${emailAddressId}/${attachmentId}.${ext}`
+  },
+
+  async uploadFromUrl(key: string, sourceUrl: string, contentType: string): Promise<void> {
+    const response = await fetch(sourceUrl)
+    if (!response.ok) throw new Error(`Failed to download: ${response.status}`)
+    const buffer = Buffer.from(await response.arrayBuffer())
+    const client = getR2Client()
+    await client.send(
+      new PutObjectCommand({
+        Bucket: getBucket(),
+        Key: key,
+        Body: buffer,
+        ContentType: contentType,
+      }),
+    )
+  },
 }

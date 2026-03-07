@@ -22,6 +22,13 @@ vi.mock('../services/inbox.js', () => ({
   },
 }))
 
+vi.mock('@planfortwo/storage', () => ({
+  storageClient: {
+    buildEmailAttachmentKey: vi.fn().mockReturnValue('email-attachments/addr-1/att-1.pdf'),
+    uploadFromUrl: vi.fn().mockResolvedValue(undefined),
+  },
+}))
+
 import { resendWebhookRoute } from './webhooks-resend.js'
 import { inboxService } from '../services/inbox.js'
 
@@ -68,6 +75,7 @@ describe('Resend Webhook Route', () => {
       isStarred: false,
       messageId: null,
       inReplyToMessageId: null,
+      replyTo: null,
       createdAt: new Date(),
     })
 

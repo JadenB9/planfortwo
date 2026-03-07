@@ -3,6 +3,7 @@ import { Webhook } from 'svix'
 import createDOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
 import { inboxService } from '../services/inbox.js'
+import { storageClient } from '@planfortwo/storage'
 
 const window = new JSDOM('').window
 const DOMPurify = createDOMPurify(window as never)
@@ -86,6 +87,12 @@ function parseEmailAddress(raw: string): { name?: string; email: string } {
 function sanitizeHtml(html: string): string {
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
+      // Structural
+      'html',
+      'head',
+      'body',
+      'style',
+      // Text
       'a',
       'b',
       'i',
@@ -102,19 +109,30 @@ function sanitizeHtml(html: string): string {
       'h4',
       'h5',
       'h6',
+      // Lists
       'ul',
       'ol',
       'li',
-      'blockquote',
-      'pre',
-      'code',
-      'img',
+      'dl',
+      'dt',
+      'dd',
+      // Tables (critical for email layout)
       'table',
       'thead',
       'tbody',
+      'tfoot',
       'tr',
       'th',
       'td',
+      'caption',
+      'colgroup',
+      'col',
+      // Media
+      'img',
+      'picture',
+      'source',
+      'video',
+      // Formatting
       'hr',
       'sub',
       'sup',
@@ -123,17 +141,21 @@ function sanitizeHtml(html: string): string {
       'ins',
       'mark',
       'abbr',
-      'dl',
-      'dt',
-      'dd',
-      'figure',
-      'figcaption',
+      'blockquote',
+      'pre',
+      'code',
+      // Semantic
       'section',
       'header',
       'footer',
       'nav',
       'main',
       'article',
+      'figure',
+      'figcaption',
+      // Legacy email elements (many emails still use these)
+      'center',
+      'font',
     ],
     ALLOWED_ATTR: [
       'href',
@@ -141,6 +163,8 @@ function sanitizeHtml(html: string): string {
       'alt',
       'title',
       'class',
+      'id',
+      'style',
       'target',
       'rel',
       'width',
@@ -154,9 +178,19 @@ function sanitizeHtml(html: string): string {
       'valign',
       'bgcolor',
       'color',
+      'face',
+      'size',
+      'role',
+      'aria-label',
+      'aria-hidden',
+      'dir',
+      'lang',
+      'type',
+      'media',
     ],
     ALLOW_DATA_ATTR: false,
     ADD_ATTR: ['target'],
+    WHOLE_DOCUMENT: true,
   })
 }
 
@@ -202,6 +236,8 @@ resendWebhookRoute.post('/', async (c) => {
     const emailId = data.email_id as string
     const ccArray = (data.cc as string[]) ?? []
     const messageId = (data.message_id as string) ?? undefined
+    const replyToArray = (data.reply_to as string[]) ?? []
+    const replyTo = replyToArray.length > 0 ? replyToArray[0] : undefined
 
     const { name: fromName, email: fromAddress } = parseEmailAddress(rawFrom)
 
@@ -224,6 +260,7 @@ resendWebhookRoute.post('/', async (c) => {
         contentType: string
         size: number
         url: string
+        r2Key?: string
       }> = []
 
       if (resendApiKey && emailId) {
@@ -241,6 +278,18 @@ resendWebhookRoute.post('/', async (c) => {
             size: att.content_length,
             url: att.download_url,
           }))
+
+        // Persist attachments to R2 (Resend download URLs expire)
+        for (const att of attachmentsMeta) {
+          try {
+            const r2Key = storageClient.buildEmailAttachmentKey(address.id, att.id, att.filename)
+            await storageClient.uploadFromUrl(r2Key, att.url, att.contentType)
+            att.r2Key = r2Key
+          } catch (err) {
+            console.error(`[resend-webhook] Failed to persist attachment ${att.filename}:`, err)
+            // Keep the Resend URL as fallback
+          }
+        }
       } else {
         console.warn('[resend-webhook] RESEND_API_KEY not set, cannot fetch email content')
       }
@@ -255,6 +304,7 @@ resendWebhookRoute.post('/', async (c) => {
         textBody,
         htmlBody,
         messageId,
+        replyTo,
         attachments: attachmentsMeta,
       })
 

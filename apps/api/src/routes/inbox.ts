@@ -70,6 +70,19 @@ inboxRoute.get('/unread-count', async (c) => {
   return c.json({ data: { count } })
 })
 
+// ── Attachment download ──
+inboxRoute.get('/attachments/:attachmentId', async (c) => {
+  const userId = c.get('dbUserId')
+  const attachmentId = c.req.param('attachmentId')
+
+  const result = await inboxService.getAttachmentDownloadUrl(userId, attachmentId)
+  if (!result) {
+    return c.json({ error: 'Attachment not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
+
+  return c.redirect(result.url)
+})
+
 // ── Send ──
 inboxRoute.post(
   '/send',

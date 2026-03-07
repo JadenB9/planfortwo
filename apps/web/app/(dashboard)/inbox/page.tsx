@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import DOMPurify from 'dompurify'
@@ -26,7 +26,6 @@ import {
   Star,
   StarOff,
   Trash2,
-  ArrowLeft,
   RefreshCw,
   Plus,
   Mail,
@@ -34,11 +33,169 @@ import {
   Loader2,
   Check,
   AtSign,
+  Paperclip,
+  Download,
+  Eye,
+  EyeOff,
+  Reply,
+  Search,
 } from 'lucide-react'
-import type { Email, EmailAddress } from '@planfortwo/types'
+import type { Email, EmailAddress, EmailAttachment } from '@planfortwo/types'
 import { toast } from 'sonner'
 
-type TabFilter = 'all' | 'inbound' | 'outbound' | 'starred'
+type TabFilter = 'all' | 'inbound' | 'outbound' | 'unread' | 'starred'
+
+function buildEmailSrcDoc(html: string): string {
+  const sanitized = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: [
+      'html',
+      'head',
+      'body',
+      'style',
+      'a',
+      'b',
+      'i',
+      'u',
+      'em',
+      'strong',
+      'p',
+      'br',
+      'div',
+      'span',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'dl',
+      'dt',
+      'dd',
+      'table',
+      'thead',
+      'tbody',
+      'tfoot',
+      'tr',
+      'th',
+      'td',
+      'caption',
+      'colgroup',
+      'col',
+      'img',
+      'picture',
+      'source',
+      'hr',
+      'sub',
+      'sup',
+      'small',
+      'del',
+      'ins',
+      'mark',
+      'abbr',
+      'blockquote',
+      'pre',
+      'code',
+      'section',
+      'header',
+      'footer',
+      'nav',
+      'main',
+      'article',
+      'figure',
+      'figcaption',
+      'center',
+      'font',
+    ],
+    ALLOWED_ATTR: [
+      'href',
+      'src',
+      'alt',
+      'title',
+      'class',
+      'id',
+      'style',
+      'target',
+      'rel',
+      'width',
+      'height',
+      'colspan',
+      'rowspan',
+      'cellpadding',
+      'cellspacing',
+      'border',
+      'align',
+      'valign',
+      'bgcolor',
+      'color',
+      'face',
+      'size',
+      'role',
+      'aria-label',
+      'aria-hidden',
+      'dir',
+      'lang',
+      'type',
+      'media',
+    ],
+    ALLOW_DATA_ATTR: false,
+    ADD_ATTR: ['target'],
+    WHOLE_DOCUMENT: true,
+  })
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base target="_blank">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      padding: 16px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    a { color: #6d28d9; }
+    img { max-width: 100%; height: auto; }
+    table { max-width: 100%; }
+    pre { overflow-x: auto; }
+    blockquote {
+      border-left: 3px solid #d1d5db;
+      margin: 8px 0;
+      padding: 4px 12px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>${sanitized}</body>
+</html>`
+}
+
+function getFileIcon(contentType: string) {
+  if (contentType.startsWith('image/')) return '🖼'
+  if (contentType.includes('pdf')) return '📄'
+  if (
+    contentType.includes('spreadsheet') ||
+    contentType.includes('excel') ||
+    contentType.includes('csv')
+  )
+    return '📊'
+  if (contentType.includes('word') || contentType.includes('document')) return '📝'
+  if (contentType.includes('zip') || contentType.includes('archive')) return '📦'
+  return '📎'
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 
 export default function InboxPage() {
   const { getToken } = useAuth()
@@ -50,6 +207,27 @@ export default function InboxPage() {
   const [totalEmails, setTotalEmails] = useState(0)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
+
+  const [searchQuery, setSearchQuery] = useState('')
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  // Iframe ref for auto-height
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  const handleIframeLoad = useCallback(() => {
+    const iframe = iframeRef.current
+    if (!iframe) return
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow?.document
+      if (doc?.body) {
+        const height = doc.body.scrollHeight + 32
+        iframe.style.height = `${Math.max(200, Math.min(height, 800))}px`
+      }
+    } catch {
+      // sandbox may block access in some cases
+      iframe.style.height = '500px'
+    }
+  }, [])
 
   // Claim form
   const [claimAddress, setClaimAddress] = useState('')
@@ -88,7 +266,9 @@ export default function InboxPage() {
     const filters: Record<string, string | number | boolean> = { page, pageSize: 20 }
     if (activeTab === 'inbound') filters.direction = 'inbound'
     if (activeTab === 'outbound') filters.direction = 'outbound'
+    if (activeTab === 'unread') filters.isRead = false
     if (activeTab === 'starred') filters.isStarred = true
+    if (searchQuery.trim()) filters.search = searchQuery.trim()
 
     try {
       const res = await api.inbox.list(token, filters)
@@ -99,7 +279,18 @@ export default function InboxPage() {
       toast.error('Failed to load emails')
       setEmailList([])
     }
-  }, [getToken, page, activeTab])
+  }, [getToken, page, activeTab, searchQuery])
+
+  const fetchUnreadCount = useCallback(async () => {
+    const token = await getToken()
+    if (!token) return
+    try {
+      const res = await api.inbox.unreadCount(token)
+      setUnreadCount(res.data.count)
+    } catch {
+      // silent fail
+    }
+  }, [getToken])
 
   useEffect(() => {
     async function init() {
@@ -113,8 +304,9 @@ export default function InboxPage() {
   useEffect(() => {
     if (addresses.length > 0) {
       fetchEmails()
+      fetchUnreadCount()
     }
-  }, [addresses.length, fetchEmails])
+  }, [addresses.length, fetchEmails, fetchUnreadCount])
 
   const handleCheckAvailability = useCallback(
     async (address: string) => {
@@ -165,6 +357,22 @@ export default function InboxPage() {
     }
   }
 
+  // Search debounce
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  useEffect(() => {
+    if (addresses.length > 0) {
+      setPage(1)
+    }
+  }, [debouncedSearch, addresses.length])
+
   const handleSelectEmail = async (email: Email) => {
     const token = await getToken()
     if (!token) return
@@ -173,11 +381,27 @@ export default function InboxPage() {
       const res = await api.inbox.get(email.id, token)
       setSelectedEmail(res.data)
       if (!email.isRead) {
+        await api.inbox.update(email.id, { isRead: true }, token)
         setEmailList((prev) => prev.map((e) => (e.id === email.id ? { ...e, isRead: true } : e)))
+        setUnreadCount((c) => Math.max(0, c - 1))
       }
     } catch {
       toast.error('Failed to load email')
       setSelectedEmail(email)
+    }
+  }
+
+  const handleToggleRead = async (email: Email) => {
+    const token = await getToken()
+    if (!token) return
+
+    try {
+      const res = await api.inbox.update(email.id, { isRead: !email.isRead }, token)
+      setEmailList((prev) => prev.map((em) => (em.id === email.id ? res.data : em)))
+      if (selectedEmail?.id === email.id) setSelectedEmail(res.data)
+      setUnreadCount((c) => (email.isRead ? c + 1 : Math.max(0, c - 1)))
+    } catch {
+      toast.error('Failed to update email')
     }
   }
 
@@ -368,15 +592,26 @@ export default function InboxPage() {
       <motion.div
         variants={fadeInUp}
         transition={springSmooth}
-        className="mb-4 flex items-center justify-between"
+        className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Inbox</h1>
           <p className="text-sm text-gray-500">
-            {addresses[0]!.address}@planfortwo.com &middot; {totalEmails} messages
+            {addresses[0]!.address}@planfortwo.com &middot; {totalEmails} message
+            {totalEmails !== 1 ? 's' : ''}
+            {unreadCount > 0 && ` \u00b7 ${unreadCount} unread`}
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <div className="relative flex-1 sm:w-56 sm:flex-initial">
+            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Search emails..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 text-sm"
+            />
+          </div>
           <Button variant="outline" size="sm" onClick={fetchEmails}>
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -410,6 +645,10 @@ export default function InboxPage() {
             <TabsTrigger value="outbound">
               <Send className="mr-1 h-3 w-3" />
               Sent
+            </TabsTrigger>
+            <TabsTrigger value="unread">
+              <Mail className="mr-1 h-3 w-3" />
+              Unread
             </TabsTrigger>
             <TabsTrigger value="starred">
               <Star className="mr-1 h-3 w-3" />
@@ -470,7 +709,14 @@ export default function InboxPage() {
                       >
                         {email.subject}
                       </p>
-                      <p className="truncate text-xs text-gray-400">{getSnippet(email)}</p>
+                      <div className="mt-0.5 flex items-center gap-1.5">
+                        <p className="min-w-0 flex-1 truncate text-xs text-gray-400">
+                          {getSnippet(email)}
+                        </p>
+                        {email.attachments && email.attachments.length > 0 && (
+                          <Paperclip className="h-3 w-3 flex-shrink-0 text-gray-400" />
+                        )}
+                      </div>
                     </div>
                     <button
                       onClick={(e) => handleToggleStar(email, e)}
@@ -521,36 +767,74 @@ export default function InboxPage() {
               {/* Detail header */}
               <div className="flex items-start justify-between border-b p-4">
                 <div className="min-w-0 flex-1">
-                  <div className="mb-1 flex items-center gap-2">
+                  <div className="mb-2 flex items-center gap-2">
                     <Badge
                       variant="outline"
                       className={
                         selectedEmail.direction === 'inbound'
-                          ? 'border-blue-200 text-blue-700'
-                          : 'border-green-200 text-green-700'
+                          ? 'border-blue-200 bg-blue-50 text-blue-700'
+                          : 'border-green-200 bg-green-50 text-green-700'
                       }
                     >
                       {selectedEmail.direction === 'inbound' ? 'Received' : 'Sent'}
                     </Badge>
-                    <span className="text-xs text-gray-400">
-                      {new Date(selectedEmail.createdAt).toLocaleString()}
-                    </span>
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">{selectedEmail.subject}</h2>
-                  <p className="mt-1 text-sm text-gray-600">
-                    <span className="font-medium">From:</span>{' '}
-                    {selectedEmail.fromName
-                      ? `${selectedEmail.fromName} <${selectedEmail.fromAddress}>`
-                      : selectedEmail.fromAddress}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">To:</span> {selectedEmail.toAddress}
-                  </p>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {selectedEmail.subject || '(No subject)'}
+                  </h2>
+                  <div className="mt-2 space-y-0.5 text-sm text-gray-600">
+                    <p>
+                      <span className="font-medium text-gray-700">From:</span>{' '}
+                      {selectedEmail.fromName
+                        ? `${selectedEmail.fromName} <${selectedEmail.fromAddress}>`
+                        : selectedEmail.fromAddress}
+                    </p>
+                    <p>
+                      <span className="font-medium text-gray-700">To:</span>{' '}
+                      {selectedEmail.toAddress}
+                    </p>
+                    {selectedEmail.ccAddresses && (
+                      <p>
+                        <span className="font-medium text-gray-700">CC:</span>{' '}
+                        {selectedEmail.ccAddresses}
+                      </p>
+                    )}
+                    {selectedEmail.replyTo && (
+                      <p>
+                        <span className="font-medium text-gray-700">Reply-To:</span>{' '}
+                        {selectedEmail.replyTo}
+                      </p>
+                    )}
+                    <p>
+                      <span className="font-medium text-gray-700">Date:</span>{' '}
+                      {new Date(selectedEmail.createdAt).toLocaleString([], {
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="sm"
+                    title={selectedEmail.isRead ? 'Mark as unread' : 'Mark as read'}
+                    onClick={() => handleToggleRead(selectedEmail)}
+                  >
+                    {selectedEmail.isRead ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    title={selectedEmail.isStarred ? 'Unstar' : 'Star'}
                     onClick={() =>
                       handleToggleStar(selectedEmail, {
                         stopPropagation: () => {},
@@ -566,6 +850,7 @@ export default function InboxPage() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    title="Reply"
                     onClick={() => {
                       setComposeForm({
                         toAddress:
@@ -580,11 +865,12 @@ export default function InboxPage() {
                       setShowCompose(true)
                     }}
                   >
-                    <ArrowLeft className="h-4 w-4 rotate-[135deg]" />
+                    <Reply className="h-4 w-4 text-gray-500" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
+                    title="Delete"
                     className="text-red-500 hover:text-red-700"
                     onClick={() => handleDelete(selectedEmail.id)}
                   >
@@ -596,23 +882,65 @@ export default function InboxPage() {
               {/* Email body */}
               <div className="flex-1 overflow-y-auto p-4">
                 {selectedEmail.htmlBody ? (
-                  <div
-                    className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(selectedEmail.htmlBody),
-                    }}
+                  <iframe
+                    ref={iframeRef}
+                    sandbox="allow-same-origin allow-popups"
+                    srcDoc={buildEmailSrcDoc(selectedEmail.htmlBody)}
+                    className="w-full border-0"
+                    title="Email content"
+                    style={{ minHeight: '200px' }}
+                    onLoad={handleIframeLoad}
                   />
                 ) : (
-                  <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700">
+                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-gray-700">
                     {selectedEmail.textBody ?? '(No content)'}
                   </pre>
                 )}
               </div>
+
+              {/* Attachments */}
+              {selectedEmail.attachments && selectedEmail.attachments.length > 0 && (
+                <div className="border-t p-4">
+                  <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                    <Paperclip className="h-3 w-3" />
+                    {selectedEmail.attachments.length} attachment
+                    {selectedEmail.attachments.length !== 1 ? 's' : ''}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedEmail.attachments.map((att: EmailAttachment) => (
+                      <div
+                        key={att.id}
+                        className="flex items-center gap-2 rounded-lg border bg-gray-50 px-3 py-2"
+                      >
+                        <span className="text-base">{getFileIcon(att.contentType)}</span>
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-medium text-gray-700">
+                            {att.filename}
+                          </p>
+                          <p className="text-[10px] text-gray-400">{formatFileSize(att.size)}</p>
+                        </div>
+                        {att.url && (
+                          <a
+                            href={att.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-1 text-rose-500 hover:text-rose-600"
+                            title="Download"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex h-full flex-col items-center justify-center text-gray-400">
-              <Mail className="mb-3 h-16 w-16" />
-              <p className="text-sm">Select an email to read</p>
+              <Mail className="mb-3 h-16 w-16 opacity-30" />
+              <p className="text-sm font-medium">Select an email to read</p>
+              <p className="mt-1 text-xs">Choose a message from the list on the left</p>
             </div>
           )}
         </Card>

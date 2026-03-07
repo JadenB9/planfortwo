@@ -44,6 +44,7 @@ export const emails = pgTable('emails', {
   isStarred: boolean('is_starred').notNull().default(false),
   messageId: text('message_id'),
   inReplyToMessageId: text('in_reply_to_message_id'),
+  replyTo: text('reply_to'),
   attachments: jsonb('attachments').$type<EmailAttachment[]>().default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
