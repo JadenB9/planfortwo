@@ -2,12 +2,70 @@ import { db, emailAddresses, emails } from '@planfortwo/db'
 import { eq, and, desc, ilike, or, sql, count } from 'drizzle-orm'
 import { Resend } from 'resend'
 import { storageClient } from '@planfortwo/storage'
+import { JSDOM } from 'jsdom'
+import DOMPurify from 'dompurify'
 import type { InboxFiltersInput, UpdateEmailInput } from '@planfortwo/validators'
 
 const RESERVED_ADDRESSES = ['admin', 'support', 'noreply', 'postmaster', 'abuse', 'webmaster']
 
 function sanitizeDisplayName(name: string): string {
   return name.replace(/[\r\n\t]/g, ' ').trim()
+}
+
+function sanitizeHtml(html: string): string {
+  const window = new JSDOM('').window
+  const purify = DOMPurify(window)
+  return purify.sanitize(html, {
+    ALLOWED_TAGS: [
+      'p',
+      'br',
+      'b',
+      'i',
+      'u',
+      'em',
+      'strong',
+      'a',
+      'ul',
+      'ol',
+      'li',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'blockquote',
+      'pre',
+      'code',
+      'div',
+      'span',
+      'img',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'td',
+      'th',
+      'hr',
+      'sub',
+      'sup',
+      'small',
+    ],
+    ALLOWED_ATTR: [
+      'href',
+      'target',
+      'rel',
+      'src',
+      'alt',
+      'width',
+      'height',
+      'style',
+      'class',
+      'id',
+      'colspan',
+      'rowspan',
+    ],
+  })
 }
 
 function getResendClient(): Resend | null {
@@ -254,7 +312,7 @@ export const inboxService = {
       text: data.textBody,
     }
     if (data.htmlBody) {
-      sendPayload.html = data.htmlBody
+      sendPayload.html = sanitizeHtml(data.htmlBody)
     }
     if (data.attachments && data.attachments.length > 0) {
       sendPayload.attachments = data.attachments

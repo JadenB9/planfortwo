@@ -97,6 +97,10 @@ vi.mock('@planfortwo/db', () => {
       dietary: 'dietary',
       mealChoice: 'mealChoice',
     },
+    websiteConfigs: {
+      weddingId: 'weddingId',
+      subdomain: 'subdomain',
+    },
     households: {},
     weddings: {},
     eq: vi.fn(),
@@ -115,6 +119,7 @@ const GUEST_ID = 'b0000000-0000-0000-0000-000000000001'
 const GUEST_ID_2 = 'b0000000-0000-0000-0000-000000000002'
 const RSVP_TOKEN = 'tok_abc123'
 const RSVP_CODE = 'SMITHS2026'
+const SLUG = 'smith-wedding'
 
 function createApp() {
   const app = new Hono()
@@ -127,6 +132,16 @@ function authHeaders(): Record<string, string> {
     Authorization: 'Bearer test-valid-token',
     'Content-Type': 'application/json',
   }
+}
+
+function mockSlugResolution() {
+  ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+    from: vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue([{ weddingId: WEDDING_ID }]),
+      }),
+    }),
+  })
 }
 
 describe('RSVP Routes', () => {
@@ -197,6 +212,7 @@ describe('RSVP Routes', () => {
 
   describe('POST /rsvp/lookup-by-name (public)', () => {
     it('should return single result when one guest matches', async () => {
+      mockSlugResolution()
       const mockResult = {
         type: 'single' as const,
         result: {
@@ -216,7 +232,7 @@ describe('RSVP Routes', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          weddingId: WEDDING_ID,
+          slug: SLUG,
           firstName: 'Alice',
           lastName: 'Smith',
         }),
@@ -229,6 +245,7 @@ describe('RSVP Routes', () => {
     })
 
     it('should return multiple guests when several match', async () => {
+      mockSlugResolution()
       const mockResult = {
         type: 'multiple' as const,
         guests: [
@@ -243,7 +260,7 @@ describe('RSVP Routes', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          weddingId: WEDDING_ID,
+          slug: SLUG,
           firstName: 'Alice',
           lastName: 'Smith',
         }),
@@ -256,6 +273,7 @@ describe('RSVP Routes', () => {
     })
 
     it('should return 404 when no guests match', async () => {
+      mockSlugResolution()
       const mockResult = { type: 'none' as const }
       mockedRsvpService.lookupByName.mockResolvedValue(mockResult as never)
 
@@ -264,7 +282,7 @@ describe('RSVP Routes', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          weddingId: WEDDING_ID,
+          slug: SLUG,
           firstName: 'Nobody',
           lastName: 'Here',
         }),
@@ -272,13 +290,14 @@ describe('RSVP Routes', () => {
 
       expect(res.status).toBe(404)
       const body = await res.json()
-      expect(body.code).toBe('GUEST_NOT_FOUND')
-      expect(body.error).toBe('No guests found matching that name')
+      expect(body.code).toBe('NOT_FOUND')
+      expect(body.error).toBe('Invitation not found')
     })
   })
 
   describe('POST /rsvp/lookup-by-guest-id (public)', () => {
     it('should return guest lookup result', async () => {
+      mockSlugResolution()
       mockedRsvpService.isDeadlinePassed.mockResolvedValue(false)
       const mockResult = {
         guest: { id: GUEST_ID, firstName: 'Alice', lastName: 'Smith' },
@@ -297,7 +316,7 @@ describe('RSVP Routes', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           guestId: GUEST_ID,
-          weddingId: WEDDING_ID,
+          slug: SLUG,
         }),
       })
 
@@ -307,6 +326,7 @@ describe('RSVP Routes', () => {
     })
 
     it('should return 404 when guest not found', async () => {
+      mockSlugResolution()
       mockedRsvpService.isDeadlinePassed.mockResolvedValue(false)
       mockedRsvpService.lookupByGuestId.mockResolvedValue(null)
 
@@ -316,16 +336,17 @@ describe('RSVP Routes', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           guestId: GUEST_ID,
-          weddingId: WEDDING_ID,
+          slug: SLUG,
         }),
       })
 
       expect(res.status).toBe(404)
       const body = await res.json()
-      expect(body.code).toBe('GUEST_NOT_FOUND')
+      expect(body.code).toBe('NOT_FOUND')
     })
 
     it('should return 410 when deadline has passed', async () => {
+      mockSlugResolution()
       mockedRsvpService.isDeadlinePassed.mockResolvedValue(true)
 
       const app = createApp()
@@ -334,7 +355,7 @@ describe('RSVP Routes', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           guestId: GUEST_ID,
-          weddingId: WEDDING_ID,
+          slug: SLUG,
         }),
       })
 
