@@ -225,6 +225,23 @@ weddingsRoute.post('/accept-invite/:token', async (c) => {
   }
 })
 
+// GET /weddings/:id/pending-invitations -- list pending invitations for a wedding
+weddingsRoute.get('/:id/pending-invitations', async (c) => {
+  const weddingId = c.req.param('id')
+  const dbUserId = c.get('dbUserId')
+
+  const membership = await weddingService.verifyMembership(weddingId, dbUserId)
+  if (!membership) {
+    return c.json(
+      { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  const invitations = await invitationService.getPendingByWedding(weddingId)
+  return c.json({ data: invitations })
+})
+
 // GET /weddings/:id/members -- list all members of a wedding
 weddingsRoute.get('/:id/members', async (c) => {
   const weddingId = c.req.param('id')

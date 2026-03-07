@@ -140,4 +140,15 @@ export const invitationService = {
 
     return results[0] ?? null
   },
+
+  async getPendingByWedding(weddingId: string) {
+    const results = await db
+      .select()
+      .from(partnerInvitations)
+      .where(
+        and(eq(partnerInvitations.weddingId, weddingId), eq(partnerInvitations.status, 'pending')),
+      )
+
+    return results
+  },
 }

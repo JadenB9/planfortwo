@@ -157,6 +157,10 @@ export const api = {
         method: 'POST',
         token: authToken,
       }),
+    getPendingInvitations: (weddingId: string, token: string) =>
+      fetchApi<{ data: PartnerInvitation[] }>(`/weddings/${weddingId}/pending-invitations`, {
+        token,
+      }),
     getMembers: (weddingId: string, token: string) =>
       fetchApi<{
         data: Array<{

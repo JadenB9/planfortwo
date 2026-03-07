@@ -7,7 +7,8 @@ import type { DashboardData, DashboardStats, GuestStats } from '@planfortwo/type
 import { api } from '@/lib/api'
 import { staggerGrid, fadeInUp, springSmooth } from '@/lib/animations'
 import Link from 'next/link'
-import { Map, ArrowRight, Calendar, Pencil, Check, X } from 'lucide-react'
+import type { PartnerInvitation } from '@planfortwo/types'
+import { Map, ArrowRight, Calendar, Pencil, Check, X, Mail, Clock } from 'lucide-react'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { UpcomingTasks } from '@/components/dashboard/upcoming-tasks'
 import { ActivityFeed } from '@/components/dashboard/activity-feed'
@@ -27,6 +28,7 @@ export default function DashboardPage() {
   const [guestStats, setGuestStats] = useState<GuestStats | null>(null)
   const [websiteStatus, setWebsiteStatus] = useState<string>('Not Set Up')
   const [loading, setLoading] = useState(true)
+  const [pendingInvitations, setPendingInvitations] = useState<PartnerInvitation[]>([])
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteStatus, setInviteStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [inviteError, setInviteError] = useState<string | null>(null)
@@ -75,6 +77,14 @@ export default function DashboardPage() {
               setWebsiteStatus('Not Set Up')
             }),
         )
+        promises.push(
+          api.weddings
+            .getPendingInvitations(data.wedding.id, token)
+            .then(({ data: invites }) => setPendingInvitations(invites))
+            .catch(() => {
+              /* no pending invitations */
+            }),
+        )
         await Promise.all(promises)
       }
     } catch {
@@ -96,7 +106,12 @@ export default function DashboardPage() {
     try {
       const token = await getToken()
       if (!token) throw new Error('Not authenticated')
-      await api.weddings.invitePartner(dashboardData.wedding.id, { email: inviteEmail }, token)
+      const { data: invitation } = await api.weddings.invitePartner(
+        dashboardData.wedding.id,
+        { email: inviteEmail },
+        token,
+      )
+      setPendingInvitations((prev) => [...prev, invitation])
       setInviteStatus('sent')
       setInviteEmail('')
     } catch (err) {
@@ -137,7 +152,11 @@ export default function DashboardPage() {
   const wedding = dashboardData?.wedding
   const members = dashboardData?.members ?? []
   const daysUntil = dashboardData?.daysUntilWedding
-  const showInvite = members.length < 2
+  const hasPartner = members.some((m) => m.role === 'partner')
+  const pendingPartnerInvite = pendingInvitations.find(
+    (i) => i.status === 'pending' && i.role === 'partner',
+  )
+  const showInvite = !hasPartner && !pendingPartnerInvite
 
   return (
     <motion.div
@@ -246,39 +265,66 @@ export default function DashboardPage() {
 
       <div className="space-y-6">
         {/* Invite Partner Card */}
-        {showInvite && (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 className="font-serif text-xl font-semibold text-gray-900">Invite Your Partner</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              Send an invitation so you can plan together.
-            </p>
-
-            {inviteStatus === 'sent' ? (
-              <div className="border-sage-200 bg-sage-50 text-sage-700 mt-4 rounded-xl border px-4 py-3 text-sm">
-                Invitation sent! They&apos;ll receive an email shortly.
+        {!hasPartner &&
+          (pendingPartnerInvite ? (
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50">
+                  <Clock className="h-5 w-5 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="font-serif text-lg font-semibold text-gray-900">
+                    Partner Invitation Pending
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    Invitation sent to{' '}
+                    <span className="font-medium text-gray-700">{pendingPartnerInvite.email}</span>{' '}
+                    &mdash; waiting for them to accept.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5">
+                  <Mail className="h-3.5 w-3.5 text-amber-600" />
+                  <span className="text-xs font-medium text-amber-700">Sent</span>
+                </div>
               </div>
-            ) : (
-              <div className="mt-4 flex gap-3">
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="partner@email.com"
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                />
-                <button
-                  onClick={handleInvitePartner}
-                  disabled={!inviteEmail.trim() || inviteStatus === 'sending'}
-                  className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {inviteStatus === 'sending' ? 'Sending...' : 'Send Invite'}
-                </button>
-              </div>
-            )}
+            </div>
+          ) : (
+            showInvite && (
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 className="font-serif text-xl font-semibold text-gray-900">
+                  Invite Your Partner
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Send an invitation so you can plan together.
+                </p>
 
-            {inviteError && <p className="mt-2 text-sm text-red-600">{inviteError}</p>}
-          </div>
-        )}
+                {inviteStatus === 'sent' ? (
+                  <div className="border-sage-200 bg-sage-50 text-sage-700 mt-4 rounded-xl border px-4 py-3 text-sm">
+                    Invitation sent! They&apos;ll receive an email shortly.
+                  </div>
+                ) : (
+                  <div className="mt-4 flex gap-3">
+                    <input
+                      type="email"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      placeholder="partner@email.com"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    />
+                    <button
+                      onClick={handleInvitePartner}
+                      disabled={!inviteEmail.trim() || inviteStatus === 'sending'}
+                      className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {inviteStatus === 'sending' ? 'Sending...' : 'Send Invite'}
+                    </button>
+                  </div>
+                )}
+
+                {inviteError && <p className="mt-2 text-sm text-red-600">{inviteError}</p>}
+              </div>
+            )
+          ))}
 
         {/* Quick Stats */}
         <motion.div

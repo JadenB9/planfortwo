@@ -63,12 +63,15 @@ export type PricingTier = 'free' | 'full'
 // ── Partner Invitation ──
 export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'cancelled'
 
+export type InvitationRole = 'partner' | 'planner' | 'family'
+
 export interface PartnerInvitation {
   id: string
   weddingId: string
   invitedByUserId: string
   email: string
   token: string
+  role: InvitationRole
   status: InvitationStatus
   createdAt: Date
   expiresAt: Date

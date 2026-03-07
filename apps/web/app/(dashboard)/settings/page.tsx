@@ -13,8 +13,8 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
-import type { Wedding, NotificationPreference } from '@planfortwo/types'
-import { UserPlus, Trash2, Crown, Heart, Users } from 'lucide-react'
+import type { Wedding, NotificationPreference, PartnerInvitation } from '@planfortwo/types'
+import { UserPlus, Trash2, Crown, Heart, Users, Mail, Clock } from 'lucide-react'
 
 export default function SettingsPage() {
   const { getToken } = useAuth()
@@ -51,6 +51,9 @@ export default function SettingsPage() {
   const [newMemberRole, setNewMemberRole] = useState<'planner' | 'family'>('planner')
   const [addingMember, setAddingMember] = useState(false)
   const [removingId, setRemovingId] = useState<string | null>(null)
+  const [pendingInvitations, setPendingInvitations] = useState<PartnerInvitation[]>([])
+  const [partnerEmail, setPartnerEmail] = useState('')
+  const [invitingPartner, setInvitingPartner] = useState(false)
 
   const loadData = useCallback(async () => {
     try {
@@ -80,6 +83,13 @@ export default function SettingsPage() {
         setMembers(memberList)
       } catch {
         /* members will show empty */
+      }
+
+      try {
+        const { data: invites } = await api.weddings.getPendingInvitations(w.id, token)
+        setPendingInvitations(invites)
+      } catch {
+        /* no pending invitations */
       }
     } catch {
       toast.error('Failed to load settings')
@@ -186,6 +196,36 @@ export default function SettingsPage() {
     },
     [weddingId, getToken],
   )
+
+  const hasPartner = members.some(({ member }) => member.role === 'partner')
+  const pendingPartnerInvite = pendingInvitations.find(
+    (i) => i.status === 'pending' && i.role === 'partner',
+  )
+  const isOwner = members.some(
+    ({ member, user: u }) =>
+      member.role === 'owner' && u.email === user?.primaryEmailAddress?.emailAddress,
+  )
+
+  const handleInvitePartner = useCallback(async () => {
+    if (!weddingId || !partnerEmail.trim()) return
+    setInvitingPartner(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      const { data: invitation } = await api.weddings.invitePartner(
+        weddingId,
+        { email: partnerEmail },
+        token,
+      )
+      setPendingInvitations((prev) => [...prev, invitation])
+      setPartnerEmail('')
+      toast.success('Partner invitation sent!')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to send invitation')
+    } finally {
+      setInvitingPartner(false)
+    }
+  }, [weddingId, getToken, partnerEmail])
 
   if (loading) {
     return (
@@ -373,6 +413,60 @@ export default function SettingsPage() {
                   )
                 })}
               </div>
+
+              {/* Invite Partner */}
+              {isOwner && !hasPartner && (
+                <>
+                  <Separator />
+                  <div className="space-y-3">
+                    <h3 className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                      <Heart className="h-4 w-4 text-pink-500" />
+                      Invite Your Partner
+                    </h3>
+                    {pendingPartnerInvite ? (
+                      <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                        <Clock className="h-4 w-4 text-amber-600" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Invitation Pending</p>
+                          <p className="text-xs text-gray-500">
+                            Sent to{' '}
+                            <span className="font-medium text-gray-700">
+                              {pendingPartnerInvite.email}
+                            </span>{' '}
+                            &mdash; waiting for them to accept.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1">
+                          <Mail className="h-3.5 w-3.5 text-amber-600" />
+                          <span className="text-xs font-medium text-amber-700">Sent</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-xs text-gray-500">
+                          Invite your partner so you can plan together. They&apos;ll receive an
+                          email invitation to join your wedding.
+                        </p>
+                        <div className="flex gap-3">
+                          <Input
+                            type="email"
+                            value={partnerEmail}
+                            onChange={(e) => setPartnerEmail(e.target.value)}
+                            placeholder="partner@email.com"
+                            className="flex-1"
+                          />
+                          <Button
+                            onClick={handleInvitePartner}
+                            disabled={!partnerEmail.trim() || invitingPartner}
+                          >
+                            {invitingPartner ? 'Sending...' : 'Send Invite'}
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
 
               <Separator />
 
