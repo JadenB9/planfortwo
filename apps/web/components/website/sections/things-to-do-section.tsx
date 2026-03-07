@@ -58,7 +58,7 @@ export function ThingsToDoSection({ title, content }: ThingsToDoSectionProps) {
                   {activity.description}
                 </p>
               )}
-              {activity.url && (
+              {activity.url && /^https?:\/\//i.test(activity.url) && (
                 <a
                   href={activity.url}
                   target="_blank"

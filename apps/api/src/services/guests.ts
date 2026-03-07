@@ -74,7 +74,8 @@ export const guestService = {
     }
 
     if (filters.search) {
-      const term = `%${filters.search}%`
+      const escaped = filters.search.replace(/[%_\\]/g, '\\$&')
+      const term = `%${escaped}%`
       conditions.push(or(ilike(guests.firstName, term), ilike(guests.lastName, term))!)
     }
 

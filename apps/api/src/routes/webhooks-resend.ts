@@ -141,7 +141,6 @@ function sanitizeHtml(html: string): string {
       'alt',
       'title',
       'class',
-      'style',
       'target',
       'rel',
       'width',
@@ -193,7 +192,7 @@ resendWebhookRoute.post('/', async (c) => {
   }
 
   const eventType = payload.type as string
-  console.log(`[resend-webhook] Received event: ${eventType}`)
+  console.log(`[resend-webhook] Received event: ${String(eventType).replace(/[\r\n\t]/g, '_')}`)
 
   if (eventType === 'email.received') {
     const data = payload.data as Record<string, unknown>
@@ -233,13 +232,15 @@ resendWebhookRoute.post('/', async (c) => {
         htmlBody = content.html ? sanitizeHtml(content.html) : undefined
 
         const rawAttachments = await fetchEmailAttachments(emailId, resendApiKey)
-        attachmentsMeta = rawAttachments.map((att) => ({
-          id: crypto.randomUUID(),
-          filename: att.filename,
-          contentType: att.content_type,
-          size: att.content_length,
-          url: att.download_url,
-        }))
+        attachmentsMeta = rawAttachments
+          .filter((att) => att.download_url?.startsWith('https://'))
+          .map((att) => ({
+            id: crypto.randomUUID(),
+            filename: att.filename.replace(/[^\x20-\x7E]/g, '_'),
+            contentType: att.content_type,
+            size: att.content_length,
+            url: att.download_url,
+          }))
       } else {
         console.warn('[resend-webhook] RESEND_API_KEY not set, cannot fetch email content')
       }
@@ -257,7 +258,9 @@ resendWebhookRoute.post('/', async (c) => {
         attachments: attachmentsMeta,
       })
 
-      console.log(`[resend-webhook] Stored inbound email for ${localPart} from ${fromAddress}`)
+      console.log(
+        `[resend-webhook] Stored inbound email for ${localPart.replace(/[\r\n\t]/g, '_')} from ${fromAddress.replace(/[\r\n\t]/g, '_')}`,
+      )
     }
   }
 

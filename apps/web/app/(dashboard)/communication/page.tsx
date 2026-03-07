@@ -1029,8 +1029,8 @@ export default function CommunicationPage() {
                         <div className="flex-1 overflow-y-auto p-4">
                           {selectedEmail.htmlBody ? (
                             <iframe
-                              sandbox="allow-same-origin"
-                              srcDoc={`<!DOCTYPE html><html><head><style>body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#374151;margin:0;padding:0;}a{color:#8b5cf6;}img{max-width:100%;height:auto;}</style></head><body>${DOMPurify.sanitize(selectedEmail.htmlBody, { ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'p', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'small', 'del', 'sub', 'sup'], ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel', 'width', 'height', 'colspan', 'rowspan', 'border', 'align', 'valign'], ALLOW_DATA_ATTR: false, ADD_ATTR: ['target'] })}</body></html>`}
+                              sandbox=""
+                              srcDoc={`<!DOCTYPE html><html><head><style>body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#374151;margin:0;padding:0;}a{color:#8b5cf6;}img{max-width:100%;height:auto;}</style></head><body>${DOMPurify.sanitize(selectedEmail.htmlBody, { ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'p', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'small', 'del', 'sub', 'sup'], ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'target', 'rel', 'width', 'height', 'colspan', 'rowspan', 'border', 'align', 'valign'], ALLOW_DATA_ATTR: false, ADD_ATTR: ['target'] })}</body></html>`}
                               className="h-full w-full border-0"
                               title="Email content"
                               style={{ minHeight: '300px' }}
@@ -1149,8 +1149,8 @@ export default function CommunicationPage() {
                       <div className="border-t p-4">
                         {selectedEmail.htmlBody ? (
                           <iframe
-                            sandbox="allow-same-origin"
-                            srcDoc={`<!DOCTYPE html><html><head><style>body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#374151;margin:0;padding:0;}a{color:#8b5cf6;}img{max-width:100%;height:auto;}</style></head><body>${DOMPurify.sanitize(selectedEmail.htmlBody, { ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'p', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'small', 'del', 'sub', 'sup'], ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel', 'width', 'height', 'colspan', 'rowspan', 'border', 'align', 'valign'], ALLOW_DATA_ATTR: false, ADD_ATTR: ['target'] })}</body></html>`}
+                            sandbox=""
+                            srcDoc={`<!DOCTYPE html><html><head><style>body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.6;color:#374151;margin:0;padding:0;}a{color:#8b5cf6;}img{max-width:100%;height:auto;}</style></head><body>${DOMPurify.sanitize(selectedEmail.htmlBody, { ALLOWED_TAGS: ['a', 'b', 'i', 'u', 'em', 'strong', 'p', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'small', 'del', 'sub', 'sup'], ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'target', 'rel', 'width', 'height', 'colspan', 'rowspan', 'border', 'align', 'valign'], ALLOW_DATA_ATTR: false, ADD_ATTR: ['target'] })}</body></html>`}
                             className="w-full border-0"
                             title="Email content"
                             style={{ minHeight: '200px' }}

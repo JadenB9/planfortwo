@@ -25,7 +25,6 @@ websitePublicRoute.get('/:slug', async (c) => {
     return c.json({
       data: {
         id: config.id,
-        weddingId: config.weddingId,
         templateId: config.templateId,
         privacyMode: 'password',
         requiresPassword: true,
@@ -38,13 +37,15 @@ websitePublicRoute.get('/:slug', async (c) => {
     .from(weddings)
     .where(eq(weddings.id, config.weddingId))
 
-  const sections = await db
+  const rawSections = await db
     .select()
     .from(websiteSections)
     .where(
       and(eq(websiteSections.weddingId, config.weddingId), eq(websiteSections.isVisible, true)),
     )
     .orderBy(asc(websiteSections.sortOrder))
+
+  const sections = rawSections.map(({ weddingId: _w, ...rest }) => rest)
 
   const photos = await db
     .select()

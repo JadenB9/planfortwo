@@ -41,7 +41,7 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
           {content.registries.map((registry, i) => (
             <motion.a
               key={i}
-              href={registry.url}
+              href={/^https?:\/\//i.test(registry.url) ? registry.url : '#'}
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}

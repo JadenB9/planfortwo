@@ -77,8 +77,8 @@ export const rsvpService = {
       .where(
         and(
           eq(guests.weddingId, weddingId),
-          ilike(guests.firstName, firstName),
-          ilike(guests.lastName, lastName),
+          ilike(guests.firstName, firstName.replace(/[%_\\]/g, '\\$&')),
+          ilike(guests.lastName, lastName.replace(/[%_\\]/g, '\\$&')),
         ),
       )
 
@@ -154,11 +154,11 @@ export const rsvpService = {
             plusOneDietary: (submission.plusOneDietary as Record<string, unknown>) ?? null,
             rsvpRespondedAt: new Date(),
           })
-          .where(eq(guests.id, submission.guestId))
+          .where(and(eq(guests.id, submission.guestId), eq(guests.weddingId, weddingId)))
           .returning()
 
         if (!updated) {
-          throw new Error(`Guest ${submission.guestId} not found`)
+          throw new Error(`Guest ${submission.guestId} not found or not in this wedding`)
         }
 
         results.push(updated as Guest)
@@ -219,8 +219,8 @@ export const rsvpService = {
 
     const isExpired = await this.isDeadlinePassed(wedding.id)
 
-    // Keep rsvpToken on primary guest so the frontend can pass it back on submit
-    const { email: _e, phone: _p, ...primarySafe } = guest
+    // Strip all sensitive fields from public lookup response
+    const { email: _e, phone: _p, rsvpToken: _t, ...primarySafe } = guest
 
     return {
       guest: primarySafe as Guest,

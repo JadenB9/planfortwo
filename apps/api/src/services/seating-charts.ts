@@ -115,7 +115,19 @@ export const seatingChartService = {
     return table!
   },
 
-  async updateTable(tableId: string, data: UpdateSeatingTableInput) {
+  async updateTable(tableId: string, data: UpdateSeatingTableInput, weddingId?: string) {
+    if (weddingId) {
+      const [table] = await db
+        .select({ chartId: seatingTables.chartId })
+        .from(seatingTables)
+        .where(eq(seatingTables.id, tableId))
+      if (!table) return null
+      const [chart] = await db
+        .select({ id: seatingCharts.id })
+        .from(seatingCharts)
+        .where(and(eq(seatingCharts.id, table.chartId), eq(seatingCharts.weddingId, weddingId)))
+      if (!chart) return null
+    }
     const updateData: Record<string, unknown> = {}
     if (data.label !== undefined) updateData.label = data.label
     if (data.tableType !== undefined) updateData.tableType = data.tableType
@@ -134,7 +146,19 @@ export const seatingChartService = {
     return updated ?? null
   },
 
-  async deleteTable(tableId: string) {
+  async deleteTable(tableId: string, weddingId?: string) {
+    if (weddingId) {
+      const [table] = await db
+        .select({ chartId: seatingTables.chartId })
+        .from(seatingTables)
+        .where(eq(seatingTables.id, tableId))
+      if (!table) return
+      const [chart] = await db
+        .select({ id: seatingCharts.id })
+        .from(seatingCharts)
+        .where(and(eq(seatingCharts.id, table.chartId), eq(seatingCharts.weddingId, weddingId)))
+      if (!chart) return
+    }
     await db.delete(seatingTables).where(eq(seatingTables.id, tableId))
   },
 
@@ -154,7 +178,19 @@ export const seatingChartService = {
     return element!
   },
 
-  async deleteElement(elementId: string) {
+  async deleteElement(elementId: string, weddingId?: string) {
+    if (weddingId) {
+      const [el] = await db
+        .select({ chartId: venueElements.chartId })
+        .from(venueElements)
+        .where(eq(venueElements.id, elementId))
+      if (!el) return
+      const [chart] = await db
+        .select({ id: seatingCharts.id })
+        .from(seatingCharts)
+        .where(and(eq(seatingCharts.id, el.chartId), eq(seatingCharts.weddingId, weddingId)))
+      if (!chart) return
+    }
     await db.delete(venueElements).where(eq(venueElements.id, elementId))
   },
 
@@ -182,7 +218,24 @@ export const seatingChartService = {
     return assignment!
   },
 
-  async unassignSeat(assignmentId: string) {
+  async unassignSeat(assignmentId: string, weddingId?: string) {
+    if (weddingId) {
+      const [assignment] = await db
+        .select({ tableId: tableAssignments.tableId })
+        .from(tableAssignments)
+        .where(eq(tableAssignments.id, assignmentId))
+      if (!assignment) return
+      const [table] = await db
+        .select({ chartId: seatingTables.chartId })
+        .from(seatingTables)
+        .where(eq(seatingTables.id, assignment.tableId))
+      if (!table) return
+      const [chart] = await db
+        .select({ id: seatingCharts.id })
+        .from(seatingCharts)
+        .where(and(eq(seatingCharts.id, table.chartId), eq(seatingCharts.weddingId, weddingId)))
+      if (!chart) return
+    }
     await db.delete(tableAssignments).where(eq(tableAssignments.id, assignmentId))
   },
 
@@ -234,7 +287,14 @@ export const seatingChartService = {
     return rel!
   },
 
-  async deleteRelationship(relationshipId: string) {
+  async deleteRelationship(relationshipId: string, weddingId?: string) {
+    if (weddingId) {
+      const [rel] = await db
+        .select({ weddingId: guestRelationships.weddingId })
+        .from(guestRelationships)
+        .where(eq(guestRelationships.id, relationshipId))
+      if (!rel || rel.weddingId !== weddingId) return
+    }
     await db.delete(guestRelationships).where(eq(guestRelationships.id, relationshipId))
   },
 

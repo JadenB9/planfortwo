@@ -78,8 +78,8 @@ app.use(
 )
 
 // ── Rate Limiting (must be registered BEFORE routes) ──
-const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30 })
-const strictRateLimit = rateLimit({ windowMs: 60_000, max: 10 })
+const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30, prefix: 'pub' })
+const strictRateLimit = rateLimit({ windowMs: 60_000, max: 10, prefix: 'strict' })
 app.use('/website-public/*', publicRateLimit)
 app.use('/guestbook/*', publicRateLimit)
 app.use('/rsvp/*', publicRateLimit)
@@ -87,6 +87,7 @@ app.use('/contact/*', publicRateLimit)
 app.use('/website-config/verify-password', strictRateLimit)
 app.use('/inbox/send', strictRateLimit)
 app.use('/inbox/addresses', strictRateLimit)
+app.use('/registry/funds/*/contribute', publicRateLimit)
 
 // ── Routes ──
 app.route('/health', healthRoute)
@@ -134,7 +135,7 @@ app.route('/progress', progressRoute)
 app.route('/inbox', inboxRoute)
 
 // ── Webhooks ──
-const webhookRateLimit = rateLimit({ windowMs: 60_000, max: 100 })
+const webhookRateLimit = rateLimit({ windowMs: 60_000, max: 100, prefix: 'webhook' })
 app.use('/webhooks/*', webhookRateLimit)
 app.route('/webhooks/resend', resendWebhookRoute)
 app.route('/webhooks/stripe', stripeWebhookRoute)

@@ -17,7 +17,11 @@ export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
   const token = authHeader.slice(7)
 
   try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    if (!appUrl) {
+      console.error('NEXT_PUBLIC_APP_URL is not configured')
+      return c.json({ error: 'Server misconfigured', code: 'SERVER_ERROR', statusCode: 500 }, 500)
+    }
     const authorizedParties = [appUrl, appUrl.replace('://app.', '://')].filter(
       (v, i, a) => a.indexOf(v) === i,
     ) // deduplicate

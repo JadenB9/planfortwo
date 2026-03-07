@@ -14,18 +14,24 @@ setInterval(
 ).unref()
 
 function getClientIp(c: Context): string {
-  return (
-    c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ?? c.req.header('x-real-ip') ?? 'unknown'
-  )
+  // Use the LAST IP in X-Forwarded-For (set by the trusted proxy/load balancer),
+  // not the first (which is client-controlled and spoofable)
+  const xff = c.req.header('x-forwarded-for')
+  if (xff) {
+    const ips = xff.split(',').map((ip) => ip.trim())
+    return ips[ips.length - 1] ?? 'unknown'
+  }
+  return c.req.header('x-real-ip') ?? 'unknown'
 }
 
-export function rateLimit(options: { windowMs: number; max: number }) {
-  const { windowMs, max } = options
+export function rateLimit(options: { windowMs: number; max: number; prefix?: string }) {
+  const { windowMs, max, prefix = 'global' } = options
 
   return async (c: Context, next: Next) => {
     const ip = getClientIp(c)
+    const key = `${prefix}:${ip}`
     const now = Date.now()
-    const entry = store.get(ip)
+    const entry = store.get(key)
 
     if (entry && entry.resetAt > now) {
       if (entry.count >= max) {
@@ -33,7 +39,7 @@ export function rateLimit(options: { windowMs: number; max: number }) {
       }
       entry.count++
     } else {
-      store.set(ip, { count: 1, resetAt: now + windowMs })
+      store.set(key, { count: 1, resetAt: now + windowMs })
     }
 
     await next()

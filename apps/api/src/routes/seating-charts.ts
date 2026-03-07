@@ -122,8 +122,9 @@ seatingChartsRoute.put(
   }),
   async (c) => {
     const tableId = c.req.param('tableId')
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
-    const updated = await seatingChartService.updateTable(tableId, data)
+    const updated = await seatingChartService.updateTable(tableId, data, weddingId)
     if (!updated)
       return c.json({ error: 'Table not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
@@ -136,7 +137,8 @@ seatingChartsRoute.delete(
   requireFeature('canSeatingChart'),
   async (c) => {
     const tableId = c.req.param('tableId')
-    await seatingChartService.deleteTable(tableId)
+    const weddingId = c.get('weddingId')
+    await seatingChartService.deleteTable(tableId, weddingId)
     return c.json({ data: { success: true } })
   },
 )
@@ -166,7 +168,8 @@ seatingChartsRoute.delete(
   requireFeature('canSeatingChart'),
   async (c) => {
     const elementId = c.req.param('elementId')
-    await seatingChartService.deleteElement(elementId)
+    const weddingId = c.get('weddingId')
+    await seatingChartService.deleteElement(elementId, weddingId)
     return c.json({ data: { success: true } })
   },
 )
@@ -192,7 +195,8 @@ seatingChartsRoute.delete(
   requireFeature('canSeatingChart'),
   async (c) => {
     const id = c.req.param('id')
-    await seatingChartService.unassignSeat(id)
+    const weddingId = c.get('weddingId')
+    await seatingChartService.unassignSeat(id, weddingId)
     return c.json({ data: { success: true } })
   },
 )
@@ -250,7 +254,8 @@ seatingChartsRoute.delete(
   requireFeature('canSeatingChart'),
   async (c) => {
     const id = c.req.param('id')
-    await seatingChartService.deleteRelationship(id)
+    const weddingId = c.get('weddingId')
+    await seatingChartService.deleteRelationship(id, weddingId)
     return c.json({ data: { success: true } })
   },
 )

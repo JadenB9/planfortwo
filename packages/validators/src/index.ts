@@ -542,7 +542,15 @@ export const updateWebsiteConfigSchema = z.object({
   fontPair: fontPairZodEnum.optional(),
   privacyMode: privacyModeZodEnum.optional(),
   subdomain: subdomainSchema.optional(),
-  customDomain: z.string().max(253).nullable().optional(),
+  customDomain: z
+    .string()
+    .max(253)
+    .regex(
+      /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/,
+      'Invalid domain format',
+    )
+    .nullable()
+    .optional(),
   metaTitle: z.string().max(200).nullable().optional(),
   metaDescription: z.string().max(500).nullable().optional(),
   ogImageUrl: z.string().url().nullable().optional(),
@@ -624,7 +632,7 @@ export type ReorderPhotosInput = z.infer<typeof reorderPhotosSchema>
 
 // ── Website: Password ──
 export const websitePasswordSchema = z.object({
-  password: z.string().min(4).max(100),
+  password: z.string().min(8).max(100),
 })
 
 export type WebsitePasswordInput = z.infer<typeof websitePasswordSchema>
@@ -638,8 +646,8 @@ export type VerifyWebsitePasswordInput = z.infer<typeof verifyWebsitePasswordSch
 // ── Guestbook ──
 export const createGuestbookEntrySchema = z.object({
   weddingId: z.string().uuid(),
-  authorName: z.string().min(1).max(100),
-  message: z.string().min(1).max(2000),
+  authorName: z.string().trim().min(1).max(100),
+  message: z.string().trim().min(1).max(2000),
 })
 
 export type CreateGuestbookEntryInput = z.infer<typeof createGuestbookEntrySchema>

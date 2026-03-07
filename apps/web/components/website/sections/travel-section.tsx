@@ -11,6 +11,8 @@ interface TravelSectionProps {
   content: TravelContent
 }
 
+const safeHref = (url: string | undefined) => (url && /^https?:\/\//i.test(url) ? url : undefined)
+
 export function TravelSection({ title, content }: TravelSectionProps) {
   const { colors, fontPair } = useTemplateStyles()
 
@@ -81,9 +83,9 @@ export function TravelSection({ title, content }: TravelSectionProps) {
                     </p>
                   )}
                   {hotel.notes && <p style={{ color: `${colors.primary}99` }}>{hotel.notes}</p>}
-                  {hotel.url && (
+                  {safeHref(hotel.url) && (
                     <a
-                      href={hotel.url}
+                      href={safeHref(hotel.url)!}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 font-medium"
@@ -106,7 +108,8 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(content.mapEmbed, {
                 ADD_TAGS: ['iframe'],
-                ADD_ATTR: ['allowfullscreen', 'frameborder', 'loading'],
+                ADD_ATTR: ['allowfullscreen', 'frameborder', 'loading', 'src'],
+                ALLOWED_URI_REGEXP: /^https:\/\/(www\.)?google\.com\/maps\//,
               }),
             }}
           />
