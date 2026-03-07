@@ -31,8 +31,8 @@ import { GuestbookSection } from './guestbook-section'
 import { CustomSection } from './custom-section'
 
 interface SectionRendererProps {
-  section: WebsiteSection
-  photos: WebsitePhoto[]
+  section: Omit<WebsiteSection, 'weddingId'>
+  photos: Omit<WebsitePhoto, 'weddingId'>[]
   guestbookEntries: GuestbookEntry[]
   weddingName: string
   weddingDate: Date | null
@@ -88,7 +88,7 @@ export function SectionRenderer({
         <GallerySection
           title={section.title}
           content={section.content as unknown as GalleryContent}
-          photos={sectionPhotos.length > 0 ? sectionPhotos : photos}
+          photos={(sectionPhotos.length > 0 ? sectionPhotos : photos) as WebsitePhoto[]}
         />
       )
     case 'travel':
