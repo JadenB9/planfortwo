@@ -14,7 +14,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import type { Wedding, NotificationPreference, PartnerInvitation } from '@planfortwo/types'
-import { UserPlus, Trash2, Crown, Heart, Users, Mail, Clock } from 'lucide-react'
+import { UserPlus, Trash2, Crown, Heart, Users, Mail, Clock, XCircle } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 export default function SettingsPage() {
   const { getToken } = useAuth()
@@ -54,6 +62,8 @@ export default function SettingsPage() {
   const [pendingInvitations, setPendingInvitations] = useState<PartnerInvitation[]>([])
   const [partnerEmail, setPartnerEmail] = useState('')
   const [invitingPartner, setInvitingPartner] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [cancellingInvite, setCancellingInvite] = useState(false)
 
   const loadData = useCallback(async () => {
     try {
@@ -226,6 +236,23 @@ export default function SettingsPage() {
       setInvitingPartner(false)
     }
   }, [weddingId, getToken, partnerEmail])
+
+  const handleCancelInvitation = useCallback(async () => {
+    if (!weddingId || !pendingPartnerInvite) return
+    setCancellingInvite(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.weddings.cancelInvitation(weddingId, pendingPartnerInvite.id, token)
+      setPendingInvitations((prev) => prev.filter((i) => i.id !== pendingPartnerInvite.id))
+      setCancelDialogOpen(false)
+      toast.success('Invitation cancelled')
+    } catch {
+      toast.error('Failed to cancel invitation')
+    } finally {
+      setCancellingInvite(false)
+    }
+  }, [weddingId, getToken, pendingPartnerInvite])
 
   if (loading) {
     return (
@@ -424,23 +451,62 @@ export default function SettingsPage() {
                       Invite Your Partner
                     </h3>
                     {pendingPartnerInvite ? (
-                      <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                        <Clock className="h-4 w-4 text-amber-600" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">Invitation Pending</p>
-                          <p className="text-xs text-gray-500">
-                            Sent to{' '}
-                            <span className="font-medium text-gray-700">
-                              {pendingPartnerInvite.email}
-                            </span>{' '}
-                            &mdash; waiting for them to accept.
-                          </p>
+                      <>
+                        <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                          <Clock className="h-4 w-4 text-amber-600" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">Invitation Pending</p>
+                            <p className="text-xs text-gray-500">
+                              Sent to{' '}
+                              <span className="font-medium text-gray-700">
+                                {pendingPartnerInvite.email}
+                              </span>{' '}
+                              &mdash; waiting for them to accept.
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1">
+                              <Mail className="h-3.5 w-3.5 text-amber-600" />
+                              <span className="text-xs font-medium text-amber-700">Sent</span>
+                            </div>
+                            <button
+                              onClick={() => setCancelDialogOpen(true)}
+                              className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                              title="Cancel invitation"
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1">
-                          <Mail className="h-3.5 w-3.5 text-amber-600" />
-                          <span className="text-xs font-medium text-amber-700">Sent</span>
-                        </div>
-                      </div>
+
+                        <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Cancel Partner Invitation</DialogTitle>
+                              <DialogDescription>
+                                Are you sure you want to cancel the invitation sent to{' '}
+                                <span className="font-medium text-gray-700">
+                                  {pendingPartnerInvite.email}
+                                </span>
+                                ? They will no longer be able to accept it, but you can send a new
+                                one afterward.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <Button variant="outline" onClick={() => setCancelDialogOpen(false)}>
+                                Keep Invitation
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                onClick={handleCancelInvitation}
+                                disabled={cancellingInvite}
+                              >
+                                {cancellingInvite ? 'Cancelling...' : 'Cancel Invitation'}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </>
                     ) : (
                       <>
                         <p className="text-xs text-gray-500">

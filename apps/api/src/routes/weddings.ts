@@ -225,6 +225,39 @@ weddingsRoute.post('/accept-invite/:token', async (c) => {
   }
 })
 
+// DELETE /weddings/:id/invitations/:invitationId -- cancel a pending invitation
+weddingsRoute.delete('/:id/invitations/:invitationId', async (c) => {
+  const weddingId = c.req.param('id')
+  const invitationId = c.req.param('invitationId')
+  const dbUserId = c.get('dbUserId')
+
+  const membership = await weddingService.verifyMembership(weddingId, dbUserId)
+  if (!membership) {
+    return c.json(
+      { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  if (membership.role !== 'owner') {
+    return c.json(
+      { error: 'Only the owner can cancel invitations', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  const cancelled = await invitationService.cancel(invitationId, weddingId)
+
+  if (!cancelled) {
+    return c.json(
+      { error: 'Invitation not found or already processed', code: 'NOT_FOUND', statusCode: 404 },
+      404,
+    )
+  }
+
+  return c.json({ data: { cancelled: true } })
+})
+
 // GET /weddings/:id/pending-invitations -- list pending invitations for a wedding
 weddingsRoute.get('/:id/pending-invitations', async (c) => {
   const weddingId = c.req.param('id')

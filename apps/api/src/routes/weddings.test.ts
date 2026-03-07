@@ -35,6 +35,8 @@ vi.mock('../services/invitations.js', () => ({
   invitationService: {
     createAndSend: vi.fn(),
     accept: vi.fn(),
+    cancel: vi.fn(),
+    getPendingByWedding: vi.fn(),
   },
 }))
 
@@ -328,6 +330,89 @@ describe('Wedding Routes', () => {
       expect(res.status).toBe(409)
       const body = await res.json()
       expect(body.code).toBe('INVITATION_USED')
+    })
+  })
+
+  describe('DELETE /weddings/:id/invitations/:invitationId', () => {
+    it('should return 403 when user is not a member', async () => {
+      mockedWeddingService.verifyMembership.mockResolvedValue(null)
+
+      const app = createApp()
+      const res = await app.request('/weddings/wedding-1/invitations/invite-1', {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
+
+      expect(res.status).toBe(403)
+      const body = await res.json()
+      expect(body.code).toBe('FORBIDDEN')
+    })
+
+    it('should return 403 when user is not the owner', async () => {
+      mockedWeddingService.verifyMembership.mockResolvedValue({
+        id: 'member-1',
+        weddingId: 'wedding-1',
+        userId: 'db-user-id',
+        role: 'partner',
+        joinedAt: new Date(),
+      } as never)
+
+      const app = createApp()
+      const res = await app.request('/weddings/wedding-1/invitations/invite-1', {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
+
+      expect(res.status).toBe(403)
+      const body = await res.json()
+      expect(body.code).toBe('FORBIDDEN')
+    })
+
+    it('should cancel a pending invitation when user is owner', async () => {
+      mockedWeddingService.verifyMembership.mockResolvedValue({
+        id: 'member-1',
+        weddingId: 'wedding-1',
+        userId: 'db-user-id',
+        role: 'owner',
+        joinedAt: new Date(),
+      } as never)
+      mockedInvitationService.cancel.mockResolvedValue({
+        id: 'invite-1',
+        weddingId: 'wedding-1',
+        status: 'cancelled',
+      } as never)
+
+      const app = createApp()
+      const res = await app.request('/weddings/wedding-1/invitations/invite-1', {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
+
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      expect(body.data.cancelled).toBe(true)
+      expect(mockedInvitationService.cancel).toHaveBeenCalledWith('invite-1', 'wedding-1')
+    })
+
+    it('should return 404 when invitation not found or already processed', async () => {
+      mockedWeddingService.verifyMembership.mockResolvedValue({
+        id: 'member-1',
+        weddingId: 'wedding-1',
+        userId: 'db-user-id',
+        role: 'owner',
+        joinedAt: new Date(),
+      } as never)
+      mockedInvitationService.cancel.mockResolvedValue(null)
+
+      const app = createApp()
+      const res = await app.request('/weddings/wedding-1/invitations/invite-1', {
+        method: 'DELETE',
+        headers: authHeaders(),
+      })
+
+      expect(res.status).toBe(404)
+      const body = await res.json()
+      expect(body.code).toBe('NOT_FOUND')
     })
   })
 })

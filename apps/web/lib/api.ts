@@ -161,6 +161,14 @@ export const api = {
       fetchApi<{ data: PartnerInvitation[] }>(`/weddings/${weddingId}/pending-invitations`, {
         token,
       }),
+    cancelInvitation: (weddingId: string, invitationId: string, token: string) =>
+      fetchApi<{ data: { cancelled: boolean } }>(
+        `/weddings/${weddingId}/invitations/${invitationId}`,
+        {
+          method: 'DELETE',
+          token,
+        },
+      ),
     getMembers: (weddingId: string, token: string) =>
       fetchApi<{
         data: Array<{

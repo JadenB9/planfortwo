@@ -6,7 +6,7 @@ export const registryLinks = pgTable('registry_links', {
   weddingId: uuid('wedding_id')
     .notNull()
     .references(() => weddings.id, { onDelete: 'cascade' }),
-  name: text('name').notNull(),
+  storeName: text('store_name').notNull(),
   url: text('url').notNull(),
   logoUrl: text('logo_url'),
   clickCount: integer('click_count').notNull().default(0),
@@ -23,6 +23,7 @@ export const cashFunds = pgTable('cash_funds', {
   description: text('description'),
   goalAmount: numeric('goal_amount', { precision: 12, scale: 2 }).notNull().default('0'),
   currentAmount: numeric('current_amount', { precision: 12, scale: 2 }).notNull().default('0'),
+  isActive: boolean('is_active').notNull().default(true),
   sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -49,14 +50,17 @@ export const gifts = pgTable('gifts', {
   weddingId: uuid('wedding_id')
     .notNull()
     .references(() => weddings.id, { onDelete: 'cascade' }),
-  guestId: uuid('guest_id'),
+  guestName: text('guest_name'),
   description: text('description').notNull(),
-  amount: numeric('amount', { precision: 12, scale: 2 }),
-  isFromRegistry: boolean('is_from_registry').notNull().default(false),
-  thankYouSent: boolean('thank_you_sent').notNull().default(false),
-  thankYouSentAt: timestamp('thank_you_sent_at', { withTimezone: true }),
+  estimatedValue: numeric('estimated_value', { precision: 12, scale: 2 }),
+  thankYouStatus: text('thank_you_status').notNull().default('not_started'),
+  receivedAt: timestamp('received_at', { withTimezone: true }),
   notes: text('notes'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 })
 
 export const moodBoards = pgTable('mood_boards', {

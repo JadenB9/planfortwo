@@ -151,4 +151,29 @@ export const invitationService = {
 
     return results
   },
+
+  async cancel(invitationId: string, weddingId: string) {
+    const [invitation] = await db
+      .select()
+      .from(partnerInvitations)
+      .where(
+        and(
+          eq(partnerInvitations.id, invitationId),
+          eq(partnerInvitations.weddingId, weddingId),
+          eq(partnerInvitations.status, 'pending'),
+        ),
+      )
+
+    if (!invitation) {
+      return null
+    }
+
+    const [updated] = await db
+      .update(partnerInvitations)
+      .set({ status: 'cancelled' })
+      .where(eq(partnerInvitations.id, invitationId))
+      .returning()
+
+    return updated ?? null
+  },
 }

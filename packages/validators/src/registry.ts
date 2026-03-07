@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const createRegistryLinkSchema = z.object({
   weddingId: z.string().uuid(),
-  name: z.string().min(1).max(200),
+  storeName: z.string().min(1).max(200),
   url: z.string().url(),
   logoUrl: z.string().url().nullable().optional(),
 })
@@ -20,6 +20,7 @@ export const updateCashFundSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   description: z.string().max(1000).nullable().optional(),
   goalAmount: z.number().min(0).max(1_000_000).optional(),
+  isActive: z.boolean().optional(),
 })
 export type UpdateCashFundInput = z.infer<typeof updateCashFundSchema>
 
@@ -35,17 +36,16 @@ export type CreateCashFundContributionInput = z.infer<typeof createCashFundContr
 
 export const createGiftSchema = z.object({
   weddingId: z.string().uuid(),
-  guestId: z.string().uuid().nullable().optional(),
+  guestName: z.string().max(200).nullable().optional(),
   description: z.string().min(1).max(500),
-  amount: z.number().min(0).max(1_000_000).nullable().optional(),
-  isFromRegistry: z.boolean().optional(),
+  estimatedValue: z.number().min(0).max(1_000_000).nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
 })
 export type CreateGiftInput = z.infer<typeof createGiftSchema>
 
 export const updateGiftSchema = z.object({
   description: z.string().min(1).max(500).optional(),
-  thankYouSent: z.boolean().optional(),
+  thankYouStatus: z.enum(['not_started', 'drafted', 'sent']).optional(),
   notes: z.string().max(2000).nullable().optional(),
 })
 export type UpdateGiftInput = z.infer<typeof updateGiftSchema>

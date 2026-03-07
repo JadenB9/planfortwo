@@ -8,15 +8,24 @@ import { api } from '@/lib/api'
 import { staggerGrid, fadeInUp, springSmooth } from '@/lib/animations'
 import Link from 'next/link'
 import type { PartnerInvitation } from '@planfortwo/types'
-import { Map, ArrowRight, Calendar, Pencil, Check, X, Mail, Clock } from 'lucide-react'
+import { Map, ArrowRight, Calendar, Pencil, Check, X, Mail, Clock, XCircle } from 'lucide-react'
 import { StatCard } from '@/components/dashboard/stat-card'
 import { UpcomingTasks } from '@/components/dashboard/upcoming-tasks'
 import { ActivityFeed } from '@/components/dashboard/activity-feed'
 import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 function formatBudgetValue(amount: number): string {
-  if (amount >= 100000) {
-    return `$${Math.round(amount / 1000)}k`
+  if (amount >= 10000) {
+    const k = amount / 1000
+    return k === Math.floor(k) ? `$${Math.floor(k)}k` : `$${k.toFixed(1)}k`
   }
   return `$${amount.toLocaleString()}`
 }
@@ -35,6 +44,8 @@ export default function DashboardPage() {
   const [editingDate, setEditingDate] = useState(false)
   const [dateInput, setDateInput] = useState('')
   const [savingDate, setSavingDate] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [cancellingInvite, setCancellingInvite] = useState(false)
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -138,6 +149,24 @@ export default function DashboardPage() {
       toast.error('Failed to update date')
     } finally {
       setSavingDate(false)
+    }
+  }
+
+  async function handleCancelInvitation() {
+    if (!dashboardData || !pendingPartnerInvite) return
+    setCancellingInvite(true)
+    try {
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+      await api.weddings.cancelInvitation(dashboardData.wedding.id, pendingPartnerInvite.id, token)
+      setPendingInvitations((prev) => prev.filter((i) => i.id !== pendingPartnerInvite.id))
+      setCancelDialogOpen(false)
+      setInviteStatus('idle')
+      toast.success('Invitation cancelled')
+    } catch {
+      toast.error('Failed to cancel invitation')
+    } finally {
+      setCancellingInvite(false)
     }
   }
 
@@ -282,11 +311,51 @@ export default function DashboardPage() {
                     &mdash; waiting for them to accept.
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5">
-                  <Mail className="h-3.5 w-3.5 text-amber-600" />
-                  <span className="text-xs font-medium text-amber-700">Sent</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5">
+                    <Mail className="h-3.5 w-3.5 text-amber-600" />
+                    <span className="text-xs font-medium text-amber-700">Sent</span>
+                  </div>
+                  <button
+                    onClick={() => setCancelDialogOpen(true)}
+                    className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                    title="Cancel invitation"
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
+
+              <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Cancel Partner Invitation</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to cancel the invitation sent to{' '}
+                      <span className="font-medium text-gray-700">
+                        {pendingPartnerInvite.email}
+                      </span>
+                      ? They will no longer be able to accept it, but you can send a new one
+                      afterward.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <button
+                      onClick={() => setCancelDialogOpen(false)}
+                      className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                    >
+                      Keep Invitation
+                    </button>
+                    <button
+                      onClick={handleCancelInvitation}
+                      disabled={cancellingInvite}
+                      className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+                    >
+                      {cancellingInvite ? 'Cancelling...' : 'Cancel Invitation'}
+                    </button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           ) : (
             showInvite && (

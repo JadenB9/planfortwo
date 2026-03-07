@@ -149,7 +149,7 @@ describe('Registry Routes', () => {
         {
           id: 'b0000000-0000-0000-0000-000000000001',
           weddingId: WEDDING_ID,
-          name: 'Amazon',
+          storeName: 'Amazon',
           url: 'https://amazon.com/registry/123',
           logoUrl: null,
           clickCount: 5,
@@ -166,7 +166,7 @@ describe('Registry Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data).toHaveLength(1)
-      expect(body.data[0].name).toBe('Amazon')
+      expect(body.data[0].storeName).toBe('Amazon')
     })
   })
 
@@ -175,7 +175,7 @@ describe('Registry Routes', () => {
       mockedService.createLink.mockResolvedValue({
         id: 'b0000000-0000-0000-0000-000000000002',
         weddingId: WEDDING_ID,
-        name: 'Target',
+        storeName: 'Target',
         url: 'https://target.com/registry/456',
         logoUrl: null,
         clickCount: 0,
@@ -189,13 +189,13 @@ describe('Registry Routes', () => {
         headers: authHeaders(),
         body: JSON.stringify({
           weddingId: WEDDING_ID,
-          name: 'Target',
+          storeName: 'Target',
           url: 'https://target.com/registry/456',
         }),
       })
       expect(res.status).toBe(201)
       const body = await res.json()
-      expect(body.data.name).toBe('Target')
+      expect(body.data.storeName).toBe('Target')
     })
   })
 
@@ -208,6 +208,7 @@ describe('Registry Routes', () => {
         description: 'Help us travel!',
         goalAmount: 5000,
         currentAmount: 0,
+        isActive: true,
         sortOrder: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -260,14 +261,14 @@ describe('Registry Routes', () => {
       mockedService.createGift.mockResolvedValue({
         id: 'e0000000-0000-0000-0000-000000000001',
         weddingId: WEDDING_ID,
-        guestId: null,
+        guestName: null,
         description: 'KitchenAid Mixer',
-        amount: 350,
-        isFromRegistry: true,
-        thankYouSent: false,
-        thankYouSentAt: null,
+        estimatedValue: 350,
+        thankYouStatus: 'not_started',
+        receivedAt: null,
         notes: null,
         createdAt: new Date(),
+        updatedAt: new Date(),
       } as never)
 
       const app = createApp()
@@ -277,8 +278,7 @@ describe('Registry Routes', () => {
         body: JSON.stringify({
           weddingId: WEDDING_ID,
           description: 'KitchenAid Mixer',
-          amount: 350,
-          isFromRegistry: true,
+          estimatedValue: 350,
         }),
       })
       expect(res.status).toBe(201)

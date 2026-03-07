@@ -33,7 +33,7 @@ export const registryService = {
       .insert(registryLinks)
       .values({
         weddingId: data.weddingId,
-        name: data.name,
+        storeName: data.storeName,
         url: data.url,
         logoUrl: data.logoUrl,
       })
@@ -89,6 +89,7 @@ export const registryService = {
     if (data.name !== undefined) updateData.name = data.name
     if (data.description !== undefined) updateData.description = data.description
     if (data.goalAmount !== undefined) updateData.goalAmount = data.goalAmount.toString()
+    if (data.isActive !== undefined) updateData.isActive = data.isActive
 
     const [updated] = await db
       .update(cashFunds)
@@ -136,7 +137,10 @@ export const registryService = {
       .from(gifts)
       .where(eq(gifts.weddingId, weddingId))
       .orderBy(desc(gifts.createdAt))
-    return rows.map((r) => ({ ...r, amount: r.amount ? parseFloat(r.amount) : null }))
+    return rows.map((r) => ({
+      ...r,
+      estimatedValue: r.estimatedValue ? parseFloat(r.estimatedValue) : null,
+    }))
   },
 
   async createGift(data: CreateGiftInput) {
@@ -144,23 +148,22 @@ export const registryService = {
       .insert(gifts)
       .values({
         weddingId: data.weddingId,
-        guestId: data.guestId,
+        guestName: data.guestName,
         description: data.description,
-        amount: data.amount?.toString(),
-        isFromRegistry: data.isFromRegistry,
+        estimatedValue: data.estimatedValue?.toString(),
         notes: data.notes,
       })
       .returning()
-    return { ...gift!, amount: gift!.amount ? parseFloat(gift!.amount) : null }
+    return {
+      ...gift!,
+      estimatedValue: gift!.estimatedValue ? parseFloat(gift!.estimatedValue) : null,
+    }
   },
 
   async updateGift(giftId: string, weddingId: string, data: UpdateGiftInput) {
     const updateData: Record<string, unknown> = {}
     if (data.description !== undefined) updateData.description = data.description
-    if (data.thankYouSent !== undefined) {
-      updateData.thankYouSent = data.thankYouSent
-      if (data.thankYouSent) updateData.thankYouSentAt = new Date()
-    }
+    if (data.thankYouStatus !== undefined) updateData.thankYouStatus = data.thankYouStatus
     if (data.notes !== undefined) updateData.notes = data.notes
 
     const [updated] = await db
@@ -169,7 +172,10 @@ export const registryService = {
       .where(and(eq(gifts.id, giftId), eq(gifts.weddingId, weddingId)))
       .returning()
     if (!updated) return null
-    return { ...updated, amount: updated.amount ? parseFloat(updated.amount) : null }
+    return {
+      ...updated,
+      estimatedValue: updated.estimatedValue ? parseFloat(updated.estimatedValue) : null,
+    }
   },
 
   async deleteGift(giftId: string, weddingId: string) {

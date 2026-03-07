@@ -1,26 +1,161 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
-import { ChevronDown, Sparkles, ExternalLink, CheckCircle, Settings } from 'lucide-react'
-import { staggerContainer, navItem, springSmooth } from '@/lib/animations'
-import { NAV_GROUPS } from '@/lib/navigation'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import {
+  ChevronDown,
+  Sparkles,
+  ExternalLink,
+  CheckCircle,
+  Settings,
+  GripVertical,
+} from 'lucide-react'
+import { staggerContainer, navItem as navItemVariant, springSmooth } from '@/lib/animations'
+import type { NavItem } from '@/lib/navigation'
+import { useSidebarOrder } from '@/hooks/use-sidebar-order'
 import { useWedding } from '@/hooks/use-wedding'
+import { api } from '@/lib/api'
+
+function SortableNavItem({
+  item,
+  isActive,
+  websiteSubdomain,
+}: {
+  item: NavItem
+  isActive: boolean
+  websiteSubdomain: string | null
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.href,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    position: 'relative' as const,
+  }
+
+  const Icon = item.icon
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <motion.div variants={navItemVariant} transition={{ duration: 0.3, ...springSmooth }}>
+        <Link
+          href={item.comingSoon ? '#' : item.href}
+          className={`group flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+            isDragging
+              ? 'bg-wedding-50 ring-wedding-200 shadow-md ring-1'
+              : isActive
+                ? 'bg-wedding-50 text-wedding-700'
+                : item.comingSoon
+                  ? 'cursor-default text-gray-400'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+          }`}
+          onClick={item.comingSoon ? (e) => e.preventDefault() : undefined}
+          draggable={false}
+        >
+          <span
+            {...listeners}
+            className="flex shrink-0 cursor-grab items-center opacity-0 transition-opacity active:cursor-grabbing group-hover:opacity-100"
+            aria-label={`Drag to reorder ${item.label}`}
+          >
+            <GripVertical className="h-3.5 w-3.5 text-gray-300" />
+          </span>
+          <Icon
+            className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-wedding-600' : 'text-gray-400'}`}
+          />
+          <div className="min-w-0 flex-1">
+            <span>{item.label}</span>
+            {item.href === '/website' && websiteSubdomain && (
+              <p className={`truncate text-xs ${isActive ? 'text-wedding-500' : 'text-gray-400'}`}>
+                {websiteSubdomain}.planfortwo.com
+              </p>
+            )}
+          </div>
+          {item.comingSoon && (
+            <span className="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+              Soon
+            </span>
+          )}
+        </Link>
+      </motion.div>
+    </div>
+  )
+}
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { getToken } = useAuth()
   const { data: weddingData, loading: weddingLoading } = useWedding()
   const tier = weddingData?.wedding.tier
+  const weddingId = weddingData?.wedding.id ?? null
+  const [websiteSubdomain, setWebsiteSubdomain] = useState<string | null>(null)
+  const { orderedGroups, reorderGroup } = useSidebarOrder()
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
-    Details: true,
-    More: true,
+    Details: false,
+    More: false,
   })
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  useEffect(() => {
+    if (!weddingId) return
+    let cancelled = false
+    void (async () => {
+      try {
+        const token = await getToken()
+        if (!token || cancelled) return
+        const { data } = await api.websiteConfig.get(weddingId, token)
+        if (!cancelled) setWebsiteSubdomain(data?.subdomain ?? null)
+      } catch {
+        /* silent — website config may not exist yet */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [weddingId, getToken])
 
   const toggleGroup = (label: string) => {
     setCollapsed((prev) => ({ ...prev, [label]: !prev[label] }))
   }
+
+  const handleDragEnd = useCallback(
+    (groupLabel: string, items: NavItem[]) => (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
+
+      const oldIndex = items.findIndex((item) => item.href === active.id)
+      const newIndex = items.findIndex((item) => item.href === over.id)
+      if (oldIndex === -1 || newIndex === -1) return
+
+      reorderGroup(groupLabel, oldIndex, newIndex)
+    },
+    [reorderGroup],
+  )
 
   return (
     <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-gray-200 bg-white lg:flex">
@@ -36,7 +171,7 @@ export function Sidebar() {
         initial="hidden"
         animate="visible"
       >
-        {NAV_GROUPS.map((group) => {
+        {orderedGroups.map((group) => {
           const isCollapsible = group.label === 'Details' || group.label === 'More'
           const isOpen = !collapsed[group.label]
 
@@ -59,42 +194,30 @@ export function Sidebar() {
               )}
 
               {(!isCollapsible || isOpen) && (
-                <div className="space-y-0.5">
-                  {group.items.map((item) => {
-                    const isActive = pathname === item.href
-                    const Icon = item.icon
-
-                    return (
-                      <motion.div
-                        key={item.href}
-                        variants={navItem}
-                        transition={{ duration: 0.3, ...springSmooth }}
-                      >
-                        <Link
-                          href={item.comingSoon ? '#' : item.href}
-                          className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
-                            isActive
-                              ? 'bg-wedding-50 text-wedding-700'
-                              : item.comingSoon
-                                ? 'cursor-default text-gray-400'
-                                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                          }`}
-                          onClick={item.comingSoon ? (e) => e.preventDefault() : undefined}
-                        >
-                          <Icon
-                            className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-wedding-600' : 'text-gray-400'}`}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd(group.label, group.items)}
+                >
+                  <SortableContext
+                    items={group.items.map((item) => item.href)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-0.5">
+                      {group.items.map((item) => {
+                        const isActive = pathname === item.href
+                        return (
+                          <SortableNavItem
+                            key={item.href}
+                            item={item}
+                            isActive={isActive}
+                            websiteSubdomain={websiteSubdomain}
                           />
-                          <span>{item.label}</span>
-                          {item.comingSoon && (
-                            <span className="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
-                              Soon
-                            </span>
-                          )}
-                        </Link>
-                      </motion.div>
-                    )
-                  })}
-                </div>
+                        )
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               )}
             </div>
           )

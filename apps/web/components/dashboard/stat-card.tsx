@@ -13,6 +13,14 @@ interface StatCardProps {
 }
 
 export function StatCard({ label, value, icon, trend, href }: StatCardProps) {
+  const valueStr = String(value)
+  const textClass =
+    valueStr.length > 12
+      ? 'text-lg font-bold text-gray-900'
+      : valueStr.length > 8
+        ? 'text-xl font-bold text-gray-900'
+        : 'text-2xl font-bold text-gray-900'
+
   const card = (
     <motion.div
       className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
@@ -31,7 +39,7 @@ export function StatCard({ label, value, icon, trend, href }: StatCardProps) {
       </div>
       <div className="mt-auto pt-4">
         <motion.p
-          className="truncate text-2xl font-bold text-gray-900"
+          className={textClass}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
