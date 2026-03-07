@@ -119,8 +119,9 @@ weddingPartyRoute.put(
   }),
   async (c) => {
     const taskId = c.req.param('taskId')
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
-    const updated = await weddingPartyService.updateTask(taskId, data)
+    const updated = await weddingPartyService.updateTask(taskId, weddingId, data)
     if (!updated)
       return c.json({ error: 'Task not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
@@ -129,7 +130,8 @@ weddingPartyRoute.put(
 
 weddingPartyRoute.delete('/tasks/:taskId', resolveWeddingMiddleware, async (c) => {
   const taskId = c.req.param('taskId')
-  await weddingPartyService.deleteTask(taskId)
+  const weddingId = c.get('weddingId')
+  await weddingPartyService.deleteTask(taskId, weddingId)
   return c.json({ data: { success: true } })
 })
 
@@ -163,6 +165,7 @@ weddingPartyRoute.post(
 
 weddingPartyRoute.delete('/gifts/:giftId', resolveWeddingMiddleware, async (c) => {
   const giftId = c.req.param('giftId')
-  await weddingPartyService.deleteGift(giftId)
+  const weddingId = c.get('weddingId')
+  await weddingPartyService.deleteGift(giftId, weddingId)
   return c.json({ data: { success: true } })
 })

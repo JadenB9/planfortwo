@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { eq } from 'drizzle-orm'
-import { db, guests } from '@planfortwo/db'
+import { db, guests, websiteConfigs } from '@planfortwo/db'
 import {
   rsvpLookupSchema,
   rsvpNameLookupSchema,
@@ -13,6 +13,20 @@ import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
 import { rsvpService } from '../services/rsvp.js'
+
+async function resolveSlugToWeddingId(slug: string): Promise<string | null> {
+  const [config] = await db
+    .select({ weddingId: websiteConfigs.weddingId })
+    .from(websiteConfigs)
+    .where(eq(websiteConfigs.subdomain, slug))
+    .limit(1)
+  return config?.weddingId ?? null
+}
+
+function randomDelay(): Promise<void> {
+  const ms = 200 + Math.floor(Math.random() * 600)
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 type Env = {
   Variables: {
@@ -66,15 +80,20 @@ rsvpRoute.post(
     }
   }),
   async (c) => {
-    const { weddingId, firstName, lastName } = c.req.valid('json')
+    const { slug, firstName, lastName } = c.req.valid('json')
+
+    const weddingId = await resolveSlugToWeddingId(slug)
+    if (!weddingId) {
+      await randomDelay()
+      return c.json({ error: 'Invitation not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
 
     const result = await rsvpService.lookupByName(weddingId, firstName, lastName)
 
+    await randomDelay()
+
     if (result.type === 'none') {
-      return c.json(
-        { error: 'No guests found matching that name', code: 'GUEST_NOT_FOUND', statusCode: 404 },
-        404,
-      )
+      return c.json({ error: 'Invitation not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     }
 
     return c.json({ data: result })
@@ -90,7 +109,13 @@ rsvpRoute.post(
     }
   }),
   async (c) => {
-    const { guestId, weddingId } = c.req.valid('json')
+    const { guestId, slug } = c.req.valid('json')
+
+    const weddingId = await resolveSlugToWeddingId(slug)
+    if (!weddingId) {
+      await randomDelay()
+      return c.json({ error: 'Invitation not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
 
     const expired = await rsvpService.isDeadlinePassed(weddingId)
     if (expired) {
@@ -103,7 +128,8 @@ rsvpRoute.post(
     const result = await rsvpService.lookupByGuestId(guestId, weddingId)
 
     if (!result) {
-      return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
+      await randomDelay()
+      return c.json({ error: 'Invitation not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     }
 
     return c.json({ data: result })

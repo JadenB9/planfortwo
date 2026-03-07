@@ -16,7 +16,7 @@ export function PublishToggle({
   onPublish,
   onUnpublish,
 }: PublishToggleProps) {
-  const siteUrl = subdomain ? `/w/${subdomain}` : null
+  const siteUrl = subdomain ? `/s/${subdomain}` : null
 
   return (
     <div className="rounded-xl border bg-white p-4">

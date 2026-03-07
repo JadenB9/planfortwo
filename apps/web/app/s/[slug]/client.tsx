@@ -10,7 +10,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
 interface PublicSection {
   id: string
-  weddingId: string
   sectionType: WebsiteSectionType
   title: string
   content: Record<string, unknown>
@@ -22,7 +21,6 @@ interface PublicSection {
 
 interface PublicPhoto {
   id: string
-  weddingId: string
   sectionId: string | null
   r2Key: string
   url: string

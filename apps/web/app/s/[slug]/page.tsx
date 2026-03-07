@@ -21,7 +21,6 @@ interface PublicWebsiteData {
   }
   sections: Array<{
     id: string
-    weddingId: string
     sectionType:
       | 'hero'
       | 'our_story'
@@ -45,7 +44,6 @@ interface PublicWebsiteData {
   }>
   photos: Array<{
     id: string
-    weddingId: string
     sectionId: string | null
     r2Key: string
     url: string

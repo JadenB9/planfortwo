@@ -66,7 +66,17 @@ export const honeymoonService = {
     return activity
   },
 
-  async updateActivity(id: string, data: UpdateHoneymoonActivityInput) {
+  async updateActivity(id: string, weddingId: string, data: UpdateHoneymoonActivityInput) {
+    const [act] = await db
+      .select({ planId: honeymoonActivities.planId })
+      .from(honeymoonActivities)
+      .where(eq(honeymoonActivities.id, id))
+    if (!act) return null
+    const [plan] = await db
+      .select({ id: honeymoonPlans.id })
+      .from(honeymoonPlans)
+      .where(and(eq(honeymoonPlans.id, act.planId), eq(honeymoonPlans.weddingId, weddingId)))
+    if (!plan) return null
     const [updated] = await db
       .update(honeymoonActivities)
       .set(data)
@@ -75,7 +85,17 @@ export const honeymoonService = {
     return updated ?? null
   },
 
-  async deleteActivity(id: string) {
+  async deleteActivity(id: string, weddingId: string) {
+    const [act] = await db
+      .select({ planId: honeymoonActivities.planId })
+      .from(honeymoonActivities)
+      .where(eq(honeymoonActivities.id, id))
+    if (!act) return null
+    const [plan] = await db
+      .select({ id: honeymoonPlans.id })
+      .from(honeymoonPlans)
+      .where(and(eq(honeymoonPlans.id, act.planId), eq(honeymoonPlans.weddingId, weddingId)))
+    if (!plan) return null
     const [deleted] = await db
       .delete(honeymoonActivities)
       .where(eq(honeymoonActivities.id, id))

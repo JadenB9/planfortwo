@@ -94,7 +94,8 @@ playlistsRoute.post(
 
 playlistsRoute.delete('/songs/:songId', resolveWeddingMiddleware, async (c) => {
   const songId = c.req.param('songId')
-  const deleted = await playlistService.deleteSong(songId)
+  const weddingId = c.get('weddingId')
+  const deleted = await playlistService.deleteSong(songId, weddingId)
   if (!deleted) return c.json({ error: 'Not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
@@ -122,14 +123,16 @@ playlistsRoute.post(
 
 playlistsRoute.put('/requests/:id/approve', resolveWeddingMiddleware, async (c) => {
   const id = c.req.param('id')
-  const approved = await playlistService.approveSongRequest(id)
+  const weddingId = c.get('weddingId')
+  const approved = await playlistService.approveSongRequest(id, weddingId)
   if (!approved) return c.json({ error: 'Not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: approved })
 })
 
 playlistsRoute.delete('/requests/:id', resolveWeddingMiddleware, async (c) => {
   const id = c.req.param('id')
-  const deleted = await playlistService.deleteSongRequest(id)
+  const weddingId = c.get('weddingId')
+  const deleted = await playlistService.deleteSongRequest(id, weddingId)
   if (!deleted) return c.json({ error: 'Not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })

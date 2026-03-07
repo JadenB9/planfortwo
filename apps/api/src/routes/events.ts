@@ -116,8 +116,9 @@ eventsRoute.put(
   }),
   async (c) => {
     const entryId = c.req.param('entryId')
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
-    const updated = await eventService.updateTimelineEntry(entryId, data)
+    const updated = await eventService.updateTimelineEntry(entryId, weddingId, data)
     if (!updated)
       return c.json({ error: 'Entry not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
@@ -126,6 +127,7 @@ eventsRoute.put(
 
 eventsRoute.delete('/timeline/:entryId', resolveWeddingMiddleware, async (c) => {
   const entryId = c.req.param('entryId')
-  await eventService.deleteTimelineEntry(entryId)
+  const weddingId = c.get('weddingId')
+  await eventService.deleteTimelineEntry(entryId, weddingId)
   return c.json({ data: { success: true } })
 })

@@ -107,7 +107,13 @@ export const eventService = {
     return entry!
   },
 
-  async updateTimelineEntry(entryId: string, data: UpdateTimelineEntryInput) {
+  async updateTimelineEntry(entryId: string, weddingId: string, data: UpdateTimelineEntryInput) {
+    const [_entry] = await db
+      .select({ weddingId: timelineEntries.weddingId })
+      .from(timelineEntries)
+      .where(eq(timelineEntries.id, entryId))
+    if (!_entry || _entry.weddingId !== weddingId) return null
+
     const updateData: Record<string, unknown> = {}
     if (data.time !== undefined) updateData.time = data.time
     if (data.title !== undefined) updateData.title = data.title
@@ -125,7 +131,12 @@ export const eventService = {
     return updated ?? null
   },
 
-  async deleteTimelineEntry(entryId: string) {
+  async deleteTimelineEntry(entryId: string, weddingId: string) {
+    const [_entry] = await db
+      .select({ weddingId: timelineEntries.weddingId })
+      .from(timelineEntries)
+      .where(eq(timelineEntries.id, entryId))
+    if (!_entry || _entry.weddingId !== weddingId) return
     await db.delete(timelineEntries).where(eq(timelineEntries.id, entryId))
   },
 }

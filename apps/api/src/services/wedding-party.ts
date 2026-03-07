@@ -105,7 +105,12 @@ export const weddingPartyService = {
     return task!
   },
 
-  async updateTask(taskId: string, data: UpdatePartyTaskInput) {
+  async updateTask(taskId: string, weddingId: string, data: UpdatePartyTaskInput) {
+    const [_task] = await db
+      .select({ weddingId: partyTasks.weddingId })
+      .from(partyTasks)
+      .where(eq(partyTasks.id, taskId))
+    if (!_task || _task.weddingId !== weddingId) return null
     const updateData: Record<string, unknown> = {}
     if (data.title !== undefined) updateData.title = data.title
     if (data.description !== undefined) updateData.description = data.description
@@ -122,7 +127,12 @@ export const weddingPartyService = {
     return updated ?? null
   },
 
-  async deleteTask(taskId: string) {
+  async deleteTask(taskId: string, weddingId: string) {
+    const [_task] = await db
+      .select({ weddingId: partyTasks.weddingId })
+      .from(partyTasks)
+      .where(eq(partyTasks.id, taskId))
+    if (!_task || _task.weddingId !== weddingId) return
     await db.delete(partyTasks).where(eq(partyTasks.id, taskId))
   },
 
@@ -144,7 +154,12 @@ export const weddingPartyService = {
     return gift!
   },
 
-  async deleteGift(giftId: string) {
+  async deleteGift(giftId: string, weddingId: string) {
+    const [_gift] = await db
+      .select({ weddingId: partyGifts.weddingId })
+      .from(partyGifts)
+      .where(eq(partyGifts.id, giftId))
+    if (!_gift || _gift.weddingId !== weddingId) return
     await db.delete(partyGifts).where(eq(partyGifts.id, giftId))
   },
 }

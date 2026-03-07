@@ -11,7 +11,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 interface RsvpSectionProps {
   title: string
   content: RsvpSectionContent
-  weddingId: string
+  slug: string
 }
 
 type RsvpState =
@@ -31,7 +31,7 @@ interface StrippedGuest {
   householdId: string | null
 }
 
-export function RsvpSection({ title, content, weddingId }: RsvpSectionProps) {
+export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
   const { colors, fontPair } = useTemplateStyles()
   const [state, setState] = useState<RsvpState>('search')
   const [firstName, setFirstName] = useState('')
@@ -51,7 +51,7 @@ export function RsvpSection({ title, content, weddingId }: RsvpSectionProps) {
       const res = await fetch(`${API_URL}/rsvp/lookup-by-name`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ weddingId, firstName: firstName.trim(), lastName: lastName.trim() }),
+        body: JSON.stringify({ slug, firstName: firstName.trim(), lastName: lastName.trim() }),
       })
 
       if (!res.ok) {
@@ -90,7 +90,7 @@ export function RsvpSection({ title, content, weddingId }: RsvpSectionProps) {
       const res = await fetch(`${API_URL}/rsvp/lookup-by-guest-id`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guestId, weddingId }),
+        body: JSON.stringify({ guestId, slug }),
       })
 
       if (!res.ok) {

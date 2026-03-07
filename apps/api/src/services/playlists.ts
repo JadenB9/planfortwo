@@ -57,7 +57,17 @@ export const playlistService = {
     return song
   },
 
-  async deleteSong(songId: string) {
+  async deleteSong(songId: string, weddingId: string) {
+    const [song] = await db
+      .select({ playlistId: playlistSongs.playlistId })
+      .from(playlistSongs)
+      .where(eq(playlistSongs.id, songId))
+    if (!song) return null
+    const [pl] = await db
+      .select({ id: playlists.id })
+      .from(playlists)
+      .where(and(eq(playlists.id, song.playlistId), eq(playlists.weddingId, weddingId)))
+    if (!pl) return null
     const [deleted] = await db.delete(playlistSongs).where(eq(playlistSongs.id, songId)).returning()
     return deleted ?? null
   },
@@ -75,7 +85,12 @@ export const playlistService = {
     return request
   },
 
-  async approveSongRequest(id: string) {
+  async approveSongRequest(id: string, weddingId: string) {
+    const [req] = await db
+      .select({ weddingId: songRequests.weddingId })
+      .from(songRequests)
+      .where(eq(songRequests.id, id))
+    if (!req || req.weddingId !== weddingId) return null
     const [updated] = await db
       .update(songRequests)
       .set({ isApproved: true })
@@ -84,7 +99,12 @@ export const playlistService = {
     return updated ?? null
   },
 
-  async deleteSongRequest(id: string) {
+  async deleteSongRequest(id: string, weddingId: string) {
+    const [req] = await db
+      .select({ weddingId: songRequests.weddingId })
+      .from(songRequests)
+      .where(eq(songRequests.id, id))
+    if (!req || req.weddingId !== weddingId) return null
     const [deleted] = await db.delete(songRequests).where(eq(songRequests.id, id)).returning()
     return deleted ?? null
   },

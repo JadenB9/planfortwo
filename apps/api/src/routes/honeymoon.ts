@@ -101,8 +101,9 @@ honeymoonRoute.put(
   }),
   async (c) => {
     const activityId = c.req.param('activityId')
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
-    const updated = await honeymoonService.updateActivity(activityId, data)
+    const updated = await honeymoonService.updateActivity(activityId, weddingId, data)
     if (!updated) return c.json({ error: 'Not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     return c.json({ data: updated })
   },
@@ -110,7 +111,8 @@ honeymoonRoute.put(
 
 honeymoonRoute.delete('/activities/:activityId', resolveWeddingMiddleware, async (c) => {
   const activityId = c.req.param('activityId')
-  const deleted = await honeymoonService.deleteActivity(activityId)
+  const weddingId = c.get('weddingId')
+  const deleted = await honeymoonService.deleteActivity(activityId, weddingId)
   if (!deleted) return c.json({ error: 'Not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
