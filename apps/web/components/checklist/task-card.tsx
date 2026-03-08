@@ -25,7 +25,7 @@ const CATEGORY_PAGE_MAP: Record<string, string> = {
   seating: '/seating',
   events: '/events',
   timeline: '/events',
-  communication: '/communication',
+  communication: '/inbox',
 }
 
 function getCategoryPageLink(categoryName: string): string | null {

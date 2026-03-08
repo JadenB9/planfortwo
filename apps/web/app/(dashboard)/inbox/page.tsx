@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import DOMPurify from 'dompurify'
 import { springSmooth, fadeInUp, staggerContainer, listItem } from '@/lib/animations'
 import { api } from '@/lib/api'
+import { useWedding } from '@/hooks/use-wedding'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,8 +40,9 @@ import {
   EyeOff,
   Reply,
   Search,
+  Users,
 } from 'lucide-react'
-import type { Email, EmailAddress, EmailAttachment } from '@planfortwo/types'
+import type { Email, EmailAddress, EmailAttachment, GuestWithTags } from '@planfortwo/types'
 import { toast } from 'sonner'
 
 type TabFilter = 'all' | 'inbound' | 'outbound' | 'unread' | 'starred'
@@ -199,6 +201,8 @@ function formatFileSize(bytes: number): string {
 
 export default function InboxPage() {
   const { getToken } = useAuth()
+  const { data: weddingData } = useWedding()
+  const weddingId = weddingData?.wedding.id ?? null
   const [loading, setLoading] = useState(true)
   const [addresses, setAddresses] = useState<EmailAddress[]>([])
   const [emailList, setEmailList] = useState<Email[]>([])
@@ -247,6 +251,16 @@ export default function InboxPage() {
     textBody: '',
   })
   const [sending, setSending] = useState(false)
+
+  // Mass email
+  const [showMassEmail, setShowMassEmail] = useState(false)
+  const [massGuests, setMassGuests] = useState<GuestWithTags[]>([])
+  const [massGuestsLoading, setMassGuestsLoading] = useState(false)
+  const [massSelected, setMassSelected] = useState<Set<string>>(new Set())
+  const [massGuestSearch, setMassGuestSearch] = useState('')
+  const [massForm, setMassForm] = useState({ subject: '', textBody: '' })
+  const [massSending, setMassSending] = useState(false)
+  const [massSendProgress, setMassSendProgress] = useState({ sent: 0, total: 0 })
 
   const fetchAddresses = useCallback(async () => {
     const token = await getToken()
@@ -459,6 +473,91 @@ export default function InboxPage() {
     }
   }
 
+  const openMassEmail = useCallback(async () => {
+    if (!weddingId) return
+    setShowMassEmail(true)
+    setMassGuestsLoading(true)
+    setMassSelected(new Set())
+    setMassGuestSearch('')
+    setMassForm({ subject: '', textBody: '' })
+    try {
+      const token = await getToken()
+      if (!token) return
+      const res = await api.guests.list(weddingId, token, { pageSize: 1000 })
+      setMassGuests(res.data)
+    } catch {
+      toast.error('Failed to load guest list')
+    } finally {
+      setMassGuestsLoading(false)
+    }
+  }, [weddingId, getToken])
+
+  const guestsWithEmail = massGuests.filter((g) => g.email)
+  const filteredMassGuests = guestsWithEmail.filter((g) => {
+    if (!massGuestSearch.trim()) return true
+    const q = massGuestSearch.toLowerCase()
+    return (
+      g.firstName.toLowerCase().includes(q) ||
+      g.lastName.toLowerCase().includes(q) ||
+      (g.email?.toLowerCase().includes(q) ?? false)
+    )
+  })
+
+  const handleSelectAll = () => {
+    if (massSelected.size === filteredMassGuests.length) {
+      setMassSelected(new Set())
+    } else {
+      setMassSelected(new Set(filteredMassGuests.map((g) => g.id)))
+    }
+  }
+
+  const toggleMassGuest = (id: string) => {
+    setMassSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const handleMassSend = async () => {
+    const token = await getToken()
+    if (!token || addresses.length === 0 || massSelected.size === 0) return
+
+    const recipients = guestsWithEmail.filter((g) => massSelected.has(g.id))
+    setMassSending(true)
+    setMassSendProgress({ sent: 0, total: recipients.length })
+
+    let sent = 0
+    let failed = 0
+    for (const guest of recipients) {
+      try {
+        await api.inbox.send(
+          {
+            emailAddressId: addresses[0]!.id,
+            toAddress: guest.email!,
+            subject: massForm.subject,
+            textBody: massForm.textBody,
+          },
+          token,
+        )
+        sent++
+      } catch {
+        failed++
+      }
+      setMassSendProgress({ sent: sent + failed, total: recipients.length })
+    }
+
+    setMassSending(false)
+    if (failed === 0) {
+      toast.success(`Sent ${sent} email${sent !== 1 ? 's' : ''}`)
+    } else {
+      toast.warning(`Sent ${sent}, failed ${failed}`)
+    }
+    setShowMassEmail(false)
+    await fetchEmails()
+  }
+
   const formatDate = (date: Date | string) => {
     const d = new Date(date)
     const now = new Date()
@@ -614,6 +713,10 @@ export default function InboxPage() {
           </div>
           <Button variant="outline" size="sm" onClick={fetchEmails}>
             <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={openMassEmail}>
+            <Users className="mr-1 h-4 w-4" />
+            Mass Email
           </Button>
           <Button
             size="sm"
@@ -1005,6 +1108,147 @@ export default function InboxPage() {
                 <Send className="mr-2 h-4 w-4" />
               )}
               Send
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Mass Email Dialog */}
+      <Dialog open={showMassEmail} onOpenChange={setShowMassEmail}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Mass Email to Guests</DialogTitle>
+          </DialogHeader>
+
+          {massGuestsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-rose-400" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-xs text-gray-500">
+                  From: {addresses[0]?.displayName} &lt;{addresses[0]?.address}@planfortwo.com&gt;
+                </Label>
+              </div>
+
+              {/* Guest selection */}
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <Label>
+                    Recipients ({massSelected.size} of {guestsWithEmail.length} guests with email)
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={handleSelectAll}
+                    className="text-xs font-medium text-rose-600 hover:text-rose-700"
+                  >
+                    {massSelected.size === filteredMassGuests.length &&
+                    filteredMassGuests.length > 0
+                      ? 'Deselect All'
+                      : 'Select All'}
+                  </button>
+                </div>
+                <div className="relative mb-2">
+                  <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search guests..."
+                    value={massGuestSearch}
+                    onChange={(e) => setMassGuestSearch(e.target.value)}
+                    className="pl-9 text-sm"
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto rounded-lg border border-gray-200">
+                  {filteredMassGuests.length === 0 ? (
+                    <p className="p-3 text-center text-sm text-gray-400">
+                      {guestsWithEmail.length === 0
+                        ? 'No guests have email addresses'
+                        : 'No matching guests'}
+                    </p>
+                  ) : (
+                    filteredMassGuests.map((guest) => (
+                      <label
+                        key={guest.id}
+                        className="flex cursor-pointer items-center gap-3 border-b border-gray-100 px-3 py-2 last:border-b-0 hover:bg-gray-50"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={massSelected.has(guest.id)}
+                          onChange={() => toggleMassGuest(guest.id)}
+                          className="h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <span className="text-sm font-medium text-gray-900">
+                            {guest.firstName} {guest.lastName}
+                          </span>
+                          <span className="ml-2 text-xs text-gray-400">{guest.email}</span>
+                        </div>
+                      </label>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Subject & body */}
+              <div>
+                <Label htmlFor="mass-subject">Subject</Label>
+                <Input
+                  id="mass-subject"
+                  placeholder="Subject"
+                  value={massForm.subject}
+                  onChange={(e) => setMassForm((f) => ({ ...f, subject: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="mass-body">Message</Label>
+                <Textarea
+                  id="mass-body"
+                  placeholder="Write your message..."
+                  rows={6}
+                  value={massForm.textBody}
+                  onChange={(e) => setMassForm((f) => ({ ...f, textBody: e.target.value }))}
+                />
+              </div>
+
+              {massSending && (
+                <div className="space-y-1">
+                  <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+                    <div
+                      className="h-full rounded-full bg-rose-500 transition-all"
+                      style={{
+                        width: `${massSendProgress.total > 0 ? (massSendProgress.sent / massSendProgress.total) * 100 : 0}%`,
+                      }}
+                    />
+                  </div>
+                  <p className="text-center text-xs text-gray-500">
+                    Sending {massSendProgress.sent} of {massSendProgress.total}...
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowMassEmail(false)}
+              disabled={massSending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleMassSend}
+              disabled={
+                massSending || massSelected.size === 0 || !massForm.subject || !massForm.textBody
+              }
+              className="bg-rose-500 hover:bg-rose-600"
+            >
+              {massSending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
+              Send to {massSelected.size} Guest{massSelected.size !== 1 ? 's' : ''}
             </Button>
           </DialogFooter>
         </DialogContent>

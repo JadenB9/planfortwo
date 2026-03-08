@@ -13,7 +13,6 @@ import {
   Camera,
   Gift,
   Plane,
-  Mail,
   Inbox,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -64,7 +63,6 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: '/photos', label: 'Photos', icon: Camera, comingSoon: false },
       { href: '/registry', label: 'Registry', icon: Gift, comingSoon: false },
       { href: '/honeymoon', label: 'Honeymoon', icon: Plane, comingSoon: false },
-      { href: '/communication', label: 'Communication', icon: Mail, comingSoon: false },
     ],
   },
 ]
