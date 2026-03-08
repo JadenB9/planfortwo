@@ -16,14 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { NavBar } from '@/components/layout/nav-bar'
 import { SiteFooter } from '@/components/layout/site-footer'
-import {
-  springSmooth,
-  staggerSlow,
-  revealUp,
-  slideFromLeft,
-  slideFromRight,
-  drawLine,
-} from '@/lib/animations'
+import { springSmooth, slideFromLeft, slideFromRight, drawLine } from '@/lib/animations'
 
 const rotatingWords = ['checklists', 'guest lists', 'budgets', 'websites', 'seating charts']
 
@@ -441,114 +434,6 @@ export default function HomePage() {
               className="rounded-3xl bg-white/60 p-6 sm:p-10"
             />
           </div>
-        </div>
-      </section>
-
-      {/* ─── Value Props ─── */}
-      <section className="bg-[#FFFCF7] px-5 py-24 sm:px-8 lg:py-32">
-        <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.6 }}
-            className="mb-16 max-w-2xl"
-          >
-            <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
-              Why PlanForTwo
-            </span>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              We built this differently.
-            </h2>
-          </motion.div>
-
-          <motion.div
-            variants={staggerSlow}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {[
-              {
-                title: 'Made for two people',
-                body: 'Both partners get full access. No "planner vs. guest" hierarchy. You\'re equals.',
-              },
-              {
-                title: 'Pay once, done',
-                body: 'One payment unlocks every feature forever. No subscriptions, no renewal surprises.',
-              },
-              {
-                title: 'No ads, no upsells',
-                body: "We don't sell your data or show you ads. The product is the product.",
-              },
-              {
-                title: 'Private by default',
-                body: "Your guest list, budget, and details are yours. We don't share with vendors.",
-              },
-              {
-                title: 'Works on everything',
-                body: 'Plan on your phone at the florist, your laptop at home, or your tablet on the couch.',
-              },
-              {
-                title: 'Real export options',
-                body: "Download your data anytime — CSV, PDF, whatever you need. It's your wedding.",
-              },
-            ].map((item) => (
-              <motion.div
-                key={item.title}
-                variants={revealUp}
-                transition={{ duration: 0.6, ...springSmooth }}
-                className="group rounded-2xl border border-gray-100 bg-white/80 p-7 transition-colors hover:border-gray-200 hover:bg-white"
-              >
-                <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-500">{item.body}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── Pricing teaser ─── */}
-      <section className="px-5 py-24 sm:px-8 lg:py-32">
-        <div className="mx-auto max-w-3xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
-              Simple pricing
-            </span>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Free to start. One upgrade if you want it all.
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-gray-500">
-              The free plan gives you the checklist, 15 guests, and one website template. Ready for
-              more? A single $200 payment unlocks everything — unlimited guests, all templates,
-              budget tools, seating charts, and every feature we ever build.
-            </p>
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-5">
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Button
-                  asChild
-                  size="lg"
-                  className="rounded-xl bg-gray-900 px-8 text-sm font-medium text-white shadow-lg shadow-gray-900/10 hover:bg-gray-800"
-                >
-                  <Link href="/sign-up">Start free</Link>
-                </Button>
-              </motion.div>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="rounded-xl border-gray-200 px-8 text-sm"
-              >
-                <Link href="/features#pricing">Compare plans</Link>
-              </Button>
-            </div>
-          </motion.div>
         </div>
       </section>
 

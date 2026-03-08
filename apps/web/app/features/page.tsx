@@ -17,20 +17,23 @@ import {
   Plane,
   Settings,
   type LucideIcon,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { NavBar } from '@/components/layout/nav-bar'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { AnimatedSection } from '@/components/features/animated-section'
 import { PricingCard, PricingCards } from '@/components/features/pricing-card'
-import { FaqSection } from '@/components/features/faq-section'
+import { InteractiveFeatureCard } from '@/components/features/interactive-feature-card'
 
 interface FeatureCategory {
   icon: LucideIcon
   title: string
   description: string
   items: string[]
+  accent: string
+  accentLight: string
 }
 
 const featureCategories: FeatureCategory[] = [
@@ -46,6 +49,8 @@ const featureCategories: FeatureCategory[] = [
       'Drag-and-drop reordering',
       'File attachments for contracts and inspiration',
     ],
+    accent: '#5B7A5E',
+    accentLight: '#EDF2ED',
   },
   {
     icon: Users,
@@ -59,6 +64,8 @@ const featureCategories: FeatureCategory[] = [
       'Tags for grouping (family, friends, work)',
       'Household grouping and plus-ones',
     ],
+    accent: '#C17F59',
+    accentLight: '#FDF2EB',
   },
   {
     icon: DollarSign,
@@ -72,6 +79,8 @@ const featureCategories: FeatureCategory[] = [
       'CSV and PDF export',
       'Payment schedule and reminders',
     ],
+    accent: '#8B7355',
+    accentLight: '#F5F0EA',
   },
   {
     icon: Globe,
@@ -85,6 +94,8 @@ const featureCategories: FeatureCategory[] = [
       'Built-in visitor analytics',
       'Custom domain support',
     ],
+    accent: '#4A6E5C',
+    accentLight: '#E9F0EC',
   },
   {
     icon: LayoutGrid,
@@ -98,6 +109,8 @@ const featureCategories: FeatureCategory[] = [
       'Dietary restriction flags',
       'Print-ready export',
     ],
+    accent: '#7A6B8A',
+    accentLight: '#F0ECF4',
   },
   {
     icon: Building2,
@@ -110,6 +123,8 @@ const featureCategories: FeatureCategory[] = [
       'Review and rating system',
       'Communication log',
     ],
+    accent: '#5A7A8A',
+    accentLight: '#EBF1F4',
   },
   {
     icon: Calendar,
@@ -123,6 +138,8 @@ const featureCategories: FeatureCategory[] = [
       'Rehearsal dinner coordination',
       'Vendor arrival times',
     ],
+    accent: '#8A6B5A',
+    accentLight: '#F4EEEB',
   },
   {
     icon: Camera,
@@ -136,6 +153,8 @@ const featureCategories: FeatureCategory[] = [
       'Shareable gallery links',
       'Download and print options',
     ],
+    accent: '#6B7A5A',
+    accentLight: '#EFF2EB',
   },
   {
     icon: Gift,
@@ -148,6 +167,8 @@ const featureCategories: FeatureCategory[] = [
       'Thank-you note manager',
       'Gift receipt confirmations',
     ],
+    accent: '#C17F59',
+    accentLight: '#FDF2EB',
   },
   {
     icon: Heart,
@@ -160,6 +181,8 @@ const featureCategories: FeatureCategory[] = [
       'Reading and music selections',
       'Officiant coordination',
     ],
+    accent: '#B07070',
+    accentLight: '#F6EDED',
   },
   {
     icon: Music,
@@ -172,6 +195,8 @@ const featureCategories: FeatureCategory[] = [
       'Do-not-play list',
       'First dance and special song picks',
     ],
+    accent: '#5B7A5E',
+    accentLight: '#EDF2ED',
   },
   {
     icon: Plane,
@@ -185,6 +210,8 @@ const featureCategories: FeatureCategory[] = [
       'Travel document checklist',
       'Budget tracking for trips',
     ],
+    accent: '#5A7A8A',
+    accentLight: '#EBF1F4',
   },
   {
     icon: Mail,
@@ -198,6 +225,8 @@ const featureCategories: FeatureCategory[] = [
       'Email campaign tracking',
       'Guest communication history',
     ],
+    accent: '#7A6B8A',
+    accentLight: '#F0ECF4',
   },
   {
     icon: Settings,
@@ -210,6 +239,8 @@ const featureCategories: FeatureCategory[] = [
       'Data export and backup',
       'Privacy and sharing controls',
     ],
+    accent: '#6B7A8A',
+    accentLight: '#EDF0F4',
   },
 ]
 
@@ -232,20 +263,15 @@ const freePlanFeatures = [
   { label: 'Registry & gift tracking', included: false },
   { label: 'Ceremony & music planning', included: false },
   { label: 'Honeymoon planning', included: false },
-  { label: 'Priority support', included: false },
 ]
 
 const fullPlanFeatures = [
-  { label: 'Checklist (view only)', included: true },
-  { label: 'Up to 15 guests', included: true },
-  { label: '1 basic website template', included: true },
-  { label: 'Budget total overview', included: true },
-  { label: 'Full checklist editing', included: true },
+  { label: 'Full checklist editing & customization', included: true },
   { label: 'Unlimited guests', included: true },
-  { label: 'RSVP tracking', included: true },
   { label: 'All 10 website templates', included: true },
-  { label: 'Custom domain', included: true },
-  { label: 'Budget analytics & export', included: true },
+  { label: 'Complete budget analytics & export', included: true },
+  { label: 'RSVP tracking & management', included: true },
+  { label: 'Custom domain support', included: true },
   { label: 'CSV and PDF data export', included: true },
   { label: 'Seating chart builder', included: true },
   { label: 'Vendor management', included: true },
@@ -254,7 +280,7 @@ const fullPlanFeatures = [
   { label: 'Registry & gift tracking', included: true },
   { label: 'Ceremony & music planning', included: true },
   { label: 'Honeymoon planning', included: true },
-  { label: 'Priority support', included: true },
+  { label: 'Every future feature we build', included: true },
 ]
 
 export default function FeaturesPage() {
@@ -292,41 +318,26 @@ export default function FeaturesPage() {
             </h2>
             <p className="mt-4 text-base leading-relaxed text-gray-500">
               Every feature is designed with couples in mind — no bloat, no complexity, just the
-              tools you actually need.
+              tools you actually need. Hover to explore.
             </p>
           </AnimatedSection>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featureCategories.map((category, index) => {
-              const Icon = category.icon
-              return (
-                <AnimatedSection key={category.title} delay={Math.min(index * 0.05, 0.4)}>
-                  <Card className="h-full border-gray-100 bg-white transition-shadow hover:shadow-md">
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <div className="bg-sage-50 flex h-10 w-10 items-center justify-center rounded-lg">
-                          <Icon className="text-sage-600 h-5 w-5" />
-                        </div>
-                        <CardTitle className="text-base">{category.title}</CardTitle>
-                      </div>
-                      <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                        {category.description}
-                      </p>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {category.items.map((item) => (
-                          <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
-                            <span className="bg-sage-300 mt-1.5 h-1 w-1 shrink-0 rounded-full" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </AnimatedSection>
-              )
-            })}
+          <div
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            style={{ perspective: '1200px' }}
+          >
+            {featureCategories.map((category, index) => (
+              <InteractiveFeatureCard
+                key={category.title}
+                icon={category.icon}
+                title={category.title}
+                description={category.description}
+                items={category.items}
+                index={index}
+                accent={category.accent}
+                accentLight={category.accentLight}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -371,24 +382,6 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="px-5 py-20 sm:px-8">
-        <div className="mx-auto max-w-3xl">
-          <AnimatedSection className="mb-12 text-center">
-            <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
-              FAQ
-            </span>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Common questions
-            </h2>
-          </AnimatedSection>
-
-          <AnimatedSection delay={0.1}>
-            <FaqSection />
-          </AnimatedSection>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="bg-gray-900 px-5 py-20 sm:px-8">
         <AnimatedSection className="mx-auto max-w-2xl text-center">
@@ -408,11 +401,14 @@ export default function FeaturesPage() {
             </Button>
             <Button
               asChild
-              variant="outline"
               size="lg"
-              className="rounded-xl border-gray-700 px-8 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="rounded-xl border-0 bg-gradient-to-r from-amber-500 to-orange-500 px-8 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 hover:from-amber-400 hover:to-orange-400"
             >
-              <Link href="/upgrade">Get Full Access</Link>
+              <Link href="/upgrade">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Get Full Access
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </AnimatedSection>

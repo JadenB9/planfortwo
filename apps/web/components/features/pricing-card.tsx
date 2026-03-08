@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { type ReactNode } from 'react'
-import { Check, X } from 'lucide-react'
+import { Check, X, Sparkles } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -45,11 +45,11 @@ export function PricingCard({
       <Card
         className={cn(
           'flex w-full flex-col',
-          highlighted && 'border-wedding-600 relative border-2 shadow-lg',
+          highlighted && 'relative border-2 border-amber-400/60 shadow-xl shadow-amber-100/50',
         )}
       >
         {highlighted && (
-          <div className="bg-wedding-600 absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-xs font-semibold text-white">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-1 text-xs font-semibold text-white shadow-md">
             Most Popular
           </div>
         )}
@@ -68,7 +68,12 @@ export function PricingCard({
             {features.map((feature) => (
               <li key={feature.label} className="flex items-start gap-3">
                 {feature.included ? (
-                  <Check className="text-sage-600 mt-0.5 h-4 w-4 shrink-0" />
+                  <Check
+                    className={cn(
+                      'mt-0.5 h-4 w-4 shrink-0',
+                      highlighted ? 'text-amber-500' : 'text-sage-600',
+                    )}
+                  />
                 ) : (
                   <X className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
                 )}
@@ -81,18 +86,28 @@ export function PricingCard({
             ))}
           </ul>
           <div className="mt-8">
-            <Button
-              asChild
-              className={cn(
-                'w-full rounded-xl',
-                highlighted
-                  ? 'bg-wedding-600 hover:bg-wedding-700 text-white'
-                  : 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-              )}
-              size="lg"
-            >
-              <Link href={href}>{cta}</Link>
-            </Button>
+            {highlighted ? (
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  asChild
+                  className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 hover:from-amber-400 hover:to-orange-400"
+                  size="lg"
+                >
+                  <Link href={href}>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    {cta}
+                  </Link>
+                </Button>
+              </motion.div>
+            ) : (
+              <Button
+                asChild
+                className="w-full rounded-xl bg-gray-100 text-gray-900 hover:bg-gray-200"
+                size="lg"
+              >
+                <Link href={href}>{cta}</Link>
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
