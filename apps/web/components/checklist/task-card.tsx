@@ -168,7 +168,7 @@ export function TaskCard({
         <Link
           href={sectionLink}
           onClick={(e) => e.stopPropagation()}
-          className="text-wedding-600 hover:text-wedding-700 flex flex-shrink-0 items-center gap-1 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100"
+          className="text-wedding-600 hover:text-wedding-700 flex flex-shrink-0 items-center gap-1 text-xs font-medium"
         >
           Go to section
           <ArrowRight className="h-3 w-3" />
