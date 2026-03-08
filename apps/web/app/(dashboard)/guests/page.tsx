@@ -44,6 +44,7 @@ export default function GuestsPage() {
   const [editingGuest, setEditingGuest] = useState<GuestWithTags | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [sendingInviteId, setSendingInviteId] = useState<string | null>(null)
+  const [deletingGuestId, setDeletingGuestId] = useState<string | null>(null)
   const [sendingBulk, setSendingBulk] = useState(false)
 
   const handleCreateGuest = useCallback(
@@ -135,6 +136,25 @@ export default function GuestsPage() {
     toast.success('Guest removed')
     await refetch()
   }, [weddingId, selectedGuest, getToken, refetch])
+
+  const handleDeleteGuestInline = useCallback(
+    async (guest: GuestWithTags) => {
+      if (!weddingId) return
+      setDeletingGuestId(guest.id)
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.guests.delete(guest.id, weddingId, token)
+        toast.success(`${guest.firstName} ${guest.lastName} removed`)
+        await refetch()
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to remove guest')
+      } finally {
+        setDeletingGuestId(null)
+      }
+    },
+    [weddingId, getToken, refetch],
+  )
 
   const handleSendInvite = useCallback(
     async (guest: GuestWithTags) => {
@@ -366,8 +386,10 @@ export default function GuestsPage() {
             guests={guests}
             onSelectGuest={setSelectedGuest}
             onEditGuest={setEditingGuest}
+            onDeleteGuest={handleDeleteGuestInline}
             onSendInvite={handleSendInvite}
             sendingInviteId={sendingInviteId}
+            deletingGuestId={deletingGuestId}
           />
         )}
 

@@ -2,14 +2,16 @@
 
 import type { GuestWithTags } from '@planfortwo/types'
 import { GuestTagBadge } from './guest-tag-badge'
-import { Mail, MailCheck, Pencil, Send } from 'lucide-react'
+import { Mail, MailCheck, Pencil, Send, Trash2 } from 'lucide-react'
 
 interface GuestTableProps {
   guests: GuestWithTags[]
   onSelectGuest: (guest: GuestWithTags) => void
   onEditGuest: (guest: GuestWithTags) => void
+  onDeleteGuest?: (guest: GuestWithTags) => void
   onSendInvite?: (guest: GuestWithTags) => void
   sendingInviteId?: string | null
+  deletingGuestId?: string | null
 }
 
 const RSVP_BADGE: Record<string, string> = {
@@ -23,8 +25,10 @@ export function GuestTable({
   guests,
   onSelectGuest,
   onEditGuest,
+  onDeleteGuest,
   onSendInvite,
   sendingInviteId,
+  deletingGuestId,
 }: GuestTableProps) {
   if (guests.length === 0) {
     return (
@@ -81,6 +85,25 @@ export function GuestTable({
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
+                    {onDeleteGuest && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (window.confirm(`Remove ${guest.firstName} ${guest.lastName}?`)) {
+                            onDeleteGuest(guest)
+                          }
+                        }}
+                        disabled={deletingGuestId === guest.id}
+                        className="shrink-0 rounded-md p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                        title="Remove guest"
+                      >
+                        {deletingGuestId === guest.id ? (
+                          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-red-600" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    )}
                     <div onClick={() => onSelectGuest(guest)} className="cursor-pointer">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-900">
