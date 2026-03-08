@@ -163,6 +163,7 @@ function SeatPopover({
       <div
         ref={ref}
         style={{ left: x, top: y }}
+        onMouseDown={(e) => e.stopPropagation()}
         className="absolute z-50 w-52 rounded-lg border border-gray-200 bg-white p-3 shadow-lg"
       >
         <p className="text-sm font-medium text-gray-900">{fullName}</p>
@@ -180,6 +181,7 @@ function SeatPopover({
     <div
       ref={ref}
       style={{ left: x, top: y }}
+      onMouseDown={(e) => e.stopPropagation()}
       className="absolute z-50 w-56 rounded-lg border border-gray-200 bg-white p-2 shadow-lg"
     >
       <Input
@@ -263,6 +265,7 @@ function RectAssignPopover({
     <div
       ref={ref}
       style={{ left: x, top: y }}
+      onMouseDown={(e) => e.stopPropagation()}
       className="absolute z-50 w-64 rounded-lg border border-gray-200 bg-white p-3 shadow-lg"
     >
       <p className="mb-2 text-xs font-semibold text-gray-700">
