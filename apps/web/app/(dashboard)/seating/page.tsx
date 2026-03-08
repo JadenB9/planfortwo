@@ -595,7 +595,7 @@ export default function SeatingPage() {
       toast.success('Guest seated')
       setSeatPopover(null)
       setRectPopover(null)
-      void loadChartDetail(selectedChart!.id)
+      if (selectedChart) void loadChartDetail(selectedChart.id)
     } catch {
       toast.error('Failed to assign guest')
     }
@@ -614,7 +614,7 @@ export default function SeatingPage() {
       toast.success('Seat assigned')
       setSeatPopover(null)
       setRectPopover(null)
-      void loadChartDetail(selectedChart!.id)
+      if (selectedChart) void loadChartDetail(selectedChart.id)
     } catch {
       toast.error('Failed to assign seat')
     }
@@ -669,7 +669,7 @@ export default function SeatingPage() {
       toast.success('Seat unassigned')
       setSeatPopover(null)
       setRectPopover(null)
-      void loadChartDetail(selectedChart!.id)
+      if (selectedChart) void loadChartDetail(selectedChart.id)
     } catch {
       toast.error('Failed to unassign seat')
     }
@@ -705,7 +705,7 @@ export default function SeatingPage() {
         return {
           ...prev,
           tables: prev.tables.map((t) =>
-            t.id === dragTableRef.current!.id ? { ...t, posX: newX, posY: newY } : t,
+            t.id === dragTableRef.current?.id ? { ...t, posX: newX, posY: newY } : t,
           ),
         }
       })
@@ -749,12 +749,12 @@ export default function SeatingPage() {
     if (isPanningRef.current) isPanningRef.current = false
 
     if (isDraggingTableRef.current && dragTableRef.current && hasDraggedRef.current) {
-      const table = selectedChart?.tables.find((t) => t.id === dragTableRef.current!.id)
+      const table = selectedChart?.tables.find((t) => t.id === dragTableRef.current?.id)
       if (table) void handleTableDragEnd(table.id, table.posX, table.posY)
     }
 
     if (isResizingRef.current && resizeRef.current && hasDraggedRef.current) {
-      const table = selectedChart?.tables.find((t) => t.id === resizeRef.current!.tableId)
+      const table = selectedChart?.tables.find((t) => t.id === resizeRef.current?.tableId)
       if (table) void handleResizeEnd(table.id, table.width, table.height, table.posX, table.posY)
     }
 
