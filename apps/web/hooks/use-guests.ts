@@ -21,6 +21,8 @@ export interface GuestFilterState {
   isChild?: boolean
   isVip?: boolean
   hasPlusOne?: boolean
+  page?: number
+  pageSize?: number
 }
 
 interface UseGuestsOptions {
@@ -35,7 +37,13 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
   const [households, setHouseholds] = useState<Household[]>([])
   const [tags, setTags] = useState<GuestTag[]>([])
   const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState<GuestFilterState>(initialFilters ?? {})
+  const [filters, setFilters] = useState<GuestFilterState>({
+    page: 1,
+    pageSize: 50,
+    ...initialFilters,
+  })
+  const [total, setTotal] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const loadGuests = useCallback(async () => {
@@ -56,6 +64,8 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
       ])
 
       setGuests(guestsRes.data)
+      setTotal(guestsRes.total)
+      setHasMore(guestsRes.hasMore)
       setStats(statsRes.data)
       setHouseholds(householdsRes.data)
       setTags(tagsRes.data)
@@ -71,14 +81,22 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
   }, [loadGuests])
 
   const updateFilters = useCallback((newFilters: Partial<GuestFilterState>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }))
+    setFilters((prev) => ({ ...prev, ...newFilters, page: 1 }))
   }, [])
 
   const setSearchDebounced = useCallback((search: string) => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      setFilters((prev) => ({ ...prev, search }))
+      setFilters((prev) => ({ ...prev, search, page: 1 }))
     }, 300)
+  }, [])
+
+  const setPage = useCallback((page: number) => {
+    setFilters((prev) => ({ ...prev, page }))
+  }, [])
+
+  const setPageSize = useCallback((pageSize: number) => {
+    setFilters((prev) => ({ ...prev, pageSize, page: 1 }))
   }, [])
 
   return {
@@ -88,8 +106,12 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
     tags,
     loading,
     filters,
+    total,
+    hasMore,
     updateFilters,
     setSearchDebounced,
+    setPage,
+    setPageSize,
     refetch: loadGuests,
   }
 }

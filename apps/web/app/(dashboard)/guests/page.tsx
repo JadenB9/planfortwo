@@ -5,7 +5,7 @@ import { useAuth } from '@clerk/nextjs'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
-import { Send } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Send } from 'lucide-react'
 import type { GuestWithTags } from '@planfortwo/types'
 import { api } from '@/lib/api'
 import { springSmooth } from '@/lib/animations'
@@ -32,8 +32,11 @@ export default function GuestsPage() {
     tags,
     loading,
     filters,
+    total,
     updateFilters,
     setSearchDebounced,
+    setPage,
+    setPageSize,
     refetch,
   } = useGuests({ weddingId })
 
@@ -211,6 +214,79 @@ export default function GuestsPage() {
 
   const uninvitedWithEmail = guests.filter((g) => g.email && !g.inviteSentAt)
 
+  const currentPage = filters.page ?? 1
+  const currentPageSize = filters.pageSize ?? 50
+  const totalPages = Math.max(1, Math.ceil(total / currentPageSize))
+  const showingFrom = total === 0 ? 0 : (currentPage - 1) * currentPageSize + 1
+  const showingTo = Math.min(currentPage * currentPageSize, total)
+
+  const paginationControls = (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        <span>Show</span>
+        <select
+          value={currentPageSize}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          className="focus:border-wedding-600 focus:ring-wedding-600/20 rounded-lg border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2"
+        >
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+          <option value={100}>100</option>
+        </select>
+        <span>per page</span>
+        {total > 0 && (
+          <span className="ml-2 text-gray-400">
+            {showingFrom}–{showingTo} of {total}
+          </span>
+        )}
+      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setPage(currentPage - 1)}
+            disabled={currentPage <= 1}
+            className="rounded-lg border border-gray-300 p-1.5 text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+            .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
+              if (idx > 0 && p - (arr[idx - 1] ?? 0) > 1) acc.push('ellipsis')
+              acc.push(p)
+              return acc
+            }, [])
+            .map((item, idx) =>
+              item === 'ellipsis' ? (
+                <span key={`e-${idx}`} className="px-1 text-sm text-gray-400">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={item}
+                  onClick={() => setPage(item)}
+                  className={`min-w-[2rem] rounded-lg px-2 py-1 text-sm font-medium transition-colors ${
+                    item === currentPage
+                      ? 'bg-wedding-600 text-white'
+                      : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {item}
+                </button>
+              ),
+            )}
+          <button
+            onClick={() => setPage(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+            className="rounded-lg border border-gray-300 p-1.5 text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <motion.div
       className="mx-auto max-w-5xl"
@@ -277,6 +353,9 @@ export default function GuestsPage() {
           onSearchChange={setSearchDebounced}
         />
 
+        {/* Pagination (top) */}
+        {!loading && total > 0 && paginationControls}
+
         {/* Table */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -291,6 +370,9 @@ export default function GuestsPage() {
             sendingInviteId={sendingInviteId}
           />
         )}
+
+        {/* Pagination (bottom) */}
+        {!loading && total > 0 && paginationControls}
 
         {/* Dietary Summary */}
         {stats && stats.totalGuests > 0 && <DietarySummaryCard summary={stats.dietarySummary} />}

@@ -314,7 +314,13 @@ export const api = {
           if (v !== undefined && v !== null && v !== '') searchParams.set(k, String(v))
         }
       }
-      return fetchApi<{ data: GuestWithTags[] }>(`/guests?${searchParams}`, { token })
+      return fetchApi<{
+        data: GuestWithTags[]
+        total: number
+        page: number
+        pageSize: number
+        hasMore: boolean
+      }>(`/guests?${searchParams}`, { token })
     },
     get: (id: string, weddingId: string, token: string) =>
       fetchApi<{ data: GuestWithTags }>(`/guests/${id}?weddingId=${weddingId}`, { token }),
