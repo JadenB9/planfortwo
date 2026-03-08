@@ -878,7 +878,7 @@ export default function SeatingPage() {
   if (selectedChart) {
     return (
       <motion.div
-        className="flex h-[calc(100vh-64px)] flex-col overflow-hidden"
+        className="-mx-4 -my-8 flex h-[calc(100vh-64px)] flex-col overflow-hidden sm:-mx-6 lg:-mx-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
