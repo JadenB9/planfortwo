@@ -994,7 +994,14 @@ export const api = {
     updateTable: (
       tableId: string,
       weddingId: string,
-      data: { label?: string; capacity?: number; posX?: number; posY?: number },
+      data: {
+        label?: string
+        capacity?: number
+        posX?: number
+        posY?: number
+        width?: number
+        height?: number
+      },
       token: string,
     ) =>
       fetchApi<{ data: SeatingTable }>(`/seating-charts/tables/${tableId}?weddingId=${weddingId}`, {
