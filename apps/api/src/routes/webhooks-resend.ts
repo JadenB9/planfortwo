@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { Webhook } from 'svix'
+import { Resend } from 'resend'
 import createDOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
 import { inboxService } from '../services/inbox.js'
@@ -8,72 +9,10 @@ import { storageClient } from '@planfortwo/storage'
 const window = new JSDOM('').window
 const DOMPurify = createDOMPurify(window as never)
 
-const RESEND_API_BASE = 'https://api.resend.com'
-
-async function fetchEmailContent(
-  emailId: string,
-  apiKey: string,
-): Promise<{ text?: string; html?: string }> {
-  try {
-    const response = await fetch(`${RESEND_API_BASE}/emails/receiving`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email_id: emailId }),
-    })
-
-    if (!response.ok) {
-      const body = await response.text()
-      console.error(`[resend-webhook] Failed to fetch email content: ${response.status} ${body}`)
-      return {}
-    }
-
-    const data = (await response.json()) as Record<string, unknown>
-    return {
-      text: (data.text as string) ?? undefined,
-      html: (data.html as string) ?? undefined,
-    }
-  } catch (err) {
-    console.error('[resend-webhook] Error fetching email content:', err)
-    return {}
-  }
-}
-
-interface ResendAttachment {
-  filename: string
-  content_type: string
-  content_length: number
-  download_url: string
-  expires_at: string
-}
-
-async function fetchEmailAttachments(emailId: string, apiKey: string): Promise<ResendAttachment[]> {
-  try {
-    const response = await fetch(
-      `${RESEND_API_BASE}/emails/attachments?emailId=${encodeURIComponent(emailId)}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    )
-
-    if (!response.ok) {
-      const body = await response.text()
-      console.error(`[resend-webhook] Failed to fetch attachments: ${response.status} ${body}`)
-      return []
-    }
-
-    const result = (await response.json()) as { data: ResendAttachment[] }
-    return result.data ?? []
-  } catch (err) {
-    console.error('[resend-webhook] Error fetching attachments:', err)
-    return []
-  }
+function getResendClient(): Resend | null {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) return null
+  return new Resend(apiKey)
 }
 
 function parseEmailAddress(raw: string): { name?: string; email: string } {
@@ -251,7 +190,7 @@ resendWebhookRoute.post('/', async (c) => {
         continue
       }
 
-      const resendApiKey = process.env.RESEND_API_KEY
+      const resend = getResendClient()
       let textBody: string | undefined
       let htmlBody: string | undefined
       let attachmentsMeta: Array<{
@@ -263,21 +202,53 @@ resendWebhookRoute.post('/', async (c) => {
         r2Key?: string
       }> = []
 
-      if (resendApiKey && emailId) {
-        const content = await fetchEmailContent(emailId, resendApiKey)
-        textBody = content.text
-        htmlBody = content.html ? sanitizeHtml(content.html) : undefined
+      if (resend && emailId) {
+        // Fetch email content via Resend SDK
+        try {
+          const { data: emailContent, error: contentError } =
+            await resend.emails.receiving.get(emailId)
 
-        const rawAttachments = await fetchEmailAttachments(emailId, resendApiKey)
-        attachmentsMeta = rawAttachments
-          .filter((att) => att.download_url?.startsWith('https://'))
-          .map((att) => ({
-            id: crypto.randomUUID(),
-            filename: att.filename.replace(/[^\x20-\x7E]/g, '_'),
-            contentType: att.content_type,
-            size: att.content_length,
-            url: att.download_url,
-          }))
+          if (contentError) {
+            console.error(
+              `[resend-webhook] SDK error fetching email content: ${contentError.message}`,
+            )
+          } else if (emailContent) {
+            textBody = emailContent.text ?? undefined
+            htmlBody = emailContent.html ? sanitizeHtml(emailContent.html) : undefined
+            console.log(
+              `[resend-webhook] Fetched content: text=${textBody ? textBody.length : 0}chars, html=${htmlBody ? htmlBody.length : 0}chars`,
+            )
+          }
+        } catch (err) {
+          console.error('[resend-webhook] Exception fetching email content:', err)
+        }
+
+        // Fetch attachments via Resend SDK
+        try {
+          const { data: attData, error: attError } = await resend.emails.receiving.attachments.list(
+            { emailId },
+          )
+
+          if (attError) {
+            console.error(`[resend-webhook] SDK error fetching attachments: ${attError.message}`)
+          } else if (attData?.data) {
+            const rawAtts = attData.data as unknown as Array<Record<string, unknown>>
+            attachmentsMeta = rawAtts
+              .filter(
+                (att) =>
+                  typeof att.download_url === 'string' && att.download_url.startsWith('https://'),
+              )
+              .map((att) => ({
+                id: crypto.randomUUID(),
+                filename: String(att.filename ?? 'attachment').replace(/[^\x20-\x7E]/g, '_'),
+                contentType: String(att.content_type ?? 'application/octet-stream'),
+                size: Number(att.content_length ?? 0),
+                url: String(att.download_url),
+              }))
+          }
+        } catch (err) {
+          console.error('[resend-webhook] Exception fetching attachments:', err)
+        }
 
         // Persist attachments to R2 (Resend download URLs expire)
         for (const att of attachmentsMeta) {
