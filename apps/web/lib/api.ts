@@ -229,8 +229,8 @@ export const api = {
         body: JSON.stringify(data),
         token,
       }),
-    update: (id: string, data: UpdateTaskInput, token: string) =>
-      fetchApi<{ data: ChecklistTask }>(`/tasks/${id}`, {
+    update: (id: string, data: UpdateTaskInput, weddingId: string, token: string) =>
+      fetchApi<{ data: ChecklistTask }>(`/tasks/${id}?weddingId=${weddingId}`, {
         method: 'PUT',
         body: JSON.stringify(data),
         token,

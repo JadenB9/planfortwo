@@ -29,6 +29,7 @@ interface SectionEditorModalProps {
   title?: string
   content: Record<string, unknown>
   authToken: string
+  weddingId: string
 }
 
 export function SectionEditorModal({
@@ -42,6 +43,7 @@ export function SectionEditorModal({
   title,
   content,
   authToken,
+  weddingId,
 }: SectionEditorModalProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -63,7 +65,7 @@ export function SectionEditorModal({
     setSaving(true)
     setError(null)
     try {
-      const res = await fetch(`${API_URL}/website-sections/${sectionId}`, {
+      const res = await fetch(`${API_URL}/website-sections/${sectionId}?weddingId=${weddingId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

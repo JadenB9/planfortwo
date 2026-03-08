@@ -80,6 +80,7 @@ export function TaskDetail({
           categoryId: editCategoryId,
           priority: editPriority as 'must_do' | 'nice_to_have' | 'optional',
         },
+        weddingId,
         token,
       )
       onUpdated()

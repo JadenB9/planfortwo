@@ -2,11 +2,12 @@
 
 import type { GuestWithTags } from '@planfortwo/types'
 import { GuestTagBadge } from './guest-tag-badge'
-import { Mail, MailCheck, Send } from 'lucide-react'
+import { Mail, MailCheck, Pencil, Send } from 'lucide-react'
 
 interface GuestTableProps {
   guests: GuestWithTags[]
   onSelectGuest: (guest: GuestWithTags) => void
+  onEditGuest: (guest: GuestWithTags) => void
   onSendInvite?: (guest: GuestWithTags) => void
   sendingInviteId?: string | null
 }
@@ -21,6 +22,7 @@ const RSVP_BADGE: Record<string, string> = {
 export function GuestTable({
   guests,
   onSelectGuest,
+  onEditGuest,
   onSendInvite,
   sendingInviteId,
 }: GuestTableProps) {
@@ -67,23 +69,37 @@ export function GuestTable({
                 key={guest.id}
                 className="hover:bg-wedding-50/30 cursor-pointer transition-colors"
               >
-                <td className="px-4 py-3" onClick={() => onSelectGuest(guest)}>
+                <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-900">
-                      {guest.firstName} {guest.lastName}
-                    </span>
-                    {guest.isVip && (
-                      <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-xs font-medium text-amber-700">
-                        VIP
-                      </span>
-                    )}
-                    {guest.isChild && (
-                      <span className="rounded-full bg-purple-50 px-1.5 py-0.5 text-xs font-medium text-purple-700">
-                        Child
-                      </span>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEditGuest(guest)
+                      }}
+                      className="shrink-0 rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                      title="Edit guest"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    <div onClick={() => onSelectGuest(guest)} className="cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900">
+                          {guest.firstName} {guest.lastName}
+                        </span>
+                        {guest.isVip && (
+                          <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-xs font-medium text-amber-700">
+                            VIP
+                          </span>
+                        )}
+                        {guest.isChild && (
+                          <span className="rounded-full bg-purple-50 px-1.5 py-0.5 text-xs font-medium text-purple-700">
+                            Child
+                          </span>
+                        )}
+                      </div>
+                      {guest.email && <p className="text-xs text-gray-500">{guest.email}</p>}
+                    </div>
                   </div>
-                  {guest.email && <p className="text-xs text-gray-500">{guest.email}</p>}
                 </td>
                 <td className="px-4 py-3" onClick={() => onSelectGuest(guest)}>
                   <span

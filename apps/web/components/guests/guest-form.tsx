@@ -7,6 +7,7 @@ interface GuestFormProps {
   guest?: GuestWithTags | null
   households: Household[]
   tags: GuestTag[]
+  guests?: GuestWithTags[]
   onSubmit: (data: GuestFormData) => Promise<void>
   onClose: () => void
 }
@@ -27,7 +28,16 @@ export interface GuestFormData {
   tagIds?: string[]
 }
 
-export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestFormProps) {
+export function GuestForm({
+  guest,
+  households,
+  tags,
+  guests = [],
+  onSubmit,
+  onClose,
+}: GuestFormProps) {
+  // Adult guests that can be selected as parents (exclude self and other children)
+  const adultGuests = guests.filter((g) => !g.isChild && g.id !== guest?.id)
   const [formData, setFormData] = useState<GuestFormData>({
     firstName: guest?.firstName ?? '',
     lastName: guest?.lastName ?? '',
@@ -167,7 +177,12 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                 <input
                   type="checkbox"
                   checked={formData.isChild ?? false}
-                  onChange={(e) => update('isChild', e.target.checked)}
+                  onChange={(e) => {
+                    update('isChild', e.target.checked)
+                    if (!e.target.checked) {
+                      // Uncheck child — don't clear household (user may want to keep it)
+                    }
+                  }}
                   className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
                 />
                 Child
@@ -191,6 +206,43 @@ export function GuestForm({ guest, households, tags, onSubmit, onClose }: GuestF
                 Has Plus-One
               </label>
             </div>
+
+            {formData.isChild && adultGuests.length > 0 && (
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Parent</label>
+                <p className="mb-1.5 text-xs text-gray-500">
+                  Assigning a parent places this child in the same family group, so they RSVP
+                  together.
+                </p>
+                <select
+                  value={
+                    // Show the parent whose household matches, if any
+                    adultGuests.find((g) => g.householdId && g.householdId === formData.householdId)
+                      ?.id ?? ''
+                  }
+                  onChange={(e) => {
+                    const parentId = e.target.value
+                    if (!parentId) {
+                      // "None" selected — don't clear household automatically
+                      return
+                    }
+                    const parent = adultGuests.find((g) => g.id === parentId)
+                    if (parent?.householdId) {
+                      update('householdId', parent.householdId)
+                    }
+                  }}
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                >
+                  <option value="">Select a parent...</option>
+                  {adultGuests.map((g) => (
+                    <option key={g.id} value={g.id} disabled={!g.householdId}>
+                      {g.firstName} {g.lastName}
+                      {!g.householdId ? ' (no family group)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {formData.hasPlusOne && (
               <div>

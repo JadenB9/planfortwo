@@ -338,6 +338,7 @@ export default function WebsitePage() {
             sectionType={editingSection?.sectionType ?? ''}
             content={editorContent}
             authToken={authToken}
+            weddingId={weddingId ?? ''}
           >
             {editingSection &&
               renderEditor(editingSection.sectionType, editorContent, setEditorContent)}

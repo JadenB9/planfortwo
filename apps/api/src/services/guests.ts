@@ -402,41 +402,92 @@ export const guestService = {
     const parsed = Papa.parse<Record<string, string>>(csvContent, {
       header: true,
       skipEmptyLines: true,
-      transformHeader: (h: string) => h.trim().toLowerCase().replace(/\s+/g, ''),
+      transformHeader: (h: string) =>
+        h
+          .trim()
+          .toLowerCase()
+          .replace(/[_\s-]+/g, ''),
     })
 
-    if (parsed.errors.length > 0) {
-      for (const err of parsed.errors) {
+    // Only surface critical parse errors (not field-level ones)
+    for (const err of parsed.errors) {
+      if (err.type === 'Delimiter' || err.type === 'Quotes') {
         result.errors.push(`Row ${err.row}: ${err.message}`)
       }
     }
 
     for (let i = 0; i < parsed.data.length; i++) {
       const row = parsed.data[i]!
-      const firstName = (row.firstname ?? row.first_name ?? '').trim()
-      const lastName = (row.lastname ?? row.last_name ?? '').trim()
 
-      if (!firstName || !lastName) {
-        result.errors.push(`Row ${i + 1}: Missing first or last name`)
+      // Resolve first name from various column aliases
+      let firstName = (row.firstname ?? row.first ?? row.givenname ?? row.given ?? '').trim()
+      let lastName = (
+        row.lastname ??
+        row.last ??
+        row.surname ??
+        row.familyname ??
+        row.family ??
+        ''
+      ).trim()
+
+      // Handle single "name" / "fullname" / "guestname" column — split into first/last
+      if (!firstName && !lastName) {
+        const fullName = (row.name ?? row.fullname ?? row.guestname ?? row.guest ?? '').trim()
+        if (fullName) {
+          const parts = fullName.split(/\s+/)
+          firstName = parts[0] ?? ''
+          lastName = parts.slice(1).join(' ')
+        }
+      }
+
+      // Fallback: grab the first non-empty cell value as the name
+      if (!firstName) {
+        const values = Object.values(row).map((v) => (v ?? '').trim())
+        const firstNonEmpty = values.find((v) => v.length > 0)
+        if (firstNonEmpty) {
+          const parts = firstNonEmpty.split(/\s+/)
+          firstName = parts[0] ?? ''
+          lastName = lastName || parts.slice(1).join(' ')
+        }
+      }
+
+      // Skip truly empty rows
+      if (!firstName) {
         result.skipped++
         continue
       }
+
+      // Default missing last name to a dash (editable later)
+      if (!lastName) {
+        lastName = '-'
+      }
+
+      const boolYes = (val: string | undefined) =>
+        ['yes', 'true', '1', 'y', 'x'].includes((val ?? '').trim().toLowerCase())
 
       try {
         await db.insert(guests).values({
           weddingId,
           firstName,
           lastName,
-          email: (row.email ?? '').trim() || null,
-          phone: (row.phone ?? '').trim() || null,
-          side: ['bride', 'groom', 'both'].includes(row.side ?? '')
-            ? (row.side as 'bride' | 'groom' | 'both')
+          email: (row.email ?? row.emailaddress ?? '').trim() || null,
+          phone:
+            (
+              row.phone ??
+              row.phonenumber ??
+              row.telephone ??
+              row.cell ??
+              row.mobile ??
+              ''
+            ).trim() || null,
+          side: ['bride', 'groom', 'both'].includes((row.side ?? '').trim().toLowerCase())
+            ? ((row.side ?? '').trim().toLowerCase() as 'bride' | 'groom' | 'both')
             : null,
-          isChild: (row.ischild ?? row.is_child ?? '').toLowerCase() === 'yes',
-          isVip: (row.isvip ?? row.is_vip ?? '').toLowerCase() === 'yes',
-          hasPlusOne: (row.hasplusone ?? row.has_plus_one ?? '').toLowerCase() === 'yes',
-          plusOneName: (row.plusonename ?? row.plus_one_name ?? '').trim() || null,
-          mealChoice: (row.mealchoice ?? row.meal_choice ?? '').trim() || null,
+          isChild: boolYes(row.ischild ?? row.child),
+          isVip: boolYes(row.isvip ?? row.vip),
+          hasPlusOne: boolYes(row.hasplusone ?? row.plusone),
+          plusOneName: (row.plusonename ?? row.plusone_name ?? '').trim() || null,
+          mealChoice: (row.mealchoice ?? row.meal ?? '').trim() || null,
           rsvpToken: randomUUID(),
         })
         result.imported++

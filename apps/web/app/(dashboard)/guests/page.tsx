@@ -38,6 +38,7 @@ export default function GuestsPage() {
   } = useGuests({ weddingId })
 
   const [selectedGuest, setSelectedGuest] = useState<GuestWithTags | null>(null)
+  const [editingGuest, setEditingGuest] = useState<GuestWithTags | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [sendingInviteId, setSendingInviteId] = useState<string | null>(null)
   const [sendingBulk, setSendingBulk] = useState(false)
@@ -73,17 +74,53 @@ export default function GuestsPage() {
     [weddingId, getToken, refetch],
   )
 
-  const handleUpdateGuest = useCallback(
-    async (data: GuestFormData) => {
-      if (!weddingId || !selectedGuest) return
+  const doUpdateGuest = useCallback(
+    async (guestId: string, data: GuestFormData) => {
+      if (!weddingId) return
       const token = await getToken()
       if (!token) return
-      await api.guests.update(selectedGuest.id, data, weddingId, token)
-      setSelectedGuest(null)
+      await api.guests.update(
+        guestId,
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email || null,
+          phone: data.phone || null,
+          householdId: data.householdId || null,
+          side: data.side || null,
+          isChild: data.isChild ?? false,
+          isVip: data.isVip ?? false,
+          hasPlusOne: data.hasPlusOne ?? false,
+          plusOneName: data.plusOneName || null,
+          mealChoice: data.mealChoice || null,
+          dietary: data.dietary,
+          tagIds: data.tagIds,
+        },
+        weddingId,
+        token,
+      )
       toast.success('Guest updated')
       await refetch()
     },
-    [weddingId, selectedGuest, getToken, refetch],
+    [weddingId, getToken, refetch],
+  )
+
+  const handleUpdateGuest = useCallback(
+    async (data: GuestFormData) => {
+      if (!selectedGuest) return
+      await doUpdateGuest(selectedGuest.id, data)
+      setSelectedGuest(null)
+    },
+    [selectedGuest, doUpdateGuest],
+  )
+
+  const handleEditGuest = useCallback(
+    async (data: GuestFormData) => {
+      if (!editingGuest) return
+      await doUpdateGuest(editingGuest.id, data)
+      setEditingGuest(null)
+    },
+    [editingGuest, doUpdateGuest],
   )
 
   const handleDeleteGuest = useCallback(async () => {
@@ -249,6 +286,7 @@ export default function GuestsPage() {
           <GuestTable
             guests={guests}
             onSelectGuest={setSelectedGuest}
+            onEditGuest={setEditingGuest}
             onSendInvite={handleSendInvite}
             sendingInviteId={sendingInviteId}
           />
@@ -264,6 +302,7 @@ export default function GuestsPage() {
           guest={selectedGuest}
           households={households}
           tags={tags}
+          guests={guests}
           onUpdate={handleUpdateGuest}
           onDelete={handleDeleteGuest}
           onClose={() => setSelectedGuest(null)}
@@ -277,8 +316,21 @@ export default function GuestsPage() {
         <GuestForm
           households={households}
           tags={tags}
+          guests={guests}
           onSubmit={handleCreateGuest}
           onClose={() => setShowAddForm(false)}
+        />
+      )}
+
+      {/* Edit Guest Modal */}
+      {editingGuest && (
+        <GuestForm
+          guest={editingGuest}
+          households={households}
+          tags={tags}
+          guests={guests}
+          onSubmit={handleEditGuest}
+          onClose={() => setEditingGuest(null)}
         />
       )}
     </motion.div>

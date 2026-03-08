@@ -10,6 +10,7 @@ interface GuestDetailProps {
   guest: GuestWithTags
   households: Household[]
   tags: GuestTag[]
+  guests?: GuestWithTags[]
   onUpdate: (data: GuestFormData) => Promise<void>
   onDelete: () => Promise<void>
   onClose: () => void
@@ -28,6 +29,7 @@ export function GuestDetail({
   guest,
   households,
   tags,
+  guests,
   onUpdate,
   onDelete,
   onClose,
@@ -52,6 +54,7 @@ export function GuestDetail({
         guest={guest}
         households={households}
         tags={tags}
+        guests={guests}
         onSubmit={async (data) => {
           await onUpdate(data)
           setEditing(false)
