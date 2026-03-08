@@ -483,8 +483,16 @@ export default function InboxPage() {
     try {
       const token = await getToken()
       if (!token) return
-      const res = await api.guests.list(weddingId, token, { pageSize: 1000 })
-      setMassGuests(res.data)
+      const allGuests: GuestWithTags[] = []
+      let p = 1
+      let more = true
+      while (more) {
+        const res = await api.guests.list(weddingId, token, { pageSize: 200, page: p })
+        allGuests.push(...res.data)
+        more = res.hasMore
+        p++
+      }
+      setMassGuests(allGuests)
     } catch {
       toast.error('Failed to load guest list')
     } finally {
