@@ -1,4 +1,4 @@
-import type { Config } from 'dompurify'
+import DOMPurify, { type Config } from 'dompurify'
 
 /**
  * Sanitize HTML using DOMPurify, with SSR safety.
@@ -7,9 +7,5 @@ import type { Config } from 'dompurify'
  */
 export function sanitizeHtml(html: string, config?: Config): string {
   if (typeof window === 'undefined') return html
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const DOMPurify = require('dompurify').default as {
-    sanitize(html: string, config?: Config): string
-  }
-  return DOMPurify.sanitize(html, config)
+  return DOMPurify.sanitize(html, config) as string
 }
