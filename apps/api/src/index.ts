@@ -78,7 +78,13 @@ const allowedOrigins = [
 app.use(
   '*',
   cors({
-    origin: (origin) => (allowedOrigins.includes(origin) ? origin : undefined),
+    origin: (origin) => {
+      // Exact match for known origins
+      if (allowedOrigins.includes(origin)) return origin
+      // Allow any *.planfortwo.com subdomain (public wedding websites)
+      if (/^https:\/\/[a-z0-9-]+\.planfortwo\.com$/.test(origin)) return origin
+      return undefined
+    },
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
     credentials: true,

@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm'
+import { eq, and, or } from 'drizzle-orm'
 import { db, websiteConfigs, websiteSections, defaultWebsiteSections } from '@planfortwo/db'
 import type { CreateWebsiteConfigInput, UpdateWebsiteConfigInput } from '@planfortwo/validators'
 import { hash, compare } from 'bcryptjs'
@@ -154,10 +154,17 @@ export const websiteConfigService = {
   },
 
   async verifyPassword(accessToken: string, password: string): Promise<boolean> {
+    // Support both access token and subdomain lookups
+    const tokenMatch = accessToken.match(/([0-9a-f]{32})$/)
+    const token = tokenMatch?.[1]
+    const conditions = []
+    if (token) conditions.push(eq(websiteConfigs.accessToken, token))
+    conditions.push(eq(websiteConfigs.subdomain, accessToken))
+
     const [config] = await db
       .select({ passwordHash: websiteConfigs.passwordHash })
       .from(websiteConfigs)
-      .where(eq(websiteConfigs.accessToken, accessToken))
+      .where(or(...conditions))
 
     if (!config?.passwordHash) return false
     return compare(password, config.passwordHash)

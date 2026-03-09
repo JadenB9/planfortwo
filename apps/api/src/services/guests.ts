@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto'
 import { eq, and, or, ilike, count, desc, asc, inArray, isNull, isNotNull } from 'drizzle-orm'
-import { db, guests, guestTags, guestTagAssignments, households, weddings } from '@planfortwo/db'
+import { db, guests, guestTags, guestTagAssignments, households } from '@planfortwo/db'
 import type {
   GuestWithTags,
   GuestStats,

@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { eq } from 'drizzle-orm'
+import { eq, or } from 'drizzle-orm'
 import { db, guests, websiteConfigs } from '@planfortwo/db'
 import {
   rsvpLookupSchema,
@@ -14,17 +14,19 @@ import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
 import { rsvpService } from '../services/rsvp.js'
 
-function extractToken(slug: string): string {
-  const match = slug.match(/([0-9a-f]{32})$/)
-  return match?.[1] ?? slug
-}
-
 async function resolveSlugToWeddingId(slug: string): Promise<string | null> {
-  const token = extractToken(slug)
+  const tokenMatch = slug.match(/([0-9a-f]{32})$/)
+  const token = tokenMatch?.[1]
+
+  // Try access token first (if present), otherwise fall back to subdomain
+  const conditions = []
+  if (token) conditions.push(eq(websiteConfigs.accessToken, token))
+  conditions.push(eq(websiteConfigs.subdomain, slug))
+
   const [config] = await db
     .select({ weddingId: websiteConfigs.weddingId })
     .from(websiteConfigs)
-    .where(eq(websiteConfigs.accessToken, token))
+    .where(or(...conditions))
     .limit(1)
   return config?.weddingId ?? null
 }
