@@ -28,7 +28,7 @@ interface SectionEditorModalProps {
   children: React.ReactNode
   title?: string
   content: Record<string, unknown>
-  authToken: string
+  getToken: () => Promise<string | null>
   weddingId: string
 }
 
@@ -42,7 +42,7 @@ export function SectionEditorModal({
   children,
   title,
   content,
-  authToken,
+  getToken,
   weddingId,
 }: SectionEditorModalProps) {
   const [saving, setSaving] = useState(false)
@@ -65,11 +65,17 @@ export function SectionEditorModal({
     setSaving(true)
     setError(null)
     try {
+      const token = await getToken()
+      if (!token) {
+        setError('Authentication expired. Please refresh the page.')
+        setSaving(false)
+        return
+      }
       const res = await fetch(`${API_URL}/website-sections/${sectionId}?weddingId=${weddingId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ title: sectionTitle, content }),
       })

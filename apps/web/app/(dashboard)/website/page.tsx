@@ -54,15 +54,13 @@ export default function WebsitePage() {
   const { config, sections, loading, refetch, analytics } = useWebsite({ weddingId })
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null)
   const [editorContent, setEditorContent] = useState<Record<string, unknown>>({})
-  const [authToken, setAuthToken] = useState('')
   const [activeTab, setActiveTab] = useState('design')
 
   useEffect(() => {
     if (editingSection) {
       setEditorContent((editingSection.content ?? {}) as Record<string, unknown>)
-      void getToken().then((t) => setAuthToken(t ?? ''))
     }
-  }, [editingSection, getToken])
+  }, [editingSection])
 
   const handleCreate = useCallback(async () => {
     if (!weddingId) return
@@ -337,7 +335,7 @@ export default function WebsitePage() {
             sectionTitle={editingSection?.title ?? ''}
             sectionType={editingSection?.sectionType ?? ''}
             content={editorContent}
-            authToken={authToken}
+            getToken={getToken}
             weddingId={weddingId ?? ''}
           >
             {editingSection &&
