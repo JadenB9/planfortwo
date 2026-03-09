@@ -64,11 +64,11 @@ export function PublicWebsiteClient({
       .catch(() => {})
   }, [slug])
 
-  const handleGuestbookSubmit = async (authorName: string, message: string) => {
+  const handleGuestbookSubmit = async (authorName: string, message: string, website?: string) => {
     const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ weddingId: '', authorName, message }),
+      body: JSON.stringify({ weddingId: '', authorName, message, ...(website ? { website } : {}) }),
     })
     if (res.ok) {
       const refreshRes = await fetch(

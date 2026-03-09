@@ -10,13 +10,14 @@ interface GuestbookSectionProps {
   content: GuestbookSectionContent
   entries: GuestbookEntry[]
   slug: string
-  onSubmit?: (authorName: string, message: string) => Promise<void>
+  onSubmit?: (authorName: string, message: string, honeypot?: string) => Promise<void>
 }
 
 export function GuestbookSection({ title, content, entries, onSubmit }: GuestbookSectionProps) {
   const { colors, fontPair } = useTemplateStyles()
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
+  const [honeypot, setHoneypot] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
@@ -25,9 +26,10 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
     if (!name.trim() || !message.trim() || !onSubmit) return
     setSubmitting(true)
     try {
-      await onSubmit(name.trim(), message.trim())
+      await onSubmit(name.trim(), message.trim(), honeypot || undefined)
       setName('')
       setMessage('')
+      setHoneypot('')
       setSubmitted(true)
       setTimeout(() => setSubmitted(false), 3000)
     } finally {
@@ -88,6 +90,16 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
+          <input
+            type="text"
+            name="website"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
+          />
           <button
             type="submit"
             disabled={submitting || !name.trim() || !message.trim()}

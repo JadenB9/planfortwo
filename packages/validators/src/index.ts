@@ -655,6 +655,7 @@ export const createGuestbookEntrySchema = z.object({
   weddingId: z.string().uuid(),
   authorName: z.string().trim().min(1).max(100),
   message: z.string().trim().min(1).max(2000),
+  website: z.string().max(200).optional(),
 })
 
 export type CreateGuestbookEntryInput = z.infer<typeof createGuestbookEntrySchema>

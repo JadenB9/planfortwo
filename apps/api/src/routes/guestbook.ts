@@ -29,6 +29,14 @@ guestbookRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
+    if (data.website) {
+      return c.json(
+        {
+          data: { id: 'ok', authorName: data.authorName, message: data.message, isVisible: false },
+        },
+        201,
+      )
+    }
     const entry = await guestbookService.create(data)
     return c.json({ data: entry }, 201)
   },
