@@ -328,7 +328,6 @@ export default function WebsitePage() {
             open={!!editingSection}
             onClose={() => setEditingSection(null)}
             onSaved={() => {
-              setEditingSection(null)
               void refetch()
             }}
             sectionId={editingSection?.id ?? ''}
