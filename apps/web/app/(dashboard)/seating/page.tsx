@@ -126,7 +126,7 @@ function getEffectiveSeatPositions(
   cy: number,
 ): { x: number; y: number; angle: number }[] {
   const radius = getEffectiveRoundRadius(table)
-  const nameRadius = radius + 18
+  const nameRadius = radius + 22
   const seats: { x: number; y: number; angle: number }[] = []
   for (let i = 0; i < table.capacity; i++) {
     const angle = (2 * Math.PI * i) / table.capacity - Math.PI / 2
@@ -755,6 +755,7 @@ export default function SeatingPage() {
     const table = selectedChart.tables.find((t) => t.id === selectedTableId)
     if (!table) return
     setClipboard({ table, isCut: false })
+    pasteCountRef.current = 0
     toast.success('Table copied')
   }
 
@@ -763,14 +764,23 @@ export default function SeatingPage() {
     const table = selectedChart.tables.find((t) => t.id === selectedTableId)
     if (!table) return
     setClipboard({ table, isCut: true })
+    pasteCountRef.current = 0
     toast.success('Table cut')
   }
+
+  const pasteCountRef = useRef(0)
 
   const handlePasteTable = async () => {
     if (!clipboard || !selectedChart || !weddingId) return
     const { table: src, isCut } = clipboard
     const existingLabels = selectedChart.tables.map((t) => t.label)
-    const newLabel = getNextCopyName(src.label, existingLabels)
+    const newLabel = isCut ? src.label : getNextCopyName(src.label, existingLabels)
+
+    // Cut: same position (original gets deleted). Copy: offset by 60px per paste.
+    pasteCountRef.current += 1
+    const offset = isCut ? 0 : 60 * pasteCountRef.current
+    const newPosX = Math.round(src.posX + offset)
+    const newPosY = Math.round(src.posY + offset)
 
     try {
       const token = await getToken()
@@ -784,8 +794,8 @@ export default function SeatingPage() {
           label: newLabel,
           tableType: src.tableType,
           capacity: src.capacity,
-          posX: src.posX + 60,
-          posY: src.posY + 60,
+          posX: newPosX,
+          posY: newPosY,
         },
         token,
       )
@@ -793,6 +803,31 @@ export default function SeatingPage() {
       if (isCut) {
         await api.seatingCharts.deleteTable(src.id, weddingId, token)
         setClipboard(null)
+        pasteCountRef.current = 0
+      } else {
+        // Optimistically add table to local state so next paste sees the new label
+        setSelectedChart((prev) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            tables: [
+              ...prev.tables,
+              {
+                id: `temp-${Date.now()}`,
+                chartId: prev.id,
+                label: newLabel,
+                tableType: src.tableType,
+                capacity: src.capacity,
+                posX: newPosX,
+                posY: newPosY,
+                rotation: 0,
+                width: src.width,
+                height: src.height,
+                assignments: [],
+              },
+            ],
+          }
+        })
       }
 
       toast.success(isCut ? 'Table moved' : 'Table pasted')
@@ -1541,16 +1576,16 @@ export default function SeatingPage() {
                           style={{ cursor: 'pointer' }}
                         >
                           {/* Invisible larger hit target for easier clicking */}
-                          <circle cx={seat.x} cy={seat.y} r={12} fill="transparent" stroke="none" />
+                          <circle cx={seat.x} cy={seat.y} r={18} fill="transparent" stroke="none" />
 
                           {/* Visible dot marker */}
                           <circle
                             cx={seat.x}
                             cy={seat.y}
-                            r={isFilled ? 4 : 5}
+                            r={isFilled ? 6 : 7}
                             fill={isFilled ? TABLE_COLOR : SEAT_EMPTY}
                             stroke={isFilled ? TABLE_COLOR : '#9ca3af'}
-                            strokeWidth={1}
+                            strokeWidth={1.5}
                           />
 
                           {/* Name or seat number */}
@@ -1559,7 +1594,7 @@ export default function SeatingPage() {
                             y={seat.y + 3.5}
                             textAnchor={anchor}
                             fill={isFilled ? '#1f2937' : '#6b7280'}
-                            fontSize={9.5}
+                            fontSize={11}
                             fontWeight={isFilled ? 600 : 400}
                             transform={`rotate(${textAngle}, ${seat.x}, ${seat.y})`}
                           >
