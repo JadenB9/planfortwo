@@ -16,8 +16,9 @@ const isPublicRoute = createRouteMatcher([
 const RESERVED_SUBDOMAINS = new Set(['www', 'app', 'api', 'mail', 'admin', ''])
 
 export default clerkMiddleware(async (auth, request) => {
-  // X-Forwarded-Host is set by the Cloudflare Worker for subdomain requests
-  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? ''
+  // X-Wedding-Host is set by the Cloudflare Worker for subdomain requests
+  // (can't use X-Forwarded-Host because Vercel overwrites it)
+  const host = request.headers.get('x-wedding-host') ?? request.headers.get('host') ?? ''
   const hostname = host.split(':')[0] ?? '' // strip port for local dev
 
   // Detect wedding website subdomains (e.g. jabby.planfortwo.com)

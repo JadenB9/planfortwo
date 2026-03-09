@@ -20,7 +20,7 @@ export default {
       body: request.body,
       redirect: 'manual',
     })
-    newRequest.headers.set('X-Forwarded-Host', url.hostname)
+    newRequest.headers.set('X-Wedding-Host', url.hostname)
 
     return fetch(newRequest)
   },
