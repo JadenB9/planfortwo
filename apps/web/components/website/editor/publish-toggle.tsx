@@ -18,6 +18,10 @@ function buildPublicUrl(subdomain: string | null, accessToken: string | null): s
   return `https://app.planfortwo.com/s/${slug}`
 }
 
+function buildDisplayUrl(subdomain: string | null): string {
+  return subdomain ? `${subdomain}.planfortwo.com` : 'planfortwo.com'
+}
+
 export function PublishToggle({
   isPublished,
   subdomain,
@@ -56,7 +60,7 @@ export function PublishToggle({
                   rel="noopener noreferrer"
                   className="text-xs text-blue-600 hover:underline"
                 >
-                  {siteUrl}
+                  {buildDisplayUrl(subdomain)}
                 </a>
                 <button
                   onClick={handleCopy}
