@@ -18,7 +18,7 @@ async function resolveSlugToWeddingId(slug: string): Promise<string | null> {
   const [config] = await db
     .select({ weddingId: websiteConfigs.weddingId })
     .from(websiteConfigs)
-    .where(eq(websiteConfigs.subdomain, slug))
+    .where(eq(websiteConfigs.accessToken, slug))
     .limit(1)
   return config?.weddingId ?? null
 }

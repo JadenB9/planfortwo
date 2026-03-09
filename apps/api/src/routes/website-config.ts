@@ -167,7 +167,7 @@ websiteConfigRoute.post(
   zValidator(
     'json',
     z.object({
-      subdomain: z.string().min(1),
+      accessToken: z.string().min(1),
       password: z.string().min(1),
     }),
     (result, c) => {
@@ -180,8 +180,8 @@ websiteConfigRoute.post(
     },
   ),
   async (c) => {
-    const { subdomain, password } = c.req.valid('json')
-    const valid = await websiteConfigService.verifyPassword(subdomain, password)
+    const { accessToken, password } = c.req.valid('json')
+    const valid = await websiteConfigService.verifyPassword(accessToken, password)
     return c.json({ data: { valid } })
   },
 )

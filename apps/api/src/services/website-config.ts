@@ -2,6 +2,7 @@ import { eq, and } from 'drizzle-orm'
 import { db, websiteConfigs, websiteSections, defaultWebsiteSections } from '@planfortwo/db'
 import type { CreateWebsiteConfigInput, UpdateWebsiteConfigInput } from '@planfortwo/validators'
 import { hash, compare } from 'bcryptjs'
+import { randomBytes } from 'node:crypto'
 import { activityService } from './activity.js'
 
 export const websiteConfigService = {
@@ -24,6 +25,7 @@ export const websiteConfigService = {
         weddingId: data.weddingId,
         templateId: data.templateId,
         subdomain: data.subdomain,
+        accessToken: randomBytes(16).toString('hex'),
       })
       .returning()
 
@@ -90,9 +92,20 @@ export const websiteConfigService = {
   },
 
   async publish(id: string, weddingId: string, userId: string) {
+    // Ensure accessToken exists before publishing
+    const [existing] = await db
+      .select({ accessToken: websiteConfigs.accessToken })
+      .from(websiteConfigs)
+      .where(and(eq(websiteConfigs.id, id), eq(websiteConfigs.weddingId, weddingId)))
+
+    const setData: Record<string, unknown> = { publishedAt: new Date() }
+    if (!existing?.accessToken) {
+      setData.accessToken = randomBytes(16).toString('hex')
+    }
+
     const [updated] = await db
       .update(websiteConfigs)
-      .set({ publishedAt: new Date() })
+      .set(setData)
       .where(and(eq(websiteConfigs.id, id), eq(websiteConfigs.weddingId, weddingId)))
       .returning()
 
@@ -140,11 +153,11 @@ export const websiteConfigService = {
     return updated ?? null
   },
 
-  async verifyPassword(subdomain: string, password: string): Promise<boolean> {
+  async verifyPassword(accessToken: string, password: string): Promise<boolean> {
     const [config] = await db
       .select({ passwordHash: websiteConfigs.passwordHash })
       .from(websiteConfigs)
-      .where(eq(websiteConfigs.subdomain, subdomain))
+      .where(eq(websiteConfigs.accessToken, accessToken))
 
     if (!config?.passwordHash) return false
     return compare(password, config.passwordHash)

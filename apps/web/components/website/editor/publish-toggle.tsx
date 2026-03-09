@@ -6,6 +6,7 @@ import { Globe, GlobeLock } from 'lucide-react'
 interface PublishToggleProps {
   isPublished: boolean
   subdomain: string | null
+  accessToken: string | null
   onPublish: () => void
   onUnpublish: () => void
 }
@@ -13,10 +14,11 @@ interface PublishToggleProps {
 export function PublishToggle({
   isPublished,
   subdomain,
+  accessToken,
   onPublish,
   onUnpublish,
 }: PublishToggleProps) {
-  const siteUrl = subdomain ? `/s/${subdomain}` : null
+  const siteUrl = accessToken ? `/s/${accessToken}` : null
 
   return (
     <div className="rounded-xl border bg-white p-4">

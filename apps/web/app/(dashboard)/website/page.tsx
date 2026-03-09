@@ -197,6 +197,9 @@ export default function WebsitePage() {
           <GalleryEditor
             content={content as unknown as GalleryContent}
             onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+            getToken={getToken}
+            weddingId={weddingId ?? ''}
+            sectionId={editingSection?.id ?? ''}
           />
         )
       case 'travel':
@@ -300,6 +303,7 @@ export default function WebsitePage() {
         <PublishToggle
           isPublished={!!config.publishedAt}
           subdomain={config.subdomain}
+          accessToken={config.accessToken}
           onPublish={handlePublish}
           onUnpublish={handleUnpublish}
         />

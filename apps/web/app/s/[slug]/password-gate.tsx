@@ -21,14 +21,11 @@ export function PasswordGate({ slug, weddingName }: PasswordGateProps) {
     setError('')
     setLoading(true)
     try {
-      const res = await fetch(
-        `${API_URL}/website-public/${encodeURIComponent(slug)}/verify-password`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password }),
-        },
-      )
+      const res = await fetch(`${API_URL}/website-config/verify-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken: slug, password }),
+      })
       if (res.ok) {
         window.location.reload()
       } else {

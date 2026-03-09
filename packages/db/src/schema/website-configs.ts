@@ -20,6 +20,7 @@ export const websiteConfigs = pgTable('website_configs', {
   privacyMode: privacyModeEnum('privacy_mode').notNull().default('public'),
   passwordHash: text('password_hash'),
   subdomain: text('subdomain').unique(),
+  accessToken: text('access_token').unique(),
   customDomain: text('custom_domain').unique(),
   domainVerified: boolean('domain_verified').notNull().default(false),
   metaTitle: text('meta_title'),

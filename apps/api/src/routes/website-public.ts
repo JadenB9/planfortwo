@@ -14,7 +14,10 @@ export const websitePublicRoute = new Hono()
 websitePublicRoute.get('/:slug', async (c) => {
   const slug = c.req.param('slug')
 
-  const [config] = await db.select().from(websiteConfigs).where(eq(websiteConfigs.subdomain, slug))
+  const [config] = await db
+    .select()
+    .from(websiteConfigs)
+    .where(eq(websiteConfigs.accessToken, slug))
 
   if (!config || !config.publishedAt) {
     return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -98,7 +101,7 @@ websitePublicRoute.post(
     const [config] = await db
       .select({ weddingId: websiteConfigs.weddingId })
       .from(websiteConfigs)
-      .where(eq(websiteConfigs.subdomain, slug))
+      .where(eq(websiteConfigs.accessToken, slug))
 
     if (!config) {
       return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -137,7 +140,7 @@ websitePublicRoute.get('/:slug/guestbook', async (c) => {
   const [config] = await db
     .select({ weddingId: websiteConfigs.weddingId })
     .from(websiteConfigs)
-    .where(eq(websiteConfigs.subdomain, slug))
+    .where(eq(websiteConfigs.accessToken, slug))
 
   if (!config) {
     return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)

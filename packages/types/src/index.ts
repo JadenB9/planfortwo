@@ -427,6 +427,7 @@ export interface WebsiteConfig {
   privacyMode: PrivacyMode
   passwordHash: string | null
   subdomain: string | null
+  accessToken: string | null
   customDomain: string | null
   domainVerified: boolean
   metaTitle: string | null
