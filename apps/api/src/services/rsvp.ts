@@ -111,6 +111,7 @@ export const rsvpService = {
       .set({
         rsvpStatus: submission.rsvpStatus,
         rsvpEmail: submission.rsvpEmail ?? null,
+        ...(submission.rsvpEmail ? { email: submission.rsvpEmail } : {}),
         dietary: (submission.dietary as Record<string, unknown>) ?? null,
         songRequest: submission.songRequest ?? null,
         rsvpNotes: submission.rsvpNotes ?? null,
@@ -144,6 +145,7 @@ export const rsvpService = {
           .set({
             rsvpStatus: submission.rsvpStatus,
             rsvpEmail: submission.rsvpEmail ?? null,
+            ...(submission.rsvpEmail ? { email: submission.rsvpEmail } : {}),
             dietary: (submission.dietary as Record<string, unknown>) ?? null,
             songRequest: submission.songRequest ?? null,
             rsvpNotes: submission.rsvpNotes ?? null,

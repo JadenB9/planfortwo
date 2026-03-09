@@ -207,7 +207,9 @@ export function RsvpForm({
               <div className="mt-6 space-y-5">
                 {showEmailField && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Email Address</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email Address (preferred)
+                    </label>
                     <input
                       type="email"
                       value={form.rsvpEmail}
