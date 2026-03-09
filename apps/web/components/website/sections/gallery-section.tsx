@@ -4,6 +4,13 @@ import { motion } from 'framer-motion'
 import type { GalleryContent, WebsitePhoto } from '@planfortwo/types'
 import { useTemplateStyles } from '../template-context'
 
+/** Only allow http(s) image URLs */
+function safeImgSrc(url: string | undefined | null): string | undefined {
+  if (!url) return undefined
+  if (/^https?:\/\//i.test(url)) return url
+  return undefined
+}
+
 interface GallerySectionProps {
   title: string
   content: GalleryContent
@@ -46,7 +53,7 @@ export function GallerySection({ title, content, photos }: GallerySectionProps) 
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={photo.url}
+                  src={safeImgSrc(photo.url)}
                   alt={photo.altText ?? ''}
                   className="w-full object-cover transition-transform duration-300 hover:scale-105"
                   loading="lazy"
@@ -72,7 +79,7 @@ export function GallerySection({ title, content, photos }: GallerySectionProps) 
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={photo.url}
+                  src={safeImgSrc(photo.url)}
                   alt={photo.altText ?? ''}
                   className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                   loading="lazy"

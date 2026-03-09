@@ -8,7 +8,6 @@ import { useWedding } from '@/hooks/use-wedding'
 import { springSmooth } from '@/lib/animations'
 import { api } from '@/lib/api'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { TemplateSelector } from '@/components/website/editor/template-selector'
 import { SectionManager } from '@/components/website/editor/section-manager'
@@ -265,9 +264,8 @@ export default function WebsitePage() {
 
   if (loading) {
     return (
-      <div className="space-y-4 p-6">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-64 w-full" />
+      <div className="flex items-center justify-center py-20">
+        <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
     )
   }
@@ -318,7 +316,13 @@ export default function WebsitePage() {
         </TabsList>
 
         <TabsContent value="design" className="mt-6">
-          <TemplateSelector selectedId={config.templateId} onSelect={handleTemplateChange} />
+          <TemplateSelector
+            selectedId={config.templateId}
+            onSelect={handleTemplateChange}
+            customColors={config.customColors}
+            fontPair={config.fontPair}
+            onCustomize={(updates) => handleConfigUpdate(updates)}
+          />
         </TabsContent>
 
         <TabsContent value="sections" className="mt-6">

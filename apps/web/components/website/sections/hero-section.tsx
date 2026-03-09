@@ -33,19 +33,28 @@ function getCountdown(date: Date | null): { days: number; hours: number } | null
   }
 }
 
+/** Only allow http(s) URLs and block characters that could escape CSS url() context */
+function safeImageUrl(url: string | undefined | null): string | null {
+  if (!url) return null
+  if (!/^https?:\/\//i.test(url)) return null
+  if (/[()'"\\]/.test(url)) return null
+  return url
+}
+
 export function HeroSection({ content, weddingName, weddingDate }: HeroSectionProps) {
   const { colors, fontPair } = useTemplateStyles()
   const countdown = content.showCountdown ? getCountdown(weddingDate) : null
+  const bgUrl = safeImageUrl(content.backgroundImageUrl)
 
   return (
     <section
       className="relative flex min-h-[80vh] items-center justify-center overflow-hidden"
       style={{ backgroundColor: colors.background }}
     >
-      {content.backgroundImageUrl && (
+      {bgUrl && (
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${content.backgroundImageUrl})` }}
+          style={{ backgroundImage: `url(${bgUrl})` }}
         >
           <div className="absolute inset-0 bg-black/30" />
         </div>
@@ -56,7 +65,7 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl ${fontPair.headingClass}`}
-          style={{ color: content.backgroundImageUrl ? '#FFFFFF' : colors.primary }}
+          style={{ color: bgUrl ? '#FFFFFF' : colors.primary }}
         >
           {content.headline || weddingName}
         </motion.h1>
@@ -66,7 +75,7 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className={`mt-4 text-lg sm:text-xl md:text-2xl ${fontPair.bodyClass}`}
-            style={{ color: content.backgroundImageUrl ? '#FFFFFFCC' : colors.accent }}
+            style={{ color: bgUrl ? '#FFFFFFCC' : colors.accent }}
           >
             {content.subheadline}
           </motion.p>
@@ -77,7 +86,7 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className={`mt-6 text-base sm:text-lg ${fontPair.bodyClass}`}
-            style={{ color: content.backgroundImageUrl ? '#FFFFFFBB' : colors.primary }}
+            style={{ color: bgUrl ? '#FFFFFFBB' : colors.primary }}
           >
             {formatWeddingDate(weddingDate)}
           </motion.p>
@@ -92,13 +101,13 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
             <div className="text-center">
               <span
                 className={`block text-3xl font-bold sm:text-4xl ${fontPair.headingClass}`}
-                style={{ color: content.backgroundImageUrl ? '#FFFFFF' : colors.primary }}
+                style={{ color: bgUrl ? '#FFFFFF' : colors.primary }}
               >
                 {countdown.days}
               </span>
               <span
                 className={`text-sm ${fontPair.bodyClass}`}
-                style={{ color: content.backgroundImageUrl ? '#FFFFFFAA' : colors.accent }}
+                style={{ color: bgUrl ? '#FFFFFFAA' : colors.accent }}
               >
                 days
               </span>
@@ -106,13 +115,13 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
             <div className="text-center">
               <span
                 className={`block text-3xl font-bold sm:text-4xl ${fontPair.headingClass}`}
-                style={{ color: content.backgroundImageUrl ? '#FFFFFF' : colors.primary }}
+                style={{ color: bgUrl ? '#FFFFFF' : colors.primary }}
               >
                 {countdown.hours}
               </span>
               <span
                 className={`text-sm ${fontPair.bodyClass}`}
-                style={{ color: content.backgroundImageUrl ? '#FFFFFFAA' : colors.accent }}
+                style={{ color: bgUrl ? '#FFFFFFAA' : colors.accent }}
               >
                 hours
               </span>

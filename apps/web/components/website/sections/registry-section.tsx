@@ -50,7 +50,7 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
               transition={{ delay: i * 0.1 }}
               className="flex items-center gap-3 rounded-2xl bg-white px-6 py-4 shadow-sm transition-shadow hover:shadow-md"
             >
-              {registry.logoUrl && (
+              {registry.logoUrl && /^https?:\/\//i.test(registry.logoUrl) && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={registry.logoUrl}

@@ -4,6 +4,13 @@ import { motion } from 'framer-motion'
 import type { WeddingPartyContent } from '@planfortwo/types'
 import { useTemplateStyles } from '../template-context'
 
+/** Only allow http(s) image URLs */
+function safeImgSrc(url: string | undefined | null): string | null {
+  if (!url) return null
+  if (/^https?:\/\//i.test(url)) return url
+  return null
+}
+
 interface WeddingPartySectionProps {
   title: string
   content: WeddingPartyContent
@@ -34,11 +41,11 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
               transition={{ delay: i * 0.1 }}
               className="text-center"
             >
-              {member.imageUrl ? (
+              {safeImgSrc(member.imageUrl) ? (
                 <div className="mx-auto h-40 w-40 overflow-hidden rounded-full">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={member.imageUrl}
+                    src={safeImgSrc(member.imageUrl)!}
                     alt={member.name}
                     className="h-full w-full object-cover"
                   />

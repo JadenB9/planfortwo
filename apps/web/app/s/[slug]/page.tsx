@@ -58,6 +58,8 @@ interface PublicWebsiteData {
   }>
   weddingName: string
   weddingDate: string | null
+  ceremonyDate: string | null
+  ceremonyStartTime: string | null
 }
 
 async function getWebsiteData(slug: string): Promise<PublicWebsiteData | null> {
@@ -110,6 +112,8 @@ export default async function PublicWebsitePage({ params }: PageProps) {
       photos={data.photos}
       weddingName={data.weddingName}
       weddingDate={data.weddingDate}
+      ceremonyDate={data.ceremonyDate}
+      ceremonyStartTime={data.ceremonyStartTime}
     />
   )
 }

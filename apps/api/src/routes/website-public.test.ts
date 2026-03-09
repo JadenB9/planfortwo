@@ -37,11 +37,24 @@ vi.mock('@planfortwo/db', () => {
         return chain
       }),
     },
-    websiteConfigs: { subdomain: 'subdomain', weddingId: 'weddingId' },
+    websiteConfigs: {
+      subdomain: 'subdomain',
+      weddingId: 'weddingId',
+      privacyMode: 'privacyMode',
+      publishedAt: 'publishedAt',
+      accessToken: 'accessToken',
+    },
     websiteSections: { weddingId: 'weddingId', isVisible: 'isVisible', sortOrder: 'sortOrder' },
     websitePhotos: { weddingId: 'weddingId', sortOrder: 'sortOrder' },
+    guestbookEntries: { weddingId: 'weddingId' },
     websitePageViews: {},
     weddings: { id: 'id', name: 'name', date: 'date' },
+    events: {
+      weddingId: 'weddingId',
+      date: 'date',
+      startTime: 'startTime',
+      sortOrder: 'sortOrder',
+    },
   }
 })
 
@@ -54,12 +67,14 @@ vi.mock('../services/website-analytics.js', () => ({
 vi.mock('../services/guestbook.js', () => ({
   guestbookService: {
     listApproved: vi.fn().mockResolvedValue([]),
+    create: vi.fn().mockResolvedValue({ id: 'g-new', authorName: 'Test', message: 'Hello' }),
   },
 }))
 
 vi.mock('drizzle-orm', () => ({
   eq: vi.fn((...args: unknown[]) => args),
   and: vi.fn((...args: unknown[]) => args),
+  or: vi.fn((...args: unknown[]) => args),
   asc: vi.fn((col: unknown) => col),
 }))
 
@@ -122,16 +137,19 @@ describe('Website Public Routes', () => {
     })
 
     it('should return limited info for password-protected website', async () => {
-      setQueryResults([
-        {
-          id: 'config-1',
-          weddingId: 'w-1',
-          templateId: 'classic',
-          publishedAt: new Date(),
-          privacyMode: 'password',
-          passwordHash: 'hashed',
-        },
-      ])
+      setQueryResults(
+        [
+          {
+            id: 'config-1',
+            weddingId: 'w-1',
+            templateId: 'classic',
+            publishedAt: new Date(),
+            privacyMode: 'password',
+            passwordHash: 'hashed',
+          },
+        ],
+        [{ name: 'Secret Wedding' }],
+      )
 
       const app = createApp()
       const res = await app.request('/website-public/secret-wedding')
@@ -139,8 +157,9 @@ describe('Website Public Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.requiresPassword).toBe(true)
-      expect(body.data.privacyMode).toBe('password')
+      expect(body.data.config.privacyMode).toBe('password')
       expect(body.data.passwordHash).toBeUndefined()
+      expect(body.data.weddingName).toBe('Secret Wedding')
     })
 
     it('should return full website data for public site', async () => {
@@ -165,6 +184,7 @@ describe('Website Public Routes', () => {
           },
         ],
         [{ name: 'Jane & John', date: '2026-09-15' }],
+        [{ date: '2026-09-15T14:00:00Z', startTime: '2:00 PM' }],
         [{ id: 's-1', sectionType: 'hero', title: 'Welcome', isVisible: true }],
         [{ id: 'p-1', url: 'https://cdn.example.com/photo.jpg' }],
       )
@@ -176,6 +196,8 @@ describe('Website Public Routes', () => {
       const body = await res.json()
       expect(body.data.config.templateId).toBe('garden-party')
       expect(body.data.weddingName).toBe('Jane & John')
+      expect(body.data.ceremonyDate).toBe('2026-09-15T14:00:00Z')
+      expect(body.data.ceremonyStartTime).toBe('2:00 PM')
       expect(body.data.sections).toHaveLength(1)
       expect(body.data.photos).toHaveLength(1)
       expect(body.data.config.passwordHash).toBeUndefined()
@@ -184,7 +206,7 @@ describe('Website Public Routes', () => {
 
   describe('POST /website-public/:slug/track', () => {
     it('should track a page view', async () => {
-      setQueryResults([{ weddingId: 'w-1' }])
+      setQueryResults([{ weddingId: 'w-1', privacyMode: 'public', publishedAt: new Date() }])
 
       const app = createApp()
       const res = await app.request('/website-public/jj-wedding/track', {
@@ -219,7 +241,7 @@ describe('Website Public Routes', () => {
 
   describe('GET /website-public/:slug/guestbook', () => {
     it('should return approved guestbook entries', async () => {
-      setQueryResults([{ weddingId: 'w-1' }])
+      setQueryResults([{ weddingId: 'w-1', privacyMode: 'public', publishedAt: new Date() }])
 
       mockedGuestbook.listApproved.mockResolvedValue([
         { id: 'g-1', authorName: 'Sarah', message: 'So happy for you!', createdAt: new Date() },

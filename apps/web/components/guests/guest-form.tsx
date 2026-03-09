@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { GuestWithTags, Household, GuestTag, GuestSide } from '@planfortwo/types'
 
 interface GuestFormProps {
@@ -53,6 +53,50 @@ export function GuestForm({
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Parent type-ahead search state
+  const [parentSearch, setParentSearch] = useState(() => {
+    if (guest?.isChild && guest?.householdId) {
+      const parent = adultGuests.find((g) => g.householdId && g.householdId === guest.householdId)
+      return parent ? `${parent.firstName} ${parent.lastName}` : ''
+    }
+    return ''
+  })
+  const [showParentDropdown, setShowParentDropdown] = useState(false)
+  const [selectedParent, setSelectedParent] = useState<GuestWithTags | null>(() => {
+    if (guest?.isChild && guest?.householdId) {
+      return adultGuests.find((g) => g.householdId && g.householdId === guest.householdId) ?? null
+    }
+    return null
+  })
+  const parentSearchRef = useRef<HTMLDivElement>(null)
+
+  // Close parent dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (parentSearchRef.current && !parentSearchRef.current.contains(e.target as Node)) {
+        setShowParentDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  // Get children in a parent's household
+  function getChildrenForParent(parent: GuestWithTags): GuestWithTags[] {
+    if (!parent.householdId) return []
+    return guests.filter(
+      (g) => g.isChild && g.householdId === parent.householdId && g.id !== guest?.id,
+    )
+  }
+
+  // Filter parents based on search
+  const filteredParents = parentSearch.trim()
+    ? adultGuests.filter((g) => {
+        const name = `${g.firstName} ${g.lastName}`.toLowerCase()
+        return name.includes(parentSearch.toLowerCase())
+      })
+    : adultGuests
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -178,7 +222,9 @@ export function GuestForm({
                   onChange={(e) => {
                     update('isChild', e.target.checked)
                     if (!e.target.checked) {
-                      // Uncheck child — don't clear household (user may want to keep it)
+                      setSelectedParent(null)
+                      setParentSearch('')
+                      setShowParentDropdown(false)
                     }
                   }}
                   className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
@@ -209,36 +255,139 @@ export function GuestForm({
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">Parent</label>
                 <p className="mb-1.5 text-xs text-gray-500">
-                  Assigning a parent places this child in the same family group, so they RSVP
-                  together.
+                  Type a parent&apos;s name to assign this child to their family group.
                 </p>
-                <select
-                  value={
-                    // Show the parent whose household matches, if any
-                    adultGuests.find((g) => g.householdId && g.householdId === formData.householdId)
-                      ?.id ?? ''
-                  }
-                  onChange={(e) => {
-                    const parentId = e.target.value
-                    if (!parentId) {
-                      // "None" selected — don't clear household automatically
-                      return
-                    }
-                    const parent = adultGuests.find((g) => g.id === parentId)
-                    if (parent?.householdId) {
-                      update('householdId', parent.householdId)
-                    }
-                  }}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
-                >
-                  <option value="">Select a parent...</option>
-                  {adultGuests.map((g) => (
-                    <option key={g.id} value={g.id} disabled={!g.householdId}>
-                      {g.firstName} {g.lastName}
-                      {!g.householdId ? ' (no family group)' : ''}
-                    </option>
-                  ))}
-                </select>
+                <div ref={parentSearchRef} className="relative">
+                  {selectedParent ? (
+                    <div className="flex items-center gap-2 rounded-xl border border-gray-300 px-3 py-2">
+                      <span className="flex-1 text-sm text-gray-900">
+                        {selectedParent.firstName} {selectedParent.lastName}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedParent(null)
+                          setParentSearch('')
+                          // Don't clear householdId — user may want to keep the group
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      value={parentSearch}
+                      onChange={(e) => {
+                        setParentSearch(e.target.value)
+                        setShowParentDropdown(true)
+                      }}
+                      onFocus={() => setShowParentDropdown(true)}
+                      placeholder="Search by parent name..."
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                    />
+                  )}
+
+                  {showParentDropdown && !selectedParent && (
+                    <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg">
+                      {filteredParents.length === 0 ? (
+                        <p className="px-3 py-2 text-xs text-gray-500">No matching parents found</p>
+                      ) : (
+                        filteredParents.slice(0, 15).map((g) => {
+                          const children = getChildrenForParent(g)
+                          const hasChildren = children.length > 0
+                          const allCheckedIn =
+                            hasChildren && children.every((c) => c.rsvpStatus === 'accepted')
+                          const checkedInCount = children.filter(
+                            (c) => c.rsvpStatus === 'accepted',
+                          ).length
+                          return (
+                            <button
+                              key={g.id}
+                              type="button"
+                              disabled={!g.householdId}
+                              onClick={() => {
+                                if (!g.householdId) return
+                                setSelectedParent(g)
+                                setParentSearch(`${g.firstName} ${g.lastName}`)
+                                setShowParentDropdown(false)
+                                update('householdId', g.householdId)
+                              }}
+                              className="flex w-full flex-col items-start px-3 py-2 text-left hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              <span className="text-sm font-medium text-gray-900">
+                                {g.firstName} {g.lastName}
+                                {!g.householdId && (
+                                  <span className="ml-1 text-xs font-normal text-gray-400">
+                                    (no family group)
+                                  </span>
+                                )}
+                              </span>
+                              {hasChildren && (
+                                <span className="text-xs text-gray-500">
+                                  {allCheckedIn
+                                    ? `All ${children.length} children already registered`
+                                    : checkedInCount > 0
+                                      ? `${checkedInCount} of ${children.length} children registered`
+                                      : `${children.length} ${children.length === 1 ? 'child' : 'children'} to register`}
+                                </span>
+                              )}
+                            </button>
+                          )
+                        })
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Show children in this parent's household */}
+                {selectedParent &&
+                  (() => {
+                    const children = getChildrenForParent(selectedParent)
+                    if (children.length === 0) return null
+                    const allRegistered = children.every((c) => c.rsvpStatus === 'accepted')
+                    return (
+                      <div className="mt-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
+                        <p className="mb-2 text-xs font-medium text-gray-700">
+                          {allRegistered ? (
+                            <span className="text-green-600">
+                              All children in this family are already registered.
+                            </span>
+                          ) : (
+                            <>Children in {selectedParent.firstName}&apos;s family:</>
+                          )}
+                        </p>
+                        <div className="space-y-1">
+                          {children.map((child) => {
+                            const isRegistered = child.rsvpStatus === 'accepted'
+                            return (
+                              <div
+                                key={child.id}
+                                className="flex items-center justify-between text-xs"
+                              >
+                                <span className={isRegistered ? 'text-gray-500' : 'text-gray-900'}>
+                                  {child.firstName} {child.lastName}
+                                  {child.age != null && (
+                                    <span className="ml-1 text-gray-400">(age {child.age})</span>
+                                  )}
+                                </span>
+                                {isRegistered ? (
+                                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
+                                    Registered
+                                  </span>
+                                ) : (
+                                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">
+                                    Not registered
+                                  </span>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })()}
               </div>
             )}
 

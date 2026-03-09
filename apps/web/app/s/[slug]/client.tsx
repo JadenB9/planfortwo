@@ -45,6 +45,30 @@ interface PublicWebsiteClientProps {
   photos: PublicPhoto[]
   weddingName: string
   weddingDate: string | null
+  ceremonyDate: string | null
+  ceremonyStartTime: string | null
+}
+
+function parseCeremonyDateTime(dateStr: string, startTime: string | null): Date {
+  const date = new Date(dateStr)
+  if (startTime) {
+    // Handle "2:00 PM" or "14:00" style time strings
+    const twelveHour = startTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i)
+    if (twelveHour) {
+      let hours = parseInt(twelveHour[1]!, 10)
+      const minutes = parseInt(twelveHour[2]!, 10)
+      const period = twelveHour[3]!.toUpperCase()
+      if (period === 'PM' && hours !== 12) hours += 12
+      if (period === 'AM' && hours === 12) hours = 0
+      date.setHours(hours, minutes, 0, 0)
+    } else {
+      const twentyFourHour = startTime.match(/^(\d{1,2}):(\d{2})$/)
+      if (twentyFourHour) {
+        date.setHours(parseInt(twentyFourHour[1]!, 10), parseInt(twentyFourHour[2]!, 10), 0, 0)
+      }
+    }
+  }
+  return date
 }
 
 export function PublicWebsiteClient({
@@ -54,6 +78,8 @@ export function PublicWebsiteClient({
   photos,
   weddingName,
   weddingDate,
+  ceremonyDate,
+  ceremonyStartTime,
 }: PublicWebsiteClientProps) {
   const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
 
@@ -68,7 +94,7 @@ export function PublicWebsiteClient({
     const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ weddingId: '', authorName, message, ...(website ? { website } : {}) }),
+      body: JSON.stringify({ authorName, message, ...(website ? { website } : {}) }),
     })
     if (res.ok) {
       const refreshRes = await fetch(
@@ -85,7 +111,11 @@ export function PublicWebsiteClient({
     .filter((s) => s.isVisible)
     .sort((a, b) => a.sortOrder - b.sortOrder)
 
-  const parsedDate = weddingDate ? new Date(weddingDate) : null
+  const parsedDate = ceremonyDate
+    ? parseCeremonyDateTime(ceremonyDate, ceremonyStartTime)
+    : weddingDate
+      ? new Date(weddingDate)
+      : null
 
   return (
     <TemplateProvider

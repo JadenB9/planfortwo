@@ -151,6 +151,20 @@ export const templates: TemplateMetadata[] = [
     fontPair: 'dancing-script-nunito',
     tags: ['playful', 'fun'],
   },
+  {
+    id: 'custom',
+    name: 'Custom',
+    description: 'Design your own — choose colors, fonts, and make it uniquely yours',
+    previewImage: '/templates/custom.jpg',
+    defaultColors: {
+      primary: '#4A5568',
+      secondary: '#EDF2F7',
+      accent: '#ED8936',
+      background: '#FFFFFF',
+    },
+    fontPair: 'josefin-open-sans',
+    tags: ['custom', 'personalized'],
+  },
 ]
 
 export function getTemplate(templateId: string): TemplateMetadata {

@@ -393,7 +393,7 @@ export default function SeatingPage() {
   const [guests, setGuests] = useState<Guest[]>([])
   const [panX, setPanX] = useState(0)
   const [panY, setPanY] = useState(0)
-  const [zoom, setZoom] = useState(0.6)
+  const [zoom, setZoom] = useState(1)
 
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
 

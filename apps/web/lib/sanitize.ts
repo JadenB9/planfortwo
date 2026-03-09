@@ -11,9 +11,20 @@ function sanitizeHtmlServer(html: string): string {
     .replace(/<script\b[^>]*\/>/gi, '')
     .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
     .replace(/<iframe\b[^>]*\/>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .replace(/<object\b[^>]*\/>/gi, '')
+    .replace(/<embed\b[^>]*\/?>/gi, '')
+    .replace(/<base\b[^>]*\/?>/gi, '')
+    .replace(/<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi, '')
+    .replace(/<form\b[^>]*\/>/gi, '')
+    .replace(/<meta\b[^>]*\/?>/gi, '')
+    .replace(/<link\b[^>]*\/?>/gi, '')
     .replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '')
     .replace(/href\s*=\s*["']?\s*javascript:/gi, 'href="')
     .replace(/src\s*=\s*["']?\s*javascript:/gi, 'src="')
+    .replace(/action\s*=\s*["']?\s*javascript:/gi, 'action="')
+    .replace(/formaction\s*=\s*["']?\s*javascript:/gi, 'formaction="')
+    .replace(/data\s*=\s*["']?\s*javascript:/gi, 'data="')
 }
 
 /**
