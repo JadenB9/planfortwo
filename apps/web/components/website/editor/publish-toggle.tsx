@@ -14,10 +14,8 @@ interface PublishToggleProps {
 
 function buildPublicUrl(subdomain: string | null, accessToken: string | null): string | null {
   if (!accessToken) return null
-  if (subdomain) {
-    return `https://${subdomain}.planfortwo.com/s/${accessToken}`
-  }
-  return `https://planfortwo.com/s/${accessToken}`
+  const slug = subdomain ? `${subdomain}-${accessToken}` : accessToken
+  return `https://app.planfortwo.com/s/${slug}`
 }
 
 export function PublishToggle({
