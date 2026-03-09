@@ -49,8 +49,9 @@ emailCampaignsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const dbUserId = c.get('dbUserId')
-    const campaign = await emailCampaignService.create(data, dbUserId)
+    const campaign = await emailCampaignService.create({ ...data, weddingId }, dbUserId)
     return c.json({ data: campaign }, 201)
   },
 )
@@ -111,8 +112,9 @@ announcementsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const dbUserId = c.get('dbUserId')
-    const announcement = await announcementService.create(data, dbUserId)
+    const announcement = await announcementService.create({ ...data, weddingId }, dbUserId)
     return c.json({ data: announcement }, 201)
   },
 )

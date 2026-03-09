@@ -58,7 +58,8 @@ thankYouRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const note = await thankYouService.create(data)
+    const weddingId = c.get('weddingId')
+    const note = await thankYouService.create({ ...data, weddingId })
     return c.json({ data: note }, 201)
   },
 )
@@ -152,7 +153,8 @@ vendorReviewsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const review = await vendorReviewService.create(data)
+    const weddingId = c.get('weddingId')
+    const review = await vendorReviewService.create({ ...data, weddingId })
     return c.json({ data: review }, 201)
   },
 )

@@ -148,7 +148,7 @@ export const paymentScheduleService = {
     await activityService.log({
       weddingId,
       userId,
-      action: 'payment_scheduled',
+      action: 'payment_deleted',
       entityType: 'payment',
       entityId: id,
       metadata: { title: entry.title, deleted: true },

@@ -96,6 +96,7 @@ vi.mock('@planfortwo/db', () => {
       plusOneConfirmed: 'plusOneConfirmed',
       dietary: 'dietary',
       mealChoice: 'mealChoice',
+      householdId: 'householdId',
     },
     websiteConfigs: {
       weddingId: 'weddingId',

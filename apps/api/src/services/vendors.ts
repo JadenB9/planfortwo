@@ -58,8 +58,8 @@ export const vendorService = {
       await activityService.log({
         weddingId: data.weddingId,
         userId,
-        action: 'task_created',
-        entityType: 'category',
+        action: 'vendor_created',
+        entityType: 'vendor',
         entityId: vendor.id,
         metadata: { type: 'vendor', name: data.name },
       })

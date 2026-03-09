@@ -1,5 +1,5 @@
 import { db, emailAddresses, emails } from '@planfortwo/db'
-import { eq, and, desc, ilike, or, sql, count } from 'drizzle-orm'
+import { eq, and, desc, ilike, or, sql, count, inArray } from 'drizzle-orm'
 import { Resend } from 'resend'
 import { storageClient } from '@planfortwo/storage'
 import { JSDOM } from 'jsdom'
@@ -160,12 +160,7 @@ export const inboxService = {
     }
 
     const addressIds = userAddresses.map((a) => a.id)
-    const conditions = [
-      sql`${emails.emailAddressId} IN (${sql.join(
-        addressIds.map((id) => sql`${id}`),
-        sql`, `,
-      )})`,
-    ]
+    const conditions = [inArray(emails.emailAddressId, addressIds)]
 
     if (filters.emailAddressId) {
       if (!addressIds.includes(filters.emailAddressId)) {
@@ -377,10 +372,7 @@ export const inboxService = {
       .from(emails)
       .where(
         and(
-          sql`${emails.emailAddressId} IN (${sql.join(
-            addressIds.map((id) => sql`${id}`),
-            sql`, `,
-          )})`,
+          inArray(emails.emailAddressId, addressIds),
           eq(emails.direction, 'inbound'),
           eq(emails.isRead, false),
         ),
@@ -446,32 +438,33 @@ export const inboxService = {
     if (userAddresses.length === 0) return null
 
     const addressIds = userAddresses.map((a) => a.id)
-    const allEmails = await db
+
+    const [emailWithAttachment] = await db
       .select()
       .from(emails)
       .where(
-        sql`${emails.emailAddressId} IN (${sql.join(
-          addressIds.map((id) => sql`${id}`),
-          sql`, `,
-        )})`,
+        and(
+          inArray(emails.emailAddressId, addressIds),
+          sql`${emails.attachments}::jsonb @> ${JSON.stringify([{ id: attachmentId }])}::jsonb`,
+        ),
       )
+      .limit(1)
 
-    for (const email of allEmails) {
-      const attachments =
-        (email.attachments as Array<{ id: string; r2Key?: string; url?: string }>) ?? []
-      const att = attachments.find((a) => a.id === attachmentId)
-      if (att) {
-        if (att.r2Key) {
-          const url = await storageClient.getDownloadUrl(att.r2Key)
-          return { url }
-        }
-        if (att.url) {
-          return { url: att.url }
-        }
-        return null
-      }
+    if (!emailWithAttachment) return null
+
+    const attachments =
+      (emailWithAttachment.attachments as Array<{ id: string; r2Key?: string; url?: string }>) ?? []
+    const att = attachments.find((a) => a.id === attachmentId)
+
+    if (!att) return null
+
+    if (att.r2Key) {
+      const url = await storageClient.getDownloadUrl(att.r2Key)
+      return { url }
     }
-
+    if (att.url) {
+      return { url: att.url }
+    }
     return null
   },
 

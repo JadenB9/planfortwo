@@ -45,8 +45,8 @@ export const weddingPartyService = {
       await activityService.log({
         weddingId: data.weddingId,
         userId,
-        action: 'task_created',
-        entityType: 'category',
+        action: 'party_member_added',
+        entityType: 'wedding_party',
         entityId: member.id,
         metadata: { type: 'party_member', name: data.name },
       })

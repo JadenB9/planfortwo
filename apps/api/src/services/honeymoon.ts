@@ -41,10 +41,14 @@ export const honeymoonService = {
   },
 
   async updatePlan(id: string, weddingId: string, data: UpdateHoneymoonPlanInput) {
-    const setData: Record<string, unknown> = { ...data }
+    const setData: Record<string, unknown> = {}
+    if (data.destination !== undefined) setData.destination = data.destination
     if (data.startDate !== undefined)
       setData.startDate = data.startDate ? new Date(data.startDate) : null
     if (data.endDate !== undefined) setData.endDate = data.endDate ? new Date(data.endDate) : null
+    if (data.budget !== undefined) setData.budget = data.budget
+    if (data.notes !== undefined) setData.notes = data.notes
+    if (data.packingList !== undefined) setData.packingList = data.packingList
     const [updated] = await db
       .update(honeymoonPlans)
       .set(setData)

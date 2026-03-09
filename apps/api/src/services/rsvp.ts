@@ -1,4 +1,4 @@
-import { eq, and, ilike } from 'drizzle-orm'
+import { eq, and, ilike, inArray } from 'drizzle-orm'
 import { db, guests, households, weddings } from '@planfortwo/db'
 import type { RsvpLookupResult, Guest } from '@planfortwo/types'
 import type { RsvpSubmissionInput } from '@planfortwo/validators'
@@ -120,7 +120,7 @@ export const rsvpService = {
         plusOneDietary: (submission.plusOneDietary as Record<string, unknown>) ?? null,
         rsvpRespondedAt: new Date(),
       })
-      .where(eq(guests.id, submission.guestId))
+      .where(and(eq(guests.id, submission.guestId), eq(guests.weddingId, weddingId)))
       .returning()
 
     if (!updated) {
@@ -130,10 +130,40 @@ export const rsvpService = {
     return updated as Guest
   },
 
-  async submitBatchRsvp(submissions: RsvpSubmissionInput[], weddingId: string): Promise<Guest[]> {
+  async submitBatchRsvp(
+    submissions: RsvpSubmissionInput[],
+    weddingId: string,
+    tokenOwnerHouseholdId: string | null,
+  ): Promise<Guest[]> {
     const expired = await this.isDeadlinePassed(weddingId)
     if (expired) {
       throw new Error('RSVP deadline has passed')
+    }
+
+    // Verify all guestIds belong to the same household as the token owner
+    const submissionGuestIds = submissions.map((s) => s.guestId)
+
+    if (!tokenOwnerHouseholdId) {
+      // No household — only the token owner (single guest) is allowed
+      if (submissionGuestIds.length > 1) {
+        throw new Error('Guest is not part of a household — batch submission not allowed')
+      }
+    } else {
+      // Fetch all submitted guests and verify household membership
+      const submittedGuests = await db
+        .select({ id: guests.id, householdId: guests.householdId })
+        .from(guests)
+        .where(and(inArray(guests.id, submissionGuestIds), eq(guests.weddingId, weddingId)))
+
+      if (submittedGuests.length !== submissionGuestIds.length) {
+        throw new Error('One or more guests not found in this wedding')
+      }
+
+      for (const g of submittedGuests) {
+        if (g.householdId !== tokenOwnerHouseholdId) {
+          throw new Error('All guests in a batch must belong to the same household')
+        }
+      }
     }
 
     const results: Guest[] = []

@@ -338,7 +338,7 @@ export const checklistService = {
     const [updated] = await db
       .update(checklistTasks)
       .set(updateData)
-      .where(eq(checklistTasks.id, taskId))
+      .where(and(eq(checklistTasks.id, taskId), eq(checklistTasks.weddingId, weddingId)))
       .returning()
 
     if (updated) {
@@ -362,7 +362,7 @@ export const checklistService = {
         title: checklistTasks.title,
       })
       .from(checklistTasks)
-      .where(eq(checklistTasks.id, taskId))
+      .where(and(eq(checklistTasks.id, taskId), eq(checklistTasks.weddingId, weddingId)))
 
     if (!task) return null
 
@@ -374,7 +374,7 @@ export const checklistService = {
         completedAt: isCompleting ? new Date() : null,
         completedByUserId: isCompleting ? userId : null,
       })
-      .where(eq(checklistTasks.id, taskId))
+      .where(and(eq(checklistTasks.id, taskId), eq(checklistTasks.weddingId, weddingId)))
       .returning()
 
     if (updated) {
@@ -395,13 +395,15 @@ export const checklistService = {
     const [task] = await db
       .select({ title: checklistTasks.title })
       .from(checklistTasks)
-      .where(eq(checklistTasks.id, taskId))
+      .where(and(eq(checklistTasks.id, taskId), eq(checklistTasks.weddingId, weddingId)))
 
     if (!task) {
       throw new Error('Task not found')
     }
 
-    await db.delete(checklistTasks).where(eq(checklistTasks.id, taskId))
+    await db
+      .delete(checklistTasks)
+      .where(and(eq(checklistTasks.id, taskId), eq(checklistTasks.weddingId, weddingId)))
 
     await activityService.log({
       weddingId,
@@ -435,6 +437,16 @@ export const checklistService = {
   },
 
   async addNote(taskId: string, userId: string, content: string, weddingId: string) {
+    // Verify task belongs to the requesting wedding
+    const [task] = await db
+      .select({ id: checklistTasks.id })
+      .from(checklistTasks)
+      .where(and(eq(checklistTasks.id, taskId), eq(checklistTasks.weddingId, weddingId)))
+
+    if (!task) {
+      throw new Error('Task not found')
+    }
+
     const [note] = await db.insert(taskNotes).values({ taskId, userId, content }).returning()
 
     if (note) {

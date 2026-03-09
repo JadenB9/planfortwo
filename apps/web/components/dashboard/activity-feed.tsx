@@ -41,6 +41,13 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   website_section_updated: 'updated a website section',
   website_template_changed: 'changed the website template',
   guestbook_entry_created: 'left a guestbook message',
+  campaign_created: 'created an email campaign',
+  announcement_created: 'created an announcement',
+  event_created: 'created an event',
+  seating_chart_created: 'created a seating chart',
+  vendor_created: 'added a vendor',
+  party_member_added: 'added a wedding party member',
+  payment_deleted: 'deleted a payment',
 }
 
 const ACTION_LINKS: Record<ActivityAction, string> = {
@@ -75,6 +82,13 @@ const ACTION_LINKS: Record<ActivityAction, string> = {
   website_section_updated: '/website',
   website_template_changed: '/website',
   guestbook_entry_created: '/website',
+  campaign_created: '/communication',
+  announcement_created: '/communication',
+  event_created: '/events',
+  seating_chart_created: '/seating',
+  vendor_created: '/vendors',
+  party_member_added: '/ceremony',
+  payment_deleted: '/budget',
 }
 
 function formatTimestamp(date: Date): string {

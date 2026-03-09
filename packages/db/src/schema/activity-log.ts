@@ -34,6 +34,13 @@ export const activityActionEnum = pgEnum('activity_action', [
   'website_section_updated',
   'website_template_changed',
   'guestbook_entry_created',
+  'campaign_created',
+  'announcement_created',
+  'event_created',
+  'seating_chart_created',
+  'vendor_created',
+  'party_member_added',
+  'payment_deleted',
 ])
 
 export const entityTypeEnum = pgEnum('entity_type', [
@@ -49,6 +56,11 @@ export const entityTypeEnum = pgEnum('entity_type', [
   'website',
   'website_section',
   'guestbook_entry',
+  'email_campaign',
+  'event',
+  'seating_chart',
+  'vendor',
+  'wedding_party',
 ])
 
 export const activityLog = pgTable('activity_log', {

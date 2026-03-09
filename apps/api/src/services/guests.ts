@@ -210,7 +210,7 @@ export const guestService = {
       .returning()
 
     if (guest && input.tagIds && input.tagIds.length > 0) {
-      await this.setTagsForGuest(guest.id, input.tagIds)
+      await this.setTagsForGuest(guest.id, input.tagIds, input.weddingId)
     }
 
     if (guest) {
@@ -247,10 +247,14 @@ export const guestService = {
     if (input.songRequest !== undefined) updateData.songRequest = input.songRequest
     if (input.rsvpNotes !== undefined) updateData.rsvpNotes = input.rsvpNotes
 
-    const [updated] = await db.update(guests).set(updateData).where(eq(guests.id, id)).returning()
+    const [updated] = await db
+      .update(guests)
+      .set(updateData)
+      .where(and(eq(guests.id, id), eq(guests.weddingId, weddingId)))
+      .returning()
 
     if (updated && input.tagIds !== undefined) {
-      await this.setTagsForGuest(id, input.tagIds)
+      await this.setTagsForGuest(id, input.tagIds, weddingId)
     }
 
     if (updated) {
@@ -271,13 +275,13 @@ export const guestService = {
     const [guest] = await db
       .select({ firstName: guests.firstName, lastName: guests.lastName })
       .from(guests)
-      .where(eq(guests.id, id))
+      .where(and(eq(guests.id, id), eq(guests.weddingId, weddingId)))
 
     if (!guest) {
       throw new Error('Guest not found')
     }
 
-    await db.delete(guests).where(eq(guests.id, id))
+    await db.delete(guests).where(and(eq(guests.id, id), eq(guests.weddingId, weddingId)))
 
     await activityService.log({
       weddingId,
@@ -356,13 +360,23 @@ export const guestService = {
     }
   },
 
-  async setTagsForGuest(guestId: string, tagIds: string[]) {
+  async setTagsForGuest(guestId: string, tagIds: string[], weddingId: string) {
     // Delete existing assignments
     await db.delete(guestTagAssignments).where(eq(guestTagAssignments.guestId, guestId))
 
-    // Insert new ones
+    // Insert new ones after verifying tags belong to this wedding
     if (tagIds.length > 0) {
-      await db.insert(guestTagAssignments).values(tagIds.map((tagId) => ({ guestId, tagId })))
+      const validTags = await db
+        .select({ id: guestTags.id })
+        .from(guestTags)
+        .where(and(inArray(guestTags.id, tagIds), eq(guestTags.weddingId, weddingId)))
+
+      const validTagIds = validTags.map((t) => t.id)
+      if (validTagIds.length > 0) {
+        await db
+          .insert(guestTagAssignments)
+          .values(validTagIds.map((tagId) => ({ guestId, tagId })))
+      }
     }
   },
 
@@ -492,7 +506,10 @@ export const guestService = {
         })
         result.imported++
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Insert failed'
+        const message =
+          err instanceof Error && err.message.includes('duplicate')
+            ? 'Duplicate entry'
+            : 'Failed to import row'
         result.errors.push(`Row ${i + 1}: ${message}`)
         result.skipped++
       }

@@ -1,4 +1,4 @@
-import { eq, and, asc } from 'drizzle-orm'
+import { eq, and, asc, inArray } from 'drizzle-orm'
 import {
   db,
   seatingCharts,
@@ -39,14 +39,14 @@ export const seatingChartService = {
 
     const elements = await db.select().from(venueElements).where(eq(venueElements.chartId, chartId))
 
-    const allAssignments: (typeof tableAssignments.$inferSelect)[] = []
-    for (const table of tables) {
-      const tableAssigns = await db
-        .select()
-        .from(tableAssignments)
-        .where(eq(tableAssignments.tableId, table.id))
-      allAssignments.push(...tableAssigns)
-    }
+    const tableIds = tables.map((t) => t.id)
+    const allAssignments =
+      tableIds.length > 0
+        ? await db
+            .select()
+            .from(tableAssignments)
+            .where(inArray(tableAssignments.tableId, tableIds))
+        : []
 
     return { ...chart, tables, elements, assignments: allAssignments }
   },
@@ -65,8 +65,8 @@ export const seatingChartService = {
       await activityService.log({
         weddingId: data.weddingId,
         userId,
-        action: 'task_created',
-        entityType: 'category',
+        action: 'seating_chart_created',
+        entityType: 'seating_chart',
         entityId: chart.id,
         metadata: { type: 'seating_chart', name: data.name },
       })
@@ -262,27 +262,21 @@ export const seatingChartService = {
   async getAssignments(chartId: string) {
     const tables = await db.select().from(seatingTables).where(eq(seatingTables.chartId, chartId))
 
-    const result: {
-      tableId: string
-      guestId: string | null
-      guestName: string | null
-      seatNumber: number | null
-    }[] = []
-    for (const table of tables) {
-      const assigns = await db
-        .select()
-        .from(tableAssignments)
-        .where(eq(tableAssignments.tableId, table.id))
-      result.push(
-        ...assigns.map((a) => ({
-          tableId: a.tableId,
-          guestId: a.guestId,
-          guestName: a.guestName,
-          seatNumber: a.seatNumber,
-        })),
-      )
-    }
-    return result
+    const tableIds = tables.map((t) => t.id)
+    const allAssigns =
+      tableIds.length > 0
+        ? await db
+            .select()
+            .from(tableAssignments)
+            .where(inArray(tableAssignments.tableId, tableIds))
+        : []
+
+    return allAssigns.map((a) => ({
+      tableId: a.tableId,
+      guestId: a.guestId,
+      guestName: a.guestName,
+      seatNumber: a.seatNumber,
+    }))
   },
 
   async listRelationships(weddingId: string) {
@@ -322,15 +316,21 @@ export const seatingChartService = {
 
     const tables = await db.select().from(seatingTables).where(eq(seatingTables.chartId, chartId))
 
+    const tableIds = tables.map((t) => t.id)
+    const allAssigns =
+      tableIds.length > 0
+        ? await db
+            .select()
+            .from(tableAssignments)
+            .where(inArray(tableAssignments.tableId, tableIds))
+        : []
+
+    // Build guest-to-table map and per-table count map
     const guestTableMap = new Map<string, string>()
-    for (const table of tables) {
-      const assigns = await db
-        .select()
-        .from(tableAssignments)
-        .where(eq(tableAssignments.tableId, table.id))
-      for (const a of assigns) {
-        if (a.guestId) guestTableMap.set(a.guestId, table.id)
-      }
+    const tableCountMap = new Map<string, number>()
+    for (const a of allAssigns) {
+      if (a.guestId) guestTableMap.set(a.guestId, a.tableId)
+      tableCountMap.set(a.tableId, (tableCountMap.get(a.tableId) ?? 0) + 1)
     }
 
     const conflicts: {
@@ -370,16 +370,13 @@ export const seatingChartService = {
       assigned: number
     }[] = []
     for (const table of tables) {
-      const assigns = await db
-        .select()
-        .from(tableAssignments)
-        .where(eq(tableAssignments.tableId, table.id))
-      if (assigns.length > table.capacity) {
+      const assignedCount = tableCountMap.get(table.id) ?? 0
+      if (assignedCount > table.capacity) {
         capacityWarnings.push({
           tableId: table.id,
           label: table.label,
           capacity: table.capacity,
-          assigned: assigns.length,
+          assigned: assignedCount,
         })
       }
     }

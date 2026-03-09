@@ -44,14 +44,14 @@ export const guestTagService = {
 
     if ((existing?.cnt ?? 0) > 0) return
 
-    for (const tag of defaultGuestTags) {
-      await db.insert(guestTags).values({
+    await db.insert(guestTags).values(
+      defaultGuestTags.map((tag) => ({
         weddingId,
         name: tag.name,
         color: tag.color,
         isDefault: true,
-      })
-    }
+      })),
+    )
   },
 
   async assignTag(guestId: string, tagId: string) {

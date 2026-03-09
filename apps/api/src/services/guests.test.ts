@@ -183,7 +183,7 @@ describe('Guest Service', () => {
         values: vi.fn().mockResolvedValue(undefined),
       })
 
-      await guestService.setTagsForGuest('guest-1', ['tag-1', 'tag-2'])
+      await guestService.setTagsForGuest('guest-1', ['tag-1', 'tag-2'], 'wedding-1')
 
       expect(mockedDb.delete).toHaveBeenCalled()
       expect(mockedDb.insert).toHaveBeenCalled()
@@ -194,7 +194,7 @@ describe('Guest Service', () => {
         where: vi.fn().mockResolvedValue(undefined),
       })
 
-      await guestService.setTagsForGuest('guest-1', [])
+      await guestService.setTagsForGuest('guest-1', [], 'wedding-1')
 
       expect(mockedDb.delete).toHaveBeenCalled()
       expect(mockedDb.insert).not.toHaveBeenCalled()

@@ -10,17 +10,14 @@ type FeatureEnv = {
 
 export function requireFeature(feature: keyof FeatureGates) {
   return createMiddleware<FeatureEnv>(async (c, next) => {
-    // Prefer weddingId from context (set by resolveWeddingMiddleware), then query/param.
-    // Never read from body — it consumes the stream and breaks downstream validators.
-    const weddingId =
-      (c.get('weddingId' as never) as string | undefined) ??
-      c.req.query('weddingId') ??
-      c.req.param('weddingId')
+    // Only use weddingId from context (set by resolveWeddingMiddleware).
+    // Never fall back to query/param — attacker could supply a full-tier weddingId they don't own.
+    const weddingId = c.get('weddingId' as never) as string | undefined
 
-    if (!weddingId || typeof weddingId !== 'string') {
+    if (!weddingId) {
       return c.json(
-        { error: 'Wedding ID required', code: 'MISSING_WEDDING_ID', statusCode: 400 },
-        400,
+        { error: 'Internal configuration error', code: 'MIDDLEWARE_ORDER', statusCode: 500 },
+        500,
       )
     }
 

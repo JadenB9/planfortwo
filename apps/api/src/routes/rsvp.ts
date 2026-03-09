@@ -228,7 +228,11 @@ rsvpRoute.post(
     }
 
     try {
-      const updated = await rsvpService.submitBatchRsvp(submissions, firstGuest.weddingId)
+      const updated = await rsvpService.submitBatchRsvp(
+        submissions,
+        firstGuest.weddingId,
+        firstGuest.householdId,
+      )
       return c.json({ data: updated })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Submit failed'
@@ -237,6 +241,15 @@ rsvpRoute.post(
         return c.json(
           { error: 'RSVP deadline has passed', code: 'RSVP_EXPIRED', statusCode: 410 },
           410,
+        )
+      }
+      if (
+        message === 'All guests in a batch must belong to the same household' ||
+        message === 'Guest is not part of a household — batch submission not allowed'
+      ) {
+        return c.json(
+          { error: 'Unauthorized batch submission', code: 'UNAUTHORIZED', statusCode: 403 },
+          403,
         )
       }
       return c.json({ error: 'Submit failed', code: 'SUBMIT_FAILED', statusCode: 400 }, 400)

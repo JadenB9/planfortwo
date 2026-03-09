@@ -337,7 +337,7 @@ guestsRoute.post(
       return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
     }
 
-    await guestService.setTagsForGuest(guestId, tagIds)
+    await guestService.setTagsForGuest(guestId, tagIds, weddingId)
     return c.json({ data: { success: true } })
   },
 )

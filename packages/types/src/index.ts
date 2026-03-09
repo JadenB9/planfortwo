@@ -731,6 +731,13 @@ export type ActivityAction =
   | 'website_section_updated'
   | 'website_template_changed'
   | 'guestbook_entry_created'
+  | 'campaign_created'
+  | 'announcement_created'
+  | 'event_created'
+  | 'seating_chart_created'
+  | 'vendor_created'
+  | 'party_member_added'
+  | 'payment_deleted'
 
 export type EntityType =
   | 'task'
@@ -745,6 +752,11 @@ export type EntityType =
   | 'website'
   | 'website_section'
   | 'guestbook_entry'
+  | 'email_campaign'
+  | 'event'
+  | 'seating_chart'
+  | 'vendor'
+  | 'wedding_party'
 
 export interface ActivityLogEntry {
   id: string

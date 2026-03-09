@@ -45,7 +45,8 @@ registryRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const link = await registryService.createLink(data)
+    const weddingId = c.get('weddingId')
+    const link = await registryService.createLink({ ...data, weddingId })
     return c.json({ data: link }, 201)
   },
 )
@@ -80,7 +81,8 @@ registryRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const fund = await registryService.createFund(data)
+    const weddingId = c.get('weddingId')
+    const fund = await registryService.createFund({ ...data, weddingId })
     return c.json({ data: fund }, 201)
   },
 )
@@ -147,7 +149,8 @@ registryRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const gift = await registryService.createGift(data)
+    const weddingId = c.get('weddingId')
+    const gift = await registryService.createGift({ ...data, weddingId })
     return c.json({ data: gift }, 201)
   },
 )
@@ -193,7 +196,8 @@ registryRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const board = await registryService.createMoodBoard(data)
+    const weddingId = c.get('weddingId')
+    const board = await registryService.createMoodBoard({ ...data, weddingId })
     return c.json({ data: board }, 201)
   },
 )

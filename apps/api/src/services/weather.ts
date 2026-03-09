@@ -39,7 +39,7 @@ export const weatherService = {
   ): Promise<WeatherForecast[]> {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&timezone=auto&forecast_days=${Math.min(days, 16)}`
 
-    const response = await fetch(url)
+    const response = await fetch(url, { signal: AbortSignal.timeout(5000) })
     if (!response.ok) {
       throw new Error(`Weather API error: ${response.status}`)
     }

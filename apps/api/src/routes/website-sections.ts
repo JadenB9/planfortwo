@@ -98,8 +98,9 @@ websiteSectionsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const section = await websiteSectionService.createCustom(
-      data.weddingId,
+      weddingId,
       data.title,
       data.content as Record<string, unknown> | undefined,
       c.get('dbUserId'),

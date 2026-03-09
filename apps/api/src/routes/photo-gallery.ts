@@ -39,7 +39,8 @@ photoGalleryRoute.post(
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
-    const { weddingId, fileName, mimeType } = c.req.valid('json')
+    const { fileName, mimeType } = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const result = await photoGalleryService.getUploadUrl(weddingId, fileName, mimeType)
     return c.json({ data: result })
   },
@@ -62,7 +63,8 @@ photoGalleryRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const photo = await photoGalleryService.create(data)
+    const weddingId = c.get('weddingId')
+    const photo = await photoGalleryService.create({ ...data, weddingId })
     return c.json({ data: photo }, 201)
   },
 )

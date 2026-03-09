@@ -42,8 +42,8 @@ export const emailCampaignService = {
       await activityService.log({
         weddingId: data.weddingId,
         userId,
-        action: 'task_created',
-        entityType: 'category',
+        action: 'campaign_created',
+        entityType: 'email_campaign',
         entityId: campaign.id,
         metadata: { type: 'email_campaign', subject: data.subject },
       })
@@ -129,8 +129,8 @@ export const announcementService = {
       await activityService.log({
         weddingId: data.weddingId,
         userId,
-        action: 'task_created',
-        entityType: 'category',
+        action: 'announcement_created',
+        entityType: 'email_campaign',
         entityId: announcement.id,
         metadata: { type: 'announcement', title: data.title },
       })
