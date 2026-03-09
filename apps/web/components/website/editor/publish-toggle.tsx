@@ -13,13 +13,10 @@ interface PublishToggleProps {
 }
 
 function buildPublicUrl(subdomain: string | null, accessToken: string | null): string | null {
+  // Prefer clean subdomain URL, fall back to path-based URL
+  if (subdomain) return `https://${subdomain}.planfortwo.com`
   if (!accessToken) return null
-  const slug = subdomain ? `${subdomain}-${accessToken}` : accessToken
-  return `https://app.planfortwo.com/s/${slug}`
-}
-
-function buildDisplayUrl(subdomain: string | null): string {
-  return subdomain ? `${subdomain}.planfortwo.com` : 'planfortwo.com'
+  return `https://app.planfortwo.com/s/${accessToken}`
 }
 
 export function PublishToggle({
@@ -60,7 +57,7 @@ export function PublishToggle({
                   rel="noopener noreferrer"
                   className="text-xs text-blue-600 hover:underline"
                 >
-                  {buildDisplayUrl(subdomain)}
+                  {siteUrl.replace('https://', '')}
                 </a>
                 <button
                   onClick={handleCopy}

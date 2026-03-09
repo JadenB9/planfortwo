@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { trackPageViewSchema } from '@planfortwo/validators'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, or } from 'drizzle-orm'
 import { db, websiteConfigs, websiteSections, websitePhotos, weddings } from '@planfortwo/db'
 import { asc } from 'drizzle-orm'
 import { websiteAnalyticsService } from '../services/website-analytics.js'
@@ -10,27 +10,28 @@ import { createHash } from 'node:crypto'
 
 export const websitePublicRoute = new Hono()
 
-// Extract the 32-char hex access token from a slug like "sarah-james-abc123..." or just "abc123..."
-function extractToken(slug: string): string {
-  const match = slug.match(/([0-9a-f]{32})$/)
-  return match?.[1] ?? slug
+// Build an OR condition to match by access token (if slug contains one) or by subdomain
+function slugCondition(slug: string) {
+  const tokenMatch = slug.match(/([0-9a-f]{32})$/)
+  const token = tokenMatch?.[1]
+  if (token) {
+    return or(eq(websiteConfigs.accessToken, token), eq(websiteConfigs.subdomain, slug))
+  }
+  return eq(websiteConfigs.subdomain, slug)
 }
 
 // GET /website-public/:slug — public wedding website data (NO auth)
+// Supports both access token slugs (jabby-abc123...) and plain subdomains (jabby)
 websitePublicRoute.get('/:slug', async (c) => {
-  const slug = extractToken(c.req.param('slug'))
+  const slug = c.req.param('slug')
 
-  const [config] = await db
-    .select()
-    .from(websiteConfigs)
-    .where(eq(websiteConfigs.accessToken, slug))
+  const [config] = await db.select().from(websiteConfigs).where(slugCondition(slug))
 
   if (!config || !config.publishedAt) {
     return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   }
 
   if (config.privacyMode === 'password') {
-    // Return limited info — frontend must verify password first
     return c.json({
       data: {
         id: config.id,
@@ -102,12 +103,12 @@ websitePublicRoute.post(
     }
   }),
   async (c) => {
-    const token = extractToken(c.req.param('slug'))
+    const slug = c.req.param('slug')
 
     const [config] = await db
       .select({ weddingId: websiteConfigs.weddingId })
       .from(websiteConfigs)
-      .where(eq(websiteConfigs.accessToken, token))
+      .where(slugCondition(slug))
 
     if (!config) {
       return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -141,12 +142,12 @@ websitePublicRoute.post(
 
 // GET /website-public/:slug/guestbook — approved guestbook entries (NO auth)
 websitePublicRoute.get('/:slug/guestbook', async (c) => {
-  const token = extractToken(c.req.param('slug'))
+  const slug = c.req.param('slug')
 
   const [config] = await db
     .select({ weddingId: websiteConfigs.weddingId })
     .from(websiteConfigs)
-    .where(eq(websiteConfigs.accessToken, token))
+    .where(slugCondition(slug))
 
   if (!config) {
     return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
