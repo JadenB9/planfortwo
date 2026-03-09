@@ -60,7 +60,7 @@ export const weddingService = {
     return updated ?? null
   },
 
-  async update(weddingId: string, data: Partial<OnboardingData>) {
+  async update(weddingId: string, data: Record<string, unknown>) {
     const updateData: Record<string, unknown> = {}
     if (data.name !== undefined) updateData.name = data.name
     if (data.date !== undefined) updateData.date = data.date
@@ -72,6 +72,7 @@ export const weddingService = {
       updateData.guestCountEstimate = data.guestCountEstimate
     if (data.budgetTotal !== undefined) updateData.budgetTotal = data.budgetTotal
     if (data.style !== undefined) updateData.style = data.style
+    if (data.themeColors !== undefined) updateData.themeColors = data.themeColors
 
     if (Object.keys(updateData).length === 0) return null
 

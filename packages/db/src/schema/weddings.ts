@@ -1,6 +1,7 @@
 import {
   boolean,
   integer,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
@@ -49,6 +50,7 @@ export const weddings = pgTable('weddings', {
   onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
   rsvpDeadline: timestamp('rsvp_deadline', { withTimezone: true }),
   stripeCustomerId: text('stripe_customer_id'),
+  themeColors: jsonb('theme_colors'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()

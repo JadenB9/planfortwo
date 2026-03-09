@@ -87,6 +87,7 @@ weddingsRoute.put(
     if (data.budgetTotal !== undefined)
       updateData.budgetTotal = data.budgetTotal != null ? String(data.budgetTotal) : null
     if (data.style !== undefined) updateData.style = data.style
+    if (data.themeColors !== undefined) updateData.themeColors = data.themeColors
 
     const updated = await weddingService.update(weddingId, updateData)
 

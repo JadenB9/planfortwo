@@ -14,7 +14,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import type { Wedding, NotificationPreference, PartnerInvitation } from '@planfortwo/types'
-import { UserPlus, Trash2, Crown, Heart, Users, Mail, Clock, XCircle } from 'lucide-react'
+import {
+  UserPlus,
+  Trash2,
+  Crown,
+  Heart,
+  Users,
+  Mail,
+  Clock,
+  XCircle,
+  Palette,
+  Check,
+} from 'lucide-react'
+import { useTheme } from '@/components/theme-provider'
 import {
   Dialog,
   DialogContent,
@@ -67,6 +79,12 @@ export default function SettingsPage() {
   const [cancelTeamDialogId, setCancelTeamDialogId] = useState<string | null>(null)
   const [removePartnerDialogOpen, setRemovePartnerDialogOpen] = useState(false)
 
+  // Theme state
+  const { setThemeColors: applyTheme } = useTheme()
+  const [selectedPrimary, setSelectedPrimary] = useState<string | null>(null)
+  const [selectedAccent, setSelectedAccent] = useState<string | null>(null)
+  const [themeSaving, setThemeSaving] = useState(false)
+
   const loadData = useCallback(async () => {
     try {
       const token = await getToken()
@@ -82,6 +100,12 @@ export default function SettingsPage() {
         budgetTotal: w.budgetTotal ? String(w.budgetTotal) : '',
         guestCountEstimate: w.guestCountEstimate ? String(w.guestCountEstimate) : '',
       })
+
+      // Initialize theme state from wedding data
+      if (w.themeColors) {
+        setSelectedPrimary(w.themeColors.primary)
+        setSelectedAccent(w.themeColors.accent)
+      }
 
       try {
         const { data: prefs } = await api.notificationPrefs.get(w.id, token)
@@ -271,6 +295,75 @@ export default function SettingsPage() {
     [weddingId, getToken, pendingPartnerInvite],
   )
 
+  const handleSaveTheme = useCallback(async () => {
+    if (!weddingId) return
+    setThemeSaving(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      const themeColors =
+        selectedPrimary && selectedAccent
+          ? { primary: selectedPrimary, accent: selectedAccent }
+          : null
+      await api.weddings.update(weddingId, { themeColors }, token)
+      applyTheme(themeColors)
+      toast.success('Theme colors saved')
+    } catch {
+      toast.error('Failed to save theme')
+    } finally {
+      setThemeSaving(false)
+    }
+  }, [weddingId, getToken, selectedPrimary, selectedAccent, applyTheme])
+
+  const handleResetTheme = useCallback(async () => {
+    if (!weddingId) return
+    setThemeSaving(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.weddings.update(weddingId, { themeColors: null }, token)
+      setSelectedPrimary(null)
+      setSelectedAccent(null)
+      applyTheme(null)
+      toast.success('Theme reset to default')
+    } catch {
+      toast.error('Failed to reset theme')
+    } finally {
+      setThemeSaving(false)
+    }
+  }, [weddingId, getToken, applyTheme])
+
+  // Color presets
+  const primaryPresets = [
+    { name: 'Default Orange', hex: '#c2674a' },
+    { name: 'Pastel Yellow', hex: '#e8c547' },
+    { name: 'Blush Pink', hex: '#d4899e' },
+    { name: 'Dusty Rose', hex: '#c9817a' },
+    { name: 'Sage Green', hex: '#7a9a7d' },
+    { name: 'Lavender', hex: '#9b8ec4' },
+    { name: 'Sky Blue', hex: '#6ba3c7' },
+    { name: 'Coral', hex: '#e07b5f' },
+    { name: 'Gold', hex: '#c4963d' },
+    { name: 'Burgundy', hex: '#8b3a4a' },
+    { name: 'Teal', hex: '#4a8b8b' },
+    { name: 'Mauve', hex: '#a87793' },
+  ]
+
+  const accentPresets = [
+    { name: 'Default Black', hex: '#1a1a1a' },
+    { name: 'Navy Blue', hex: '#1e3a5f' },
+    { name: 'Charcoal', hex: '#36454f' },
+    { name: 'Deep Forest', hex: '#2d3e2f' },
+    { name: 'Espresso', hex: '#3c2415' },
+    { name: 'Midnight', hex: '#191970' },
+    { name: 'Dark Plum', hex: '#4a2040' },
+    { name: 'Slate', hex: '#4a5568' },
+    { name: 'Dark Teal', hex: '#1a4040' },
+    { name: 'Graphite', hex: '#2d2d2d' },
+  ]
+
+  const isFull = wedding?.tier === 'full'
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -297,6 +390,7 @@ export default function SettingsPage() {
         <TabsList className="mb-6">
           <TabsTrigger value="wedding">Wedding Details</TabsTrigger>
           <TabsTrigger value="team">Planning Team</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
         </TabsList>
@@ -747,6 +841,196 @@ export default function SettingsPage() {
                   </Button>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="appearance">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Theme Colors
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {!isFull ? (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                  <p className="font-medium text-amber-800">Upgrade to customize your theme</p>
+                  <p className="mt-1 text-sm text-amber-600">
+                    Custom theme colors are available on the full plan. Upgrade to personalize your
+                    dashboard colors.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-3"
+                    onClick={() => (window.location.href = '/upgrade')}
+                  >
+                    View Plans
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-600">
+                    Choose your primary and accent colors to personalize your planning dashboard.
+                    These colors are shared with your partner and persist across all sessions.
+                  </p>
+
+                  {/* Primary Color */}
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-gray-900">
+                      Primary Color{' '}
+                      <span className="font-normal text-gray-500">
+                        (buttons, links, highlights)
+                      </span>
+                    </h3>
+                    <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
+                      {primaryPresets.map((preset) => (
+                        <button
+                          key={preset.hex}
+                          onClick={() => setSelectedPrimary(preset.hex)}
+                          className={`group relative flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 transition-all ${
+                            selectedPrimary === preset.hex
+                              ? 'border-gray-900 shadow-md'
+                              : !selectedPrimary && preset.hex === '#c2674a'
+                                ? 'border-gray-300'
+                                : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div
+                            className="h-8 w-8 rounded-full shadow-inner"
+                            style={{ backgroundColor: preset.hex }}
+                          />
+                          {selectedPrimary === preset.hex && (
+                            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gray-900">
+                              <Check className="h-3 w-3 text-white" />
+                            </div>
+                          )}
+                          <span className="text-[10px] leading-tight text-gray-500">
+                            {preset.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Label className="text-xs text-gray-500">Custom hex:</Label>
+                      <Input
+                        type="text"
+                        value={selectedPrimary ?? '#c2674a'}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          if (/^#[0-9a-fA-F]{0,6}$/.test(val)) {
+                            setSelectedPrimary(val)
+                          }
+                        }}
+                        className="w-32 font-mono text-sm"
+                        placeholder="#c2674a"
+                      />
+                      <div
+                        className="h-6 w-6 rounded-full border border-gray-300"
+                        style={{ backgroundColor: selectedPrimary ?? '#c2674a' }}
+                      />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Accent Color */}
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-gray-900">
+                      Accent Color{' '}
+                      <span className="font-normal text-gray-500">
+                        (headings, body text, dark elements)
+                      </span>
+                    </h3>
+                    <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
+                      {accentPresets.map((preset) => (
+                        <button
+                          key={preset.hex}
+                          onClick={() => setSelectedAccent(preset.hex)}
+                          className={`group relative flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 transition-all ${
+                            selectedAccent === preset.hex
+                              ? 'border-gray-900 shadow-md'
+                              : !selectedAccent && preset.hex === '#1a1a1a'
+                                ? 'border-gray-300'
+                                : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div
+                            className="h-8 w-8 rounded-full shadow-inner"
+                            style={{ backgroundColor: preset.hex }}
+                          />
+                          {selectedAccent === preset.hex && (
+                            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gray-900">
+                              <Check className="h-3 w-3 text-white" />
+                            </div>
+                          )}
+                          <span className="text-[10px] leading-tight text-gray-500">
+                            {preset.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Label className="text-xs text-gray-500">Custom hex:</Label>
+                      <Input
+                        type="text"
+                        value={selectedAccent ?? '#1a1a1a'}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          if (/^#[0-9a-fA-F]{0,6}$/.test(val)) {
+                            setSelectedAccent(val)
+                          }
+                        }}
+                        className="w-32 font-mono text-sm"
+                        placeholder="#1a1a1a"
+                      />
+                      <div
+                        className="h-6 w-6 rounded-full border border-gray-300"
+                        style={{ backgroundColor: selectedAccent ?? '#1a1a1a' }}
+                      />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Preview */}
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-gray-900">Preview</h3>
+                    <div className="rounded-xl border border-gray-200 p-4">
+                      <div className="flex items-center gap-4">
+                        <div
+                          className="flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white"
+                          style={{
+                            backgroundColor: selectedPrimary ?? '#c2674a',
+                          }}
+                        >
+                          Sample Button
+                        </div>
+                        <p
+                          className="font-serif text-lg font-bold"
+                          style={{ color: selectedAccent ?? '#1a1a1a' }}
+                        >
+                          Heading Text
+                        </p>
+                        <p className="text-sm" style={{ color: selectedAccent ?? '#1a1a1a' }}>
+                          Body text
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-3">
+                    <Button onClick={handleSaveTheme} disabled={themeSaving}>
+                      {themeSaving ? 'Saving...' : 'Save Theme'}
+                    </Button>
+                    <Button variant="outline" onClick={handleResetTheme} disabled={themeSaving}>
+                      Reset to Default
+                    </Button>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

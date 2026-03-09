@@ -21,6 +21,12 @@ export interface WeddingMember {
 
 export type WeddingRole = 'owner' | 'partner' | 'planner' | 'family' | 'party_member'
 
+// ── Theme Colors ──
+export interface ThemeColors {
+  primary: string
+  accent: string
+}
+
 // ── Wedding ──
 export interface Wedding {
   id: string
@@ -40,6 +46,7 @@ export interface Wedding {
   tier: PricingTier
   rsvpDeadline: Date | null
   stripeCustomerId: string | null
+  themeColors: ThemeColors | null
   createdAt: Date
   updatedAt: Date
 }

@@ -18,8 +18,7 @@ const RESERVED_SUBDOMAINS = new Set(['www', 'app', 'api', 'mail', 'admin', ''])
 export default clerkMiddleware(async (auth, request) => {
   // X-Wedding-Host is set by the Cloudflare Worker for subdomain requests
   // Vercel normalizes host to the primary domain, so we need this custom header
-  const hostname =
-    (request.headers.get('x-wedding-host') ?? '').split(':')[0] ?? ''
+  const hostname = (request.headers.get('x-wedding-host') ?? '').split(':')[0] ?? ''
 
   // Detect wedding website subdomains (e.g. jabby.planfortwo.com)
   const match = hostname.match(/^([a-z0-9-]+)\.planfortwo\.com$/)

@@ -42,6 +42,13 @@ export const createWeddingSchema = z.object({
 
 export type CreateWeddingInput = z.infer<typeof createWeddingSchema>
 
+export const themeColorsSchema = z.object({
+  primary: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color'),
+  accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color'),
+})
+
+export type ThemeColorsInput = z.infer<typeof themeColorsSchema>
+
 export const updateWeddingSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   date: z.string().datetime().nullable().optional(),
@@ -52,6 +59,7 @@ export const updateWeddingSchema = z.object({
   guestCountEstimate: z.number().int().min(1).max(2000).nullable().optional(),
   budgetTotal: z.number().min(0).max(10_000_000).nullable().optional(),
   style: weddingStyleEnum.nullable().optional(),
+  themeColors: themeColorsSchema.nullable().optional(),
 })
 
 export type UpdateWeddingInput = z.infer<typeof updateWeddingSchema>
