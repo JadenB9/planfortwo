@@ -48,7 +48,8 @@ playlistsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const playlist = await playlistService.createPlaylist(data)
+    const weddingId = c.get('weddingId')
+    const playlist = await playlistService.createPlaylist({ ...data, weddingId })
     return c.json({ data: playlist }, 201)
   },
 )
@@ -86,8 +87,12 @@ playlistsRoute.post(
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
+    const playlistId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const playlist = await playlistService.getPlaylist(playlistId, weddingId)
+    if (!playlist) return c.json({ error: 'Playlist not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
-    const song = await playlistService.addSong(data)
+    const song = await playlistService.addSong({ ...data, playlistId })
     return c.json({ data: song }, 201)
   },
 )
@@ -116,7 +121,8 @@ playlistsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const request = await playlistService.createSongRequest(data)
+    const weddingId = c.get('weddingId')
+    const request = await playlistService.createSongRequest({ ...data, weddingId })
     return c.json({ data: request }, 201)
   },
 )

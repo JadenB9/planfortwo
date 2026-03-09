@@ -54,8 +54,9 @@ seatingChartsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const dbUserId = c.get('dbUserId')
-    const chart = await seatingChartService.createChart(data, dbUserId)
+    const chart = await seatingChartService.createChart({ ...data, weddingId }, dbUserId)
     return c.json({ data: chart }, 201)
   },
 )
@@ -244,7 +245,8 @@ seatingChartsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const relationship = await seatingChartService.createRelationship(data)
+    const weddingId = c.get('weddingId')
+    const relationship = await seatingChartService.createRelationship({ ...data, weddingId })
     return c.json({ data: relationship }, 201)
   },
 )

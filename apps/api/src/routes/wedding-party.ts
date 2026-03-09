@@ -49,8 +49,9 @@ weddingPartyRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const dbUserId = c.get('dbUserId')
-    const member = await weddingPartyService.create(data, dbUserId)
+    const member = await weddingPartyService.create({ ...data, weddingId }, dbUserId)
     return c.json({ data: member }, 201)
   },
 )
@@ -105,7 +106,7 @@ weddingPartyRoute.post(
     if (!member)
       return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
-    const task = await weddingPartyService.createTask(data)
+    const task = await weddingPartyService.createTask({ ...data, memberId, weddingId })
     return c.json({ data: task }, 201)
   },
 )
@@ -158,7 +159,7 @@ weddingPartyRoute.post(
     if (!member)
       return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
-    const gift = await weddingPartyService.createGift(data)
+    const gift = await weddingPartyService.createGift({ ...data, memberId, weddingId })
     return c.json({ data: gift }, 201)
   },
 )

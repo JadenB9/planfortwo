@@ -42,7 +42,8 @@ ceremonyRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const outline = await ceremonyService.createOutline(data)
+    const weddingId = c.get('weddingId')
+    const outline = await ceremonyService.createOutline({ ...data, weddingId })
     return c.json({ data: outline }, 201)
   },
 )
@@ -112,7 +113,8 @@ ceremonyRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const entry = await ceremonyService.createProcessionalEntry(data)
+    const weddingId = c.get('weddingId')
+    const entry = await ceremonyService.createProcessionalEntry({ ...data, weddingId })
     return c.json({ data: entry }, 201)
   },
 )

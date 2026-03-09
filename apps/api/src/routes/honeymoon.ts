@@ -48,7 +48,8 @@ honeymoonRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const plan = await honeymoonService.createPlan(data)
+    const weddingId = c.get('weddingId')
+    const plan = await honeymoonService.createPlan({ ...data, weddingId })
     return c.json({ data: plan }, 201)
   },
 )
@@ -87,7 +88,8 @@ honeymoonRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const activity = await honeymoonService.addActivity(data)
+    const planId = c.req.param('id')
+    const activity = await honeymoonService.addActivity({ ...data, planId })
     return c.json({ data: activity }, 201)
   },
 )
