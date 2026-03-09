@@ -118,8 +118,8 @@ budgetItemsRoute.delete(
       await budgetItemService.delete(itemId, weddingId, dbUserId)
       return c.json({ data: { success: true } })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+      console.error('Delete budget item failed:', err)
+      return c.json({ error: 'Delete failed', code: 'DELETE_FAILED', statusCode: 404 }, 404)
     }
   },
 )

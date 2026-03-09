@@ -172,10 +172,14 @@ rsvpRoute.post(
       return c.json({ data: updated })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Submit failed'
+      console.error('RSVP submit failed:', err)
       if (message === 'RSVP deadline has passed') {
-        return c.json({ error: message, code: 'RSVP_EXPIRED', statusCode: 410 }, 410)
+        return c.json(
+          { error: 'RSVP deadline has passed', code: 'RSVP_EXPIRED', statusCode: 410 },
+          410,
+        )
       }
-      return c.json({ error: message, code: 'SUBMIT_FAILED', statusCode: 400 }, 400)
+      return c.json({ error: 'Submit failed', code: 'SUBMIT_FAILED', statusCode: 400 }, 400)
     }
   },
 )
@@ -220,10 +224,14 @@ rsvpRoute.post(
       return c.json({ data: updated })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Submit failed'
+      console.error('RSVP batch submit failed:', err)
       if (message === 'RSVP deadline has passed') {
-        return c.json({ error: message, code: 'RSVP_EXPIRED', statusCode: 410 }, 410)
+        return c.json(
+          { error: 'RSVP deadline has passed', code: 'RSVP_EXPIRED', statusCode: 410 },
+          410,
+        )
       }
-      return c.json({ error: message, code: 'SUBMIT_FAILED', statusCode: 400 }, 400)
+      return c.json({ error: 'Submit failed', code: 'SUBMIT_FAILED', statusCode: 400 }, 400)
     }
   },
 )

@@ -150,22 +150,26 @@ export const checklistService = {
     return category!
   },
 
-  async updateCategory(categoryId: string, data: UpdateCategoryInput) {
+  async updateCategory(categoryId: string, weddingId: string, data: UpdateCategoryInput) {
     const [updated] = await db
       .update(checklistCategories)
       .set(data)
-      .where(eq(checklistCategories.id, categoryId))
+      .where(
+        and(eq(checklistCategories.id, categoryId), eq(checklistCategories.weddingId, weddingId)),
+      )
       .returning()
 
     return updated ?? null
   },
 
   async deleteCategory(categoryId: string, userId: string, weddingId: string) {
-    // Check if default
+    // Check if default — scoped to weddingId
     const [cat] = await db
       .select({ isDefault: checklistCategories.isDefault, name: checklistCategories.name })
       .from(checklistCategories)
-      .where(eq(checklistCategories.id, categoryId))
+      .where(
+        and(eq(checklistCategories.id, categoryId), eq(checklistCategories.weddingId, weddingId)),
+      )
 
     if (!cat) {
       throw new Error('Category not found')
@@ -175,7 +179,11 @@ export const checklistService = {
       throw new Error('Cannot delete a default category')
     }
 
-    await db.delete(checklistCategories).where(eq(checklistCategories.id, categoryId))
+    await db
+      .delete(checklistCategories)
+      .where(
+        and(eq(checklistCategories.id, categoryId), eq(checklistCategories.weddingId, weddingId)),
+      )
 
     await activityService.log({
       weddingId,
@@ -405,23 +413,23 @@ export const checklistService = {
     })
   },
 
-  async reorderTask(taskId: string, sortOrder: number) {
+  async reorderTask(taskId: string, sortOrder: number, weddingId: string) {
     const [updated] = await db
       .update(checklistTasks)
       .set({ sortOrder })
-      .where(eq(checklistTasks.id, taskId))
+      .where(and(eq(checklistTasks.id, taskId), eq(checklistTasks.weddingId, weddingId)))
       .returning()
 
     return updated ?? null
   },
 
-  async bulkReorder(tasks: Array<{ id: string; sortOrder: number }>) {
+  async bulkReorder(tasks: Array<{ id: string; sortOrder: number }>, weddingId: string) {
     await db.transaction(async (tx) => {
       for (const task of tasks) {
         await tx
           .update(checklistTasks)
           .set({ sortOrder: task.sortOrder })
-          .where(eq(checklistTasks.id, task.id))
+          .where(and(eq(checklistTasks.id, task.id), eq(checklistTasks.weddingId, weddingId)))
       }
     })
   },

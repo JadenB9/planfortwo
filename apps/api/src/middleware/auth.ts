@@ -1,5 +1,6 @@
 import { createMiddleware } from 'hono/factory'
 import { verifyToken } from '@clerk/backend'
+import { timingSafeEqual } from 'node:crypto'
 
 type AuthEnv = {
   Variables: {
@@ -7,7 +8,27 @@ type AuthEnv = {
   }
 }
 
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b))
+}
+
 export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
+  // Check for MCP API key authentication
+  const apiKey = c.req.header('X-API-Key')
+  const configuredApiKey = process.env.PLANFORTWO_API_KEY
+  const mcpClerkUserId = process.env.MCP_CLERK_USER_ID
+
+  if (apiKey && configuredApiKey && mcpClerkUserId) {
+    if (safeCompare(apiKey, configuredApiKey)) {
+      c.set('clerkUserId', mcpClerkUserId)
+      await next()
+      return
+    }
+    return c.json({ error: 'Unauthorized', code: 'INVALID_API_KEY', statusCode: 401 }, 401)
+  }
+
+  // Standard Clerk JWT authentication
   const authHeader = c.req.header('Authorization')
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

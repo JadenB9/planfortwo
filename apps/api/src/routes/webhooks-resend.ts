@@ -186,7 +186,9 @@ resendWebhookRoute.post('/', async (c) => {
 
       const address = await inboxService.findAddressByLocalPart(localPart)
       if (!address) {
-        console.log(`[resend-webhook] No claimed address found for ${localPart}`)
+        console.log(
+          `[resend-webhook] No claimed address found for ${localPart.replace(/[\r\n\t]/g, '_')}`,
+        )
         continue
       }
 

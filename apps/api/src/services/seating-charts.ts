@@ -194,7 +194,23 @@ export const seatingChartService = {
     await db.delete(venueElements).where(eq(venueElements.id, elementId))
   },
 
-  async assignGuest(data: AssignGuestInput) {
+  async assignGuest(data: AssignGuestInput, weddingId: string) {
+    // Verify the table belongs to a chart owned by this wedding
+    const [table] = await db
+      .select({ chartId: seatingTables.chartId })
+      .from(seatingTables)
+      .where(eq(seatingTables.id, data.tableId))
+    if (!table) {
+      throw new Error('Table not found')
+    }
+    const [chart] = await db
+      .select({ id: seatingCharts.id })
+      .from(seatingCharts)
+      .where(and(eq(seatingCharts.id, table.chartId), eq(seatingCharts.weddingId, weddingId)))
+    if (!chart) {
+      throw new Error('Table not found')
+    }
+
     if (data.guestId) {
       const existing = await db
         .select()

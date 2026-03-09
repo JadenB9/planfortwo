@@ -192,8 +192,8 @@ weddingsRoute.post(
         ? 'EMAIL_NOT_CONFIGURED'
         : 'EMAIL_SEND_FAILED'
 
-      console.error('Partner invite failed:', message)
-      return c.json({ error: message, code, statusCode: 500 }, 500)
+      console.error('Partner invite failed:', err)
+      return c.json({ error: 'Failed to send invitation', code, statusCode: 500 }, 500)
     }
   },
 )
@@ -210,18 +210,31 @@ weddingsRoute.post('/accept-invite/:token', async (c) => {
     return c.json({ data: wedding ?? { id: weddingId } })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to accept invitation'
+    console.error('Accept invite failed:', err)
 
     if (message.includes('not found')) {
-      return c.json({ error: message, code: 'INVITATION_NOT_FOUND', statusCode: 404 }, 404)
+      return c.json(
+        { error: 'Invitation not found', code: 'INVITATION_NOT_FOUND', statusCode: 404 },
+        404,
+      )
     }
     if (message.includes('expired')) {
-      return c.json({ error: message, code: 'INVITATION_EXPIRED', statusCode: 410 }, 410)
+      return c.json(
+        { error: 'Invitation has expired', code: 'INVITATION_EXPIRED', statusCode: 410 },
+        410,
+      )
     }
     if (message.includes('already been')) {
-      return c.json({ error: message, code: 'INVITATION_USED', statusCode: 409 }, 409)
+      return c.json(
+        { error: 'Invitation has already been used', code: 'INVITATION_USED', statusCode: 409 },
+        409,
+      )
     }
 
-    return c.json({ error: message, code: 'INVITATION_FAILED', statusCode: 400 }, 400)
+    return c.json(
+      { error: 'Failed to accept invitation', code: 'INVITATION_FAILED', statusCode: 400 },
+      400,
+    )
   }
 })
 

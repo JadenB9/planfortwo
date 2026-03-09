@@ -36,7 +36,8 @@ websitePhotosRoute.post(
     }
   }),
   async (c) => {
-    const { weddingId, fileName, mimeType } = c.req.valid('json')
+    const { fileName, mimeType } = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const result = await websitePhotoService.getUploadUrl(weddingId, fileName, mimeType)
     return c.json({ data: result })
   },
@@ -72,8 +73,8 @@ websitePhotosRoute.delete(
       await websitePhotoService.delete(id, weddingId)
       return c.json({ data: { success: true } })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+      console.error('Delete website photo failed:', err)
+      return c.json({ error: 'Delete failed', code: 'DELETE_FAILED', statusCode: 404 }, 404)
     }
   },
 )

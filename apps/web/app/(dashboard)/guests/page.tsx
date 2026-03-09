@@ -65,7 +65,6 @@ export default function GuestsPage() {
           isVip: data.isVip ?? false,
           hasPlusOne: data.hasPlusOne ?? false,
           plusOneName: data.plusOneName || null,
-          mealChoice: data.mealChoice || null,
           dietary: data.dietary,
           tagIds: data.tagIds,
         },
@@ -96,7 +95,6 @@ export default function GuestsPage() {
           isVip: data.isVip ?? false,
           hasPlusOne: data.hasPlusOne ?? false,
           plusOneName: data.plusOneName || null,
-          mealChoice: data.mealChoice || null,
           dietary: data.dietary,
           tagIds: data.tagIds,
         },
@@ -177,6 +175,11 @@ export default function GuestsPage() {
 
   const handleSendAllInvites = useCallback(async () => {
     if (!weddingId) return
+    const toSend = guests.filter((g) => g.email && !g.inviteSentAt)
+    const confirmed = window.confirm(
+      `Send RSVP invitations to ${toSend.length} guest${toSend.length !== 1 ? 's' : ''}? This will email each guest a personalized RSVP link.`,
+    )
+    if (!confirmed) return
     setSendingBulk(true)
     try {
       const token = await getToken()
@@ -195,7 +198,7 @@ export default function GuestsPage() {
     } finally {
       setSendingBulk(false)
     }
-  }, [weddingId, getToken, refetch])
+  }, [weddingId, guests, getToken, refetch])
 
   const apiError = weddingError || featuresError
 

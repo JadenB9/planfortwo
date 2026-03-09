@@ -44,8 +44,11 @@ inboxRoute.post(
       const address = await inboxService.claimAddress(userId, data)
       return c.json({ data: address }, 201)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to claim address'
-      return c.json({ error: message, code: 'CLAIM_FAILED', statusCode: 400 }, 400)
+      console.error('Claim address failed:', err)
+      return c.json(
+        { error: 'Failed to claim address', code: 'CLAIM_FAILED', statusCode: 400 },
+        400,
+      )
     }
   },
 )
@@ -97,8 +100,8 @@ inboxRoute.post(
       const email = await inboxService.sendEmail(userId, data)
       return c.json({ data: email }, 201)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to send email'
-      return c.json({ error: message, code: 'SEND_FAILED', statusCode: 400 }, 400)
+      console.error('Send email failed:', err)
+      return c.json({ error: 'Failed to send email', code: 'SEND_FAILED', statusCode: 400 }, 400)
     }
   },
 )

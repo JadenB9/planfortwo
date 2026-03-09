@@ -153,9 +153,10 @@ tasksRoute.patch(
   }),
   async (c) => {
     const taskId = c.req.param('id')
+    const weddingId = c.get('weddingId')
     const { sortOrder } = c.req.valid('json')
 
-    const updated = await checklistService.reorderTask(taskId, sortOrder)
+    const updated = await checklistService.reorderTask(taskId, sortOrder, weddingId)
 
     if (!updated) {
       return c.json({ error: 'Task not found', code: 'TASK_NOT_FOUND', statusCode: 404 }, 404)
@@ -175,8 +176,8 @@ tasksRoute.delete('/:id', resolveWeddingMiddleware, requireFeature('canDeleteTas
     await checklistService.deleteTask(taskId, dbUserId, weddingId)
     return c.json({ data: { success: true } })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Delete failed'
-    return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+    console.error('Delete task failed:', err)
+    return c.json({ error: 'Delete failed', code: 'DELETE_FAILED', statusCode: 404 }, 404)
   }
 })
 
@@ -191,8 +192,9 @@ tasksRoute.post(
     }
   }),
   async (c) => {
+    const weddingId = c.get('weddingId')
     const { tasks } = c.req.valid('json')
-    await checklistService.bulkReorder(tasks)
+    await checklistService.bulkReorder(tasks, weddingId)
     return c.json({ data: { success: true } })
   },
 )

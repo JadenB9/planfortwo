@@ -28,6 +28,7 @@ export const guests = pgTable('guests', {
   rsvpToken: text('rsvp_token').unique(),
   rsvpStatus: rsvpStatusEnum('rsvp_status').notNull().default('pending'),
   rsvpRespondedAt: timestamp('rsvp_responded_at', { withTimezone: true }),
+  rsvpEmail: text('rsvp_email'),
   mealChoice: text('meal_choice'),
   dietary: jsonb('dietary').$type<Record<string, unknown>>(),
   songRequest: text('song_request'),

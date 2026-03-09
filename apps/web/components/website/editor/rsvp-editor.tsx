@@ -37,19 +37,6 @@ export function RsvpEditor({ content, onChange }: RsvpEditorProps) {
         <label className="flex items-center gap-3">
           <input
             type="checkbox"
-            checked={content.showMealChoice}
-            onChange={(e) => update({ showMealChoice: e.target.checked })}
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <span className="text-sm text-gray-700">Show meal choice selection</span>
-        </label>
-        <p className="-mt-2 ml-7 text-xs text-gray-500">
-          Guests can pick their meal preference (e.g., chicken, fish, vegetarian).
-        </p>
-
-        <label className="flex items-center gap-3">
-          <input
-            type="checkbox"
             checked={content.showDietary}
             onChange={(e) => update({ showDietary: e.target.checked })}
             className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"

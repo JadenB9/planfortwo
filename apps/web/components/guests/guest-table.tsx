@@ -62,7 +62,6 @@ export function GuestTable({
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">Name</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">RSVP</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">Invite</th>
-              <th className="px-4 py-3 font-serif font-semibold text-gray-900">Meal</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">Tags</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">+1</th>
             </tr>
@@ -159,9 +158,6 @@ export function GuestTable({
                       No email
                     </span>
                   )}
-                </td>
-                <td className="px-4 py-3 text-gray-600" onClick={() => onSelectGuest(guest)}>
-                  {guest.mealChoice ?? <span className="text-gray-400">--</span>}
                 </td>
                 <td className="px-4 py-3" onClick={() => onSelectGuest(guest)}>
                   <div className="flex flex-wrap gap-1">

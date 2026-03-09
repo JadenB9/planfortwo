@@ -119,7 +119,6 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
     title: 'RSVP',
     content: {
       message: 'Please let us know if you can make it!',
-      showMealChoice: true,
       showDietary: true,
       showSongRequest: true,
     },

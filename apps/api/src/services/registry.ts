@@ -47,11 +47,11 @@ export const registryService = {
       .where(and(eq(registryLinks.id, linkId), eq(registryLinks.weddingId, weddingId)))
   },
 
-  async trackClick(linkId: string) {
+  async trackClick(linkId: string, weddingId: string) {
     await db
       .update(registryLinks)
       .set({ clickCount: sql`${registryLinks.clickCount} + 1` })
-      .where(eq(registryLinks.id, linkId))
+      .where(and(eq(registryLinks.id, linkId), eq(registryLinks.weddingId, weddingId)))
   },
 
   async listFunds(weddingId: string) {
@@ -111,6 +111,15 @@ export const registryService = {
   },
 
   async addContribution(data: CreateCashFundContributionInput) {
+    // Verify the fund exists before contributing
+    const [fund] = await db
+      .select({ id: cashFunds.id })
+      .from(cashFunds)
+      .where(eq(cashFunds.id, data.fundId))
+    if (!fund) {
+      throw new Error('Fund not found')
+    }
+
     const [contribution] = await db
       .insert(cashFundContributions)
       .values({
@@ -237,7 +246,19 @@ export const registryService = {
     return item!
   },
 
-  async deleteBoardItem(itemId: string) {
+  async deleteBoardItem(itemId: string, weddingId: string) {
+    // Verify the item's board belongs to this wedding
+    const [item] = await db
+      .select({ boardId: moodBoardItems.boardId })
+      .from(moodBoardItems)
+      .where(eq(moodBoardItems.id, itemId))
+    if (!item) return
+    const [board] = await db
+      .select({ id: moodBoards.id })
+      .from(moodBoards)
+      .where(and(eq(moodBoards.id, item.boardId), eq(moodBoards.weddingId, weddingId)))
+    if (!board) return
+
     await db.delete(moodBoardItems).where(eq(moodBoardItems.id, itemId))
   },
 }

@@ -69,7 +69,8 @@ budgetCategoriesRoute.post(
     },
   ),
   async (c) => {
-    const { weddingId, totalBudget } = c.req.valid('json')
+    const { totalBudget } = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const dbUserId = c.get('dbUserId')
 
     await budgetCategoryService.seedDefaults(weddingId, totalBudget, dbUserId)
@@ -119,8 +120,8 @@ budgetCategoriesRoute.delete(
       await budgetCategoryService.delete(categoryId, weddingId, dbUserId)
       return c.json({ data: { success: true } })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+      console.error('Delete budget category failed:', err)
+      return c.json({ error: 'Delete failed', code: 'DELETE_FAILED', statusCode: 404 }, 404)
     }
   },
 )

@@ -24,6 +24,18 @@ function getBucket(): string {
   return process.env.R2_BUCKET_NAME ?? 'planfortwo-uploads'
 }
 
+function isAllowedUploadSource(sourceUrl: string): boolean {
+  const parsed = new URL(sourceUrl)
+  const allowedHosts = ['attachments.resend.com', 'resend.dev']
+  const isAllowed = allowedHosts.some(
+    (h) => parsed.hostname === h || parsed.hostname.endsWith('.' + h),
+  )
+  if (isAllowed || parsed.hostname.endsWith('.resend.com')) {
+    return true
+  }
+  return false
+}
+
 export const storageClient = {
   async getUploadUrl(key: string, contentType: string, expiresIn = 3600): Promise<string> {
     const client = getR2Client()
@@ -90,6 +102,10 @@ export const storageClient = {
   },
 
   async uploadFromUrl(key: string, sourceUrl: string, contentType: string): Promise<void> {
+    if (!isAllowedUploadSource(sourceUrl)) {
+      throw new Error('Upload source URL not from allowed host')
+    }
+
     const response = await fetch(sourceUrl)
     if (!response.ok) throw new Error(`Failed to download: ${response.status}`)
     const buffer = Buffer.from(await response.arrayBuffer())

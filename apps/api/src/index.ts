@@ -57,7 +57,15 @@ const app = new Hono()
 
 // ── Global Middleware ──
 app.use('*', logger())
-app.use('*', secureHeaders())
+app.use(
+  '*',
+  secureHeaders({
+    contentSecurityPolicy: {
+      defaultSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+    },
+  }),
+)
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL
 const allowedOrigins = [
@@ -72,7 +80,7 @@ app.use(
   cors({
     origin: (origin) => (allowedOrigins.includes(origin) ? origin : undefined),
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
     credentials: true,
   }),
 )
@@ -80,17 +88,22 @@ app.use(
 // ── Rate Limiting (must be registered BEFORE routes) ──
 const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30, prefix: 'pub' })
 const strictRateLimit = rateLimit({ windowMs: 60_000, max: 10, prefix: 'strict' })
+const rsvpLookupRateLimit = rateLimit({ windowMs: 60_000, max: 5, prefix: 'rsvp-lookup' })
 app.use('/website-public/*', publicRateLimit)
 app.use('/guestbook/*', publicRateLimit)
-const rsvpLookupRateLimit = rateLimit({ windowMs: 60_000, max: 5, prefix: 'rsvp-lookup' })
+// Strict 5/min on all RSVP lookup endpoints (token, name, guest-id)
+app.use('/rsvp/lookup', rsvpLookupRateLimit)
 app.use('/rsvp/lookup-by-name', rsvpLookupRateLimit)
 app.use('/rsvp/lookup-by-guest-id', rsvpLookupRateLimit)
 app.use('/rsvp/*', publicRateLimit)
 app.use('/contact/*', publicRateLimit)
-app.use('/website-config/verify-password', strictRateLimit)
+// Brute-force protection on password verification (5/min)
+app.use('/website-config/verify-password', rsvpLookupRateLimit)
 app.use('/inbox/send', strictRateLimit)
 app.use('/inbox/addresses', strictRateLimit)
-app.use('/registry/funds/*/contribute', publicRateLimit)
+// Financial and redemption endpoints (5/min)
+app.use('/registry/funds/*/contribute', rsvpLookupRateLimit)
+app.use('/referrals/redeem', rsvpLookupRateLimit)
 
 // ── Routes ──
 app.route('/health', healthRoute)

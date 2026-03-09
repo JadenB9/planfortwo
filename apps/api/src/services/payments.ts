@@ -95,6 +95,14 @@ export const purchaseService = {
     const purchaseId = session.metadata?.purchaseId
     if (!weddingId || !purchaseId) return
 
+    // Idempotency guard: skip if already processed
+    const [existing] = await db
+      .select({ status: purchases.status })
+      .from(purchases)
+      .where(eq(purchases.id, purchaseId))
+      .limit(1)
+    if (existing?.status === 'completed') return
+
     await db
       .update(purchases)
       .set({

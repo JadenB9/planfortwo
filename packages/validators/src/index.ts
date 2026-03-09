@@ -321,13 +321,12 @@ export type RsvpNameLookupInput = z.infer<typeof rsvpNameLookupSchema>
 export const rsvpSubmissionSchema = z.object({
   guestId: z.string().uuid(),
   rsvpStatus: rsvpStatusZodEnum,
-  mealChoice: z.string().max(100).nullable().optional(),
+  rsvpEmail: z.string().email().max(255).nullable().optional(),
   dietary: dietaryInfoSchema,
   songRequest: z.string().max(500).nullable().optional(),
   rsvpNotes: z.string().max(2000).nullable().optional(),
   plusOneName: z.string().max(200).nullable().optional(),
   plusOneConfirmed: z.boolean().optional(),
-  plusOneMealChoice: z.string().max(100).nullable().optional(),
   plusOneDietary: dietaryInfoSchema,
 })
 
@@ -594,7 +593,7 @@ export type CreateCustomSectionInput = z.infer<typeof createCustomSectionSchema>
 export const requestPhotoUploadSchema = z.object({
   weddingId: z.string().uuid(),
   fileName: z.string().min(1).max(255),
-  mimeType: z.string().regex(/^image\/(jpeg|png|gif|webp|svg\+xml)$/, 'Must be a valid image type'),
+  mimeType: z.string().regex(/^image\/(jpeg|png|gif|webp)$/, 'Must be a valid image type'),
   fileSize: z.number().int().min(1).max(20_000_000),
   sectionId: z.string().uuid().nullable().optional(),
 })

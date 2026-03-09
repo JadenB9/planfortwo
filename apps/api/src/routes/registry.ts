@@ -59,7 +59,8 @@ registryRoute.delete('/links/:id', resolveWeddingMiddleware, async (c) => {
 
 registryRoute.post('/links/:id/click', resolveWeddingMiddleware, async (c) => {
   const linkId = c.req.param('id')
-  await registryService.trackClick(linkId)
+  const weddingId = c.get('weddingId')
+  await registryService.trackClick(linkId, weddingId)
   return c.json({ data: { success: true } })
 })
 
@@ -116,9 +117,17 @@ registryRoute.post(
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
-    const data = c.req.valid('json')
-    const contribution = await registryService.addContribution(data)
-    return c.json({ data: contribution }, 201)
+    try {
+      const data = c.req.valid('json')
+      const contribution = await registryService.addContribution(data)
+      return c.json({ data: contribution }, 201)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Contribution failed'
+      if (message === 'Fund not found') {
+        return c.json({ error: 'Fund not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+      }
+      throw err
+    }
   },
 )
 
@@ -225,6 +234,7 @@ registryRoute.post(
 
 registryRoute.delete('/mood-boards/items/:itemId', resolveWeddingMiddleware, async (c) => {
   const itemId = c.req.param('itemId')
-  await registryService.deleteBoardItem(itemId)
+  const weddingId = c.get('weddingId')
+  await registryService.deleteBoardItem(itemId, weddingId)
   return c.json({ data: { success: true } })
 })

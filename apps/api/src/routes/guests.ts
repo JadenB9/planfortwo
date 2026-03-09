@@ -134,8 +134,8 @@ guestsRoute.delete(
       await guestService.deleteGuest(guestId, dbUserId, weddingId)
       return c.json({ data: { success: true } })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Delete failed'
-      return c.json({ error: message, code: 'DELETE_FAILED', statusCode: 404 }, 404)
+      console.error('Delete guest failed:', err)
+      return c.json({ error: 'Delete failed', code: 'DELETE_FAILED', statusCode: 404 }, 404)
     }
   },
 )
@@ -150,7 +150,7 @@ guestsRoute.post(
     'json',
     z.object({
       weddingId: z.string().uuid(),
-      csvContent: z.string().min(1),
+      csvContent: z.string().min(1).max(500_000),
     }),
     (result, c) => {
       if (!result.success) {
@@ -162,7 +162,8 @@ guestsRoute.post(
     },
   ),
   async (c) => {
-    const { weddingId, csvContent } = c.req.valid('json')
+    const { csvContent } = c.req.valid('json')
+    const weddingId = c.get('weddingId')
     const dbUserId = c.get('dbUserId')
 
     const result = await guestService.bulkImportCsv(weddingId, csvContent, dbUserId)
@@ -224,8 +225,8 @@ guestsRoute.post('/:id/send-invite', resolveWeddingMiddleware, async (c) => {
 
     return c.json({ data: { success: true } })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to send invite'
-    return c.json({ error: message, code: 'EMAIL_FAILED', statusCode: 500 }, 500)
+    console.error('Send invite failed:', err)
+    return c.json({ error: 'Failed to send invite', code: 'EMAIL_FAILED', statusCode: 500 }, 500)
   }
 })
 
@@ -249,7 +250,8 @@ guestsRoute.post(
     },
   ),
   async (c) => {
-    const { weddingId, guestIds } = c.req.valid('json')
+    const { guestIds } = c.req.valid('json')
+    const weddingId = c.get('weddingId')
 
     const [wedding] = await db.select().from(weddings).where(eq(weddings.id, weddingId))
     if (!wedding) {

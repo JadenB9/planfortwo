@@ -23,7 +23,6 @@ export interface GuestFormData {
   isVip?: boolean
   hasPlusOne?: boolean
   plusOneName?: string | null
-  mealChoice?: string | null
   dietary?: { notes?: string } | null
   tagIds?: string[]
 }
@@ -49,7 +48,6 @@ export function GuestForm({
     isVip: guest?.isVip ?? false,
     hasPlusOne: guest?.hasPlusOne ?? false,
     plusOneName: guest?.plusOneName ?? '',
-    mealChoice: guest?.mealChoice ?? '',
     dietary: guest?.dietary ?? null,
     tagIds: guest?.tags.map((t) => t.id) ?? [],
   })
@@ -257,17 +255,6 @@ export function GuestForm({
                 />
               </div>
             )}
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Meal Choice</label>
-              <input
-                type="text"
-                value={formData.mealChoice ?? ''}
-                onChange={(e) => update('mealChoice', e.target.value || null)}
-                placeholder="e.g. Chicken, Fish, Vegetarian"
-                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
-              />
-            </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Dietary Notes</label>

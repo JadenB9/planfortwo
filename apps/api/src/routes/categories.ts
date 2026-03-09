@@ -59,9 +59,10 @@ categoriesRoute.put(
   }),
   async (c) => {
     const categoryId = c.req.param('id')
+    const weddingId = c.get('weddingId')
     const data = c.req.valid('json')
 
-    const updated = await checklistService.updateCategory(categoryId, data)
+    const updated = await checklistService.updateCategory(categoryId, weddingId, data)
 
     if (!updated) {
       return c.json(
@@ -89,10 +90,13 @@ categoriesRoute.delete(
       return c.json({ data: { success: true } })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Delete failed'
-      const code = message.includes('default') ? 'DEFAULT_CATEGORY' : 'DELETE_FAILED'
-      const status = message.includes('default') ? 400 : 404
+      console.error('Delete category failed:', err)
+      const isDefault = message.includes('default')
+      const code = isDefault ? 'DEFAULT_CATEGORY' : 'DELETE_FAILED'
+      const status = isDefault ? 400 : 404
+      const genericMsg = isDefault ? 'Cannot delete default category' : 'Delete failed'
 
-      return c.json({ error: message, code, statusCode: status }, status)
+      return c.json({ error: genericMsg, code, statusCode: status }, status)
     }
   },
 )

@@ -184,7 +184,8 @@ seatingChartsRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
-    const assignment = await seatingChartService.assignGuest(data)
+    const weddingId = c.get('weddingId')
+    const assignment = await seatingChartService.assignGuest(data, weddingId)
     return c.json({ data: assignment }, 201)
   },
 )

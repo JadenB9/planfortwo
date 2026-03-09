@@ -14,13 +14,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 interface GuestFormState {
   guestId: string
   rsvpStatus: RsvpStatus
-  mealChoice: string
+  rsvpEmail: string
   dietary: DietaryInfo
   songRequest: string
   rsvpNotes: string
   plusOneName: string
   plusOneConfirmed: boolean
-  plusOneMealChoice: string
   plusOneDietary: DietaryInfo
 }
 
@@ -28,7 +27,7 @@ function createGuestFormState(guest: Guest): GuestFormState {
   return {
     guestId: guest.id,
     rsvpStatus: guest.rsvpStatus ?? 'pending',
-    mealChoice: guest.mealChoice ?? '',
+    rsvpEmail: guest.rsvpEmail ?? '',
     dietary: {
       vegetarian: guest.dietary?.vegetarian ?? false,
       vegan: guest.dietary?.vegan ?? false,
@@ -42,7 +41,6 @@ function createGuestFormState(guest: Guest): GuestFormState {
     rsvpNotes: guest.rsvpNotes ?? '',
     plusOneName: guest.plusOneName ?? '',
     plusOneConfirmed: guest.plusOneConfirmed ?? false,
-    plusOneMealChoice: guest.plusOneMealChoice ?? '',
     plusOneDietary: {
       vegetarian: (guest.plusOneDietary as DietaryInfo)?.vegetarian ?? false,
       vegan: (guest.plusOneDietary as DietaryInfo)?.vegan ?? false,
@@ -59,13 +57,12 @@ function buildSubmission(state: GuestFormState): RsvpSubmission {
   return {
     guestId: state.guestId,
     rsvpStatus: state.rsvpStatus,
-    mealChoice: state.mealChoice || null,
+    rsvpEmail: state.rsvpEmail || null,
     dietary: state.dietary,
     songRequest: state.songRequest || null,
     rsvpNotes: state.rsvpNotes || null,
     plusOneName: state.plusOneName || null,
     plusOneConfirmed: state.plusOneConfirmed,
-    plusOneMealChoice: state.plusOneMealChoice || null,
     plusOneDietary: state.plusOneDietary,
   }
 }
@@ -76,12 +73,10 @@ const RSVP_OPTIONS: { value: RsvpStatus; label: string; icon: string }[] = [
   { value: 'maybe', label: 'Not Sure Yet', icon: '?' },
 ]
 
-const MEAL_OPTIONS = ['Chicken', 'Beef', 'Fish', 'Vegetarian', 'Vegan', 'Kids Meal']
-
 interface RsvpFormProps {
   lookupResult: RsvpLookupResult
   onSuccess: () => void
-  showMealChoice?: boolean
+  showEmailField?: boolean
   showDietary?: boolean
   showSongRequest?: boolean
 }
@@ -89,7 +84,7 @@ interface RsvpFormProps {
 export function RsvpForm({
   lookupResult,
   onSuccess,
-  showMealChoice = true,
+  showEmailField = false,
   showDietary = true,
   showSongRequest = true,
 }: RsvpFormProps) {
@@ -210,23 +205,19 @@ export function RsvpForm({
 
             {(form.rsvpStatus === 'accepted' || form.rsvpStatus === 'maybe') && (
               <div className="mt-6 space-y-5">
-                {showMealChoice && (
+                {showEmailField && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Meal Preference
-                    </label>
-                    <select
-                      value={form.mealChoice}
-                      onChange={(e) => updateForm(index, { mealChoice: e.target.value })}
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                    >
-                      <option value="">Select a meal...</option>
-                      {MEAL_OPTIONS.map((meal) => (
-                        <option key={meal} value={meal}>
-                          {meal}
-                        </option>
-                      ))}
-                    </select>
+                    <label className="block text-sm font-medium text-gray-700">Email Address</label>
+                    <input
+                      type="email"
+                      value={form.rsvpEmail}
+                      onChange={(e) => updateForm(index, { rsvpEmail: e.target.value })}
+                      placeholder="your@email.com"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      So the couple can keep in touch with updates.
+                    </p>
                   </div>
                 )}
 
@@ -326,28 +317,6 @@ export function RsvpForm({
                               className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                             />
                           </div>
-
-                          {showMealChoice && (
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">
-                                Their Meal Preference
-                              </label>
-                              <select
-                                value={form.plusOneMealChoice}
-                                onChange={(e) =>
-                                  updateForm(index, { plusOneMealChoice: e.target.value })
-                                }
-                                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                              >
-                                <option value="">Select a meal...</option>
-                                {MEAL_OPTIONS.map((meal) => (
-                                  <option key={meal} value={meal}>
-                                    {meal}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
 
                           {showDietary && (
                             <div>

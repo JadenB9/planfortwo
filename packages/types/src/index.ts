@@ -164,6 +164,7 @@ export interface Guest {
   rsvpToken: string | null
   rsvpStatus: RsvpStatus
   rsvpRespondedAt: Date | null
+  rsvpEmail: string | null
   mealChoice: string | null
   dietary: DietaryInfo | null
   songRequest: string | null
@@ -235,13 +236,12 @@ export interface RsvpLookupResult {
 export interface RsvpSubmission {
   guestId: string
   rsvpStatus: RsvpStatus
-  mealChoice?: string | null
+  rsvpEmail?: string | null
   dietary?: DietaryInfo | null
   songRequest?: string | null
   rsvpNotes?: string | null
   plusOneName?: string | null
   plusOneConfirmed?: boolean
-  plusOneMealChoice?: string | null
   plusOneDietary?: DietaryInfo | null
 }
 
@@ -560,7 +560,6 @@ export interface FaqContent {
 
 export interface RsvpSectionContent {
   message: string
-  showMealChoice: boolean
   showDietary: boolean
   showSongRequest: boolean
 }

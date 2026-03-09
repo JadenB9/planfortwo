@@ -21,10 +21,8 @@ export const emailService = {
   async sendWelcome(email: string, firstName: string) {
     const resend = getResendClient()
     if (!resend) {
-      console.warn('[email] RESEND_API_KEY not configured — skipping welcome email', {
-        to: email,
-        subject: 'Welcome to PlanForTwo!',
-      })
+      console.warn('[email] RESEND_API_KEY not configured — skipping welcome email')
+
       return
     }
 
@@ -47,9 +45,8 @@ export const emailService = {
     const resend = getResendClient()
     if (!resend) {
       console.warn('[email] RESEND_API_KEY not configured — skipping partner invite email', {
-        to: email,
+        to: email.replace(/./g, '*'),
         subject: `${inviterName} invited you to plan your wedding on PlanForTwo`,
-        inviteUrl,
       })
       return
     }
@@ -78,9 +75,8 @@ export const emailService = {
     const resend = getResendClient()
     if (!resend) {
       console.warn('[email] RESEND_API_KEY not configured — skipping team member invite email', {
-        to: email,
+        to: email.replace(/./g, '*'),
         subject: `${inviterName} invited you to join their wedding planning team`,
-        inviteUrl,
       })
       return
     }
@@ -112,9 +108,8 @@ export const emailService = {
     const resend = getResendClient()
     if (!resend) {
       console.warn('[email] RESEND_API_KEY not configured — skipping RSVP invite email', {
-        to: email,
+        to: email.replace(/./g, '*'),
         subject: `You're invited to ${coupleName}'s wedding!`,
-        rsvpUrl,
       })
       return
     }

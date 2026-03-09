@@ -59,10 +59,14 @@ websiteConfigRoute.post(
       return c.json({ data: config }, 201)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Create failed'
+      console.error('Website config create failed:', err)
       if (message.includes('already exists')) {
-        return c.json({ error: message, code: 'ALREADY_EXISTS', statusCode: 409 }, 409)
+        return c.json(
+          { error: 'Website config already exists', code: 'ALREADY_EXISTS', statusCode: 409 },
+          409,
+        )
       }
-      return c.json({ error: message, code: 'CREATE_FAILED', statusCode: 400 }, 400)
+      return c.json({ error: 'Create failed', code: 'CREATE_FAILED', statusCode: 400 }, 400)
     }
   },
 )

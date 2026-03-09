@@ -74,6 +74,18 @@ function getResendClient(): Resend | null {
   return new Resend(apiKey)
 }
 
+function isAllowedAttachmentUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return (
+      parsed.hostname.endsWith('.r2.cloudflarestorage.com') ||
+      parsed.hostname.endsWith('.resend.com')
+    )
+  } catch {
+    return false
+  }
+}
+
 export const inboxService = {
   async listAddresses(userId: string) {
     return db.select().from(emailAddresses).where(eq(emailAddresses.userId, userId))
@@ -316,7 +328,7 @@ export const inboxService = {
     }
     if (data.attachments && data.attachments.length > 0) {
       sendPayload.attachments = data.attachments
-        .filter((att) => att.url)
+        .filter((att) => att.url && isAllowedAttachmentUrl(att.url))
         .map((att) => ({
           path: att.url!,
           filename: att.filename,

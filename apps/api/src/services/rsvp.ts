@@ -110,13 +110,12 @@ export const rsvpService = {
       .update(guests)
       .set({
         rsvpStatus: submission.rsvpStatus,
-        mealChoice: submission.mealChoice ?? null,
+        rsvpEmail: submission.rsvpEmail ?? null,
         dietary: (submission.dietary as Record<string, unknown>) ?? null,
         songRequest: submission.songRequest ?? null,
         rsvpNotes: submission.rsvpNotes ?? null,
         plusOneName: submission.plusOneName ?? null,
         plusOneConfirmed: submission.plusOneConfirmed ?? false,
-        plusOneMealChoice: submission.plusOneMealChoice ?? null,
         plusOneDietary: (submission.plusOneDietary as Record<string, unknown>) ?? null,
         rsvpRespondedAt: new Date(),
       })
@@ -144,13 +143,12 @@ export const rsvpService = {
           .update(guests)
           .set({
             rsvpStatus: submission.rsvpStatus,
-            mealChoice: submission.mealChoice ?? null,
+            rsvpEmail: submission.rsvpEmail ?? null,
             dietary: (submission.dietary as Record<string, unknown>) ?? null,
             songRequest: submission.songRequest ?? null,
             rsvpNotes: submission.rsvpNotes ?? null,
             plusOneName: submission.plusOneName ?? null,
             plusOneConfirmed: submission.plusOneConfirmed ?? false,
-            plusOneMealChoice: submission.plusOneMealChoice ?? null,
             plusOneDietary: (submission.plusOneDietary as Record<string, unknown>) ?? null,
             rsvpRespondedAt: new Date(),
           })
@@ -219,8 +217,8 @@ export const rsvpService = {
 
     const isExpired = await this.isDeadlinePassed(wedding.id)
 
-    // Strip all sensitive fields from public lookup response
-    const { email: _e, phone: _p, rsvpToken: _t, ...primarySafe } = guest
+    // Strip email/phone but keep rsvpToken (needed for form submission)
+    const { email: _e, phone: _p, ...primarySafe } = guest
 
     return {
       guest: primarySafe as Guest,

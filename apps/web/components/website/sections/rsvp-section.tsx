@@ -290,7 +290,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
             <RsvpForm
               lookupResult={lookupResult}
               onSuccess={() => setState('success')}
-              showMealChoice={content.showMealChoice}
+              showEmailField
               showDietary={content.showDietary}
               showSongRequest={content.showSongRequest}
             />

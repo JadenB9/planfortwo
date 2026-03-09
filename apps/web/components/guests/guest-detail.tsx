@@ -124,10 +124,6 @@ export function GuestDetail({
                   <span className="text-gray-500">Side</span>
                   <span className="capitalize text-gray-900">{guest.side ?? '--'}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Meal Choice</span>
-                  <span className="text-gray-900">{guest.mealChoice ?? '--'}</span>
-                </div>
                 {guest.dietary?.notes && (
                   <div className="flex justify-between">
                     <span className="text-gray-500">Dietary</span>
