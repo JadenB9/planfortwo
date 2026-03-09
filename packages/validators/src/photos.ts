@@ -8,7 +8,12 @@ export const createPhotoSchema = z.object({
   r2Key: z.string().min(1),
   url: z.string().url(),
   fileName: z.string().min(1).max(255),
-  mimeType: z.string().regex(/^image\/(jpeg|png|gif|webp)$/, 'Must be a valid image type'),
+  mimeType: z
+    .string()
+    .regex(
+      /^image\/(jpeg|png|gif|webp|heic|heif|avif|bmp|tiff)$/,
+      'Must be a valid image type (JPEG, PNG, GIF, WebP, HEIC, HEIF, AVIF, BMP, TIFF)',
+    ),
   fileSize: z.number().int().min(1).max(20_000_000),
   width: z.number().int().min(1).nullable().optional(),
   height: z.number().int().min(1).nullable().optional(),
@@ -34,7 +39,12 @@ export type ModeratePhotoInput = z.infer<typeof moderatePhotoSchema>
 export const requestGalleryUploadSchema = z.object({
   weddingId: z.string().uuid(),
   fileName: z.string().min(1).max(255),
-  mimeType: z.string().regex(/^image\/(jpeg|png|gif|webp)$/, 'Must be a valid image type'),
+  mimeType: z
+    .string()
+    .regex(
+      /^image\/(jpeg|png|gif|webp|heic|heif|avif|bmp|tiff)$/,
+      'Must be a valid image type (JPEG, PNG, GIF, WebP, HEIC, HEIF, AVIF, BMP, TIFF)',
+    ),
   fileSize: z.number().int().min(1).max(20_000_000),
 })
 export type RequestGalleryUploadInput = z.infer<typeof requestGalleryUploadSchema>

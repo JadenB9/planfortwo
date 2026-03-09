@@ -1181,7 +1181,7 @@ export const api = {
     get: (id: string, weddingId: string, token: string) =>
       fetchApi<{ data: GalleryPhoto }>(`/photos/${id}?weddingId=${weddingId}`, { token }),
     getUploadUrl: (
-      data: { weddingId: string; fileName: string; mimeType: string },
+      data: { weddingId: string; fileName: string; mimeType: string; fileSize: number },
       token: string,
     ) =>
       fetchApi<{ data: { uploadUrl: string; r2Key: string; url: string; photoId: string } }>(

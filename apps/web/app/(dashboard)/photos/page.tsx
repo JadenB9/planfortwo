@@ -92,7 +92,12 @@ export default function PhotosPage() {
       )
 
       const { data: uploadData } = await api.photoGallery.getUploadUrl(
-        { weddingId, fileName: uploadFile.file.name, mimeType: uploadFile.file.type },
+        {
+          weddingId,
+          fileName: uploadFile.file.name,
+          mimeType: uploadFile.file.type,
+          fileSize: uploadFile.file.size,
+        },
         token,
       )
 
@@ -100,11 +105,14 @@ export default function PhotosPage() {
         prev.map((f) => (f.id === uploadFile.id ? { ...f, progress: 50 } : f)),
       )
 
-      await fetch(uploadData.uploadUrl, {
+      const r2Response = await fetch(uploadData.uploadUrl, {
         method: 'PUT',
         body: uploadFile.file,
         headers: { 'Content-Type': uploadFile.file.type },
       })
+      if (!r2Response.ok) {
+        throw new Error(`Upload to storage failed (${r2Response.status})`)
+      }
 
       setUploadingFiles((prev) =>
         prev.map((f) => (f.id === uploadFile.id ? { ...f, progress: 80 } : f)),
@@ -128,7 +136,9 @@ export default function PhotosPage() {
           f.id === uploadFile.id ? { ...f, status: 'done' as const, progress: 100 } : f,
         ),
       )
-    } catch {
+    } catch (err) {
+      const message = err instanceof Error && err.message ? err.message : 'Failed to upload photo'
+      toast.error(message)
       setUploadingFiles((prev) =>
         prev.map((f) => (f.id === uploadFile.id ? { ...f, status: 'failed' as const } : f)),
       )
