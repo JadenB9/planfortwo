@@ -65,6 +65,7 @@ export default function SettingsPage() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [cancellingInvite, setCancellingInvite] = useState(false)
   const [cancelTeamDialogId, setCancelTeamDialogId] = useState<string | null>(null)
+  const [removePartnerDialogOpen, setRemovePartnerDialogOpen] = useState(false)
 
   const loadData = useCallback(async () => {
     try {
@@ -441,7 +442,7 @@ export default function SettingsPage() {
                           {roleIcon}
                           {roleLabel}
                         </span>
-                        {member.role !== 'owner' && (
+                        {member.role !== 'owner' && member.role !== 'partner' && (
                           <button
                             onClick={() => handleRemoveMember(member.id)}
                             disabled={removingId === member.id}
@@ -457,16 +458,96 @@ export default function SettingsPage() {
                 })}
               </div>
 
-              {/* Invite Partner */}
-              {isOwner && !hasPartner && (
+              {/* Partner Section */}
+              {isOwner && (
                 <>
                   <Separator />
                   <div className="space-y-3">
                     <h3 className="flex items-center gap-2 text-sm font-medium text-gray-900">
                       <Heart className="h-4 w-4 text-pink-500" />
-                      Invite Your Partner
+                      {hasPartner ? 'Your Partner' : 'Invite Your Partner'}
                     </h3>
-                    {pendingPartnerInvite ? (
+                    {hasPartner ? (
+                      <>
+                        {(() => {
+                          const partnerEntry = members.find(
+                            ({ member }) => member.role === 'partner',
+                          )
+                          if (!partnerEntry) return null
+                          const { member: partnerMember, user: partnerUser } = partnerEntry
+                          return (
+                            <div className="flex items-center justify-between rounded-xl border border-pink-200 bg-pink-50 px-4 py-3">
+                              <div className="flex items-center gap-3">
+                                {partnerUser.avatarUrl ? (
+                                  <img
+                                    src={partnerUser.avatarUrl}
+                                    alt=""
+                                    className="h-8 w-8 rounded-full"
+                                  />
+                                ) : (
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-100 text-sm font-medium text-pink-600">
+                                    {partnerUser.firstName?.[0]}
+                                    {partnerUser.lastName?.[0]}
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {partnerUser.firstName} {partnerUser.lastName}
+                                  </p>
+                                  <p className="text-xs text-gray-500">{partnerUser.email}</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setRemovePartnerDialogOpen(true)}
+                                disabled={removingId === partnerMember.id}
+                                className="rounded-lg px-3 py-1.5 text-sm text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          )
+                        })()}
+
+                        <Dialog
+                          open={removePartnerDialogOpen}
+                          onOpenChange={setRemovePartnerDialogOpen}
+                        >
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Remove Partner</DialogTitle>
+                              <DialogDescription>
+                                Are you sure you want to remove your partner from this wedding? They
+                                will lose access to all wedding planning data. You can invite them
+                                again later.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <Button
+                                variant="outline"
+                                onClick={() => setRemovePartnerDialogOpen(false)}
+                              >
+                                Keep Partner
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                onClick={async () => {
+                                  const partnerEntry = members.find(
+                                    ({ member }) => member.role === 'partner',
+                                  )
+                                  if (partnerEntry) {
+                                    await handleRemoveMember(partnerEntry.member.id)
+                                    setRemovePartnerDialogOpen(false)
+                                  }
+                                }}
+                                disabled={removingId !== null}
+                              >
+                                {removingId ? 'Removing...' : 'Remove Partner'}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </>
+                    ) : pendingPartnerInvite ? (
                       <>
                         <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
                           <Clock className="h-4 w-4 text-amber-600" />
