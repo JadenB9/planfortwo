@@ -17,6 +17,7 @@ function formatWeddingDate(date: Date | null): string {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'UTC',
   })
 }
 
