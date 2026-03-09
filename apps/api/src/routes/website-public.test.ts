@@ -18,6 +18,7 @@ vi.mock('@planfortwo/db', () => {
     chain.orderBy = vi.fn().mockReturnValue(chain)
     chain.insert = vi.fn().mockReturnValue(chain)
     chain.values = vi.fn().mockReturnValue(chain)
+    chain.limit = vi.fn().mockReturnValue(chain)
     chain.then = (resolve: (v: unknown) => void) => {
       const result = queryResults[queryIndex.value] ?? []
       queryIndex.value++
@@ -157,6 +158,7 @@ describe('Website Public Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.requiresPassword).toBe(true)
+      // privacyMode is nested under config
       expect(body.data.config.privacyMode).toBe('password')
       expect(body.data.passwordHash).toBeUndefined()
       expect(body.data.weddingName).toBe('Secret Wedding')
