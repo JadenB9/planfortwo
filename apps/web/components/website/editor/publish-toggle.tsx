@@ -14,13 +14,10 @@ interface PublishToggleProps {
 
 function buildPublicUrl(subdomain: string | null, accessToken: string | null): string | null {
   if (!accessToken) return null
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
-  // Production: use subdomain.planfortwo.com/s/{token}
-  if (appUrl.includes('planfortwo.com') && subdomain) {
+  if (subdomain) {
     return `https://${subdomain}.planfortwo.com/s/${accessToken}`
   }
-  // Fallback (local dev): relative path
-  return `/s/${subdomain ? `${subdomain}-` : ''}${accessToken}`
+  return `https://planfortwo.com/s/${accessToken}`
 }
 
 export function PublishToggle({
