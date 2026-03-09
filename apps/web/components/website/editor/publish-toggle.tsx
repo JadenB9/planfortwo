@@ -1,7 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Globe, GlobeLock } from 'lucide-react'
+import { Globe, GlobeLock, ExternalLink, Copy, Check } from 'lucide-react'
+import { useState } from 'react'
 
 interface PublishToggleProps {
   isPublished: boolean
@@ -11,6 +12,17 @@ interface PublishToggleProps {
   onUnpublish: () => void
 }
 
+function buildPublicUrl(subdomain: string | null, accessToken: string | null): string | null {
+  if (!accessToken) return null
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  // Production: use subdomain.planfortwo.com/s/{token}
+  if (appUrl.includes('planfortwo.com') && subdomain) {
+    return `https://${subdomain}.planfortwo.com/s/${accessToken}`
+  }
+  // Fallback (local dev): relative path
+  return `/s/${subdomain ? `${subdomain}-` : ''}${accessToken}`
+}
+
 export function PublishToggle({
   isPublished,
   subdomain,
@@ -18,7 +30,15 @@ export function PublishToggle({
   onPublish,
   onUnpublish,
 }: PublishToggleProps) {
-  const siteUrl = accessToken ? `/s/${subdomain ? `${subdomain}-` : ''}${accessToken}` : null
+  const [copied, setCopied] = useState(false)
+  const siteUrl = buildPublicUrl(subdomain, accessToken)
+
+  const handleCopy = async () => {
+    if (!siteUrl) return
+    await navigator.clipboard.writeText(siteUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <div className="rounded-xl border bg-white p-4">
@@ -34,14 +54,36 @@ export function PublishToggle({
               {isPublished ? 'Published' : 'Unpublished'}
             </p>
             {isPublished && siteUrl && (
-              <a
-                href={siteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-wedding-600 text-xs hover:underline"
-              >
-                {siteUrl}
-              </a>
+              <div className="flex items-center gap-1.5">
+                <a
+                  href={siteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  {siteUrl}
+                </a>
+                <button
+                  onClick={handleCopy}
+                  className="text-gray-400 hover:text-gray-600"
+                  title="Copy link"
+                >
+                  {copied ? (
+                    <Check className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                </button>
+                <a
+                  href={siteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-gray-600"
+                  title="Open in new tab"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
             )}
           </div>
         </div>
