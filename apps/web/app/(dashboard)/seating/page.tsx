@@ -20,7 +20,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { Plus, Minus, RotateCcw, ArrowLeft, Trash2, GripVertical } from 'lucide-react'
+import {
+  Plus,
+  Minus,
+  RotateCcw,
+  ArrowLeft,
+  Trash2,
+  GripVertical,
+  Copy,
+  Scissors,
+  ClipboardPaste,
+} from 'lucide-react'
 
 const CANVAS_W = 3000
 const CANVAS_H = 3000
@@ -98,16 +108,27 @@ function getRoundRadius(capacity: number): number {
   return Math.max(35, 20 + capacity * 4)
 }
 
-function getSeatPositionsRound(
-  capacity: number,
+function getEffectiveRoundRadius(table: TableData): number {
+  const isRect =
+    table.tableType === 'rectangular' ||
+    table.tableType === 'banquet' ||
+    table.tableType === 'head_table'
+  if (!isRect && table.width > 0) {
+    return table.width / 2
+  }
+  return getRoundRadius(table.capacity)
+}
+
+function getEffectiveSeatPositions(
+  table: TableData,
   cx: number,
   cy: number,
 ): { x: number; y: number; angle: number }[] {
-  const radius = getRoundRadius(capacity)
-  const nameRadius = radius + 14
+  const radius = getEffectiveRoundRadius(table)
+  const nameRadius = radius + 18
   const seats: { x: number; y: number; angle: number }[] = []
-  for (let i = 0; i < capacity; i++) {
-    const angle = (2 * Math.PI * i) / capacity - Math.PI / 2
+  for (let i = 0; i < table.capacity; i++) {
+    const angle = (2 * Math.PI * i) / table.capacity - Math.PI / 2
     seats.push({
       x: cx + nameRadius * Math.cos(angle),
       y: cy + nameRadius * Math.sin(angle),
@@ -115,6 +136,21 @@ function getSeatPositionsRound(
     })
   }
   return seats
+}
+
+function getNextCopyName(baseName: string, existingLabels: string[]): string {
+  const base = baseName.replace(/\s*\(\d+\)$/, '')
+  let maxNum = 0
+  const escaped = base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(`^${escaped}(?:\\s*\\((\\d+)\\))?$`)
+  for (const label of existingLabels) {
+    const match = label.match(regex)
+    if (match) {
+      const num = match[1] ? parseInt(match[1]) : 0
+      if (num > maxNum) maxNum = num
+    }
+  }
+  return `${base} (${maxNum + 1})`
 }
 
 function SeatPopover({
@@ -397,6 +433,10 @@ export default function SeatingPage() {
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const hasDraggedRef = useRef(false)
 
+  const [editingTableId, setEditingTableId] = useState<string | null>(null)
+  const [editingTableName, setEditingTableName] = useState('')
+  const [clipboard, setClipboard] = useState<{ table: TableData; isCut: boolean } | null>(null)
+
   const loadCharts = useCallback(async () => {
     if (!weddingId) return
     try {
@@ -678,6 +718,111 @@ export default function SeatingPage() {
     }
   }
 
+  // --- Table rename ---
+  const handleRenameTable = async (tableId: string, newLabel: string) => {
+    if (!weddingId || !newLabel.trim()) return
+    const trimmed = newLabel.trim()
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.seatingCharts.updateTable(tableId, weddingId, { label: trimmed }, token)
+      setSelectedChart((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          tables: prev.tables.map((t) => (t.id === tableId ? { ...t, label: trimmed } : t)),
+        }
+      })
+      toast.success('Table renamed')
+    } catch {
+      toast.error('Failed to rename table')
+    }
+    setEditingTableId(null)
+    setEditingTableName('')
+  }
+
+  const handleStartRename = (table: TableData) => {
+    setEditingTableId(table.id)
+    setEditingTableName(table.label)
+  }
+
+  // --- Copy / Cut / Paste ---
+  const handleCopyTable = () => {
+    if (!selectedTableId || !selectedChart) return
+    const table = selectedChart.tables.find((t) => t.id === selectedTableId)
+    if (!table) return
+    setClipboard({ table, isCut: false })
+    toast.success('Table copied')
+  }
+
+  const handleCutTable = () => {
+    if (!selectedTableId || !selectedChart) return
+    const table = selectedChart.tables.find((t) => t.id === selectedTableId)
+    if (!table) return
+    setClipboard({ table, isCut: true })
+    toast.success('Table cut')
+  }
+
+  const handlePasteTable = async () => {
+    if (!clipboard || !selectedChart || !weddingId) return
+    const { table: src, isCut } = clipboard
+    const existingLabels = selectedChart.tables.map((t) => t.label)
+    const newLabel = getNextCopyName(src.label, existingLabels)
+
+    try {
+      const token = await getToken()
+      if (!token) return
+
+      await api.seatingCharts.addTable(
+        selectedChart.id,
+        selectedChart.weddingId,
+        {
+          chartId: selectedChart.id,
+          label: newLabel,
+          tableType: src.tableType,
+          capacity: src.capacity,
+          posX: src.posX + 60,
+          posY: src.posY + 60,
+        },
+        token,
+      )
+
+      if (isCut) {
+        await api.seatingCharts.deleteTable(src.id, weddingId, token)
+        setClipboard(null)
+      }
+
+      toast.success(isCut ? 'Table moved' : 'Table pasted')
+      void loadChartDetail(selectedChart.id)
+    } catch {
+      toast.error('Failed to paste table')
+    }
+  }
+
+  // --- Round table resize ---
+  const handleResizeRoundTable = async (tableId: string, delta: number) => {
+    if (!selectedChart || !weddingId) return
+    const table = selectedChart.tables.find((t) => t.id === tableId)
+    if (!table) return
+    const currentRadius = getEffectiveRoundRadius(table)
+    const newRadius = Math.max(25, Math.min(200, currentRadius + delta))
+    const newWidth = Math.round(newRadius * 2)
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.seatingCharts.updateTable(tableId, weddingId, { width: newWidth }, token)
+      setSelectedChart((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          tables: prev.tables.map((t) => (t.id === tableId ? { ...t, width: newWidth } : t)),
+        }
+      })
+    } catch {
+      toast.error('Failed to resize table')
+    }
+  }
+
   // --- Canvas interactions ---
 
   const handleCanvasMouseDown = (e: React.MouseEvent) => {
@@ -816,6 +961,39 @@ export default function SeatingPage() {
     return () => el.removeEventListener('wheel', handler)
   }, [])
 
+  // Keyboard shortcuts for copy/cut/paste/delete
+  useEffect(() => {
+    if (!selectedChart) return
+    const handler = (e: KeyboardEvent) => {
+      // Don't intercept when editing a table name
+      if (editingTableId) return
+      const isMeta = e.metaKey || e.ctrlKey
+      if (isMeta && e.key === 'c') {
+        if (selectedTableId) {
+          e.preventDefault()
+          handleCopyTable()
+        }
+      } else if (isMeta && e.key === 'x') {
+        if (selectedTableId) {
+          e.preventDefault()
+          handleCutTable()
+        }
+      } else if (isMeta && e.key === 'v') {
+        if (clipboard) {
+          e.preventDefault()
+          void handlePasteTable()
+        }
+      } else if (e.key === 'Escape') {
+        setSelectedTableId(null)
+        setSeatPopover(null)
+        setRectPopover(null)
+        setEditingTableId(null)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [selectedChart, selectedTableId, clipboard, editingTableId])
+
   const handleSeatClick = (e: React.MouseEvent, tableId: string, seatIndex: number) => {
     e.stopPropagation()
     if (hasDraggedRef.current) return
@@ -948,6 +1126,8 @@ export default function SeatingPage() {
             <div className="ml-auto flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1">
               <span className="text-xs font-medium text-gray-700">{selectedTable.label}</span>
               <div className="mx-1 h-4 w-px bg-gray-200" />
+
+              {/* Seats control */}
               <span className="text-xs text-gray-500">Seats:</span>
               <Button
                 size="sm"
@@ -966,6 +1146,53 @@ export default function SeatingPage() {
               >
                 <Plus className="h-3 w-3" />
               </Button>
+
+              {/* Size control for round tables */}
+              {!isRectType(selectedTable.tableType) && (
+                <>
+                  <div className="mx-1 h-4 w-px bg-gray-200" />
+                  <span className="text-xs text-gray-500">Size:</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 w-6 p-0"
+                    onClick={() => handleResizeRoundTable(selectedTable.id, -10)}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 w-6 p-0"
+                    onClick={() => handleResizeRoundTable(selectedTable.id, 10)}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </>
+              )}
+
+              <div className="mx-1 h-4 w-px bg-gray-200" />
+
+              {/* Copy / Cut / Paste */}
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 w-6 p-0"
+                onClick={handleCopyTable}
+                title="Copy table (Ctrl+C)"
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 w-6 p-0"
+                onClick={handleCutTable}
+                title="Cut table (Ctrl+X)"
+              >
+                <Scissors className="h-3 w-3" />
+              </Button>
+
               <div className="mx-1 h-4 w-px bg-gray-200" />
               <Button
                 size="sm"
@@ -976,6 +1203,19 @@ export default function SeatingPage() {
                 <Trash2 className="h-3 w-3" />
               </Button>
             </div>
+          )}
+
+          {/* Paste button (when clipboard has content) */}
+          {clipboard && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="ml-2 h-7 text-xs"
+              onClick={() => void handlePasteTable()}
+            >
+              <ClipboardPaste className="mr-1 h-3 w-3" />
+              Paste {clipboard.isCut ? '(cut)' : '(copy)'}
+            </Button>
           )}
         </div>
 
@@ -1048,17 +1288,55 @@ export default function SeatingPage() {
                         strokeDasharray={table.tableType === 'head_table' ? '6 3' : undefined}
                       />
 
-                      {/* Table label */}
-                      <text
-                        x={cx}
-                        y={cy - hh + 16}
-                        textAnchor="middle"
-                        fill="#374151"
-                        fontSize={10}
-                        fontWeight={600}
-                      >
-                        {table.label}
-                      </text>
+                      {/* Table label — double-click to rename */}
+                      {editingTableId === table.id ? (
+                        <foreignObject x={cx - 50} y={cy - hh + 4} width={100} height={22}>
+                          <input
+                            type="text"
+                            value={editingTableName}
+                            onChange={(e) => setEditingTableName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                void handleRenameTable(table.id, editingTableName)
+                              } else if (e.key === 'Escape') {
+                                setEditingTableId(null)
+                                setEditingTableName('')
+                              }
+                            }}
+                            onBlur={() => void handleRenameTable(table.id, editingTableName)}
+                            autoFocus
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              textAlign: 'center',
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              border: '1px solid #1e40af',
+                              borderRadius: '3px',
+                              outline: 'none',
+                              background: 'white',
+                              padding: '0 4px',
+                            }}
+                            onMouseDown={(e) => e.stopPropagation()}
+                          />
+                        </foreignObject>
+                      ) : (
+                        <text
+                          x={cx}
+                          y={cy - hh + 16}
+                          textAnchor="middle"
+                          fill="#374151"
+                          fontSize={10}
+                          fontWeight={600}
+                          style={{ cursor: 'text' }}
+                          onDoubleClick={(e) => {
+                            e.stopPropagation()
+                            handleStartRename(table)
+                          }}
+                        >
+                          {table.label}
+                        </text>
+                      )}
                       <text x={cx} y={cy - hh + 28} textAnchor="middle" fill="#9ca3af" fontSize={8}>
                         {table.assignments.length}/{table.capacity}
                       </text>
@@ -1159,9 +1437,10 @@ export default function SeatingPage() {
                 }
 
                 // Round / sweetheart tables — names radiating outward
-                const radius = getRoundRadius(table.capacity)
+                const radius = getEffectiveRoundRadius(table)
                 const seatRadius = table.tableType === 'sweetheart' ? radius - 10 : radius
-                const seats = getSeatPositionsRound(table.capacity, cx, cy)
+                const seats = getEffectiveSeatPositions(table, cx, cy)
+                const isEditingThis = editingTableId === table.id
 
                 return (
                   <g
@@ -1181,18 +1460,56 @@ export default function SeatingPage() {
                       strokeWidth={isSelected ? 2.5 : 2}
                     />
 
-                    {/* Table label + count */}
-                    <text
-                      x={cx}
-                      y={cy - 4}
-                      textAnchor="middle"
-                      fill="#374151"
-                      fontSize={10}
-                      fontWeight={600}
-                    >
-                      {table.label}
-                    </text>
-                    <text x={cx} y={cy + 9} textAnchor="middle" fill="#9ca3af" fontSize={8}>
+                    {/* Table label + count — double-click to rename */}
+                    {isEditingThis ? (
+                      <foreignObject x={cx - 50} y={cy - 18} width={100} height={24}>
+                        <input
+                          type="text"
+                          value={editingTableName}
+                          onChange={(e) => setEditingTableName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              void handleRenameTable(table.id, editingTableName)
+                            } else if (e.key === 'Escape') {
+                              setEditingTableId(null)
+                              setEditingTableName('')
+                            }
+                          }}
+                          onBlur={() => void handleRenameTable(table.id, editingTableName)}
+                          autoFocus
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            textAlign: 'center',
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            border: '1px solid #1e40af',
+                            borderRadius: '3px',
+                            outline: 'none',
+                            background: 'white',
+                            padding: '0 4px',
+                          }}
+                          onMouseDown={(e) => e.stopPropagation()}
+                        />
+                      </foreignObject>
+                    ) : (
+                      <text
+                        x={cx}
+                        y={cy - 4}
+                        textAnchor="middle"
+                        fill="#374151"
+                        fontSize={12}
+                        fontWeight={600}
+                        style={{ cursor: 'text' }}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation()
+                          handleStartRename(table)
+                        }}
+                      >
+                        {table.label}
+                      </text>
+                    )}
+                    <text x={cx} y={cy + 11} textAnchor="middle" fill="#9ca3af" fontSize={9}>
                       {table.assignments.length}/{table.capacity}
                     </text>
 
@@ -1220,24 +1537,27 @@ export default function SeatingPage() {
                           }
                           style={{ cursor: 'pointer' }}
                         >
-                          {/* Small dot marker */}
+                          {/* Invisible larger hit target for easier clicking */}
+                          <circle cx={seat.x} cy={seat.y} r={12} fill="transparent" stroke="none" />
+
+                          {/* Visible dot marker */}
                           <circle
                             cx={seat.x}
                             cy={seat.y}
-                            r={isFilled ? 2 : 3}
+                            r={isFilled ? 4 : 5}
                             fill={isFilled ? TABLE_COLOR : SEAT_EMPTY}
                             stroke={isFilled ? TABLE_COLOR : '#9ca3af'}
-                            strokeWidth={0.5}
+                            strokeWidth={1}
                           />
 
                           {/* Name or seat number */}
                           <text
-                            x={seat.x + (anchor === 'start' ? 5 : -5)}
-                            y={seat.y + 3}
+                            x={seat.x + (anchor === 'start' ? 7 : -7)}
+                            y={seat.y + 3.5}
                             textAnchor={anchor}
-                            fill={isFilled ? '#1f2937' : '#9ca3af'}
-                            fontSize={7.5}
-                            fontWeight={isFilled ? 500 : 400}
+                            fill={isFilled ? '#1f2937' : '#6b7280'}
+                            fontSize={9.5}
+                            fontWeight={isFilled ? 600 : 400}
                             transform={`rotate(${textAngle}, ${seat.x}, ${seat.y})`}
                           >
                             {isFilled && displayName ? displayName : i + 1}
