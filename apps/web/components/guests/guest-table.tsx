@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import type { GuestWithTags } from '@planfortwo/types'
 import { GuestTagBadge } from './guest-tag-badge'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Mail, MailCheck, Pencil, Send, Trash2 } from 'lucide-react'
 
 interface GuestTableProps {
@@ -30,6 +32,8 @@ export function GuestTable({
   sendingInviteId,
   deletingGuestId,
 }: GuestTableProps) {
+  const [deleteConfirmGuest, setDeleteConfirmGuest] = useState<GuestWithTags | null>(null)
+
   if (guests.length === 0) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
@@ -88,9 +92,7 @@ export function GuestTable({
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          if (window.confirm(`Remove ${guest.firstName} ${guest.lastName}?`)) {
-                            onDeleteGuest(guest)
-                          }
+                          setDeleteConfirmGuest(guest)
                         }}
                         disabled={deletingGuestId === guest.id}
                         className="shrink-0 rounded-md p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
@@ -178,6 +180,26 @@ export function GuestTable({
           </tbody>
         </table>
       </div>
+
+      {/* Delete guest confirmation */}
+      <ConfirmDialog
+        open={!!deleteConfirmGuest}
+        onOpenChange={(open) => !open && setDeleteConfirmGuest(null)}
+        title="Remove Guest"
+        description={
+          deleteConfirmGuest
+            ? `Are you sure you want to remove ${deleteConfirmGuest.firstName} ${deleteConfirmGuest.lastName}? This action cannot be undone.`
+            : ''
+        }
+        confirmLabel="Remove"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteConfirmGuest && onDeleteGuest) {
+            onDeleteGuest(deleteConfirmGuest)
+          }
+          setDeleteConfirmGuest(null)
+        }}
+      />
     </div>
   )
 }

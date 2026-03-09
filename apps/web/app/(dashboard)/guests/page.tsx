@@ -18,6 +18,7 @@ import { GuestTable } from '@/components/guests/guest-table'
 import { GuestDetail } from '@/components/guests/guest-detail'
 import { GuestForm } from '@/components/guests/guest-form'
 import { DietarySummaryCard } from '@/components/guests/dietary-summary'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { GuestFormData } from '@/components/guests/guest-form'
 
 export default function GuestsPage() {
@@ -46,6 +47,7 @@ export default function GuestsPage() {
   const [sendingInviteId, setSendingInviteId] = useState<string | null>(null)
   const [deletingGuestId, setDeletingGuestId] = useState<string | null>(null)
   const [sendingBulk, setSendingBulk] = useState(false)
+  const [showBulkInviteConfirm, setShowBulkInviteConfirm] = useState(false)
 
   const handleCreateGuest = useCallback(
     async (data: GuestFormData) => {
@@ -175,11 +177,6 @@ export default function GuestsPage() {
 
   const handleSendAllInvites = useCallback(async () => {
     if (!weddingId) return
-    const toSend = guests.filter((g) => g.email && !g.inviteSentAt)
-    const confirmed = window.confirm(
-      `Send RSVP invitations to ${toSend.length} guest${toSend.length !== 1 ? 's' : ''}? This will email each guest a personalized RSVP link.`,
-    )
-    if (!confirmed) return
     setSendingBulk(true)
     try {
       const token = await getToken()
@@ -326,7 +323,7 @@ export default function GuestsPage() {
         <div className="flex gap-3">
           {uninvitedWithEmail.length > 0 && (
             <button
-              onClick={handleSendAllInvites}
+              onClick={() => setShowBulkInviteConfirm(true)}
               disabled={sendingBulk}
               className="flex items-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
             >
@@ -440,6 +437,17 @@ export default function GuestsPage() {
           onClose={() => setEditingGuest(null)}
         />
       )}
+
+      {/* Bulk invite confirmation */}
+      <ConfirmDialog
+        open={showBulkInviteConfirm}
+        onOpenChange={setShowBulkInviteConfirm}
+        title="Send RSVP Invitations"
+        description={`Send RSVP invitations to ${uninvitedWithEmail.length} guest${uninvitedWithEmail.length !== 1 ? 's' : ''}? This will email each guest a personalized RSVP link.`}
+        confirmLabel="Send Invitations"
+        variant="default"
+        onConfirm={() => void handleSendAllInvites()}
+      />
     </motion.div>
   )
 }

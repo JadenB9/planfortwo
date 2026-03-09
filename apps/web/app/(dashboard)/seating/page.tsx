@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import {
   Plus,
   Minus,
@@ -436,6 +437,8 @@ export default function SeatingPage() {
   const [editingTableId, setEditingTableId] = useState<string | null>(null)
   const [editingTableName, setEditingTableName] = useState('')
   const [clipboard, setClipboard] = useState<{ table: TableData; isCut: boolean } | null>(null)
+  const [deleteChartConfirm, setDeleteChartConfirm] = useState<string | null>(null)
+  const [deleteTableConfirm, setDeleteTableConfirm] = useState<string | null>(null)
 
   const loadCharts = useCallback(async () => {
     if (!weddingId) return
@@ -1198,7 +1201,7 @@ export default function SeatingPage() {
                 size="sm"
                 variant="ghost"
                 className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                onClick={() => handleDeleteTable(selectedTable.id)}
+                onClick={() => setDeleteTableConfirm(selectedTable.id)}
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
@@ -1572,7 +1575,7 @@ export default function SeatingPage() {
                       <g
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleDeleteTable(table.id)
+                          setDeleteTableConfirm(table.id)
                         }}
                         style={{ cursor: 'pointer' }}
                       >
@@ -1653,6 +1656,20 @@ export default function SeatingPage() {
               )
             })()}
         </div>
+
+        {/* Delete table confirmation */}
+        <ConfirmDialog
+          open={!!deleteTableConfirm}
+          onOpenChange={(open) => !open && setDeleteTableConfirm(null)}
+          title="Remove Table"
+          description="This will remove this table and unassign all seated guests. This cannot be undone."
+          confirmLabel="Remove Table"
+          variant="danger"
+          onConfirm={() => {
+            if (deleteTableConfirm) void handleDeleteTable(deleteTableConfirm)
+            setDeleteTableConfirm(null)
+          }}
+        />
 
         {/* Add Table Dialog */}
         <Dialog open={showAddTable} onOpenChange={setShowAddTable}>
@@ -1798,7 +1815,7 @@ export default function SeatingPage() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeleteChart(chart.id)
+                      setDeleteChartConfirm(chart.id)
                     }}
                     className="mt-3 text-xs text-red-500 hover:text-red-700"
                   >
@@ -1833,6 +1850,20 @@ export default function SeatingPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete chart confirmation */}
+      <ConfirmDialog
+        open={!!deleteChartConfirm}
+        onOpenChange={(open) => !open && setDeleteChartConfirm(null)}
+        title="Delete Seating Chart"
+        description="This will permanently delete this seating chart and all its tables and assignments. This cannot be undone."
+        confirmLabel="Delete Chart"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteChartConfirm) void handleDeleteChart(deleteChartConfirm)
+          setDeleteChartConfirm(null)
+        }}
+      />
     </motion.div>
   )
 }
