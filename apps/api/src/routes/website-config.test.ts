@@ -238,7 +238,7 @@ describe('Website Config Routes', () => {
       const res = await app.request(`/website-config/verify-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subdomain: 'jane-john', password: 'secret123' }),
+        body: JSON.stringify({ accessToken: 'jane-john', password: 'secret123' }),
       })
 
       expect(res.status).toBe(200)

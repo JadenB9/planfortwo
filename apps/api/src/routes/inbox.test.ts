@@ -71,6 +71,7 @@ const MOCK_EMAIL = {
   messageId: null,
   inReplyToMessageId: null,
   replyTo: null,
+  attachments: null,
   createdAt: new Date(),
 }
 
@@ -163,7 +164,7 @@ describe('Inbox Routes', () => {
 
       expect(res.status).toBe(400)
       const json = await res.json()
-      expect(json.error).toBe('Already taken')
+      expect(json.error).toBe('Failed to claim address')
     })
   })
 

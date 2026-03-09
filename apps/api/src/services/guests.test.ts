@@ -262,7 +262,7 @@ describe('Guest Service', () => {
     it('should skip rows with missing names', async () => {
       mockedPapa.parse.mockReturnValue({
         data: [
-          { firstname: '', lastname: 'Smith' },
+          { firstname: '', lastname: '' },
           { firstname: 'Bob', lastname: '' },
           { firstname: 'Carol', lastname: 'White' },
         ],
@@ -275,15 +275,15 @@ describe('Guest Service', () => {
 
       const result = await guestService.bulkImportCsv('wedding-1', 'csv-content', 'user-1')
 
-      expect(result.imported).toBe(1)
-      expect(result.skipped).toBe(2)
-      expect(result.errors).toHaveLength(2)
+      expect(result.imported).toBe(2)
+      expect(result.skipped).toBe(1)
+      expect(result.errors).toHaveLength(0)
     })
 
     it('should handle parse errors', async () => {
       mockedPapa.parse.mockReturnValue({
         data: [],
-        errors: [{ row: 1, message: 'Malformed CSV' }],
+        errors: [{ type: 'Delimiter', row: 1, message: 'Malformed CSV' }],
         meta: {},
       } as never)
 

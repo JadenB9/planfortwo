@@ -9,6 +9,7 @@ vi.mock('@planfortwo/db', () => {
     select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
     returning: vi.fn(),
@@ -43,7 +44,8 @@ vi.mock('@planfortwo/db', () => {
 import { purchaseService, referralService, contactService } from './payments.js'
 import { db } from '@planfortwo/db'
 
-const mockedDb = vi.mocked(db)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockedDb = vi.mocked(db) as any
 
 describe('Payment Services', () => {
   beforeEach(() => {
@@ -183,11 +185,25 @@ describe('Payment Services', () => {
           payment_intent: 'pi_test_123',
         } as unknown as import('stripe').default.Checkout.Session
 
-        // First update call: purchases
-        // Second update call: weddings
-        ;(mockedDb.where as ReturnType<typeof vi.fn>)
+        // Idempotency guard: select().from().where().limit() -> not completed
+        ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([{ status: 'pending' }]),
+            }),
+          }),
+        })
+
+        // Two update().set().where() calls (purchases + weddings)
+        const mockUpdateWhere = vi
+          .fn()
           .mockResolvedValueOnce(undefined)
           .mockResolvedValueOnce(undefined)
+        ;(mockedDb.update as ReturnType<typeof vi.fn>).mockReturnValue({
+          set: vi.fn().mockReturnValue({
+            where: mockUpdateWhere,
+          }),
+        })
 
         await purchaseService.handleCheckoutCompleted(mockSession)
 

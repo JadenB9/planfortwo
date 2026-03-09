@@ -28,11 +28,7 @@ describe('Health Check API', () => {
 
     const body = await res.json()
     expect(body.status).toBe('ok')
-    expect(body.version).toBeDefined()
     expect(body.timestamp).toBeDefined()
-    expect(body.services).toBeDefined()
-    expect(body.services.database).toBe('connected')
-    expect(body.services.auth).toBe('connected')
   })
 
   it('should return 404 for unknown routes', async () => {

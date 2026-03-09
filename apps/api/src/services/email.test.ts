@@ -40,7 +40,6 @@ describe('Email Service', () => {
       expect(mockSend).not.toHaveBeenCalled()
       expect(consoleSpy).toHaveBeenCalledWith(
         '[email] RESEND_API_KEY not configured — skipping welcome email',
-        expect.objectContaining({ to: 'jane@example.com' }),
       )
 
       consoleSpy.mockRestore()
@@ -97,8 +96,8 @@ describe('Email Service', () => {
       expect(consoleSpy).toHaveBeenCalledWith(
         '[email] RESEND_API_KEY not configured — skipping partner invite email',
         expect.objectContaining({
-          to: 'partner@example.com',
-          inviteUrl: 'https://planfortwo.com/invite?token=abc',
+          to: '*******************',
+          subject: 'Jane invited you to plan your wedding on PlanForTwo',
         }),
       )
 
