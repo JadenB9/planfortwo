@@ -18,7 +18,7 @@ export function PublishToggle({
   onPublish,
   onUnpublish,
 }: PublishToggleProps) {
-  const siteUrl = accessToken ? `/s/${accessToken}` : null
+  const siteUrl = accessToken ? `/s/${subdomain ? `${subdomain}-` : ''}${accessToken}` : null
 
   return (
     <div className="rounded-xl border bg-white p-4">

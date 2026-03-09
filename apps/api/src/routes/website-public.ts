@@ -10,9 +10,15 @@ import { createHash } from 'node:crypto'
 
 export const websitePublicRoute = new Hono()
 
+// Extract the 32-char hex access token from a slug like "sarah-james-abc123..." or just "abc123..."
+function extractToken(slug: string): string {
+  const match = slug.match(/([0-9a-f]{32})$/)
+  return match?.[1] ?? slug
+}
+
 // GET /website-public/:slug — public wedding website data (NO auth)
 websitePublicRoute.get('/:slug', async (c) => {
-  const slug = c.req.param('slug')
+  const slug = extractToken(c.req.param('slug'))
 
   const [config] = await db
     .select()
@@ -96,12 +102,12 @@ websitePublicRoute.post(
     }
   }),
   async (c) => {
-    const slug = c.req.param('slug')
+    const token = extractToken(c.req.param('slug'))
 
     const [config] = await db
       .select({ weddingId: websiteConfigs.weddingId })
       .from(websiteConfigs)
-      .where(eq(websiteConfigs.accessToken, slug))
+      .where(eq(websiteConfigs.accessToken, token))
 
     if (!config) {
       return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
@@ -135,12 +141,12 @@ websitePublicRoute.post(
 
 // GET /website-public/:slug/guestbook — approved guestbook entries (NO auth)
 websitePublicRoute.get('/:slug/guestbook', async (c) => {
-  const slug = c.req.param('slug')
+  const token = extractToken(c.req.param('slug'))
 
   const [config] = await db
     .select({ weddingId: websiteConfigs.weddingId })
     .from(websiteConfigs)
-    .where(eq(websiteConfigs.accessToken, slug))
+    .where(eq(websiteConfigs.accessToken, token))
 
   if (!config) {
     return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)

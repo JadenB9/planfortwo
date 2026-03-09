@@ -14,11 +14,17 @@ import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
 import { rsvpService } from '../services/rsvp.js'
 
+function extractToken(slug: string): string {
+  const match = slug.match(/([0-9a-f]{32})$/)
+  return match?.[1] ?? slug
+}
+
 async function resolveSlugToWeddingId(slug: string): Promise<string | null> {
+  const token = extractToken(slug)
   const [config] = await db
     .select({ weddingId: websiteConfigs.weddingId })
     .from(websiteConfigs)
-    .where(eq(websiteConfigs.accessToken, slug))
+    .where(eq(websiteConfigs.accessToken, token))
     .limit(1)
   return config?.weddingId ?? null
 }
