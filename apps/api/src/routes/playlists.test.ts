@@ -243,6 +243,10 @@ describe('Playlist Routes', () => {
 
   describe('POST /playlists/:id/songs', () => {
     it('should add a song to playlist', async () => {
+      mockedService.getPlaylist.mockResolvedValue({
+        id: PLAYLIST_ID,
+        weddingId: WEDDING_ID,
+      } as never)
       mockedService.addSong.mockResolvedValue({
         id: SONG_ID,
         playlistId: PLAYLIST_ID,

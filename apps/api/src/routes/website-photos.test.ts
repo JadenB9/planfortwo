@@ -44,6 +44,12 @@ vi.mock('../services/website-photos.js', () => ({
   },
 }))
 
+vi.mock('@planfortwo/storage', () => ({
+  storageClient: {
+    validateKeyOwnership: vi.fn().mockReturnValue(true),
+  },
+}))
+
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
@@ -135,7 +141,7 @@ describe('Website Photo Routes', () => {
     it('should return a presigned upload URL', async () => {
       mockedService.getUploadUrl.mockResolvedValue({
         uploadUrl: 'https://r2.example.com/upload?token=abc',
-        r2Key: `weddings/${WEDDING_ID}/photos/xyz.jpg`,
+        r2Key: `website-photos/${WEDDING_ID}/xyz.jpg`,
         url: 'https://cdn.example.com/photos/xyz.jpg',
         photoId: PHOTO_ID,
       })
@@ -232,7 +238,7 @@ describe('Website Photo Routes', () => {
     it('should register an uploaded photo', async () => {
       const photoData = {
         weddingId: WEDDING_ID,
-        r2Key: `weddings/${WEDDING_ID}/photos/xyz.jpg`,
+        r2Key: `website-photos/${WEDDING_ID}/xyz.jpg`,
         url: 'https://cdn.example.com/photos/xyz.jpg',
         fileName: 'ceremony.jpg',
         mimeType: 'image/jpeg',

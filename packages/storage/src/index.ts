@@ -101,6 +101,34 @@ export const storageClient = {
     return `email-attachments/${emailAddressId}/${attachmentId}.${ext}`
   },
 
+  /**
+   * Validates that an r2Key belongs to the expected wedding.
+   * Each key type uses a known prefix pattern: `{type}/{weddingId}/...`
+   * Also rejects path traversal attempts.
+   */
+  validateKeyOwnership(r2Key: string, weddingId: string): boolean {
+    // Reject path traversal
+    if (r2Key.includes('..') || r2Key.includes('//')) return false
+
+    const validPrefixes = [
+      `gallery/${weddingId}/`,
+      `website-photos/${weddingId}/`,
+      `receipts/${weddingId}/`,
+      `og-images/${weddingId}/`,
+    ]
+
+    return validPrefixes.some((prefix) => r2Key.startsWith(prefix))
+  },
+
+  /**
+   * Validates that an r2Key belongs to the expected email address.
+   * Email attachment keys use: `email-attachments/{emailAddressId}/...`
+   */
+  validateEmailAttachmentKeyOwnership(r2Key: string, emailAddressId: string): boolean {
+    if (r2Key.includes('..') || r2Key.includes('//')) return false
+    return r2Key.startsWith(`email-attachments/${emailAddressId}/`)
+  },
+
   async uploadFromUrl(key: string, sourceUrl: string, contentType: string): Promise<void> {
     if (!isAllowedUploadSource(sourceUrl)) {
       throw new Error('Upload source URL not from allowed host')

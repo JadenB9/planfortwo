@@ -46,6 +46,12 @@ vi.mock('../services/photo-gallery.js', () => ({
   },
 }))
 
+vi.mock('@planfortwo/storage', () => ({
+  storageClient: {
+    validateKeyOwnership: vi.fn().mockReturnValue(true),
+  },
+}))
+
 vi.mock('../services/features.js', () => ({
   featureService: {
     getFeatures: vi.fn().mockResolvedValue({
@@ -99,7 +105,7 @@ function authHeaders(): Record<string, string> {
 const samplePhoto = {
   id: PHOTO_ID,
   weddingId: WEDDING_ID,
-  r2Key: `weddings/${WEDDING_ID}/photos/ceremony.jpg`,
+  r2Key: `gallery/${WEDDING_ID}/ceremony.jpg`,
   url: 'https://cdn.example.com/photos/ceremony.jpg',
   fileName: 'ceremony.jpg',
   mimeType: 'image/jpeg',
@@ -190,7 +196,7 @@ describe('Photo Gallery Routes', () => {
     it('should create a photo and return 201', async () => {
       const createInput = {
         weddingId: WEDDING_ID,
-        r2Key: `weddings/${WEDDING_ID}/photos/new.jpg`,
+        r2Key: `gallery/${WEDDING_ID}/new.jpg`,
         url: 'https://cdn.example.com/photos/new.jpg',
         fileName: 'new.jpg',
         mimeType: 'image/jpeg',

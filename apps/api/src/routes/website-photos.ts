@@ -5,6 +5,7 @@ import {
   registerPhotoSchema,
   reorderPhotosSchema,
 } from '@planfortwo/validators'
+import { storageClient } from '@planfortwo/storage'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -55,6 +56,15 @@ websitePhotosRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
+    const weddingId = c.get('weddingId')
+
+    if (!storageClient.validateKeyOwnership(data.r2Key, weddingId)) {
+      return c.json(
+        { error: 'Invalid storage key', code: 'VALIDATION_ERROR', statusCode: 400 },
+        400,
+      )
+    }
+
     const photo = await websitePhotoService.register(data)
     return c.json({ data: photo }, 201)
   },

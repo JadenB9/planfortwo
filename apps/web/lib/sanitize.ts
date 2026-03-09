@@ -9,6 +9,8 @@ function sanitizeHtmlServer(html: string): string {
   return html
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/<script\b[^>]*\/>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<iframe\b[^>]*\/>/gi, '')
     .replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '')
     .replace(/href\s*=\s*["']?\s*javascript:/gi, 'href="')
     .replace(/src\s*=\s*["']?\s*javascript:/gi, 'src="')

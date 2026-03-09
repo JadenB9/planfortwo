@@ -10,6 +10,7 @@ import {
   createMoodBoardSchema,
   createMoodBoardItemSchema,
 } from '@planfortwo/validators'
+import { storageClient } from '@planfortwo/storage'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -114,14 +115,17 @@ registryRoute.delete('/funds/:id', resolveWeddingMiddleware, async (c) => {
 
 registryRoute.post(
   '/funds/:id/contribute',
+  resolveWeddingMiddleware,
   zValidator('json', createCashFundContributionSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }),
   async (c) => {
     try {
+      const fundId = c.req.param('id')
+      const weddingId = c.get('weddingId')
       const data = c.req.valid('json')
-      const contribution = await registryService.addContribution(data)
+      const contribution = await registryService.addContribution({ ...data, fundId }, weddingId)
       return c.json({ data: contribution }, 201)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Contribution failed'
@@ -231,6 +235,14 @@ registryRoute.post(
     const board = await registryService.getMoodBoard(boardId, weddingId)
     if (!board) return c.json({ error: 'Board not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
+
+    if (data.r2Key && !storageClient.validateKeyOwnership(data.r2Key, weddingId)) {
+      return c.json(
+        { error: 'Invalid storage key', code: 'VALIDATION_ERROR', statusCode: 400 },
+        400,
+      )
+    }
+
     const item = await registryService.addBoardItem(data)
     return c.json({ data: item }, 201)
   },

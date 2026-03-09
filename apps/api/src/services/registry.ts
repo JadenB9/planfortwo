@@ -110,12 +110,12 @@ export const registryService = {
       .where(and(eq(cashFunds.id, fundId), eq(cashFunds.weddingId, weddingId)))
   },
 
-  async addContribution(data: CreateCashFundContributionInput) {
-    // Verify the fund exists before contributing
+  async addContribution(data: CreateCashFundContributionInput, weddingId: string) {
+    // Verify the fund exists AND belongs to the user's wedding
     const [fund] = await db
       .select({ id: cashFunds.id })
       .from(cashFunds)
-      .where(eq(cashFunds.id, data.fundId))
+      .where(and(eq(cashFunds.id, data.fundId), eq(cashFunds.weddingId, weddingId)))
     if (!fund) {
       throw new Error('Fund not found')
     }

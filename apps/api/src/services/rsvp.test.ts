@@ -204,14 +204,23 @@ describe('RSVP Service', () => {
 
   describe('submitBatchRsvp', () => {
     it('should use a transaction for batch submissions', async () => {
-      // First mock isDeadlinePassed to return false
-      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ rsvpDeadline: '2099-12-31' }]),
+      // First call: isDeadlinePassed check, second call: household membership check
+      ;(mockedDb.select as ReturnType<typeof vi.fn>)
+        .mockReturnValueOnce({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([{ rsvpDeadline: '2099-12-31' }]),
+            }),
           }),
-        }),
-      })
+        })
+        .mockReturnValueOnce({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([
+              { id: 'g1', householdId: 'h1' },
+              { id: 'g2', householdId: 'h1' },
+            ]),
+          }),
+        })
       ;(mockedDb.transaction as ReturnType<typeof vi.fn>).mockImplementation(async (cb) => {
         const tx = {
           update: vi.fn().mockReturnValue({
@@ -243,7 +252,7 @@ describe('RSVP Service', () => {
         { guestId: 'g2', rsvpStatus: 'declined' as const },
       ]
 
-      const results = await rsvpService.submitBatchRsvp(submissions, 'wedding-1')
+      const results = await rsvpService.submitBatchRsvp(submissions, 'wedding-1', 'h1')
 
       expect(mockedDb.transaction).toHaveBeenCalledOnce()
       expect(results).toHaveLength(2)

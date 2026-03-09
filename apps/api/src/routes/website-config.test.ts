@@ -113,7 +113,6 @@ describe('Website Config Routes', () => {
         customColors: null,
         fontPair: 'playfair-lato',
         privacyMode: 'public',
-        passwordHash: null,
         subdomain: 'jane-john',
         customDomain: null,
         domainVerified: false,
@@ -135,6 +134,7 @@ describe('Website Config Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.templateId).toBe('classic')
+      expect(body.data.passwordHash).toBeUndefined()
     })
   })
 
@@ -147,7 +147,6 @@ describe('Website Config Routes', () => {
         customColors: null,
         fontPair: 'playfair-lato',
         privacyMode: 'public',
-        passwordHash: null,
         subdomain: 'jane-john',
         customDomain: null,
         domainVerified: false,

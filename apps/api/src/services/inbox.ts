@@ -297,6 +297,18 @@ export const inboxService = {
       throw new Error('Email address not found or not owned by you')
     }
 
+    // Validate r2Key ownership on attachments
+    if (data.attachments) {
+      for (const att of data.attachments) {
+        if (
+          att.r2Key &&
+          !storageClient.validateEmailAttachmentKeyOwnership(att.r2Key, address.id)
+        ) {
+          throw new Error('Invalid attachment storage key')
+        }
+      }
+    }
+
     const safeName = sanitizeDisplayName(address.displayName)
     const fromEmail = `${safeName} <${address.address}@planfortwo.com>`
     const resend = getResendClient()

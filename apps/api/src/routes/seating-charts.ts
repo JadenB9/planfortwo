@@ -246,8 +246,15 @@ seatingChartsRoute.post(
   async (c) => {
     const data = c.req.valid('json')
     const weddingId = c.get('weddingId')
-    const relationship = await seatingChartService.createRelationship({ ...data, weddingId })
-    return c.json({ data: relationship }, 201)
+    try {
+      const relationship = await seatingChartService.createRelationship({ ...data, weddingId })
+      return c.json({ data: relationship }, 201)
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('do not belong to this wedding')) {
+        return c.json({ error: err.message, code: 'FORBIDDEN', statusCode: 403 }, 403)
+      }
+      throw err
+    }
   },
 )
 

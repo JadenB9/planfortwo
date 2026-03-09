@@ -79,7 +79,10 @@ describe('Weather Service', () => {
       const result = await weatherService.getForecast(39.7456, -84.1862)
 
       expect(result).toHaveLength(7)
-      expect(mockedFetch).toHaveBeenCalledWith(expect.stringContaining('forecast_days=7'))
+      expect(mockedFetch).toHaveBeenCalledWith(
+        expect.stringContaining('forecast_days=7'),
+        expect.any(Object),
+      )
     })
 
     it('should cap forecast at 16 days', async () => {
@@ -92,7 +95,10 @@ describe('Weather Service', () => {
 
       await weatherService.getForecast(39.7456, -84.1862, 30)
 
-      expect(mockedFetch).toHaveBeenCalledWith(expect.stringContaining('forecast_days=16'))
+      expect(mockedFetch).toHaveBeenCalledWith(
+        expect.stringContaining('forecast_days=16'),
+        expect.any(Object),
+      )
     })
 
     it('should throw on API error', async () => {

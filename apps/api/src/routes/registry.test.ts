@@ -233,7 +233,7 @@ describe('Registry Routes', () => {
   })
 
   describe('POST /registry/funds/:id/contribute', () => {
-    it('should add a contribution', async () => {
+    it('should add a contribution with wedding ownership check', async () => {
       const fundId = 'c0000000-0000-0000-0000-000000000001'
       mockedService.addContribution.mockResolvedValue({
         id: 'd0000000-0000-0000-0000-000000000001',
@@ -247,12 +247,25 @@ describe('Registry Routes', () => {
       } as never)
 
       const app = createApp()
-      const res = await app.request(`/registry/funds/${fundId}/contribute`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ fundId, guestName: 'Uncle Bob', amount: 100, message: 'Congrats!' }),
-      })
+      const res = await app.request(
+        `/registry/funds/${fundId}/contribute?weddingId=${WEDDING_ID}`,
+        {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            fundId,
+            guestName: 'Uncle Bob',
+            amount: 100,
+            message: 'Congrats!',
+          }),
+        },
+      )
       expect(res.status).toBe(201)
+      // Verify weddingId from middleware context is passed to service
+      expect(mockedService.addContribution).toHaveBeenCalledWith(
+        expect.objectContaining({ fundId, guestName: 'Uncle Bob', amount: 100 }),
+        WEDDING_ID,
+      )
     })
   })
 

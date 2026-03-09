@@ -1275,14 +1275,18 @@ export const api = {
       }),
     contribute: (
       fundId: string,
+      weddingId: string,
       data: { fundId: string; guestName: string; amount: number; message?: string },
       token: string,
     ) =>
-      fetchApi<{ data: CashFundContribution }>(`/registry/funds/${fundId}/contribute`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        token,
-      }),
+      fetchApi<{ data: CashFundContribution }>(
+        `/registry/funds/${fundId}/contribute?weddingId=${weddingId}`,
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+          token,
+        },
+      ),
     listGifts: (weddingId: string, token: string) =>
       fetchApi<{ data: Gift[] }>(`/registry/gifts?weddingId=${weddingId}`, { token }),
     createGift: (

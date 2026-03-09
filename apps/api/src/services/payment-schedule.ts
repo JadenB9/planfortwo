@@ -76,6 +76,16 @@ export const paymentScheduleService = {
   },
 
   async update(id: string, weddingId: string, data: UpdatePaymentScheduleInput, userId: string) {
+    // Fetch the current state before updating to detect isPaid transitions
+    const [existing] = await db
+      .select({ isPaid: paymentSchedule.isPaid, amount: paymentSchedule.amount })
+      .from(paymentSchedule)
+      .where(and(eq(paymentSchedule.id, id), eq(paymentSchedule.weddingId, weddingId)))
+
+    if (!existing) return null
+
+    const wasPaid = existing.isPaid
+
     const updateData: Record<string, unknown> = {}
 
     if (data.title !== undefined) updateData.title = data.title
@@ -102,7 +112,8 @@ export const paymentScheduleService = {
 
     if (!updated) return null
 
-    if (data.isPaid === true) {
+    // Only increment paidAmount when transitioning from unpaid to paid
+    if (data.isPaid === true && !wasPaid) {
       const paymentAmount = parseFloat(updated.amount)
 
       const [currentItem] = await db
@@ -128,17 +139,58 @@ export const paymentScheduleService = {
       })
     }
 
+    // Decrement paidAmount when transitioning from paid to unpaid
+    if (data.isPaid === false && wasPaid) {
+      const paymentAmount = parseFloat(existing.amount)
+
+      const [currentItem] = await db
+        .select({ paidAmount: budgetItems.paidAmount })
+        .from(budgetItems)
+        .where(eq(budgetItems.id, updated.budgetItemId))
+
+      if (currentItem) {
+        const newPaidAmount = Math.max(0, parseFloat(currentItem.paidAmount) - paymentAmount)
+        await db
+          .update(budgetItems)
+          .set({ paidAmount: newPaidAmount.toString() })
+          .where(eq(budgetItems.id, updated.budgetItemId))
+      }
+    }
+
     return parseRow(updated)
   },
 
   async delete(id: string, weddingId: string, userId: string) {
     const [entry] = await db
-      .select({ title: paymentSchedule.title })
+      .select({
+        title: paymentSchedule.title,
+        isPaid: paymentSchedule.isPaid,
+        amount: paymentSchedule.amount,
+        budgetItemId: paymentSchedule.budgetItemId,
+      })
       .from(paymentSchedule)
       .where(and(eq(paymentSchedule.id, id), eq(paymentSchedule.weddingId, weddingId)))
 
     if (!entry) {
       throw new Error('Payment schedule entry not found')
+    }
+
+    // Decrement paidAmount on the budget item if deleting a paid payment
+    if (entry.isPaid) {
+      const paymentAmount = parseFloat(entry.amount)
+
+      const [currentItem] = await db
+        .select({ paidAmount: budgetItems.paidAmount })
+        .from(budgetItems)
+        .where(eq(budgetItems.id, entry.budgetItemId))
+
+      if (currentItem) {
+        const newPaidAmount = Math.max(0, parseFloat(currentItem.paidAmount) - paymentAmount)
+        await db
+          .update(budgetItems)
+          .set({ paidAmount: newPaidAmount.toString() })
+          .where(eq(budgetItems.id, entry.budgetItemId))
+      }
     }
 
     await db

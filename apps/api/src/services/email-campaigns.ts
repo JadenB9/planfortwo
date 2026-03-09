@@ -6,7 +6,65 @@ import type {
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
 } from '@planfortwo/validators'
+import { JSDOM } from 'jsdom'
+import DOMPurify from 'dompurify'
 import { activityService } from './activity.js'
+
+function sanitizeHtml(html: string): string {
+  const window = new JSDOM('').window
+  const purify = DOMPurify(window)
+  return purify.sanitize(html, {
+    ALLOWED_TAGS: [
+      'p',
+      'br',
+      'b',
+      'i',
+      'u',
+      'em',
+      'strong',
+      'a',
+      'ul',
+      'ol',
+      'li',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'blockquote',
+      'pre',
+      'code',
+      'div',
+      'span',
+      'img',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'td',
+      'th',
+      'hr',
+      'sub',
+      'sup',
+      'small',
+    ],
+    ALLOWED_ATTR: [
+      'href',
+      'target',
+      'rel',
+      'src',
+      'alt',
+      'width',
+      'height',
+      'style',
+      'class',
+      'id',
+      'colspan',
+      'rowspan',
+    ],
+  })
+}
 
 export const emailCampaignService = {
   async list(weddingId: string) {
@@ -31,7 +89,7 @@ export const emailCampaignService = {
       .values({
         weddingId: data.weddingId,
         subject: data.subject,
-        body: data.body,
+        body: sanitizeHtml(data.body),
         templateType: data.templateType,
         scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : undefined,
         recipientFilter: data.recipientFilter,
@@ -55,7 +113,7 @@ export const emailCampaignService = {
   async update(campaignId: string, weddingId: string, data: UpdateEmailCampaignInput) {
     const updateData: Record<string, unknown> = {}
     if (data.subject !== undefined) updateData.subject = data.subject
-    if (data.body !== undefined) updateData.body = data.body
+    if (data.body !== undefined) updateData.body = sanitizeHtml(data.body)
     if (data.templateType !== undefined) updateData.templateType = data.templateType
     if (data.scheduledAt !== undefined)
       updateData.scheduledAt = data.scheduledAt ? new Date(data.scheduledAt) : null
@@ -119,7 +177,7 @@ export const announcementService = {
       .values({
         weddingId: data.weddingId,
         title: data.title,
-        content: data.content,
+        content: sanitizeHtml(data.content),
         isPublished: data.isPublished ?? false,
         publishedAt: data.isPublished ? new Date() : undefined,
       })
@@ -142,7 +200,7 @@ export const announcementService = {
   async update(announcementId: string, weddingId: string, data: UpdateAnnouncementInput) {
     const updateData: Record<string, unknown> = {}
     if (data.title !== undefined) updateData.title = data.title
-    if (data.content !== undefined) updateData.content = data.content
+    if (data.content !== undefined) updateData.content = sanitizeHtml(data.content)
     if (data.isPublished !== undefined) {
       updateData.isPublished = data.isPublished
       if (data.isPublished) updateData.publishedAt = new Date()

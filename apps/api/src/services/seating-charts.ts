@@ -6,6 +6,7 @@ import {
   venueElements,
   tableAssignments,
   guestRelationships,
+  guests,
 } from '@planfortwo/db'
 import type {
   CreateSeatingChartInput,
@@ -212,6 +213,15 @@ export const seatingChartService = {
     }
 
     if (data.guestId) {
+      // Verify the guest belongs to this wedding to prevent cross-wedding IDOR
+      const [guest] = await db
+        .select({ id: guests.id })
+        .from(guests)
+        .where(and(eq(guests.id, data.guestId), eq(guests.weddingId, weddingId)))
+      if (!guest) {
+        throw new Error('Guest not found')
+      }
+
       const existing = await db
         .select()
         .from(tableAssignments)
@@ -284,6 +294,17 @@ export const seatingChartService = {
   },
 
   async createRelationship(data: CreateGuestRelationshipInput) {
+    // Verify both guests belong to this wedding to prevent cross-wedding IDOR
+    const guestIds = [data.guestAId, data.guestBId]
+    const matchingGuests = await db
+      .select({ id: guests.id })
+      .from(guests)
+      .where(and(inArray(guests.id, guestIds), eq(guests.weddingId, data.weddingId)))
+
+    if (matchingGuests.length !== 2) {
+      throw new Error('One or both guests do not belong to this wedding')
+    }
+
     const [rel] = await db
       .insert(guestRelationships)
       .values({

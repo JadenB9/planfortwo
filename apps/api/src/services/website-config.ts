@@ -5,6 +5,13 @@ import { hash, compare } from 'bcryptjs'
 import { randomBytes } from 'node:crypto'
 import { activityService } from './activity.js'
 
+function stripSensitiveFields<T extends { passwordHash?: string | null }>(
+  config: T,
+): Omit<T, 'passwordHash'> {
+  const { passwordHash: _, ...safe } = config
+  return safe
+}
+
 export const websiteConfigService = {
   async get(weddingId: string) {
     const [config] = await db
@@ -12,7 +19,7 @@ export const websiteConfigService = {
       .from(websiteConfigs)
       .where(eq(websiteConfigs.weddingId, weddingId))
 
-    return config ?? null
+    return config ? stripSensitiveFields(config) : null
   },
 
   async create(data: CreateWebsiteConfigInput, userId: string) {
@@ -63,7 +70,7 @@ export const websiteConfigService = {
       metadata: { templateId: data.templateId, subdomain: data.subdomain },
     })
 
-    return config!
+    return stripSensitiveFields(config!)
   },
 
   async update(id: string, weddingId: string, data: UpdateWebsiteConfigInput) {
@@ -88,7 +95,7 @@ export const websiteConfigService = {
       .where(and(eq(websiteConfigs.id, id), eq(websiteConfigs.weddingId, weddingId)))
       .returning()
 
-    return updated ?? null
+    return updated ? stripSensitiveFields(updated) : null
   },
 
   async publish(id: string, weddingId: string, userId: string) {
@@ -119,7 +126,7 @@ export const websiteConfigService = {
       })
     }
 
-    return updated ?? null
+    return updated ? stripSensitiveFields(updated) : null
   },
 
   async unpublish(id: string, weddingId: string, userId: string) {
@@ -139,7 +146,7 @@ export const websiteConfigService = {
       })
     }
 
-    return updated ?? null
+    return updated ? stripSensitiveFields(updated) : null
   },
 
   async setPassword(id: string, weddingId: string, password: string) {
@@ -150,7 +157,7 @@ export const websiteConfigService = {
       .where(and(eq(websiteConfigs.id, id), eq(websiteConfigs.weddingId, weddingId)))
       .returning()
 
-    return updated ?? null
+    return updated ? stripSensitiveFields(updated) : null
   },
 
   async verifyPassword(accessToken: string, password: string): Promise<boolean> {
