@@ -797,9 +797,14 @@ export interface DashboardStats {
   budgetTotal: number
 }
 
+export interface DashboardMember {
+  member: WeddingMember
+  user: Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'avatarUrl'>
+}
+
 export interface DashboardData {
   wedding: Wedding
-  members: WeddingMember[]
+  members: DashboardMember[]
   daysUntilWedding: number | null
   stats?: DashboardStats
 }

@@ -181,7 +181,7 @@ export default function DashboardPage() {
   const wedding = dashboardData?.wedding
   const members = dashboardData?.members ?? []
   const daysUntil = dashboardData?.daysUntilWedding
-  const hasPartner = members.some((m) => m.role === 'partner')
+  const hasPartner = members.some((m) => m.member.role === 'partner')
   const pendingPartnerInvite = pendingInvitations.find(
     (i) => i.status === 'pending' && i.role === 'partner',
   )

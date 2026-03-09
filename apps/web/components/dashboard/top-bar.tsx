@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
-import { Settings } from 'lucide-react'
+import { Settings, ExternalLink } from 'lucide-react'
 import { NAV_GROUPS } from '@/lib/navigation'
 
 export function TopBar() {
@@ -157,6 +157,32 @@ export function TopBar() {
                 ))}
               </div>
             </nav>
+
+            {/* Bottom section */}
+            <div className="space-y-2 border-t border-gray-200 p-4">
+              <Link
+                href="/settings"
+                onClick={closeMenu}
+                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                  pathname === '/settings'
+                    ? 'bg-wedding-50 text-wedding-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Settings
+                  className={`h-4 w-4 flex-shrink-0 ${pathname === '/settings' ? 'text-wedding-600' : 'text-gray-400'}`}
+                />
+                Wedding Settings
+              </Link>
+              <Link
+                href="/"
+                onClick={closeMenu}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-gray-400 transition-colors hover:text-gray-600"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Visit Home Page
+              </Link>
+            </div>
           </div>
         </div>
       )}
