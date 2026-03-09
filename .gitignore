@@ -38,6 +38,9 @@ blob-report/
 .claude/
 CLAUDE.md
 
+# Personal data
+*.csv
+
 # Misc
 *.log
 npm-debug.log*
