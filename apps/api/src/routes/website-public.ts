@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { trackPageViewSchema, createGuestbookEntrySchema } from '@planfortwo/validators'
+import { trackPageViewSchema } from '@planfortwo/validators'
 import { eq, and, or } from 'drizzle-orm'
 import {
   db,
