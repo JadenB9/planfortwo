@@ -1,9 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import DOMPurify from 'dompurify'
 import { ExternalLink, Phone, MapPin } from 'lucide-react'
 import type { TravelContent } from '@planfortwo/types'
+import { sanitizeHtml } from '@/lib/sanitize'
 import { useTemplateStyles } from '../template-context'
 
 interface TravelSectionProps {
@@ -35,7 +35,7 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             viewport={{ once: true }}
             className={`mb-10 text-center ${fontPair.bodyClass}`}
             style={{ color: `${colors.primary}CC` }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.directions) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.directions) }}
           />
         )}
         {content.accommodations.length > 0 && (
@@ -106,7 +106,7 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             viewport={{ once: true }}
             className="mt-10 overflow-hidden rounded-2xl"
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(content.mapEmbed, {
+              __html: sanitizeHtml(content.mapEmbed, {
                 ADD_TAGS: ['iframe'],
                 ADD_ATTR: ['allowfullscreen', 'frameborder', 'loading', 'src'],
                 ALLOWED_URI_REGEXP: /^https:\/\/(www\.)?google\.com\/maps\//,

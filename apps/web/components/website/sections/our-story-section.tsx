@@ -1,8 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import DOMPurify from 'dompurify'
 import type { OurStoryContent } from '@planfortwo/types'
+import { sanitizeHtml } from '@/lib/sanitize'
 import { useTemplateStyles } from '../template-context'
 
 interface OurStorySectionProps {
@@ -33,7 +33,7 @@ export function OurStorySection({ title, content }: OurStorySectionProps) {
             transition={{ delay: 0.2 }}
             className={`prose mx-auto max-w-none text-center ${fontPair.bodyClass}`}
             style={{ color: colors.primary }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.body) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.body) }}
           />
         )}
         {content.timelineEvents.length > 0 && (

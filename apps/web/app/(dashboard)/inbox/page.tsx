@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '@/lib/sanitize'
 import { springSmooth, fadeInUp, staggerContainer, listItem } from '@/lib/animations'
 import { api } from '@/lib/api'
 import { useWedding } from '@/hooks/use-wedding'
@@ -48,7 +48,7 @@ import { toast } from 'sonner'
 type TabFilter = 'all' | 'inbound' | 'outbound' | 'unread' | 'starred'
 
 function buildEmailSrcDoc(html: string): string {
-  const sanitized = DOMPurify.sanitize(html, {
+  const sanitized = sanitizeHtml(html, {
     ALLOWED_TAGS: [
       'html',
       'head',
