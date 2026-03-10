@@ -1,19 +1,19 @@
 import type { TemplateTask } from './index'
 
 export const tasks6Month: TemplateTask[] = [
-  // ── 6 months before ───────────────────────────────────────────────
+  // ── 6 months before ──────────────────────────────────────────────
   {
     title: 'Set your wedding budget',
     description:
-      'Agree on a total budget together. With a shorter timeline you need clarity fast so you can commit to vendors without hesitation.',
+      'Agree on a total number fast. With a compressed timeline you need clarity immediately so you can commit to vendors without hesitation.',
     categoryIndex: 7,
     monthsBefore: 6,
     priority: 'must_do',
   },
   {
-    title: 'Build your guest list',
+    title: 'Finalize your guest list',
     description:
-      'Finalize your guest list now — a 6-month timeline leaves no room for a B-list. Headcount determines venue, catering, and budget.',
+      'No room for a B-list on a 6-month timeline. Lock in your headcount now — it determines venue, catering, and seating.',
     categoryIndex: 11,
     monthsBefore: 6,
     priority: 'must_do',
@@ -21,7 +21,7 @@ export const tasks6Month: TemplateTask[] = [
   {
     title: 'Book your venue',
     description:
-      'Move quickly — available dates will be limited. Prioritize venues that include catering to simplify logistics.',
+      'Move quickly — available dates are limited. Prioritize venues that include catering and chairs/tables to simplify logistics.',
     categoryIndex: 0,
     monthsBefore: 6,
     priority: 'must_do',
@@ -29,15 +29,23 @@ export const tasks6Month: TemplateTask[] = [
   {
     title: 'Book your photographer',
     description:
-      'Photographers book up fast. Contact your top 3 immediately and secure one with a deposit.',
+      'Contact your top 3 immediately and secure one with a deposit. Ask about engagement session availability too.',
     categoryIndex: 1,
+    monthsBefore: 6,
+    priority: 'must_do',
+  },
+  {
+    title: 'Book your officiant',
+    description:
+      'Secure an officiant early. Discuss ceremony format, premarital meetings, and any required paperwork or licensing.',
+    categoryIndex: 12,
     monthsBefore: 6,
     priority: 'must_do',
   },
   {
     title: 'Start shopping for wedding attire',
     description:
-      'With a compressed timeline, look for in-stock dresses or sample sales. Custom orders may not arrive in time.',
+      'Look for in-stock dresses or sample sales — custom orders may not arrive in time. Buy off-the-rack and budget for rush alterations.',
     categoryIndex: 4,
     monthsBefore: 6,
     priority: 'must_do',
@@ -50,61 +58,12 @@ export const tasks6Month: TemplateTask[] = [
     monthsBefore: 6,
     priority: 'must_do',
   },
-  {
-    title: 'Book your officiant',
-    description:
-      'Secure an officiant early. Discuss ceremony format, premarital meetings, and any required paperwork.',
-    categoryIndex: 12,
-    monthsBefore: 6,
-    priority: 'must_do',
-  },
-  {
-    title: 'Create your wedding website',
-    description:
-      "Set up a site with date, venue, registry, and RSVP. You'll reference this URL on all communications.",
-    categoryIndex: 5,
-    monthsBefore: 6,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Purchase wedding insurance',
-    description:
-      'Protect deposits with event insurance. Especially important with a tight timeline when rescheduling is harder.',
-    categoryIndex: 7,
-    monthsBefore: 6,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Register for gifts',
-    description:
-      "Set up registries at 1-2 stores plus a cash fund. You'll want this ready before invitations go out.",
-    categoryIndex: 8,
-    monthsBefore: 6,
-    priority: 'nice_to_have',
-  },
 
+  // ── 5 months before ──────────────────────────────────────────────
   {
-    title: 'Decide on your color palette and theme',
+    title: 'Book your caterer & cake baker',
     description:
-      'Pick 2-4 colors and an aesthetic direction. This guides every visual decision from here on.',
-    categoryIndex: 2,
-    monthsBefore: 6,
-    priority: 'must_do',
-  },
-  {
-    title: 'Hire a day-of coordinator',
-    description:
-      'Even on a tight timeline, a coordinator manages logistics so you can focus on enjoying the day.',
-    categoryIndex: 6,
-    monthsBefore: 6,
-    priority: 'nice_to_have',
-  },
-
-  // ── 5 months before ───────────────────────────────────────────────
-  {
-    title: 'Book your caterer',
-    description:
-      "If your venue doesn't handle catering, lock in a caterer now. Schedule a tasting for month 3.",
+      "If your venue doesn't handle catering, lock in a caterer now. Book a cake baker or dessert vendor at the same time. Schedule tastings for month 3.",
     categoryIndex: 0,
     monthsBefore: 5,
     priority: 'must_do',
@@ -112,7 +71,7 @@ export const tasks6Month: TemplateTask[] = [
   {
     title: 'Book your DJ or band',
     description:
-      'Secure entertainment with a deposit. Discuss timeline of events and must-play songs.',
+      'Secure entertainment with a deposit. Discuss timeline of events, must-play songs, and equipment needs.',
     categoryIndex: 3,
     monthsBefore: 5,
     priority: 'must_do',
@@ -120,399 +79,157 @@ export const tasks6Month: TemplateTask[] = [
   {
     title: 'Book your florist',
     description:
-      'Bring inspiration photos and discuss seasonal flower options. Confirm bouquets, centerpieces, and ceremony arrangements.',
+      'Bring inspiration photos and discuss seasonal options. Confirm bouquets, centerpieces, and ceremony arrangements. Lock in with deposit.',
     categoryIndex: 2,
     monthsBefore: 5,
     priority: 'must_do',
   },
   {
-    title: 'Send save-the-dates or invitations',
+    title: 'Send save-the-dates or early invitations',
     description:
-      'With 6 months, consider combining save-the-dates and invitations — or send electronic save-the-dates immediately.',
+      'Consider combining save-the-dates and invitations, or send electronic save-the-dates immediately. Include your wedding website URL.',
     categoryIndex: 5,
     monthsBefore: 5,
     priority: 'must_do',
   },
   {
-    title: 'Book a videographer',
+    title: 'Set up your gift registry',
     description:
-      'If video is a priority, book now. Many couples regret skipping this. Even a single-shooter package captures key moments.',
-    categoryIndex: 1,
+      'Register at 1-2 stores plus a cash fund. Have this ready before invitations go out.',
+    categoryIndex: 8,
     monthsBefore: 5,
     priority: 'nice_to_have',
   },
   {
-    title: 'Order your wedding dress or attire',
+    title: 'Plan your honeymoon',
     description:
-      'Place the order or purchase off-the-rack. Ask about rush delivery fees if ordering custom.',
-    categoryIndex: 4,
-    monthsBefore: 5,
-    priority: 'must_do',
-  },
-  {
-    title: 'Book a wedding cake baker',
-    description:
-      'Schedule a tasting and discuss design. For a simpler option, consider a small cutting cake with a dessert bar.',
-    categoryIndex: 0,
-    monthsBefore: 5,
-    priority: 'must_do',
-  },
-  {
-    title: 'Start planning the honeymoon',
-    description:
-      'Research destinations and start booking flights and accommodations. Check passport validity.',
+      'Research destinations and start booking flights and accommodations. Check passport validity if traveling internationally.',
     categoryIndex: 9,
     monthsBefore: 5,
     priority: 'nice_to_have',
   },
 
+  // ── 4 months before ──────────────────────────────────────────────
   {
-    title: 'Research bar and beverage options',
+    title: 'Book hair & makeup artists',
     description:
-      'Decide between open bar, limited bar, or beer/wine only. Check if the venue has liquor license requirements.',
-    categoryIndex: 0,
-    monthsBefore: 5,
-    priority: 'nice_to_have',
+      'Book stylists and schedule a trial run. Discuss how many people need services and the getting-ready timeline.',
+    categoryIndex: 4,
+    monthsBefore: 4,
+    priority: 'must_do',
   },
   {
-    title: 'Purchase wedding shoes and accessories',
+    title: 'Coordinate wedding party attire',
     description:
-      'Buy shoes, veil, jewelry, and accessories. Prioritize comfort — you will be on your feet all day.',
+      'Choose styles that are available for quick shipping. Have all attendants order immediately — no time for custom orders.',
     categoryIndex: 4,
-    monthsBefore: 5,
-    priority: 'nice_to_have',
+    monthsBefore: 4,
+    priority: 'must_do',
   },
-
-  // ── 4 months before ───────────────────────────────────────────────
   {
-    title: 'Book hair and makeup artists',
+    title: 'Plan ceremony details with your officiant',
     description:
-      'Book stylists and schedule a trial run. Discuss the number of people who need services.',
-    categoryIndex: 4,
+      'Decide on readings, music, unity ceremony elements, processional order, and ring exchange wording.',
+    categoryIndex: 12,
     monthsBefore: 4,
     priority: 'must_do',
   },
   {
     title: 'Plan the rehearsal dinner',
     description:
-      'Choose a restaurant or casual venue. Invite the wedding party, close family, and officiant.',
+      'Choose a restaurant or casual venue. Invite the wedding party, close family, and officiant. Book the space.',
     categoryIndex: 13,
     monthsBefore: 4,
     priority: 'must_do',
   },
   {
-    title: 'Reserve hotel room blocks',
+    title: 'Create your wedding website',
     description:
-      'Arrange group rates at hotels near the venue. Add reservation details to your wedding website.',
-    categoryIndex: 6,
+      'Add venue directions, parking, hotel info, dress code, registry links, timeline, and RSVP functionality.',
+    categoryIndex: 5,
     monthsBefore: 4,
     priority: 'nice_to_have',
   },
   {
     title: 'Book transportation',
     description:
-      'Reserve vehicles for the wedding party and arrange guest shuttles if the venue is remote.',
+      'Reserve vehicles for the wedding party. Arrange guest shuttles if the venue is remote.',
     categoryIndex: 6,
     monthsBefore: 4,
     priority: 'nice_to_have',
   },
-  {
-    title: 'Order wedding party attire',
-    description:
-      'Ensure all attendants order their outfits now. Choose styles that are available for quick shipping.',
-    categoryIndex: 4,
-    monthsBefore: 4,
-    priority: 'must_do',
-  },
-  {
-    title: 'Plan the ceremony structure',
-    description:
-      'Decide on readings, music, unity ceremony elements, and processional order with your officiant.',
-    categoryIndex: 12,
-    monthsBefore: 4,
-    priority: 'must_do',
-  },
-  {
-    title: 'Choose ceremony and reception music',
-    description:
-      'Select processional, recessional, first dance, and parent dance songs. Start building your playlist.',
-    categoryIndex: 3,
-    monthsBefore: 4,
-    priority: 'must_do',
-  },
-  {
-    title: 'Plan the reception layout',
-    description: 'Work with your venue on table arrangement, dance floor placement, and bar setup.',
-    categoryIndex: 13,
-    monthsBefore: 4,
-    priority: 'must_do',
-  },
-  {
-    title: 'Finalize honeymoon bookings',
-    description: 'Confirm all travel arrangements — flights, hotels, rental cars, and activities.',
-    categoryIndex: 9,
-    monthsBefore: 4,
-    priority: 'nice_to_have',
-  },
 
-  {
-    title: 'Finalize bar and beverage menu',
-    description:
-      'Confirm cocktail options, wine selections, and non-alcoholic alternatives with your venue or caterer.',
-    categoryIndex: 0,
-    monthsBefore: 4,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Set up a wedding hashtag',
-    description:
-      'Create a unique hashtag for guests to use on social media. Display it on signage at the reception.',
-    categoryIndex: 5,
-    monthsBefore: 4,
-    priority: 'optional',
-  },
-  {
-    title: 'Research name change process',
-    description:
-      "If planning a name change, research requirements: Social Security, driver's license, bank accounts, passport.",
-    categoryIndex: 7,
-    monthsBefore: 4,
-    priority: 'optional',
-  },
-  {
-    title: 'Arrange guest book and card box',
-    description:
-      'Choose a traditional guest book or creative alternative. Get a secure, attractive card box.',
-    categoryIndex: 13,
-    monthsBefore: 4,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Update your wedding website with full details',
-    description:
-      'Add venue directions, parking, hotel recommendations, dress code, timeline, and RSVP link.',
-    categoryIndex: 5,
-    monthsBefore: 4,
-    priority: 'nice_to_have',
-  },
-
-  // ── 3 months before ───────────────────────────────────────────────
+  // ── 3 months before ──────────────────────────────────────────────
   {
     title: 'Mail wedding invitations',
     description:
-      'Send invitations now with a 4-week RSVP deadline. Include all details — venue, parking, dress code.',
+      'Send invitations now with a 3-4 week RSVP deadline. Include all details — venue, parking, dress code, and RSVP link.',
     categoryIndex: 5,
-    monthsBefore: 3,
-    priority: 'must_do',
-  },
-  {
-    title: 'Schedule a catering tasting',
-    description:
-      "Sample your menu options and finalize selections. Discuss dietary accommodations and kids' meals.",
-    categoryIndex: 0,
-    monthsBefore: 3,
-    priority: 'must_do',
-  },
-  {
-    title: 'Apply for your marriage license',
-    description:
-      'Check local requirements for waiting periods and documentation. Schedule your appointment.',
-    categoryIndex: 7,
     monthsBefore: 3,
     priority: 'must_do',
   },
   {
     title: 'Buy wedding rings',
-    description: 'Select rings, get sized, and allow time for engraving or custom work.',
+    description:
+      "Select rings, get sized, and allow time for engraving. Simple bands ship faster if you're tight on time.",
     categoryIndex: 12,
     monthsBefore: 3,
     priority: 'must_do',
   },
   {
-    title: 'Start writing vows',
+    title: 'Finalize floral designs & decor',
     description:
-      "Begin drafting personal vows if you're writing your own. Agree on similar length and tone.",
-    categoryIndex: 12,
-    monthsBefore: 3,
-    priority: 'must_do',
-  },
-  {
-    title: 'Schedule hair and makeup trial',
-    description: 'Do a trial run with your veil, accessories, and inspirational photos.',
-    categoryIndex: 4,
-    monthsBefore: 3,
-    priority: 'must_do',
-  },
-  {
-    title: 'Finalize floral designs',
-    description:
-      'Confirm all bouquets, boutonnieres, centerpieces, and ceremony arrangements with your florist.',
+      'Confirm all bouquets, boutonnieres, centerpieces, ceremony arrangements, and any additional decor.',
     categoryIndex: 2,
     monthsBefore: 3,
     priority: 'must_do',
   },
-  {
-    title: 'Plan bachelor and bachelorette parties',
-    description: 'Coordinate with the wedding party on dates, budget, and activities.',
-    categoryIndex: 10,
-    monthsBefore: 3,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Choose wedding party gifts',
-    description:
-      'Select meaningful gifts to thank your attendants. Plan to give them at the rehearsal dinner.',
-    categoryIndex: 8,
-    monthsBefore: 3,
-    priority: 'nice_to_have',
-  },
 
+  // ── 2 months before ──────────────────────────────────────────────
   {
-    title: 'Create a day-of emergency kit',
+    title: 'Final dress fittings & alterations',
     description:
-      'Assemble: sewing kit, stain remover, pain meds, safety pins, bobby pins, breath mints, phone charger, snacks.',
-    categoryIndex: 6,
-    monthsBefore: 3,
-    priority: 'optional',
-  },
-  {
-    title: 'Plan a signature cocktail',
-    description:
-      'Design a custom drink that reflects your personality as a couple. Feature it at the bar with a fun name.',
-    categoryIndex: 13,
-    monthsBefore: 3,
-    priority: 'optional',
-  },
-  {
-    title: 'Arrange photo booth or entertainment',
-    description:
-      'Book a photo booth, lawn games, or other cocktail hour entertainment on a compressed timeline.',
-    categoryIndex: 3,
-    monthsBefore: 3,
-    priority: 'optional',
-  },
-
-  // ── 2 months before ───────────────────────────────────────────────
-  {
-    title: 'Follow up on outstanding RSVPs',
-    description:
-      'Contact guests who missed the deadline. You need a final count for catering and seating.',
-    categoryIndex: 11,
-    monthsBefore: 2,
-    priority: 'must_do',
-  },
-  {
-    title: 'Create the seating chart',
-    description:
-      'Assign guests to tables once RSVPs are in. Consider group dynamics and special needs.',
-    categoryIndex: 11,
-    monthsBefore: 2,
-    priority: 'must_do',
-  },
-  {
-    title: 'Schedule dress fittings and alterations',
-    description: 'Get your final fitting done. Bring shoes, undergarments, and accessories.',
+      'Get your fittings done. Bring shoes, undergarments, and accessories. Pick up finished attire by month 1.',
     categoryIndex: 4,
     monthsBefore: 2,
     priority: 'must_do',
   },
   {
-    title: 'Finalize the reception timeline',
+    title: 'Build your seating chart',
     description:
-      'Map out cocktail hour, dinner, speeches, dances, and entertainment with your DJ or band.',
-    categoryIndex: 13,
+      'Assign guests to tables as RSVPs come in. Follow up with anyone who missed the deadline — you need a final count.',
+    categoryIndex: 11,
     monthsBefore: 2,
     priority: 'must_do',
   },
   {
-    title: 'Create your must-play and do-not-play lists',
-    description: 'Finalize song requests with your DJ or band leader.',
+    title: 'Finalize your music selections',
+    description:
+      'Create must-play and do-not-play lists. Choose songs for processional, recessional, first dance, parent dances, and last dance.',
     categoryIndex: 3,
     monthsBefore: 2,
     priority: 'must_do',
   },
   {
-    title: 'Finalize vows',
-    description: 'Polish your vows and practice reading them aloud. Print a copy for the ceremony.',
-    categoryIndex: 12,
-    monthsBefore: 2,
-    priority: 'must_do',
-  },
-  {
-    title: 'Order ceremony programs and place cards',
-    description: 'Design and print ceremony programs, escort cards, and menu cards.',
-    categoryIndex: 5,
-    monthsBefore: 2,
-    priority: 'optional',
-  },
-
-  {
-    title: 'Plan welcome bags for out-of-town guests',
+    title: 'Write & practice your vows',
     description:
-      'Assemble bags with local snacks, water, a weekend schedule, and a welcome note. Drop at hotels.',
-    categoryIndex: 8,
-    monthsBefore: 2,
-    priority: 'optional',
-  },
-  {
-    title: 'Prepare toasts and speech coordination',
-    description:
-      'Confirm who is giving speeches. Offer guidance on length (2-4 minutes) and order of toasts.',
-    categoryIndex: 13,
-    monthsBefore: 2,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Finalize the ceremony script',
-    description:
-      'Review the full ceremony with your officiant. Confirm vow format, ring exchange, and pronunciation.',
+      'Draft personal vows or confirm traditional wording. Agree on similar length and tone. Practice reading aloud.',
     categoryIndex: 12,
     monthsBefore: 2,
     priority: 'must_do',
   },
 
-  // ── 1 month before ────────────────────────────────────────────────
+  // ── 1 month before ───────────────────────────────────────────────
   {
-    title: 'Submit final guest count to caterer',
-    description: 'Provide the exact headcount and confirm menu, dietary needs, and vendor meals.',
-    categoryIndex: 0,
-    monthsBefore: 1,
-    priority: 'must_do',
-  },
-  {
-    title: 'Confirm all vendor details',
+    title: 'Confirm all vendors & submit final headcount',
     description:
-      'Contact every vendor to reconfirm dates, times, locations, and requirements. Send the full timeline.',
+      'Contact every vendor to reconfirm details. Submit final guest count with dietary notes to your caterer.',
     categoryIndex: 6,
     monthsBefore: 1,
     priority: 'must_do',
   },
   {
-    title: 'Do a final venue walkthrough',
-    description:
-      'Walk through the space with your coordinator. Confirm layout, power, parking, and backup plans.',
-    categoryIndex: 0,
-    monthsBefore: 1,
-    priority: 'must_do',
-  },
-  {
-    title: 'Pick up your wedding attire',
-    description:
-      'Collect your dress or suit after final alterations. Store carefully in a garment bag.',
-    categoryIndex: 4,
-    monthsBefore: 1,
-    priority: 'must_do',
-  },
-  {
-    title: 'Prepare vendor tips and final payments',
-    description:
-      'Calculate tips, prepare labeled envelopes, and assign someone to distribute them on the day.',
-    categoryIndex: 7,
-    monthsBefore: 1,
-    priority: 'must_do',
-  },
-  {
-    title: 'Create a detailed day-of timeline',
+    title: 'Create the day-of timeline',
     description:
       'Map every moment from getting ready to the grand exit. Share with all vendors and the wedding party.',
     categoryIndex: 6,
@@ -520,131 +237,53 @@ export const tasks6Month: TemplateTask[] = [
     priority: 'must_do',
   },
   {
+    title: 'Prepare vendor tips & final payments',
+    description:
+      'Calculate tips, prepare labeled cash envelopes, and assign a trusted person to distribute them on the day.',
+    categoryIndex: 7,
+    monthsBefore: 1,
+    priority: 'must_do',
+  },
+  {
     title: 'Delegate day-of responsibilities',
     description:
-      'Assign tasks: gift table, guest book, card box, vendor point of contact, end-of-night cleanup.',
+      'Assign tasks: gift table, guest book, card box, vendor point-of-contact, and end-of-night cleanup.',
     categoryIndex: 10,
     monthsBefore: 1,
     priority: 'must_do',
   },
-  {
-    title: 'Prepare a must-have photo list',
-    description: 'Give your photographer a list of family groupings and key moments to capture.',
-    categoryIndex: 1,
-    monthsBefore: 1,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Break in your wedding shoes',
-    description: 'Wear your shoes around the house to avoid blisters on the big day.',
-    categoryIndex: 4,
-    monthsBefore: 1,
-    priority: 'nice_to_have',
-  },
-
-  {
-    title: 'Arrange post-wedding cleanup crew',
-    description:
-      'Designate people to collect gifts, personal items, decorations, and vendor returns after the reception.',
-    categoryIndex: 6,
-    monthsBefore: 1,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Change name on travel documents if needed',
-    description:
-      'If changing your name and traveling internationally, ensure passport name matches your ticket.',
-    categoryIndex: 7,
-    monthsBefore: 1,
-    priority: 'nice_to_have',
-  },
 
   // ── Wedding week (0 months before) ────────────────────────────────
   {
-    title: 'Attend the rehearsal and rehearsal dinner',
+    title: 'Get your marriage license',
     description:
-      'Walk through the ceremony with the wedding party. Hand out attendant gifts at the dinner.',
-    categoryIndex: 12,
+      'Check local requirements for waiting periods, ID, and documentation. Give the signed license to your officiant before the ceremony.',
+    categoryIndex: 7,
     monthsBefore: 0,
     priority: 'must_do',
   },
   {
+    title: 'Pack your emergency kit',
+    description:
+      'Assemble: sewing kit, stain remover, pain meds, safety pins, bobby pins, breath mints, phone charger, snacks, and water.',
+    categoryIndex: 6,
+    monthsBefore: 0,
+    priority: 'nice_to_have',
+  },
+  {
     title: 'Pack for the honeymoon',
     description:
-      'Pack bags, verify travel documents, and arrange for someone to handle mail and pets.',
+      'Pack bags, verify travel documents, and arrange for someone to handle mail, pets, and plants.',
     categoryIndex: 9,
     monthsBefore: 0,
     priority: 'must_do',
   },
   {
-    title: 'Drop off decor and supplies at the venue',
-    description:
-      'Deliver signage, programs, favors, card box, guest book, and any DIY decorations.',
-    categoryIndex: 2,
-    monthsBefore: 0,
-    priority: 'must_do',
-  },
-  {
-    title: 'Confirm final details with the wedding party',
-    description:
-      'Send a final message with arrival times, getting-ready location, and contact numbers.',
-    categoryIndex: 10,
-    monthsBefore: 0,
-    priority: 'must_do',
-  },
-  {
-    title: 'Hand over marriage license and rings',
-    description:
-      'Give the license to your officiant and the rings to the best man or designated person.',
-    categoryIndex: 7,
-    monthsBefore: 0,
-    priority: 'must_do',
-  },
-  {
     title: 'Enjoy your wedding day',
-    description: 'Pause together to take it all in. This is what all the planning was for.',
+    description:
+      'Attend the rehearsal and dinner. On the big day, eat breakfast, stay hydrated, and steal a quiet moment together to soak it all in.',
     categoryIndex: 12,
     monthsBefore: 0,
     priority: 'must_do',
-  },
-  {
-    title: 'Plan your grand exit',
-    description:
-      'Arrange sparklers, confetti, or a decorated car. Coordinate with your photographer for the shot.',
-    categoryIndex: 6,
-    monthsBefore: 0,
-    priority: 'optional',
-  },
-  {
-    title: 'Eat breakfast and stay hydrated',
-    description:
-      'Wedding days are long and exciting. Start with a good meal and keep water nearby while getting ready.',
-    categoryIndex: 4,
-    monthsBefore: 0,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Charge your phone and portable charger',
-    description:
-      'You need your phone for last-minute coordination and capturing getting-ready moments.',
-    categoryIndex: 6,
-    monthsBefore: 0,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Get a good night of sleep',
-    description:
-      'Everything is in place. Trust the plan, rest up, and wake up excited for the best day.',
-    categoryIndex: 12,
-    monthsBefore: 0,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Bring your emergency kit to the venue',
-    description:
-      'Bring the emergency kit with you on the morning of — stain remover, mints, safety pins, phone charger.',
-    categoryIndex: 6,
-    monthsBefore: 0,
-    priority: 'nice_to_have',
   },
 ]

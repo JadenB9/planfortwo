@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { GuestWithTags, Household, GuestTag } from '@planfortwo/types'
+import type { GuestWithTags, Household, GuestTag, RsvpStatus } from '@planfortwo/types'
 import { GuestTagBadge } from './guest-tag-badge'
 import { GuestForm } from './guest-form'
 import type { GuestFormData } from './guest-form'
@@ -12,17 +12,11 @@ interface GuestDetailProps {
   tags: GuestTag[]
   guests?: GuestWithTags[]
   onUpdate: (data: GuestFormData) => Promise<void>
+  onRsvpChange?: (status: RsvpStatus) => Promise<void>
   onDelete: () => Promise<void>
   onClose: () => void
   canEdit: boolean
   canDelete: boolean
-}
-
-const RSVP_COLORS: Record<string, string> = {
-  accepted: 'bg-green-50 text-green-700 border-green-200',
-  pending: 'bg-amber-50 text-amber-700 border-amber-200',
-  declined: 'bg-red-50 text-red-700 border-red-200',
-  maybe: 'bg-blue-50 text-blue-700 border-blue-200',
 }
 
 export function GuestDetail({
@@ -31,6 +25,7 @@ export function GuestDetail({
   tags,
   guests,
   onUpdate,
+  onRsvpChange,
   onDelete,
   onClose,
   canEdit,
@@ -38,6 +33,7 @@ export function GuestDetail({
 }: GuestDetailProps) {
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [changingRsvp, setChangingRsvp] = useState(false)
 
   async function handleDelete() {
     setDeleting(true)
@@ -88,11 +84,49 @@ export function GuestDetail({
         <div className="flex-1 overflow-y-auto p-6">
           <div className="space-y-5">
             {/* RSVP Status */}
-            <div className={`rounded-xl border px-4 py-3 ${RSVP_COLORS[guest.rsvpStatus] ?? ''}`}>
-              <p className="text-xs font-medium uppercase tracking-wider">RSVP Status</p>
-              <p className="mt-0.5 text-sm font-semibold capitalize">{guest.rsvpStatus}</p>
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                RSVP Status
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {(['accepted', 'maybe', 'declined', 'pending'] as RsvpStatus[]).map((status) => {
+                  const active = guest.rsvpStatus === status
+                  const baseStyles: Record<string, string> = {
+                    accepted: active
+                      ? 'bg-green-600 text-white border-green-600'
+                      : 'border-gray-200 text-gray-500 hover:border-green-400 hover:text-green-600',
+                    maybe: active
+                      ? 'bg-amber-500 text-white border-amber-500'
+                      : 'border-gray-200 text-gray-500 hover:border-amber-400 hover:text-amber-600',
+                    declined: active
+                      ? 'bg-red-600 text-white border-red-600'
+                      : 'border-gray-200 text-gray-500 hover:border-red-400 hover:text-red-600',
+                    pending: active
+                      ? 'bg-gray-700 text-white border-gray-700'
+                      : 'border-gray-200 text-gray-500 hover:border-gray-500 hover:text-gray-700',
+                  }
+                  return (
+                    <button
+                      key={status}
+                      disabled={changingRsvp || !canEdit}
+                      onClick={async () => {
+                        if (active || !onRsvpChange) return
+                        setChangingRsvp(true)
+                        try {
+                          await onRsvpChange(status)
+                        } finally {
+                          setChangingRsvp(false)
+                        }
+                      }}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-medium capitalize transition-colors ${baseStyles[status]} ${!canEdit ? 'cursor-default' : 'cursor-pointer'}`}
+                    >
+                      {status}
+                    </button>
+                  )
+                })}
+              </div>
               {guest.rsvpRespondedAt && (
-                <p className="mt-1 text-xs opacity-70">
+                <p className="mt-2 text-xs text-gray-400">
                   Responded {new Date(guest.rsvpRespondedAt).toLocaleDateString()}
                 </p>
               )}

@@ -39,7 +39,7 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState<GuestFilterState>({
     page: 1,
-    pageSize: 50,
+    pageSize: 10,
     ...initialFilters,
   })
   const [total, setTotal] = useState(0)

@@ -1,35 +1,27 @@
 import type { TemplateTask } from './index'
 
 export const tasksElopement: TemplateTask[] = [
-  // ── 3 months before ───────────────────────────────────────────────
-  {
-    title: 'Decide on your elopement location',
-    description:
-      'Choose a spot that is meaningful to you — mountaintop, beach, courthouse, city hall, a favorite park, or a destination abroad.',
-    categoryIndex: 0,
-    monthsBefore: 3,
-    priority: 'must_do',
-  },
+  // ── 3 months before ──────────────────────────────────────────────
   {
     title: 'Set a simple budget',
     description:
-      'Elopements are budget-friendly but still have costs: officiant, photographer, attire, travel, and a celebratory meal.',
+      'Elopements are budget-friendly but still have costs: officiant, photographer, attire, travel, rings, and a celebratory meal. Write it all down.',
     categoryIndex: 7,
     monthsBefore: 3,
     priority: 'must_do',
   },
   {
-    title: 'Research elopement packages or coordinators',
+    title: 'Choose your elopement location',
     description:
-      'Many destinations offer all-inclusive elopement packages covering officiant, photographer, flowers, and permits.',
-    categoryIndex: 6,
+      'Pick a spot that means something to you — mountaintop, beach, courthouse, city hall, a favorite park, or a destination abroad. Check permit requirements for public spaces.',
+    categoryIndex: 0,
     monthsBefore: 3,
-    priority: 'nice_to_have',
+    priority: 'must_do',
   },
   {
     title: 'Book your officiant',
     description:
-      'Find a licensed officiant in your chosen location. Discuss the ceremony format and any personalization.',
+      'Find a licensed officiant at your chosen location. Discuss ceremony format, personalization, and whether they can serve as a witness.',
     categoryIndex: 12,
     monthsBefore: 3,
     priority: 'must_do',
@@ -37,23 +29,15 @@ export const tasksElopement: TemplateTask[] = [
   {
     title: 'Book an elopement photographer',
     description:
-      'Look for photographers who specialize in elopements and adventure sessions. Discuss locations, timeline, and deliverables.',
+      'Look for photographers who specialize in elopements and adventure sessions. Discuss locations, timeline, and deliverables. Many also serve as a witness.',
     categoryIndex: 1,
-    monthsBefore: 3,
-    priority: 'must_do',
-  },
-  {
-    title: 'Check permit requirements',
-    description:
-      'National parks, beaches, and many public spaces require permits for ceremonies. Apply early — some have limited availability.',
-    categoryIndex: 7,
     monthsBefore: 3,
     priority: 'must_do',
   },
   {
     title: 'Research marriage license requirements',
     description:
-      'Every state and country has different rules. Check waiting periods, ID requirements, witness needs, and validity windows.',
+      'Every state and country has different rules. Check waiting periods, ID requirements, witness needs, and validity windows. Apply at the right time.',
     categoryIndex: 7,
     monthsBefore: 3,
     priority: 'must_do',
@@ -61,15 +45,15 @@ export const tasksElopement: TemplateTask[] = [
   {
     title: 'Start shopping for your attire',
     description:
-      'Elopement attire can be anything — a traditional gown, a cocktail dress, a sharp suit, or something entirely your own.',
+      'Elopement attire can be anything — a gown, cocktail dress, sharp suit, or something entirely your own. Buy off-the-rack for a short timeline.',
     categoryIndex: 4,
     monthsBefore: 3,
     priority: 'must_do',
   },
   {
-    title: 'Book travel and accommodations',
+    title: 'Book travel & accommodations',
     description:
-      'If eloping away from home, book flights, hotels, or an Airbnb. Consider arriving a day early to explore.',
+      'If eloping away from home, book flights, hotels, or an Airbnb. Consider arriving a day early to explore and decompress.',
     categoryIndex: 6,
     monthsBefore: 3,
     priority: 'must_do',
@@ -77,50 +61,25 @@ export const tasksElopement: TemplateTask[] = [
   {
     title: 'Decide who (if anyone) to invite',
     description:
-      'Some couples elope completely alone, others bring parents or a few close friends. Decide what feels right.',
+      'Some couples elope alone, others bring parents or a few close friends. Decide what feels right and communicate your plans.',
     categoryIndex: 12,
     monthsBefore: 3,
     priority: 'must_do',
   },
-  {
-    title: 'Plan how to share the news',
-    description:
-      'Decide when and how to announce your elopement — immediately after, with photos later, or at a future celebration.',
-    categoryIndex: 5,
-    monthsBefore: 3,
-    priority: 'nice_to_have',
-  },
 
+  // ── 2 months before ──────────────────────────────────────────────
   {
-    title: 'Choose your music or playlist',
+    title: 'Buy wedding rings',
     description:
-      'Create a small playlist for the ceremony and celebration. Even a single meaningful song playing as you walk to each other matters.',
-    categoryIndex: 3,
-    monthsBefore: 3,
-    priority: 'optional',
-  },
-
-  // ── 2 months before ───────────────────────────────────────────────
-  {
-    title: 'Purchase or order your attire',
-    description:
-      'With a short timeline, buy off-the-rack or from quick-ship designers. Schedule any needed alterations.',
-    categoryIndex: 4,
+      'Select and size your rings. Allow time for engraving if desired. Simple bands often ship faster.',
+    categoryIndex: 12,
     monthsBefore: 2,
     priority: 'must_do',
   },
   {
-    title: 'Order a small bouquet and boutonniere',
-    description:
-      'Contact a local florist at your elopement destination or order dried flowers that travel well.',
-    categoryIndex: 2,
-    monthsBefore: 2,
-    priority: 'nice_to_have',
-  },
-  {
     title: 'Write your personal vows',
     description:
-      'This is the heart of your elopement. Take time to write something meaningful and authentic.',
+      'This is the heart of your elopement. Take time to write something meaningful, authentic, and from the heart. Agree on a similar length.',
     categoryIndex: 12,
     monthsBefore: 2,
     priority: 'must_do',
@@ -128,86 +87,37 @@ export const tasksElopement: TemplateTask[] = [
   {
     title: 'Plan your elopement day timeline',
     description:
-      'Map the day: getting ready, first look, ceremony, photos, and a special meal. Keep it relaxed.',
+      "Map the day: getting ready, first look, ceremony, photos, and a celebratory meal. Keep it relaxed — that's the whole point.",
     categoryIndex: 6,
     monthsBefore: 2,
     priority: 'must_do',
   },
   {
-    title: 'Book a special dinner or meal',
+    title: 'Order a small bouquet & boutonniere',
     description:
-      'Reserve a table at a meaningful restaurant for your post-ceremony celebration. Ask about a private area.',
+      'Contact a local florist at your destination or order dried flowers that travel well. Simple and beautiful.',
+    categoryIndex: 2,
+    monthsBefore: 2,
+    priority: 'nice_to_have',
+  },
+  {
+    title: 'Book a celebratory dinner',
+    description:
+      'Reserve a table at a special restaurant for your post-ceremony celebration. Ask about a private area or outdoor seating.',
     categoryIndex: 0,
     monthsBefore: 2,
     priority: 'nice_to_have',
   },
   {
-    title: 'Buy wedding rings',
-    description:
-      'Select and size your rings. Allow time for engraving. Simple bands often ship faster.',
-    categoryIndex: 12,
-    monthsBefore: 2,
-    priority: 'must_do',
-  },
-  {
-    title: 'Confirm passport and travel documents',
-    description:
-      'If eloping abroad, verify passport validity (6+ months), visas, and any COVID-era entry requirements.',
-    categoryIndex: 7,
-    monthsBefore: 2,
-    priority: 'must_do',
-  },
-  {
-    title: 'Consider a videographer or self-film setup',
-    description:
-      'Hire a videographer for the ceremony or set up a tripod with a phone for a DIY video of your vows.',
-    categoryIndex: 1,
-    monthsBefore: 2,
-    priority: 'optional',
-  },
-  {
-    title: 'Plan a post-elopement celebration',
-    description:
-      'Many couples host a casual party weeks or months later to celebrate with everyone they love.',
-    categoryIndex: 13,
-    monthsBefore: 2,
-    priority: 'optional',
-  },
-
-  {
-    title: 'Plan your elopement hair and makeup',
+    title: 'Plan your elopement hair & makeup',
     description:
       'Book a stylist at your destination or plan to do your own. Do a practice run at home either way.',
     categoryIndex: 4,
     monthsBefore: 2,
     priority: 'nice_to_have',
   },
-  {
-    title: 'Arrange for witnesses if required',
-    description:
-      'Some states require 1-2 witnesses. Check local laws and arrange for someone — your photographer can often serve as one.',
-    categoryIndex: 7,
-    monthsBefore: 2,
-    priority: 'must_do',
-  },
-  {
-    title: 'Purchase accessories and personal touches',
-    description:
-      'Veil, jewelry, cufflinks, a small vase for a ceremony table, or handwritten vow cards to hold.',
-    categoryIndex: 4,
-    monthsBefore: 2,
-    priority: 'optional',
-  },
-  {
-    title: 'Write letters to each other',
-    description:
-      'Write a letter to your partner to open on the morning of the elopement. A meaningful tradition for an intimate day.',
-    categoryIndex: 12,
-    monthsBefore: 2,
-    priority: 'optional',
-  },
 
-  // ── 1 month before ────────────────────────────────────────────────
+  // ── 1 month before ───────────────────────────────────────────────
   {
     title: 'Apply for your marriage license',
     description:
@@ -219,90 +129,33 @@ export const tasksElopement: TemplateTask[] = [
   {
     title: 'Confirm all vendor details',
     description:
-      'Reconfirm your officiant, photographer, and any other vendors. Share your timeline and meeting locations.',
+      'Reconfirm your officiant, photographer, and any other vendors. Share your timeline, meeting locations, and phone numbers.',
     categoryIndex: 6,
     monthsBefore: 1,
     priority: 'must_do',
   },
   {
-    title: 'Finalize and practice your vows',
+    title: 'Finalize & practice your vows',
     description:
-      'Polish your vows and read them aloud. Print a clean copy to hold during the ceremony.',
+      'Polish your vows and read them aloud several times. Print a clean copy on nice card stock to hold during the ceremony.',
     categoryIndex: 12,
     monthsBefore: 1,
     priority: 'must_do',
   },
   {
-    title: 'Get your attire fitted and ready',
+    title: 'Get your attire fitted & ready',
     description:
-      'Do a final try-on with accessories and shoes. Steam or press everything and pack carefully.',
+      'Do a final try-on with all accessories and shoes. Steam or press everything and pack it carefully for travel.',
     categoryIndex: 4,
     monthsBefore: 1,
     priority: 'must_do',
   },
-  {
-    title: 'Prepare an elopement kit',
-    description:
-      'Pack essentials: vows, rings, license, emergency sewing kit, phone charger, snacks, water, and touch-up makeup.',
-    categoryIndex: 6,
-    monthsBefore: 1,
-    priority: 'nice_to_have',
-  },
-  {
-    title: 'Write elopement announcement cards',
-    description:
-      'Design and print announcement cards to mail after the ceremony. Include a favorite photo from the day.',
-    categoryIndex: 5,
-    monthsBefore: 1,
-    priority: 'optional',
-  },
-  {
-    title: 'Plan something meaningful for the morning of',
-    description:
-      'Write a letter to each other, exchange gifts, or share a quiet breakfast before the ceremony.',
-    categoryIndex: 12,
-    monthsBefore: 1,
-    priority: 'optional',
-  },
 
+  // ── Elopement week (0 months before) ─────────────────────────────
   {
-    title: 'Research name change requirements',
+    title: 'Pack rings, vows, license & attire',
     description:
-      "If planning a name change, look into the process for Social Security, driver's license, and passport.",
-    categoryIndex: 7,
-    monthsBefore: 1,
-    priority: 'optional',
-  },
-
-  // ── Elopement week (0 months before) ──────────────────────────────
-  {
-    title: 'Confirm travel and accommodation details',
-    description:
-      'Double-check flights, hotel reservations, and transportation. Save all confirmation numbers.',
-    categoryIndex: 6,
-    monthsBefore: 0,
-    priority: 'must_do',
-  },
-  {
-    title: 'Pack rings, vows, license, and attire',
-    description:
-      'Use a checklist. Carry the rings, vows, and license in your personal bag — never in checked luggage.',
-    categoryIndex: 7,
-    monthsBefore: 0,
-    priority: 'must_do',
-  },
-  {
-    title: 'Check the weather forecast',
-    description:
-      'Have a backup plan if your ceremony is outdoors. Bring layers, umbrellas, or a rain plan.',
-    categoryIndex: 6,
-    monthsBefore: 0,
-    priority: 'must_do',
-  },
-  {
-    title: 'Hand over the marriage license to your officiant',
-    description:
-      'Give the license to your officiant before the ceremony. Confirm they will file it after.',
+      'Use a checklist. Carry rings, vows, and license in your personal bag — never in checked luggage. Bring an emergency kit with snacks and a phone charger.',
     categoryIndex: 7,
     monthsBefore: 0,
     priority: 'must_do',
@@ -310,23 +163,15 @@ export const tasksElopement: TemplateTask[] = [
   {
     title: 'Enjoy your elopement day',
     description:
-      'Be present with each other. No guest list to manage, no timeline pressure — just the two of you making a promise.',
+      'Be fully present with each other. No guest list to manage, no timeline pressure — just the two of you making a promise.',
     categoryIndex: 12,
     monthsBefore: 0,
     priority: 'must_do',
   },
   {
-    title: 'Send elopement announcements',
-    description:
-      'Share the news with family and friends. A heartfelt message, a photo, or mailed announcement cards all work beautifully.',
-    categoryIndex: 5,
-    monthsBefore: 0,
-    priority: 'nice_to_have',
-  },
-  {
     title: 'File your marriage certificate',
     description:
-      'Confirm your officiant filed the signed certificate. Order extra certified copies for name changes and legal matters.',
+      'Confirm your officiant filed the signed certificate after the ceremony. Order extra certified copies for name changes and legal matters.',
     categoryIndex: 7,
     monthsBefore: 0,
     priority: 'must_do',

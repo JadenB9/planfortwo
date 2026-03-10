@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight, Send } from 'lucide-react'
-import type { GuestWithTags } from '@planfortwo/types'
+import type { GuestWithTags, RsvpStatus } from '@planfortwo/types'
 import { api } from '@/lib/api'
 import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
@@ -99,6 +99,7 @@ export default function GuestsPage() {
           plusOneName: data.plusOneName || null,
           dietary: data.dietary,
           tagIds: data.tagIds,
+          ...(data.rsvpStatus ? { rsvpStatus: data.rsvpStatus } : {}),
         },
         weddingId,
         token,
@@ -136,6 +137,23 @@ export default function GuestsPage() {
     toast.success('Guest removed')
     await refetch()
   }, [weddingId, selectedGuest, getToken, refetch])
+
+  const handleRsvpChange = useCallback(
+    async (status: RsvpStatus) => {
+      if (!weddingId || !selectedGuest) return
+      const token = await getToken()
+      if (!token) return
+      await api.guests.update(
+        selectedGuest.id,
+        { rsvpStatus: status },
+        weddingId,
+        token,
+      )
+      toast.success(`RSVP updated to ${status}`)
+      await refetch()
+    },
+    [weddingId, selectedGuest, getToken, refetch],
+  )
 
   const handleDeleteGuestInline = useCallback(
     async (guest: GuestWithTags) => {
@@ -235,7 +253,7 @@ export default function GuestsPage() {
   const uninvitedWithEmail = guests.filter((g) => g.email && !g.inviteSentAt)
 
   const currentPage = filters.page ?? 1
-  const currentPageSize = filters.pageSize ?? 50
+  const currentPageSize = filters.pageSize ?? 10
   const totalPages = Math.max(1, Math.ceil(total / currentPageSize))
   const showingFrom = total === 0 ? 0 : (currentPage - 1) * currentPageSize + 1
   const showingTo = Math.min(currentPage * currentPageSize, total)
@@ -249,9 +267,11 @@ export default function GuestsPage() {
           onChange={(e) => setPageSize(Number(e.target.value))}
           className="focus:border-wedding-600 focus:ring-wedding-600/20 rounded-lg border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2"
         >
+          <option value={10}>10</option>
           <option value={25}>25</option>
           <option value={50}>50</option>
           <option value={100}>100</option>
+          <option value={200}>200</option>
         </select>
         <span>per page</span>
         {total > 0 && (
@@ -408,6 +428,7 @@ export default function GuestsPage() {
           tags={tags}
           guests={guests}
           onUpdate={handleUpdateGuest}
+          onRsvpChange={handleRsvpChange}
           onDelete={handleDeleteGuest}
           onClose={() => setSelectedGuest(null)}
           canEdit={features?.canEditGuests ?? false}

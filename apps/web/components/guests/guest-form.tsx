@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import type { GuestWithTags, Household, GuestTag, GuestSide } from '@planfortwo/types'
+import type { GuestWithTags, Household, GuestTag, GuestSide, RsvpStatus } from '@planfortwo/types'
 
 interface GuestFormProps {
   guest?: GuestWithTags | null
@@ -25,6 +25,7 @@ export interface GuestFormData {
   plusOneName?: string | null
   dietary?: { notes?: string } | null
   tagIds?: string[]
+  rsvpStatus?: RsvpStatus
 }
 
 export function GuestForm({
@@ -50,6 +51,7 @@ export function GuestForm({
     plusOneName: guest?.plusOneName ?? '',
     dietary: guest?.dietary ?? null,
     tagIds: guest?.tags.map((t) => t.id) ?? [],
+    rsvpStatus: guest?.rsvpStatus as RsvpStatus | undefined,
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -213,6 +215,43 @@ export function GuestForm({
                 </select>
               </div>
             </div>
+
+            {guest && (
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  RSVP Status
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {(['pending', 'accepted', 'maybe', 'declined'] as const).map((status) => {
+                    const active = formData.rsvpStatus === status
+                    const styles: Record<string, string> = {
+                      accepted: active
+                        ? 'bg-green-600 text-white'
+                        : 'border-gray-300 text-gray-600 hover:border-green-400',
+                      maybe: active
+                        ? 'bg-amber-500 text-white'
+                        : 'border-gray-300 text-gray-600 hover:border-amber-400',
+                      declined: active
+                        ? 'bg-red-600 text-white'
+                        : 'border-gray-300 text-gray-600 hover:border-red-400',
+                      pending: active
+                        ? 'bg-gray-700 text-white'
+                        : 'border-gray-300 text-gray-600 hover:border-gray-500',
+                    }
+                    return (
+                      <button
+                        key={status}
+                        type="button"
+                        onClick={() => update('rsvpStatus', status)}
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-medium capitalize transition-colors ${styles[status]}`}
+                      >
+                        {status}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-4">
               <label className="flex items-center gap-2 text-sm text-gray-700">
