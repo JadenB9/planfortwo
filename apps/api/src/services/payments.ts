@@ -129,21 +129,42 @@ export const purchaseService = {
       return { success: false as const, error: 'Invalid promo code' }
     }
 
-    const [purchase] = await db
-      .insert(purchases)
-      .values({
-        weddingId,
-        userId,
-        amount: '0.00',
-        currency: 'usd',
-        status: 'completed',
-        completedAt: new Date(),
-      })
-      .returning()
+    const result = await db.transaction(async (tx) => {
+      // Idempotency: check if this wedding already redeemed a promo code
+      const [existing] = await tx
+        .select({ id: purchases.id })
+        .from(purchases)
+        .where(
+          and(
+            eq(purchases.weddingId, weddingId),
+            eq(purchases.amount, '0.00'),
+            eq(purchases.status, 'completed'),
+          ),
+        )
+        .limit(1)
 
-    await db.update(weddings).set({ tier: 'full' }).where(eq(weddings.id, weddingId))
+      if (existing) {
+        return { success: true as const, purchase: existing, alreadyRedeemed: true }
+      }
 
-    return { success: true as const, purchase: purchase! }
+      const [purchase] = await tx
+        .insert(purchases)
+        .values({
+          weddingId,
+          userId,
+          amount: '0.00',
+          currency: 'usd',
+          status: 'completed',
+          completedAt: new Date(),
+        })
+        .returning()
+
+      await tx.update(weddings).set({ tier: 'full' }).where(eq(weddings.id, weddingId))
+
+      return { success: true as const, purchase: purchase! }
+    })
+
+    return result
   },
 
   getStripe,
@@ -186,10 +207,6 @@ export const referralService = {
 }
 
 export const contactService = {
-  async list() {
-    return db.select().from(contactSubmissions)
-  },
-
   async create(data: CreateContactSubmissionInput) {
     const [submission] = await db
       .insert(contactSubmissions)

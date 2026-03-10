@@ -39,6 +39,7 @@ export function useBudget({ weddingId, initialFilters }: UseBudgetOptions) {
   const [tips, setTips] = useState<TipSuggestion[]>([])
   const [splits, setSplits] = useState<SplitCostSummary | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<BudgetFilterState>(initialFilters ?? {})
 
   const loadData = useCallback(async () => {
@@ -47,6 +48,7 @@ export function useBudget({ weddingId, initialFilters }: UseBudgetOptions) {
       return
     }
     setLoading(true)
+    setError(null)
     try {
       const token = await getToken()
       if (!token) return
@@ -101,8 +103,8 @@ export function useBudget({ weddingId, initialFilters }: UseBudgetOptions) {
           }),
       )
       await Promise.all(analyticsPromises)
-    } catch {
-      /* silent */
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load budget data')
     } finally {
       setLoading(false)
     }
@@ -126,6 +128,7 @@ export function useBudget({ weddingId, initialFilters }: UseBudgetOptions) {
     tips,
     splits,
     loading,
+    error,
     filters,
     updateFilters,
     refetch: loadData,

@@ -9,11 +9,14 @@ import {
   websitePhotos,
   weddings,
   events,
+  photos,
 } from '@planfortwo/db'
 import { asc } from 'drizzle-orm'
 import { websiteAnalyticsService } from '../services/website-analytics.js'
 import { guestbookService } from '../services/guestbook.js'
-import { createHash } from 'node:crypto'
+import { playlistService } from '../services/playlists.js'
+import { storageClient } from '@planfortwo/storage'
+import { createHash, randomUUID } from 'node:crypto'
 import { z } from 'zod'
 
 export const websitePublicRoute = new Hono()
@@ -29,7 +32,6 @@ function slugCondition(slug: string) {
 }
 
 // GET /website-public/:slug — public wedding website data (NO auth)
-// Supports both access token slugs (jabby-abc123...) and plain subdomains (jabby)
 websitePublicRoute.get('/:slug', async (c) => {
   const slug = c.req.param('slug')
 
@@ -40,13 +42,11 @@ websitePublicRoute.get('/:slug', async (c) => {
   }
 
   if (config.privacyMode === 'password') {
-    // Fetch wedding name for password gate UI (no sensitive data)
     const [pwWedding] = await db
       .select({ name: weddings.name })
       .from(weddings)
       .where(eq(weddings.id, config.weddingId))
 
-    // Only return minimal data — no internal IDs
     return c.json({
       data: {
         config: {
@@ -64,7 +64,6 @@ websitePublicRoute.get('/:slug', async (c) => {
     .from(weddings)
     .where(eq(weddings.id, config.weddingId))
 
-  // Query the earliest event (ceremony) for a more accurate countdown
   const weddingEvents = await db
     .select({ date: events.date, startTime: events.startTime })
     .from(events)
@@ -89,7 +88,16 @@ websitePublicRoute.get('/:slug', async (c) => {
     .where(eq(websitePhotos.weddingId, config.weddingId))
     .orderBy(asc(websitePhotos.sortOrder))
 
-  const photos = rawPhotos.map(({ weddingId: _w, ...rest }) => rest)
+  const websitePhotoList = rawPhotos.map(({ weddingId: _w, ...rest }) => rest)
+
+  // Fetch approved guest photos from the photos (gallery) table
+  const approvedGuestPhotos = await db
+    .select()
+    .from(photos)
+    .where(
+      and(eq(photos.weddingId, config.weddingId), eq(photos.moderationStatus, 'approved')),
+    )
+    .orderBy(asc(photos.createdAt))
 
   const headers: Record<string, string> = {}
   if (config.privacyMode === 'unlisted') {
@@ -112,7 +120,8 @@ websitePublicRoute.get('/:slug', async (c) => {
           subdomain: safeConfig.subdomain,
         },
         sections,
-        photos,
+        photos: websitePhotoList,
+        guestPhotos: approvedGuestPhotos.map(({ weddingId: _w, ...rest }) => rest),
         weddingName: wedding?.name ?? '',
         weddingDate: wedding?.date ?? null,
         ceremonyDate: ceremonyEvent?.date ?? wedding?.date ?? null,
@@ -142,7 +151,6 @@ async function resolvePublicConfig(slug: string) {
 // Simple in-memory dedup cache for analytics (visitorId:path -> timestamp)
 const analyticsDedup = new Map<string, number>()
 const DEDUP_WINDOW_MS = 30_000
-// Periodic cleanup to prevent memory leak
 setInterval(() => {
   const now = Date.now()
   for (const [key, ts] of analyticsDedup) {
@@ -166,7 +174,6 @@ websitePublicRoute.post(
       return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     }
 
-    // Block analytics on password-protected sites (visitor hasn't authenticated)
     if (config.privacyMode === 'password') {
       return c.json({ data: { success: true } })
     }
@@ -183,7 +190,6 @@ websitePublicRoute.post(
     const country = c.req.header('cf-ipcountry') ?? null
     const visitorId = createHash('sha256').update(`${ip}:${ua}`).digest('hex').slice(0, 16)
 
-    // Deduplicate: skip if same visitor+path tracked within 30 seconds
     const dedupKey = `${visitorId}:${data.path}:${data.sectionViewed ?? ''}`
     const lastTracked = analyticsDedup.get(dedupKey)
     if (lastTracked && Date.now() - lastTracked < DEDUP_WINDOW_MS) {
@@ -214,7 +220,6 @@ websitePublicRoute.get('/:slug/guestbook', async (c) => {
     return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   }
 
-  // Block guestbook on password-protected sites
   if (config.privacyMode === 'password') {
     return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   }
@@ -224,7 +229,6 @@ websitePublicRoute.get('/:slug/guestbook', async (c) => {
 })
 
 // POST /website-public/:slug/guestbook — submit guestbook entry via slug (NO auth)
-// Validates input with a public-friendly schema (no weddingId from client)
 const publicGuestbookSchema = z.object({
   authorName: z.string().trim().min(1).max(100),
   message: z.string().trim().min(1).max(2000),
@@ -246,7 +250,6 @@ websitePublicRoute.post(
       return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     }
 
-    // Block guestbook on password-protected sites
     if (config.privacyMode === 'password') {
       return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     }
@@ -274,5 +277,184 @@ websitePublicRoute.post(
       message: data.message,
     })
     return c.json({ data: entry }, 201)
+  },
+)
+
+// --- Song Requests ---
+
+// GET /website-public/:slug/song-requests — approved song requests (NO auth)
+websitePublicRoute.get('/:slug/song-requests', async (c) => {
+  const slug = c.req.param('slug')
+
+  const config = await resolvePublicConfig(slug)
+  if (!config) {
+    return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
+
+  if (config.privacyMode === 'password') {
+    return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
+
+  const allRequests = await playlistService.listSongRequests(config.weddingId)
+  const approved = allRequests.filter((r) => r.isApproved)
+  return c.json({ data: approved })
+})
+
+// POST /website-public/:slug/song-requests — submit song request via slug (NO auth)
+const publicSongRequestSchema = z.object({
+  guestName: z.string().trim().min(1).max(200),
+  title: z.string().trim().min(1).max(300),
+  artist: z.string().trim().min(1).max(300),
+  notes: z.string().trim().max(500).nullable().optional(),
+})
+
+websitePublicRoute.post(
+  '/:slug/song-requests',
+  zValidator('json', publicSongRequestSchema, (result, c) => {
+    if (!result.success) {
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    }
+  }),
+  async (c) => {
+    const slug = c.req.param('slug')
+
+    const config = await resolvePublicConfig(slug)
+    if (!config) {
+      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    if (config.privacyMode === 'password') {
+      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    const data = c.req.valid('json')
+
+    const request = await playlistService.createSongRequest({
+      weddingId: config.weddingId,
+      guestName: data.guestName,
+      title: data.title,
+      artist: data.artist,
+      notes: data.notes ?? null,
+    })
+    return c.json({ data: request }, 201)
+  },
+)
+
+// --- Guest Photo Upload ---
+
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+] as const
+
+const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
+
+const requestGuestUploadSchema = z.object({
+  fileName: z.string().trim().min(1).max(255),
+  mimeType: z.enum(ALLOWED_IMAGE_TYPES),
+  fileSize: z.number().int().positive().max(MAX_FILE_SIZE),
+  uploaderName: z.string().trim().min(1).max(100),
+})
+
+// POST /website-public/:slug/photos/upload-url — get presigned R2 upload URL (NO auth)
+websitePublicRoute.post(
+  '/:slug/photos/upload-url',
+  zValidator('json', requestGuestUploadSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const slug = c.req.param('slug')
+
+    const config = await resolvePublicConfig(slug)
+    if (!config) {
+      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    if (config.privacyMode === 'password') {
+      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    const { fileName, mimeType } = c.req.valid('json')
+
+    const photoId = randomUUID()
+    const r2Key = storageClient.buildGalleryPhotoKey(config.weddingId, photoId, fileName)
+    const uploadUrl = await storageClient.getUploadUrl(r2Key, mimeType)
+    const publicUrl = await storageClient.getDownloadUrl(r2Key)
+
+    return c.json({
+      data: { uploadUrl, r2Key, url: publicUrl, photoId },
+    })
+  },
+)
+
+const createGuestPhotoSchema = z.object({
+  r2Key: z.string().trim().min(1),
+  url: z.string().url(),
+  fileName: z.string().trim().min(1).max(255),
+  mimeType: z.enum(ALLOWED_IMAGE_TYPES),
+  fileSize: z.number().int().positive().max(MAX_FILE_SIZE),
+  uploaderName: z.string().trim().min(1).max(100),
+  uploaderEmail: z.string().email().max(255).optional(),
+})
+
+// POST /website-public/:slug/photos — register uploaded guest photo (NO auth)
+websitePublicRoute.post(
+  '/:slug/photos',
+  zValidator('json', createGuestPhotoSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const slug = c.req.param('slug')
+
+    const config = await resolvePublicConfig(slug)
+    if (!config) {
+      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    if (config.privacyMode === 'password') {
+      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    const data = c.req.valid('json')
+
+    // Validate R2 key ownership — must belong to this wedding
+    if (!data.r2Key.startsWith(`gallery/${config.weddingId}/`)) {
+      return c.json(
+        { error: 'Invalid storage key', code: 'VALIDATION_ERROR', statusCode: 400 },
+        400,
+      )
+    }
+
+    // Reject path traversal
+    if (data.r2Key.includes('..') || data.r2Key.includes('//')) {
+      return c.json(
+        { error: 'Invalid storage key', code: 'VALIDATION_ERROR', statusCode: 400 },
+        400,
+      )
+    }
+
+    const [photo] = await db
+      .insert(photos)
+      .values({
+        weddingId: config.weddingId,
+        r2Key: data.r2Key,
+        url: data.url,
+        fileName: data.fileName,
+        mimeType: data.mimeType,
+        fileSize: data.fileSize,
+        uploaderName: data.uploaderName,
+        uploaderEmail: data.uploaderEmail ?? null,
+        source: 'guest',
+        moderationStatus: 'pending',
+      })
+      .returning()
+
+    return c.json({ data: photo }, 201)
   },
 )

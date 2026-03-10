@@ -1,6 +1,6 @@
 import { createMiddleware } from 'hono/factory'
 import { verifyToken } from '@clerk/backend'
-import { timingSafeEqual } from 'node:crypto'
+import { timingSafeEqual, createHash } from 'node:crypto'
 
 type AuthEnv = {
   Variables: {
@@ -9,8 +9,9 @@ type AuthEnv = {
 }
 
 function safeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) return false
-  return timingSafeEqual(Buffer.from(a), Buffer.from(b))
+  const aHash = createHash('sha256').update(a).digest()
+  const bHash = createHash('sha256').update(b).digest()
+  return timingSafeEqual(aHash, bHash)
 }
 
 export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {

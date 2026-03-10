@@ -217,11 +217,11 @@ export const checklistService = {
     }
 
     const sortMap = {
-      dueDate: asc(checklistTasks.dueDate),
+      dueDate: sql`${checklistTasks.dueDate} ASC NULLS LAST`,
       priority: asc(checklistTasks.priority),
       sortOrder: asc(checklistTasks.sortOrder),
       createdAt: desc(checklistTasks.createdAt),
-    } as const
+    }
 
     const orderBy = sortMap[filters.sortBy ?? 'sortOrder']
 

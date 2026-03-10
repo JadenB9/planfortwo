@@ -15,24 +15,31 @@ export function useWedding() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const retryCountRef = useRef(0)
+  const mountedRef = useRef(true)
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const load = useCallback(async () => {
     try {
+      if (!mountedRef.current) return
       setError(null)
       const token = await getToken()
+      if (!mountedRef.current) return
       if (!token) {
         setError('Unable to authenticate. Please sign in again.')
         setLoading(false)
         return
       }
       const { data: dashData } = await api.weddings.mine(token)
+      if (!mountedRef.current) return
       setData(dashData)
       retryCountRef.current = 0
       if (dashData.wedding.id) {
         const { data: feats } = await api.features.get(dashData.wedding.id, token)
+        if (!mountedRef.current) return
         setFeatures(feats)
       }
     } catch (err) {
+      if (!mountedRef.current) return
       const message = err instanceof Error ? err.message : 'Failed to load wedding data'
       console.error('useWedding error:', err)
 
@@ -45,7 +52,7 @@ export function useWedding() {
       if (isSetupPending && retryCountRef.current < MAX_RETRIES) {
         retryCountRef.current += 1
         console.log(`useWedding: retrying (${retryCountRef.current}/${MAX_RETRIES})...`)
-        setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
           void load()
         }, RETRY_DELAY_MS)
         return
@@ -63,6 +70,7 @@ export function useWedding() {
         setError(message)
       }
     } finally {
+      if (!mountedRef.current) return
       if (retryCountRef.current === 0 || retryCountRef.current >= MAX_RETRIES) {
         setLoading(false)
       }
@@ -70,7 +78,12 @@ export function useWedding() {
   }, [getToken])
 
   useEffect(() => {
+    mountedRef.current = true
     void load()
+    return () => {
+      mountedRef.current = false
+      clearTimeout(timeoutRef.current)
+    }
   }, [load])
 
   return { data, features, loading, error, refetch: load }

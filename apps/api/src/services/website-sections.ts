@@ -1,7 +1,46 @@
 import { eq, and, asc } from 'drizzle-orm'
 import { db, websiteSections } from '@planfortwo/db'
 import type { UpdateWebsiteSectionInput } from '@planfortwo/validators'
+import { JSDOM } from 'jsdom'
+import DOMPurify from 'dompurify'
 import { activityService } from './activity.js'
+
+/** DOMPurify instance for server-side HTML sanitization */
+const purifyWindow = new JSDOM('').window
+const purify = DOMPurify(purifyWindow)
+
+/** Fields in section content that contain general HTML */
+const HTML_FIELDS = ['body', 'directions'] as const
+
+/** Fields in section content that contain HTML with iframes (e.g., Google Maps embeds) */
+const IFRAME_HTML_FIELDS = ['mapEmbed'] as const
+
+/**
+ * Sanitize known HTML fields in website section content JSONB before storage.
+ * Only sanitizes fields that are expected to contain HTML — plain text fields
+ * like title, subtitle, date, etc. are left untouched.
+ */
+function sanitizeSectionContent(content: Record<string, unknown>): Record<string, unknown> {
+  const sanitized = { ...content }
+
+  for (const field of HTML_FIELDS) {
+    if (typeof sanitized[field] === 'string') {
+      sanitized[field] = purify.sanitize(sanitized[field] as string)
+    }
+  }
+
+  for (const field of IFRAME_HTML_FIELDS) {
+    if (typeof sanitized[field] === 'string') {
+      sanitized[field] = purify.sanitize(sanitized[field] as string, {
+        ADD_TAGS: ['iframe'],
+        ADD_ATTR: ['allowfullscreen', 'frameborder', 'loading', 'src'],
+        ALLOWED_URI_REGEXP: /^https:\/\/(www\.)?google\.com\/maps\//,
+      })
+    }
+  }
+
+  return sanitized
+}
 
 export const websiteSectionService = {
   async list(weddingId: string) {
@@ -25,7 +64,8 @@ export const websiteSectionService = {
     const updateData: Record<string, unknown> = {}
 
     if (data.title !== undefined) updateData.title = data.title
-    if (data.content !== undefined) updateData.content = data.content
+    if (data.content !== undefined)
+      updateData.content = sanitizeSectionContent(data.content as Record<string, unknown>)
     if (data.isVisible !== undefined) updateData.isVisible = data.isVisible
 
     if (Object.keys(updateData).length === 0) return null
@@ -74,7 +114,7 @@ export const websiteSectionService = {
         weddingId,
         sectionType: 'custom',
         title,
-        content: content ?? { body: '' },
+        content: content ? sanitizeSectionContent(content) : { body: '' },
         sortOrder: maxOrder + 1,
       })
       .returning()

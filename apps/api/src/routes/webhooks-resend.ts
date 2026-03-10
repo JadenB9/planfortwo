@@ -1,13 +1,11 @@
 import { Hono } from 'hono'
 import { Webhook } from 'svix'
 import { Resend } from 'resend'
-import createDOMPurify from 'dompurify'
-import { JSDOM } from 'jsdom'
 import { inboxService } from '../services/inbox.js'
 import { storageClient } from '@planfortwo/storage'
-
-const window = new JSDOM('').window
-const DOMPurify = createDOMPurify(window as never)
+import { sanitizeHtml } from '../utils/sanitize.js'
+import { db, emails } from '@planfortwo/db'
+import { eq } from 'drizzle-orm'
 
 function getResendClient(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
@@ -21,116 +19,6 @@ function parseEmailAddress(raw: string): { name?: string; email: string } {
     return { name: match[1]!.trim(), email: match[2]!.trim() }
   }
   return { email: raw.trim() }
-}
-
-function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      // Structural
-      'html',
-      'head',
-      'body',
-      'style',
-      // Text
-      'a',
-      'b',
-      'i',
-      'u',
-      'em',
-      'strong',
-      'p',
-      'br',
-      'div',
-      'span',
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      // Lists
-      'ul',
-      'ol',
-      'li',
-      'dl',
-      'dt',
-      'dd',
-      // Tables (critical for email layout)
-      'table',
-      'thead',
-      'tbody',
-      'tfoot',
-      'tr',
-      'th',
-      'td',
-      'caption',
-      'colgroup',
-      'col',
-      // Media
-      'img',
-      'picture',
-      'source',
-      'video',
-      // Formatting
-      'hr',
-      'sub',
-      'sup',
-      'small',
-      'del',
-      'ins',
-      'mark',
-      'abbr',
-      'blockquote',
-      'pre',
-      'code',
-      // Semantic
-      'section',
-      'header',
-      'footer',
-      'nav',
-      'main',
-      'article',
-      'figure',
-      'figcaption',
-      // Legacy email elements (many emails still use these)
-      'center',
-      'font',
-    ],
-    ALLOWED_ATTR: [
-      'href',
-      'src',
-      'alt',
-      'title',
-      'class',
-      'id',
-      'style',
-      'target',
-      'rel',
-      'width',
-      'height',
-      'colspan',
-      'rowspan',
-      'cellpadding',
-      'cellspacing',
-      'border',
-      'align',
-      'valign',
-      'bgcolor',
-      'color',
-      'face',
-      'size',
-      'role',
-      'aria-label',
-      'aria-hidden',
-      'dir',
-      'lang',
-      'type',
-      'media',
-    ],
-    ALLOW_DATA_ATTR: false,
-    ADD_ATTR: ['target'],
-    WHOLE_DOCUMENT: true,
-  })
 }
 
 export const resendWebhookRoute = new Hono()
@@ -265,6 +153,19 @@ resendWebhookRoute.post('/', async (c) => {
         }
       } else {
         console.warn('[resend-webhook] RESEND_API_KEY not set, cannot fetch email content')
+      }
+
+      // Idempotency: skip if this Resend email was already stored
+      if (emailId) {
+        const [existing] = await db
+          .select({ id: emails.id })
+          .from(emails)
+          .where(eq(emails.resendEmailId, emailId))
+          .limit(1)
+        if (existing) {
+          console.log(`[resend-webhook] Duplicate email ${emailId} — skipping`)
+          continue
+        }
       }
 
       await inboxService.storeInboundEmail(address.id, {

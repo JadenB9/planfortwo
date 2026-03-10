@@ -5,11 +5,13 @@ import {
   updatePlaylistSchema,
   createPlaylistSongSchema,
   createSongRequestSchema,
+  spotifyUrlSchema,
 } from '@planfortwo/validators'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
 import { playlistService } from '../services/playlists.js'
+import { spotifyService } from '../services/spotify.js'
 
 type Env = {
   Variables: {
@@ -104,6 +106,133 @@ playlistsRoute.delete('/songs/:songId', resolveWeddingMiddleware, async (c) => {
   const deleted = await playlistService.deleteSong(songId, weddingId)
   if (!deleted) return c.json({ error: 'Not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
+})
+
+// ── Spotify Import ──
+playlistsRoute.post(
+  '/:id/import-spotify',
+  resolveWeddingMiddleware,
+  zValidator('json', spotifyUrlSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const playlistId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+
+    // Verify playlist exists and belongs to wedding
+    const playlist = await playlistService.getPlaylist(playlistId, weddingId)
+    if (!playlist)
+      return c.json({ error: 'Playlist not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+
+    const { spotifyUrl } = c.req.valid('json')
+    const parsed = spotifyService.parseSpotifyUrl(spotifyUrl)
+    if (!parsed || parsed.type !== 'playlist') {
+      return c.json(
+        { error: 'Invalid Spotify playlist URL', code: 'VALIDATION_ERROR', statusCode: 400 },
+        400,
+      )
+    }
+
+    try {
+      const tracks = await spotifyService.getPlaylistTracks(parsed.id)
+
+      // Clear existing songs and re-import
+      await playlistService.clearPlaylistSongs(playlistId, weddingId)
+      const songs = await playlistService.bulkAddSongs(playlistId, tracks)
+
+      // Store the Spotify URL on the playlist
+      await playlistService.updatePlaylist(playlistId, weddingId, { spotifyUrl })
+
+      return c.json({ data: { imported: songs.length, songs } })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to import from Spotify'
+      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+    }
+  },
+)
+
+playlistsRoute.post(
+  '/:id/add-spotify-track',
+  resolveWeddingMiddleware,
+  zValidator('json', spotifyUrlSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const playlistId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+
+    const playlist = await playlistService.getPlaylist(playlistId, weddingId)
+    if (!playlist)
+      return c.json({ error: 'Playlist not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+
+    const { spotifyUrl } = c.req.valid('json')
+    const parsed = spotifyService.parseSpotifyUrl(spotifyUrl)
+    if (!parsed || parsed.type !== 'track') {
+      return c.json(
+        { error: 'Invalid Spotify track URL', code: 'VALIDATION_ERROR', statusCode: 400 },
+        400,
+      )
+    }
+
+    try {
+      const trackData = await spotifyService.getTrack(parsed.id)
+      const currentSongs = playlist.songs ?? []
+      const song = await playlistService.addSong({
+        playlistId,
+        title: trackData.title,
+        artist: trackData.artist,
+        album: trackData.album,
+        albumArt: trackData.albumArt,
+        durationMs: trackData.durationMs,
+        spotifyTrackId: trackData.spotifyTrackId,
+        sortOrder: currentSongs.length,
+      })
+      return c.json({ data: song }, 201)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch track from Spotify'
+      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+    }
+  },
+)
+
+playlistsRoute.post('/:id/refresh-spotify', resolveWeddingMiddleware, async (c) => {
+  const playlistId = c.req.param('id')
+  const weddingId = c.get('weddingId')
+
+  const playlist = await playlistService.getPlaylist(playlistId, weddingId)
+  if (!playlist)
+    return c.json({ error: 'Playlist not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+
+  if (!playlist.spotifyUrl) {
+    return c.json(
+      {
+        error: 'No Spotify URL linked to this playlist',
+        code: 'VALIDATION_ERROR',
+        statusCode: 400,
+      },
+      400,
+    )
+  }
+
+  const parsed = spotifyService.parseSpotifyUrl(playlist.spotifyUrl)
+  if (!parsed || parsed.type !== 'playlist') {
+    return c.json(
+      { error: 'Invalid stored Spotify URL', code: 'VALIDATION_ERROR', statusCode: 400 },
+      400,
+    )
+  }
+
+  try {
+    const tracks = await spotifyService.getPlaylistTracks(parsed.id)
+    await playlistService.clearPlaylistSongs(playlistId, weddingId)
+    const songs = await playlistService.bulkAddSongs(playlistId, tracks)
+    return c.json({ data: { imported: songs.length, songs } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to refresh from Spotify'
+    return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+  }
 })
 
 // ── Song Requests ──

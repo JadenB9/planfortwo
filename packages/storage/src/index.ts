@@ -10,18 +10,23 @@ function getR2Client(): S3Client {
   const accountId = process.env.R2_ACCOUNT_ID
   if (!accountId) throw new Error('R2_ACCOUNT_ID is required')
 
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID
+  if (!accessKeyId) throw new Error('R2_ACCESS_KEY_ID is required')
+
+  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY
+  if (!secretAccessKey) throw new Error('R2_SECRET_ACCESS_KEY is required')
+
   return new S3Client({
     region: 'auto',
     endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-    credentials: {
-      accessKeyId: process.env.R2_ACCESS_KEY_ID ?? '',
-      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? '',
-    },
+    credentials: { accessKeyId, secretAccessKey },
   })
 }
 
 function getBucket(): string {
-  return process.env.R2_BUCKET_NAME ?? 'planfortwo-uploads'
+  const bucket = process.env.R2_BUCKET_NAME
+  if (!bucket) throw new Error('R2_BUCKET_NAME is required')
+  return bucket
 }
 
 function isAllowedUploadSource(sourceUrl: string): boolean {

@@ -42,8 +42,8 @@ export function GuestbookEditor({ content, onChange }: GuestbookEditorProps) {
           <span className="text-sm text-gray-700">Require approval before entries are visible</span>
         </label>
         <p className="ml-7 mt-1 text-xs text-gray-500">
-          When enabled, new guestbook entries will be hidden until you approve them from the
-          dashboard.
+          When enabled, new guestbook entries will be hidden until you approve them from Messages
+          under More.
         </p>
       </div>
     </div>

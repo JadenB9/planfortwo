@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -12,6 +13,7 @@ interface PasswordGateProps {
 }
 
 export function PasswordGate({ slug, weddingName }: PasswordGateProps) {
+  const router = useRouter()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,7 +29,7 @@ export function PasswordGate({ slug, weddingName }: PasswordGateProps) {
         body: JSON.stringify({ accessToken: slug, password }),
       })
       if (res.ok) {
-        window.location.reload()
+        router.refresh()
       } else {
         setError('Incorrect password')
       }

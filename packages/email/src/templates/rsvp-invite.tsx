@@ -44,8 +44,7 @@ export function RsvpInviteEmail({
           </Text>
           <Text style={text}>
             Please let us know if you can make it by responding to this invitation. You&apos;ll be
-            able to select your meal preference, note any dietary restrictions, and let us know
-            about your plus-one.
+            able to note any dietary restrictions and let us know about your plus-one.
           </Text>
           <Section style={buttonContainer}>
             <Button style={button} href={rsvpUrl}>

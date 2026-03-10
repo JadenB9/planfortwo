@@ -195,7 +195,7 @@ export default function GuestsPage() {
     } finally {
       setSendingBulk(false)
     }
-  }, [weddingId, guests, getToken, refetch])
+  }, [weddingId, getToken, refetch])
 
   const apiError = weddingError || featuresError
 

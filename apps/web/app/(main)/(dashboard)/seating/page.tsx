@@ -488,7 +488,7 @@ export default function SeatingPage() {
     try {
       const token = await getToken()
       if (!token) return
-      const { data } = await api.guests.list(weddingId, token)
+      const { data } = await api.guests.list(weddingId, token, { pageSize: 9999 })
       setGuests(data)
     } catch {
       toast.error('Failed to load guests')

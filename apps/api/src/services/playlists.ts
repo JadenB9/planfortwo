@@ -57,6 +57,43 @@ export const playlistService = {
     return song
   },
 
+  async bulkAddSongs(
+    playlistId: string,
+    songs: Array<{
+      title: string
+      artist: string
+      album?: string | null
+      albumArt?: string | null
+      durationMs?: number | null
+      spotifyTrackId?: string | null
+      sortOrder?: number
+    }>,
+  ) {
+    if (songs.length === 0) return []
+    const values = songs.map((s, i) => ({
+      playlistId,
+      title: s.title,
+      artist: s.artist,
+      album: s.album ?? null,
+      albumArt: s.albumArt ?? null,
+      durationMs: s.durationMs ?? null,
+      spotifyTrackId: s.spotifyTrackId ?? null,
+      sortOrder: s.sortOrder ?? i,
+    }))
+    return db.insert(playlistSongs).values(values).returning()
+  },
+
+  async clearPlaylistSongs(playlistId: string, weddingId: string) {
+    // Verify ownership first
+    const [pl] = await db
+      .select({ id: playlists.id })
+      .from(playlists)
+      .where(and(eq(playlists.id, playlistId), eq(playlists.weddingId, weddingId)))
+    if (!pl) return false
+    await db.delete(playlistSongs).where(eq(playlistSongs.playlistId, playlistId))
+    return true
+  },
+
   async deleteSong(songId: string, weddingId: string) {
     const [song] = await db
       .select({ playlistId: playlistSongs.playlistId })

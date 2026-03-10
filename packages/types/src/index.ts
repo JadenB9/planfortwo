@@ -409,6 +409,7 @@ export type WebsiteSectionType =
   | 'schedule'
   | 'guestbook'
   | 'custom'
+  | 'song_requests'
 
 export type FontPair =
   | 'playfair-lato'
@@ -598,6 +599,11 @@ export interface GuestbookSectionContent {
 export interface CustomSectionContent {
   slug?: string
   body: string
+}
+
+export interface SongRequestsSectionContent {
+  message: string
+  showApproved: boolean
 }
 
 export interface WebsiteWithSections extends WebsiteConfig {

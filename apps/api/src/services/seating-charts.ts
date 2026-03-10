@@ -265,30 +265,6 @@ export const seatingChartService = {
     await db.delete(tableAssignments).where(eq(tableAssignments.id, assignmentId))
   },
 
-  async unassignGuest(guestId: string) {
-    await db.delete(tableAssignments).where(eq(tableAssignments.guestId, guestId))
-  },
-
-  async getAssignments(chartId: string) {
-    const tables = await db.select().from(seatingTables).where(eq(seatingTables.chartId, chartId))
-
-    const tableIds = tables.map((t) => t.id)
-    const allAssigns =
-      tableIds.length > 0
-        ? await db
-            .select()
-            .from(tableAssignments)
-            .where(inArray(tableAssignments.tableId, tableIds))
-        : []
-
-    return allAssigns.map((a) => ({
-      tableId: a.tableId,
-      guestId: a.guestId,
-      guestName: a.guestName,
-      seatNumber: a.seatNumber,
-    }))
-  },
-
   async listRelationships(weddingId: string) {
     return db.select().from(guestRelationships).where(eq(guestRelationships.weddingId, weddingId))
   },

@@ -144,4 +144,14 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
     isVisible: false,
     sortOrder: 11,
   },
+  {
+    sectionType: 'song_requests',
+    title: 'Song Requests',
+    content: {
+      message: 'Help us build our playlist! Request your favorite songs for our celebration.',
+      showApproved: false,
+    },
+    isVisible: false,
+    sortOrder: 12,
+  },
 ]

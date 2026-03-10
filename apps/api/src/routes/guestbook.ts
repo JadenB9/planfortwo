@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { createGuestbookEntrySchema } from '@planfortwo/validators'
 import { z } from 'zod'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
@@ -18,29 +17,6 @@ type Env = {
 }
 
 export const guestbookRoute = new Hono<Env>()
-
-// POST /guestbook — public submission (no auth)
-guestbookRoute.post(
-  '/',
-  zValidator('json', createGuestbookEntrySchema, (result, c) => {
-    if (!result.success) {
-      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
-    }
-  }),
-  async (c) => {
-    const data = c.req.valid('json')
-    if (data.website) {
-      return c.json(
-        {
-          data: { id: 'ok', authorName: data.authorName, message: data.message, isVisible: false },
-        },
-        201,
-      )
-    }
-    const entry = await guestbookService.create(data)
-    return c.json({ data: entry }, 201)
-  },
-)
 
 // GET /guestbook?weddingId=X — admin list (auth required)
 guestbookRoute.get(

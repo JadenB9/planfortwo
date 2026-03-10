@@ -108,7 +108,7 @@ seatingChartsRoute.post(
     const chart = await seatingChartService.getChart(chartId, weddingId)
     if (!chart) return c.json({ error: 'Chart not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
-    const table = await seatingChartService.addTable(data)
+    const table = await seatingChartService.addTable({ ...data, chartId })
     return c.json({ data: table }, 201)
   },
 )
@@ -158,7 +158,7 @@ seatingChartsRoute.post(
     const chart = await seatingChartService.getChart(chartId, weddingId)
     if (!chart) return c.json({ error: 'Chart not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
     const data = c.req.valid('json')
-    const element = await seatingChartService.addElement(data)
+    const element = await seatingChartService.addElement({ ...data, chartId })
     return c.json({ data: element }, 201)
   },
 )

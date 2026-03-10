@@ -39,11 +39,21 @@ export const createPlaylistSongSchema = z.object({
   playlistId: z.string().uuid(),
   title: z.string().min(1).max(300),
   artist: z.string().min(1).max(300),
+  album: z.string().max(300).nullable().optional(),
+  albumArt: z.string().url().nullable().optional(),
+  durationMs: z.number().int().min(0).nullable().optional(),
+  spotifyTrackId: z.string().max(100).nullable().optional(),
   category: songCategoryZodEnum.optional(),
   sortOrder: z.number().int().min(0).optional(),
 })
 
 export type CreatePlaylistSongInput = z.infer<typeof createPlaylistSongSchema>
+
+export const spotifyUrlSchema = z.object({
+  spotifyUrl: z.string().min(1).max(500),
+})
+
+export type SpotifyUrlInput = z.infer<typeof spotifyUrlSchema>
 
 export const createSongRequestSchema = z.object({
   weddingId: z.string().uuid(),

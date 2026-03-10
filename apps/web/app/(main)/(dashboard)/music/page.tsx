@@ -11,6 +11,7 @@ import {
   scaleIn,
   cardHover,
 } from '@/lib/animations'
+import Image from 'next/image'
 import { api } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -40,6 +41,10 @@ import {
   Check,
   X,
   Loader2,
+  Download,
+  RefreshCw,
+  Link,
+  Clock,
 } from 'lucide-react'
 
 type Tab = 'playlists' | 'requests'
@@ -59,6 +64,10 @@ interface Song {
   id: string
   title: string
   artist: string
+  album: string | null
+  albumArt: string | null
+  durationMs: number | null
+  spotifyTrackId: string | null
   category: string | null
   sortOrder: number
 }
@@ -128,6 +137,15 @@ export default function MusicPage() {
   const [showAddSong, setShowAddSong] = useState<string | null>(null)
   const [songForm, setSongForm] = useState({ title: '', artist: '', category: '' })
   const [addingSong, setAddingSong] = useState(false)
+
+  // Spotify state
+  const [showSpotifyImport, setShowSpotifyImport] = useState<string | null>(null)
+  const [spotifyImportUrl, setSpotifyImportUrl] = useState('')
+  const [importingSpotify, setImportingSpotify] = useState(false)
+  const [showAddSpotifyTrack, setShowAddSpotifyTrack] = useState<string | null>(null)
+  const [spotifyTrackUrl, setSpotifyTrackUrl] = useState('')
+  const [addingSpotifyTrack, setAddingSpotifyTrack] = useState(false)
+  const [refreshingSpotify, setRefreshingSpotify] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
     try {
@@ -289,6 +307,87 @@ export default function MusicPage() {
     },
     [weddingId, getToken, songForm, loadPlaylistSongs],
   )
+
+  const handleImportSpotify = useCallback(
+    async (playlistId: string) => {
+      if (!weddingId || !spotifyImportUrl.trim()) return
+      setImportingSpotify(true)
+      try {
+        const token = await getToken()
+        if (!token) return
+        const { data } = await api.playlists.importSpotify(
+          playlistId,
+          weddingId,
+          spotifyImportUrl.trim(),
+          token,
+        )
+        toast.success(`Imported ${data.imported} songs from Spotify`)
+        setSpotifyImportUrl('')
+        setShowSpotifyImport(null)
+        void loadPlaylistSongs(playlistId)
+        void loadData()
+      } catch {
+        toast.error('Failed to import from Spotify. Check the URL and try again.')
+      } finally {
+        setImportingSpotify(false)
+      }
+    },
+    [weddingId, getToken, spotifyImportUrl, loadPlaylistSongs, loadData],
+  )
+
+  const handleAddSpotifyTrack = useCallback(
+    async (playlistId: string) => {
+      if (!weddingId || !spotifyTrackUrl.trim()) return
+      setAddingSpotifyTrack(true)
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.playlists.addSpotifyTrack(playlistId, weddingId, spotifyTrackUrl.trim(), token)
+        toast.success('Song added from Spotify')
+        setSpotifyTrackUrl('')
+        setShowAddSpotifyTrack(null)
+        void loadPlaylistSongs(playlistId)
+      } catch {
+        toast.error("Failed to add track. Make sure it's a valid Spotify track URL.")
+      } finally {
+        setAddingSpotifyTrack(false)
+      }
+    },
+    [weddingId, getToken, spotifyTrackUrl, loadPlaylistSongs],
+  )
+
+  const handleRefreshSpotify = useCallback(
+    async (playlistId: string) => {
+      if (!weddingId) return
+      setRefreshingSpotify(playlistId)
+      try {
+        const token = await getToken()
+        if (!token) return
+        const { data } = await api.playlists.refreshSpotify(playlistId, weddingId, token)
+        toast.success(`Refreshed ${data.imported} songs from Spotify`)
+        void loadPlaylistSongs(playlistId)
+      } catch {
+        toast.error('Failed to refresh from Spotify')
+      } finally {
+        setRefreshingSpotify(null)
+      }
+    },
+    [weddingId, getToken, loadPlaylistSongs],
+  )
+
+  const formatDuration = (ms: number) => {
+    const mins = Math.floor(ms / 60000)
+    const secs = Math.floor((ms % 60000) / 1000)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  const getSpotifyEmbedUrl = (spotifyUrl: string) => {
+    // Convert open.spotify.com/playlist/ID to open.spotify.com/embed/playlist/ID
+    const match = spotifyUrl.match(/open\.spotify\.com\/(playlist|track|album)\/([a-zA-Z0-9]+)/)
+    if (match)
+      return `https://open.spotify.com/embed/${match[1]}/${match[2]}?utm_source=generator&theme=0`
+    return null
+  }
 
   const handleDeleteSong = useCallback(
     async (songId: string, playlistId: string) => {
@@ -527,11 +626,10 @@ export default function MusicPage() {
 
                                 <div className="ml-4 flex shrink-0 items-center gap-2">
                                   {/* Song count badge */}
-                                  {isExpanded && (
-                                    <Badge variant="secondary" className="text-xs">
-                                      {songCount} {songCount === 1 ? 'song' : 'songs'}
-                                    </Badge>
-                                  )}
+                                  <Badge variant="secondary" className="text-xs">
+                                    {isExpanded ? songCount : '...'}{' '}
+                                    {isExpanded && songCount === 1 ? 'song' : 'songs'}
+                                  </Badge>
 
                                   {/* Streaming buttons */}
                                   {pl.spotifyUrl && (
@@ -626,6 +724,176 @@ export default function MusicPage() {
                                   className="overflow-hidden"
                                 >
                                   <div className="border-t border-gray-100 px-6 pb-4 pt-3">
+                                    {/* Spotify embed player */}
+                                    {pl.spotifyUrl && getSpotifyEmbedUrl(pl.spotifyUrl) && (
+                                      <div className="mb-4">
+                                        <iframe
+                                          src={getSpotifyEmbedUrl(pl.spotifyUrl)!}
+                                          width="100%"
+                                          height="152"
+                                          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                          loading="lazy"
+                                          className="rounded-xl"
+                                          title="Spotify playlist"
+                                        />
+                                      </div>
+                                    )}
+
+                                    {/* Spotify action bar */}
+                                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                                      {pl.spotifyUrl && (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="h-8 gap-1.5 border-[#1DB954]/30 text-xs text-[#1DB954] hover:bg-[#1DB954]/5"
+                                          disabled={refreshingSpotify === pl.id}
+                                          onClick={() => handleRefreshSpotify(pl.id)}
+                                        >
+                                          {refreshingSpotify === pl.id ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                          ) : (
+                                            <RefreshCw className="h-3.5 w-3.5" />
+                                          )}
+                                          Refresh from Spotify
+                                        </Button>
+                                      )}
+                                      {!pl.spotifyUrl && showSpotifyImport !== pl.id && (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="h-8 gap-1.5 border-[#1DB954]/30 text-xs text-[#1DB954] hover:bg-[#1DB954]/5"
+                                          onClick={() => {
+                                            setShowSpotifyImport(pl.id)
+                                            setSpotifyImportUrl('')
+                                          }}
+                                        >
+                                          <Download className="h-3.5 w-3.5" />
+                                          Import from Spotify
+                                        </Button>
+                                      )}
+                                      {showAddSpotifyTrack !== pl.id && (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="h-8 gap-1.5 border-[#1DB954]/30 text-xs text-[#1DB954] hover:bg-[#1DB954]/5"
+                                          onClick={() => {
+                                            setShowAddSpotifyTrack(pl.id)
+                                            setSpotifyTrackUrl('')
+                                          }}
+                                        >
+                                          <Link className="h-3.5 w-3.5" />
+                                          Add Song via Spotify URL
+                                        </Button>
+                                      )}
+                                    </div>
+
+                                    {/* Import from Spotify form */}
+                                    <AnimatePresence>
+                                      {showSpotifyImport === pl.id && (
+                                        <motion.div
+                                          initial={{ height: 0, opacity: 0 }}
+                                          animate={{ height: 'auto', opacity: 1 }}
+                                          exit={{ height: 0, opacity: 0 }}
+                                          transition={{ duration: 0.2 }}
+                                          className="mb-3 overflow-hidden"
+                                        >
+                                          <div className="rounded-lg border border-[#1DB954]/20 bg-[#1DB954]/5 p-4">
+                                            <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                              <Download className="h-4 w-4 text-[#1DB954]" />
+                                              Import from Spotify Playlist
+                                            </h4>
+                                            <p className="mb-3 text-xs text-gray-500">
+                                              Paste a Spotify playlist URL to import all songs. This
+                                              will replace any existing songs.
+                                            </p>
+                                            <div className="flex gap-2">
+                                              <Input
+                                                value={spotifyImportUrl}
+                                                onChange={(e) =>
+                                                  setSpotifyImportUrl(e.target.value)
+                                                }
+                                                placeholder="https://open.spotify.com/playlist/..."
+                                                className="flex-1 bg-white"
+                                              />
+                                              <Button
+                                                size="sm"
+                                                className="bg-[#1DB954] hover:bg-[#1aa34a]"
+                                                disabled={
+                                                  !spotifyImportUrl.trim() || importingSpotify
+                                                }
+                                                onClick={() => handleImportSpotify(pl.id)}
+                                              >
+                                                {importingSpotify ? (
+                                                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                                                ) : (
+                                                  <Download className="mr-1.5 h-3.5 w-3.5" />
+                                                )}
+                                                Import
+                                              </Button>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setShowSpotifyImport(null)}
+                                              >
+                                                Cancel
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+
+                                    {/* Add Spotify track form */}
+                                    <AnimatePresence>
+                                      {showAddSpotifyTrack === pl.id && (
+                                        <motion.div
+                                          initial={{ height: 0, opacity: 0 }}
+                                          animate={{ height: 'auto', opacity: 1 }}
+                                          exit={{ height: 0, opacity: 0 }}
+                                          transition={{ duration: 0.2 }}
+                                          className="mb-3 overflow-hidden"
+                                        >
+                                          <div className="rounded-lg border border-[#1DB954]/20 bg-[#1DB954]/5 p-4">
+                                            <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                              <Link className="h-4 w-4 text-[#1DB954]" />
+                                              Add Song from Spotify
+                                            </h4>
+                                            <div className="flex gap-2">
+                                              <Input
+                                                value={spotifyTrackUrl}
+                                                onChange={(e) => setSpotifyTrackUrl(e.target.value)}
+                                                placeholder="https://open.spotify.com/track/..."
+                                                className="flex-1 bg-white"
+                                              />
+                                              <Button
+                                                size="sm"
+                                                className="bg-[#1DB954] hover:bg-[#1aa34a]"
+                                                disabled={
+                                                  !spotifyTrackUrl.trim() || addingSpotifyTrack
+                                                }
+                                                onClick={() => handleAddSpotifyTrack(pl.id)}
+                                              >
+                                                {addingSpotifyTrack ? (
+                                                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                                                ) : (
+                                                  <Plus className="mr-1.5 h-3.5 w-3.5" />
+                                                )}
+                                                Add
+                                              </Button>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setShowAddSpotifyTrack(null)}
+                                              >
+                                                Cancel
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+
+                                    {/* Song list */}
                                     {isLoadingSongs ? (
                                       <div className="flex items-center justify-center py-8">
                                         <Loader2 className="text-wedding-500 h-5 w-5 animate-spin" />
@@ -637,32 +905,75 @@ export default function MusicPage() {
                                       <div className="py-6 text-center">
                                         <Music2 className="mx-auto h-8 w-8 text-gray-300" />
                                         <p className="mt-2 text-sm text-gray-500">
-                                          No songs yet. Add your first song below.
+                                          No songs yet. Add your first song below or import from
+                                          Spotify.
                                         </p>
                                       </div>
                                     ) : (
                                       <motion.div
-                                        className="space-y-2"
+                                        className="space-y-1.5"
                                         variants={staggerContainer}
                                         initial="hidden"
                                         animate="visible"
                                       >
-                                        {songs.map((song) => (
+                                        {songs.map((song, idx) => (
                                           <motion.div
                                             key={song.id}
                                             variants={fadeInUp}
-                                            className="group flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50/50 px-4 py-2.5 transition-colors hover:bg-gray-50"
+                                            className="group flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2 transition-colors hover:bg-gray-50"
                                           >
-                                            <Music2 className="h-4 w-4 shrink-0 text-gray-400" />
+                                            {/* Track number or album art */}
+                                            {song.albumArt ? (
+                                              <Image
+                                                src={song.albumArt}
+                                                alt={song.album ?? song.title}
+                                                width={40}
+                                                height={40}
+                                                className="h-10 w-10 shrink-0 rounded object-cover"
+                                                unoptimized
+                                              />
+                                            ) : (
+                                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-gray-100 text-xs font-medium text-gray-400">
+                                                {idx + 1}
+                                              </div>
+                                            )}
                                             <div className="min-w-0 flex-1">
-                                              <p className="text-sm font-medium text-gray-900">
-                                                {song.title}
+                                              <div className="flex items-center gap-1.5">
+                                                <p className="truncate text-sm font-medium text-gray-900">
+                                                  {song.title}
+                                                </p>
+                                                {song.spotifyTrackId && (
+                                                  <a
+                                                    href={`https://open.spotify.com/track/${song.spotifyTrackId}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="shrink-0 text-[#1DB954] hover:text-[#1aa34a]"
+                                                    title="Open in Spotify"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                  >
+                                                    <ExternalLink className="h-3 w-3" />
+                                                  </a>
+                                                )}
+                                              </div>
+                                              <p className="truncate text-xs text-gray-500">
+                                                {song.artist}
+                                                {song.album && (
+                                                  <span className="text-gray-400">
+                                                    {' '}
+                                                    &middot; {song.album}
+                                                  </span>
+                                                )}
                                               </p>
-                                              <p className="text-xs text-gray-500">{song.artist}</p>
                                             </div>
-                                            {song.category && (
+                                            {song.durationMs && (
+                                              <span className="flex shrink-0 items-center gap-1 text-xs text-gray-400">
+                                                <Clock className="h-3 w-3" />
+                                                {formatDuration(song.durationMs)}
+                                              </span>
+                                            )}
+                                            {song.category && song.category !== 'other' && (
                                               <span
-                                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${CATEGORY_COLORS[song.category] ?? 'bg-gray-100 text-gray-700'}`}
+                                                className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium ${CATEGORY_COLORS[song.category] ?? 'bg-gray-100 text-gray-700'}`}
                                               >
                                                 {CATEGORY_LABELS[song.category] ?? song.category}
                                               </span>
@@ -694,7 +1005,7 @@ export default function MusicPage() {
                                             <div className="rounded-lg border border-gray-200 bg-white p-4">
                                               <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-gray-700">
                                                 <Plus className="h-4 w-4" />
-                                                Add a Song
+                                                Add a Song Manually
                                               </h4>
                                               <div className="grid gap-3 sm:grid-cols-3">
                                                 <div>
@@ -803,7 +1114,7 @@ export default function MusicPage() {
                                               }}
                                             >
                                               <Plus className="mr-2 h-3.5 w-3.5" />
-                                              Add Song
+                                              Add Song Manually
                                             </Button>
                                           </motion.div>
                                         )}

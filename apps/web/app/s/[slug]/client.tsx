@@ -34,6 +34,14 @@ interface PublicPhoto {
   createdAt: Date
 }
 
+interface PublicGuestPhoto {
+  id: string
+  url: string
+  caption: string | null
+  uploaderName: string | null
+  createdAt: Date | string
+}
+
 interface PublicWebsiteClientProps {
   slug: string
   config: {
@@ -43,6 +51,7 @@ interface PublicWebsiteClientProps {
   }
   sections: PublicSection[]
   photos: PublicPhoto[]
+  guestPhotos?: PublicGuestPhoto[]
   weddingName: string
   weddingDate: string | null
   ceremonyDate: string | null
@@ -76,6 +85,7 @@ export function PublicWebsiteClient({
   config,
   sections,
   photos,
+  guestPhotos,
   weddingName,
   weddingDate,
   ceremonyDate,
@@ -129,6 +139,7 @@ export function PublicWebsiteClient({
           key={section.id}
           section={section}
           photos={photos}
+          guestPhotos={guestPhotos}
           guestbookEntries={guestbookEntries}
           weddingName={weddingName}
           weddingDate={parsedDate}

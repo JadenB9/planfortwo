@@ -30,8 +30,8 @@ export const sectionIcons: Record<WebsiteSectionType, LucideIcon> = {
   rsvp: Mail,
   schedule: Clock,
   guestbook: MessageSquare,
-  song_requests: Music,
   custom: FileText,
+  song_requests: Music,
 }
 
 export const sectionLabels: Record<WebsiteSectionType, string> = {
@@ -47,6 +47,6 @@ export const sectionLabels: Record<WebsiteSectionType, string> = {
   rsvp: 'RSVP',
   schedule: 'Schedule',
   guestbook: 'Guestbook',
-  song_requests: 'Song Requests',
   custom: 'Custom Section',
+  song_requests: 'Song Requests',
 }

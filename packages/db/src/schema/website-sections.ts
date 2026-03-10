@@ -24,6 +24,7 @@ export const websiteSectionTypeEnum = pgEnum('website_section_type', [
   'schedule',
   'guestbook',
   'custom',
+  'song_requests',
 ])
 
 export const websiteSections = pgTable('website_sections', {

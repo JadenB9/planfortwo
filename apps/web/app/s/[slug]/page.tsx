@@ -56,6 +56,13 @@ interface PublicWebsiteData {
     sortOrder: number
     createdAt: Date
   }>
+  guestPhotos?: Array<{
+    id: string
+    url: string
+    caption: string | null
+    uploaderName: string | null
+    createdAt: Date
+  }>
   weddingName: string
   weddingDate: string | null
   ceremonyDate: string | null
@@ -110,6 +117,7 @@ export default async function PublicWebsitePage({ params }: PageProps) {
       config={data.config}
       sections={data.sections}
       photos={data.photos}
+      guestPhotos={data.guestPhotos}
       weddingName={data.weddingName}
       weddingDate={data.weddingDate}
       ceremonyDate={data.ceremonyDate}

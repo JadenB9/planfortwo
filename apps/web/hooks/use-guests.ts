@@ -45,6 +45,13 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
   const [total, setTotal] = useState(0)
   const [hasMore, setHasMore] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
 
   const loadGuests = useCallback(async () => {
     if (!weddingId) {
@@ -52,6 +59,7 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
       return
     }
     setLoading(true)
+    setError(null)
     try {
       const token = await getToken()
       if (!token) return
@@ -69,8 +77,8 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
       setStats(statsRes.data)
       setHouseholds(householdsRes.data)
       setTags(tagsRes.data)
-    } catch {
-      /* silent */
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load guest data')
     } finally {
       setLoading(false)
     }
@@ -105,6 +113,7 @@ export function useGuests({ weddingId, initialFilters }: UseGuestsOptions) {
     households,
     tags,
     loading,
+    error,
     filters,
     total,
     hasMore,

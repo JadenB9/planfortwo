@@ -60,6 +60,13 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
 
   const { update: debouncedUpdate, flush } = useDebouncedUpdate(onUpdate)
 
+  useEffect(() => {
+    setSubdomain(config.subdomain ?? '')
+    setMetaTitle(config.metaTitle ?? '')
+    setMetaDescription(config.metaDescription ?? '')
+    setHashtag(config.hashtag ?? '')
+  }, [config.subdomain, config.metaTitle, config.metaDescription, config.hashtag])
+
   const handleCheckSubdomain = async () => {
     if (!subdomain.trim()) return
     setChecking(true)

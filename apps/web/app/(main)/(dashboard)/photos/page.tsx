@@ -166,7 +166,10 @@ export default function PhotosPage() {
     void loadPhotos()
 
     setTimeout(() => {
-      setUploadingFiles((prev) => prev.filter((f) => f.status !== 'done'))
+      setUploadingFiles((prev) => {
+        prev.filter((f) => f.status === 'done').forEach((f) => URL.revokeObjectURL(f.previewUrl))
+        return prev.filter((f) => f.status !== 'done')
+      })
     }, 2000)
   }
 
@@ -307,21 +310,21 @@ export default function PhotosPage() {
     setCaptionDraft(filteredPhotos[index]?.caption ?? '')
   }
 
-  const lightboxPrev = () => {
+  const lightboxPrev = useCallback(() => {
     if (lightboxIndex === null || filteredPhotos.length === 0) return
     const newIndex = (lightboxIndex - 1 + filteredPhotos.length) % filteredPhotos.length
     setLightboxIndex(newIndex)
     setEditingCaption(false)
     setCaptionDraft(filteredPhotos[newIndex]?.caption ?? '')
-  }
+  }, [lightboxIndex, filteredPhotos])
 
-  const lightboxNext = () => {
+  const lightboxNext = useCallback(() => {
     if (lightboxIndex === null || filteredPhotos.length === 0) return
     const newIndex = (lightboxIndex + 1) % filteredPhotos.length
     setLightboxIndex(newIndex)
     setEditingCaption(false)
     setCaptionDraft(filteredPhotos[newIndex]?.caption ?? '')
-  }
+  }, [lightboxIndex, filteredPhotos])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -332,8 +335,7 @@ export default function PhotosPage() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lightboxIndex, filteredPhotos.length])
+  }, [lightboxIndex, lightboxPrev, lightboxNext])
 
   const isLoading = weddingLoading || loading
 

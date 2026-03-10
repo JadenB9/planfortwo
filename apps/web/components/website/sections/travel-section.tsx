@@ -107,8 +107,15 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             className="mt-10 overflow-hidden rounded-2xl"
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(content.mapEmbed, {
-                ADD_TAGS: ['iframe'],
-                ADD_ATTR: ['allowfullscreen', 'frameborder', 'loading', 'src'],
+                ALLOWED_TAGS: ['iframe'],
+                ALLOWED_ATTR: [
+                  'src',
+                  'width',
+                  'height',
+                  'frameborder',
+                  'allowfullscreen',
+                  'loading',
+                ],
                 ALLOWED_URI_REGEXP: /^https:\/\/(www\.)?google\.com\/maps\//,
               }),
             }}

@@ -354,13 +354,6 @@ export const rsvpGuestIdLookupSchema = z.object({
 
 export type RsvpGuestIdLookupInput = z.infer<typeof rsvpGuestIdLookupSchema>
 
-// ── CSV Import ──
-export const csvImportSchema = z.object({
-  slug: z.string().min(1).max(100),
-})
-
-export type CsvImportInput = z.infer<typeof csvImportSchema>
-
 // ── Budget: Enums ──
 export const payerZodEnum = z.enum(['couple', 'bride_family', 'groom_family', 'other'])
 export const paymentStatusZodEnum = z.enum(['unpaid', 'deposit', 'partial', 'paid'])
@@ -534,6 +527,21 @@ export const savedPaletteSchema = z.object({
 })
 
 // ── Website: Subdomain ──
+const RESERVED_SUBDOMAINS = [
+  'app',
+  'api',
+  'admin',
+  'dashboard',
+  'static',
+  'cdn',
+  'mail',
+  'www',
+  'staging',
+  'dev',
+  'test',
+  'beta',
+]
+
 export const subdomainSchema = z
   .string()
   .min(3)
@@ -542,6 +550,9 @@ export const subdomainSchema = z
     /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/,
     'Lowercase alphanumeric and hyphens only, cannot start or end with a hyphen',
   )
+  .refine((val) => !RESERVED_SUBDOMAINS.includes(val), {
+    message: 'This subdomain is reserved and cannot be used',
+  })
 
 // ── Website: Config ──
 export const createWebsiteConfigSchema = z.object({
@@ -665,6 +676,7 @@ export const createGuestbookEntrySchema = z.object({
   weddingId: z.string().uuid(),
   authorName: z.string().trim().min(1).max(100),
   message: z.string().trim().min(1).max(2000),
+  // Honeypot field — not stored in DB. If filled, submission is silently rejected.
   website: z.string().url().max(200).optional(),
 })
 

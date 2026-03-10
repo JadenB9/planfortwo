@@ -20,7 +20,7 @@ export function RsvpEntry() {
   // Name lookup state
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [weddingId, setWeddingId] = useState('')
+  const [slug, setSlug] = useState('')
   const [nameLoading, setNameLoading] = useState(false)
   const [nameError, setNameError] = useState<string | null>(null)
   const [nameResults, setNameResults] = useState<Guest[] | null>(null)
@@ -56,7 +56,7 @@ export function RsvpEntry() {
 
   async function handleNameSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!firstName.trim() || !lastName.trim() || !weddingId.trim()) return
+    if (!firstName.trim() || !lastName.trim() || !slug.trim()) return
 
     setNameLoading(true)
     setNameError(null)
@@ -67,7 +67,7 @@ export function RsvpEntry() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          weddingId: weddingId.trim(),
+          slug: slug.trim(),
           firstName: firstName.trim(),
           lastName: lastName.trim(),
         }),
@@ -175,18 +175,18 @@ export function RsvpEntry() {
       {activeTab === 'name' && (
         <form onSubmit={handleNameSubmit} className="space-y-4">
           <div>
-            <label htmlFor="rsvp-wedding-id" className="block text-sm font-medium text-gray-700">
-              Wedding ID
+            <label htmlFor="rsvp-slug" className="block text-sm font-medium text-gray-700">
+              Wedding Website URL
             </label>
             <p className="mt-1 text-xs text-gray-500">
-              From your invitation or the couple&apos;s wedding page
+              The couple&apos;s wedding website name (e.g. &quot;smith-jones&quot;)
             </p>
             <input
-              id="rsvp-wedding-id"
+              id="rsvp-slug"
               type="text"
-              value={weddingId}
-              onChange={(e) => setWeddingId(e.target.value)}
-              placeholder="Wedding ID"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="e.g. smith-jones"
               className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
             />
           </div>
@@ -226,7 +226,7 @@ export function RsvpEntry() {
 
           <button
             type="submit"
-            disabled={!firstName.trim() || !lastName.trim() || !weddingId.trim() || nameLoading}
+            disabled={!firstName.trim() || !lastName.trim() || !slug.trim() || nameLoading}
             className="bg-wedding-600 hover:bg-wedding-700 w-full rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             {nameLoading ? (
