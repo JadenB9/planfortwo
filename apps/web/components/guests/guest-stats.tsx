@@ -9,23 +9,36 @@ interface GuestStatsBarProps {
 export function GuestStatsBar({ stats }: GuestStatsBarProps) {
   if (!stats) return null
 
-  const items = [
-    { label: 'Total', value: stats.totalGuests, color: 'bg-gray-100 text-gray-800' },
-    { label: 'Accepted', value: stats.rsvpAccepted, color: 'bg-green-50 text-green-700' },
-    { label: 'Pending', value: stats.rsvpPending, color: 'bg-amber-50 text-amber-700' },
-    { label: 'Declined', value: stats.rsvpDeclined, color: 'bg-red-50 text-red-700' },
-    { label: 'Maybe', value: stats.rsvpMaybe, color: 'bg-blue-50 text-blue-700' },
-    { label: 'Plus-Ones', value: stats.confirmedPlusOnes, color: 'bg-purple-50 text-purple-700' },
+  const primary = [
+    { label: 'Accepted', value: stats.rsvpAccepted, color: 'text-green-700' },
+    { label: 'Maybe', value: stats.rsvpMaybe, color: 'text-amber-600' },
+    { label: 'Declined', value: stats.rsvpDeclined, color: 'text-red-600' },
+  ]
+
+  const secondary = [
+    { label: 'Total', value: stats.totalGuests },
+    { label: 'Pending', value: stats.rsvpPending },
+    { label: 'Plus-Ones', value: stats.confirmedPlusOnes },
   ]
 
   return (
-    <div className="flex flex-wrap gap-3">
-      {items.map((item) => (
-        <div key={item.label} className={`rounded-xl px-3 py-2 text-center ${item.color}`}>
-          <p className="text-lg font-bold">{item.value}</p>
-          <p className="text-xs font-medium">{item.label}</p>
-        </div>
-      ))}
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-6">
+        {primary.map((item) => (
+          <div key={item.label} className="text-center">
+            <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
+            <p className={`text-xs font-medium ${item.color}`}>{item.label}</p>
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-5">
+        {secondary.map((item) => (
+          <div key={item.label} className="text-center">
+            <p className="text-base font-semibold text-gray-700">{item.value}</p>
+            <p className="text-[11px] font-medium text-gray-500">{item.label}</p>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
