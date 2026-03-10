@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
 import {
   updateWebsiteSectionSchema,
@@ -83,6 +84,36 @@ websiteSectionsRoute.post(
     const { sections } = c.req.valid('json')
     await websiteSectionService.reorder(weddingId, sections)
     return c.json({ data: { success: true } })
+  },
+)
+
+// POST /website-sections/add-built-in?weddingId=X
+const addBuiltInSchema = z.object({
+  sectionType: z.string().min(1),
+  title: z.string().min(1).max(100),
+  content: z.record(z.unknown()),
+})
+
+websiteSectionsRoute.post(
+  '/add-built-in',
+  resolveWeddingMiddleware,
+  requireFeature('canWebsiteBuilder'),
+  zValidator('json', addBuiltInSchema, (result, c) => {
+    if (!result.success) {
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    }
+  }),
+  async (c) => {
+    const data = c.req.valid('json')
+    const weddingId = c.get('weddingId')
+    const section = await websiteSectionService.createBuiltIn(
+      weddingId,
+      data.sectionType,
+      data.title,
+      data.content,
+      c.get('dbUserId'),
+    )
+    return c.json({ data: section }, 201)
   },
 )
 

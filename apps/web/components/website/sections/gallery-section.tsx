@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import type { GalleryContent, WebsitePhoto } from '@planfortwo/types'
-import { useTemplateStyles } from '../template-context'
+import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
@@ -55,7 +55,9 @@ export function GallerySection({
   slug,
   guestPhotos = [],
 }: GallerySectionProps) {
-  const { colors, fontPair } = useTemplateStyles()
+  const { colors } = useTemplateStyles()
+  const headingClass = useHeadingClass()
+  const bodyClass = useBodyClass()
   const columns = content.columns ?? 3
 
   const [showUploadForm, setShowUploadForm] = useState(false)
@@ -164,7 +166,7 @@ export function GallerySection({
   ) => {
     if (photoList.length === 0) {
       return (
-        <p className={`text-center ${fontPair.bodyClass}`} style={{ color: `${colors.primary}99` }}>
+        <p className={`text-center ${bodyClass}`} style={{ color: `${colors.primary}99` }}>
           No photos yet. Be the first to share!
         </p>
       )
@@ -231,7 +233,7 @@ export function GallerySection({
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`mb-12 text-center text-3xl sm:text-4xl ${fontPair.headingClass}`}
+          className={`mb-12 text-center text-3xl sm:text-4xl ${headingClass}`}
           style={{ color: colors.primary }}
         >
           {title}
@@ -250,7 +252,7 @@ export function GallerySection({
             <div className="text-center">
               <button
                 onClick={() => setShowUploadForm(true)}
-                className={`inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90 ${fontPair.bodyClass}`}
+                className={`inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90 ${bodyClass}`}
                 style={{
                   backgroundColor: colors.primary,
                   color: colors.background,
@@ -285,7 +287,7 @@ export function GallerySection({
               }}
             >
               <h3
-                className={`mb-4 text-lg font-semibold ${fontPair.headingClass}`}
+                className={`mb-4 text-lg font-semibold ${headingClass}`}
                 style={{ color: colors.primary }}
               >
                 Share Your Photos
@@ -295,7 +297,7 @@ export function GallerySection({
                 {/* Name */}
                 <div>
                   <label
-                    className={`mb-1 block text-sm ${fontPair.bodyClass}`}
+                    className={`mb-1 block text-sm ${bodyClass}`}
                     style={{ color: colors.primary }}
                   >
                     Your Name <span className="text-red-500">*</span>
@@ -318,7 +320,7 @@ export function GallerySection({
                 {/* Email (optional) */}
                 <div>
                   <label
-                    className={`mb-1 block text-sm ${fontPair.bodyClass}`}
+                    className={`mb-1 block text-sm ${bodyClass}`}
                     style={{ color: colors.primary }}
                   >
                     Email <span style={{ color: `${colors.primary}60` }}>(optional)</span>
@@ -341,7 +343,7 @@ export function GallerySection({
                 {/* File Selection */}
                 <div>
                   <label
-                    className={`mb-1 block text-sm ${fontPair.bodyClass}`}
+                    className={`mb-1 block text-sm ${bodyClass}`}
                     style={{ color: colors.primary }}
                   >
                     Photos <span className="text-red-500">*</span>
@@ -368,14 +370,11 @@ export function GallerySection({
                       <circle cx="9" cy="9" r="2" />
                       <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                     </svg>
-                    <p
-                      className={`text-sm ${fontPair.bodyClass}`}
-                      style={{ color: `${colors.primary}80` }}
-                    >
+                    <p className={`text-sm ${bodyClass}`} style={{ color: `${colors.primary}80` }}>
                       Click to select photos
                     </p>
                     <p
-                      className={`mt-1 text-xs ${fontPair.bodyClass}`}
+                      className={`mt-1 text-xs ${bodyClass}`}
                       style={{ color: `${colors.primary}50` }}
                     >
                       JPG, PNG, GIF, WebP, HEIC - Max 20MB each
@@ -395,7 +394,7 @@ export function GallerySection({
                 {selectedFiles.length > 0 && (
                   <div className="space-y-2">
                     <p
-                      className={`text-sm font-medium ${fontPair.bodyClass}`}
+                      className={`text-sm font-medium ${bodyClass}`}
                       style={{ color: colors.primary }}
                     >
                       {selectedFiles.length} photo{selectedFiles.length !== 1 ? 's' : ''} selected
@@ -456,7 +455,7 @@ export function GallerySection({
                       />
                     </div>
                     <p
-                      className={`text-center text-sm ${fontPair.bodyClass}`}
+                      className={`text-center text-sm ${bodyClass}`}
                       style={{ color: `${colors.primary}80` }}
                     >
                       Uploading {uploadedCount} of {selectedFiles.length}...
@@ -486,7 +485,7 @@ export function GallerySection({
                       setShowUploadForm(false)
                       resetUpload()
                     }}
-                    className={`flex-1 rounded-lg border px-4 py-2 text-sm transition-colors hover:opacity-80 ${fontPair.bodyClass}`}
+                    className={`flex-1 rounded-lg border px-4 py-2 text-sm transition-colors hover:opacity-80 ${bodyClass}`}
                     style={{
                       borderColor: `${colors.primary}30`,
                       color: colors.primary,
@@ -502,7 +501,7 @@ export function GallerySection({
                       selectedFiles.length === 0 ||
                       uploadState.status === 'uploading'
                     }
-                    className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50 ${fontPair.bodyClass}`}
+                    className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50 ${bodyClass}`}
                     style={{
                       backgroundColor: colors.primary,
                       color: colors.background,
@@ -540,15 +539,12 @@ export function GallerySection({
                 </svg>
               </div>
               <p
-                className={`text-lg font-medium ${fontPair.headingClass}`}
+                className={`text-lg font-medium ${headingClass}`}
                 style={{ color: colors.primary }}
               >
                 Photos uploaded!
               </p>
-              <p
-                className={`mt-1 text-sm ${fontPair.bodyClass}`}
-                style={{ color: `${colors.primary}80` }}
-              >
+              <p className={`mt-1 text-sm ${bodyClass}`} style={{ color: `${colors.primary}80` }}>
                 Your photos will appear after the couple reviews them.
               </p>
               <button
@@ -556,7 +552,7 @@ export function GallerySection({
                   resetUpload()
                   setShowUploadForm(false)
                 }}
-                className={`mt-4 rounded-lg px-6 py-2 text-sm font-medium transition-opacity hover:opacity-90 ${fontPair.bodyClass}`}
+                className={`mt-4 rounded-lg px-6 py-2 text-sm font-medium transition-opacity hover:opacity-90 ${bodyClass}`}
                 style={{
                   backgroundColor: colors.primary,
                   color: colors.background,

@@ -1,11 +1,43 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import type { WebsiteSection } from '@planfortwo/types'
+import type { WebsiteSection, WebsiteSectionType } from '@planfortwo/types'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { sectionIcons, sectionLabels } from '@/lib/section-icons'
-import { GripVertical, Pencil, Trash2 } from 'lucide-react'
+import { GripVertical, Pencil, Trash2, Plus, ChevronDown } from 'lucide-react'
+// Default built-in sections that can be added to a website
+// Duplicated from packages/db/src/templates/website-sections.ts to avoid server-only imports
+const ADDABLE_SECTIONS: { sectionType: string; title: string; content: Record<string, unknown> }[] =
+  [
+    {
+      sectionType: 'prayers',
+      title: 'Prayers',
+      content: {
+        requireApproval: true,
+        message:
+          'We would be honored to have your prayers and blessings as we begin this new chapter together.',
+      },
+    },
+    {
+      sectionType: 'song_requests',
+      title: 'Song Requests',
+      content: { message: 'Help us build our playlist!', showApproved: false },
+    },
+    {
+      sectionType: 'guestbook',
+      title: 'Guestbook',
+      content: { requireApproval: true, message: 'Leave us a message!' },
+    },
+    { sectionType: 'schedule', title: 'Schedule', content: { items: [] } },
+    { sectionType: 'things_to_do', title: 'Things to Do', content: { activities: [] } },
+    {
+      sectionType: 'travel',
+      title: 'Travel & Accommodations',
+      content: { accommodations: [], directions: '', mapEmbed: null },
+    },
+    { sectionType: 'faq', title: 'FAQ', content: { questions: [] } },
+  ]
 
 interface SectionManagerProps {
   sections: WebsiteSection[]
@@ -13,6 +45,7 @@ interface SectionManagerProps {
   onEdit: (section: WebsiteSection) => void
   onReorder: (sections: { id: string; sortOrder: number }[]) => void
   onDeleteCustom?: (id: string) => void
+  onAddBuiltIn?: (sectionType: string, title: string, content: Record<string, unknown>) => void
 }
 
 export function SectionManager({
@@ -21,11 +54,19 @@ export function SectionManager({
   onEdit,
   onReorder,
   onDeleteCustom,
+  onAddBuiltIn,
 }: SectionManagerProps) {
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)
+  const [showAddMenu, setShowAddMenu] = useState(false)
   const sorted = [...sections].sort((a, b) => a.sortOrder - b.sortOrder)
   const dragNode = useRef<HTMLDivElement | null>(null)
+
+  // Find built-in sections that are missing from this website
+  const existingTypes = new Set(sections.map((s) => s.sectionType))
+  const missingSections = ADDABLE_SECTIONS.filter(
+    (d) => !existingTypes.has(d.sectionType as WebsiteSectionType),
+  )
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
     setDragIndex(index)
@@ -119,6 +160,45 @@ export function SectionManager({
           )
         })}
       </div>
+
+      {/* Add missing built-in sections */}
+      {missingSections.length > 0 && onAddBuiltIn && (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => setShowAddMenu((v) => !v)}
+            className="flex items-center gap-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+          >
+            <Plus className="h-4 w-4" />
+            Add Section
+            <ChevronDown
+              className={`h-3.5 w-3.5 transition-transform ${showAddMenu ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {showAddMenu && (
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {missingSections.map((def) => {
+                const Icon = sectionIcons[def.sectionType as WebsiteSectionType]
+                const label = sectionLabels[def.sectionType as WebsiteSectionType]
+                return (
+                  <button
+                    key={def.sectionType}
+                    type="button"
+                    onClick={() => {
+                      onAddBuiltIn(def.sectionType, def.title, def.content)
+                      setShowAddMenu(false)
+                    }}
+                    className="flex items-center gap-2.5 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-2.5 text-left text-sm text-gray-700 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    {Icon && <Icon className="h-4 w-4 shrink-0 text-gray-400" />}
+                    <span>{label ?? def.title}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -23,7 +23,9 @@ interface TemplateSelectorProps {
   }) => void
 }
 
-const COLOR_FIELDS: { key: keyof CustomColors; label: string }[] = [
+type ColorKey = 'primary' | 'secondary' | 'accent' | 'background' | 'sectionBackground'
+
+const COLOR_FIELDS: { key: ColorKey; label: string }[] = [
   { key: 'primary', label: 'Primary' },
   { key: 'secondary', label: 'Secondary' },
   { key: 'accent', label: 'Accent' },
@@ -85,7 +87,7 @@ function FontPreviewPicker({
   }, [])
 
   return (
-    <div className="grid gap-2 sm:grid-cols-2">
+    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {fontPairs.map((fp) => (
         <button
           key={fp.id}
@@ -303,7 +305,7 @@ export function TemplateSelector({
   return (
     <div>
       <h3 className="mb-4 text-lg font-semibold text-gray-900">Choose a Template</h3>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {templates.map((t) => (
           <TemplatePreview
             key={t.id}
@@ -414,6 +416,85 @@ export function TemplateSelector({
           <div className="mt-5 border-t border-gray-200 pt-4">
             <h4 className="mb-3 text-sm font-semibold text-gray-900">Font Style</h4>
             <FontPreviewPicker selected={fontPair} onSelect={handleFontChange} />
+
+            <div className="mt-4 space-y-3">
+              <h4 className="text-sm font-semibold text-gray-900">Typography Options</h4>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="mb-1.5 text-xs font-medium text-gray-600">Headings</p>
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = { ...localColors, headingBold: !localColors.headingBold }
+                        setLocalColors(updated)
+                        debouncedUpdate(updated)
+                      }}
+                      className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
+                        localColors.headingBold !== false
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      B
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = {
+                          ...localColors,
+                          headingItalic: !localColors.headingItalic,
+                        }
+                        setLocalColors(updated)
+                        debouncedUpdate(updated)
+                      }}
+                      className={`rounded-md border px-3 py-1.5 text-xs italic transition-colors ${
+                        localColors.headingItalic
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      I
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <p className="mb-1.5 text-xs font-medium text-gray-600">Body Text</p>
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = { ...localColors, bodyBold: !localColors.bodyBold }
+                        setLocalColors(updated)
+                        debouncedUpdate(updated)
+                      }}
+                      className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
+                        localColors.bodyBold
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      B
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = { ...localColors, bodyItalic: !localColors.bodyItalic }
+                        setLocalColors(updated)
+                        debouncedUpdate(updated)
+                      }}
+                      className={`rounded-md border px-3 py-1.5 text-xs italic transition-colors ${
+                        localColors.bodyItalic
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      I
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Save / Update palette actions */}

@@ -419,6 +419,12 @@ export type FontPair =
   | 'josefin-open-sans'
   | 'libre-baskerville-source-sans'
   | 'dancing-script-nunito'
+  | 'raleway-merriweather'
+  | 'abril-fatface-poppins'
+  | 'cinzel-lora'
+  | 'sacramento-roboto'
+  | 'quicksand-crimson-text'
+  | 'spectral-inter'
 
 export interface CustomColors {
   primary: string
@@ -426,6 +432,10 @@ export interface CustomColors {
   accent: string
   background: string
   sectionBackground?: string
+  headingBold?: boolean
+  headingItalic?: boolean
+  bodyBold?: boolean
+  bodyItalic?: boolean
 }
 
 export interface SavedPalette {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ExternalLink, Heart } from 'lucide-react'
 import type { RegistryContent } from '@planfortwo/types'
-import { useTemplateStyles } from '../template-context'
+import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
 import { RegistryViewer } from '@/components/registry/registry-viewer'
 
 interface RegistrySectionProps {
@@ -16,15 +16,15 @@ function CashFundCard({
   registry,
   index,
   colors,
-  fontPair,
   onView,
 }: {
   registry: RegistryContent['registries'][number]
   index: number
   colors: { primary: string; accent: string }
-  fontPair: { headingClass: string; bodyClass: string }
   onView: (url: string, name: string) => void
 }) {
+  const headingClass = useHeadingClass()
+  const bodyClass = useBodyClass()
   const hasUrl = /^https?:\/\//i.test(registry.url)
   const progress =
     registry.goalAmount && registry.goalAmount > 0
@@ -41,18 +41,12 @@ function CashFundCard({
     >
       <div className="mb-2 flex items-center gap-2">
         <Heart className="h-5 w-5" style={{ color: colors.accent }} />
-        <h3
-          className={`text-lg font-semibold ${fontPair.headingClass}`}
-          style={{ color: colors.primary }}
-        >
+        <h3 className={`text-lg font-semibold ${headingClass}`} style={{ color: colors.primary }}>
           {registry.name}
         </h3>
       </div>
       {registry.description && (
-        <p
-          className={`mb-3 text-sm ${fontPair.bodyClass}`}
-          style={{ color: `${colors.primary}99` }}
-        >
+        <p className={`mb-3 text-sm ${bodyClass}`} style={{ color: `${colors.primary}99` }}>
           {registry.description}
         </p>
       )}
@@ -64,10 +58,7 @@ function CashFundCard({
               style={{ width: `${progress}%`, backgroundColor: colors.accent }}
             />
           </div>
-          <p
-            className={`mt-1 text-xs ${fontPair.bodyClass}`}
-            style={{ color: `${colors.primary}88` }}
-          >
+          <p className={`mt-1 text-xs ${bodyClass}`} style={{ color: `${colors.primary}88` }}>
             {progress}% funded
           </p>
         </div>
@@ -100,7 +91,9 @@ function CashFundCard({
 }
 
 export function RegistrySection({ title, content }: RegistrySectionProps) {
-  const { colors, fontPair } = useTemplateStyles()
+  const { colors } = useTemplateStyles()
+  const headingClass = useHeadingClass()
+  const bodyClass = useBodyClass()
   const [viewing, setViewing] = useState<{ url: string; name: string } | null>(null)
 
   const regularRegistries = content.registries.filter((r) => !r.isCashFund)
@@ -118,7 +111,7 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className={`mb-4 text-3xl sm:text-4xl ${fontPair.headingClass}`}
+            className={`mb-4 text-3xl sm:text-4xl ${headingClass}`}
             style={{ color: colors.primary }}
           >
             {title}
@@ -129,7 +122,7 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className={`mb-10 ${fontPair.bodyClass}`}
+              className={`mb-10 ${bodyClass}`}
               style={{ color: `${colors.primary}BB` }}
             >
               {content.message}
@@ -160,10 +153,7 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
                         className="h-8 w-8 object-contain"
                       />
                     )}
-                    <span
-                      className={`font-medium ${fontPair.bodyClass}`}
-                      style={{ color: colors.primary }}
-                    >
+                    <span className={`font-medium ${bodyClass}`} style={{ color: colors.primary }}>
                       {registry.name}
                     </span>
                     <ExternalLink className="h-4 w-4" style={{ color: colors.accent }} />
@@ -184,7 +174,6 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
                   registry={fund}
                   index={i}
                   colors={colors}
-                  fontPair={fontPair}
                   onView={handleView}
                 />
               ))}

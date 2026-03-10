@@ -154,4 +154,15 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
     isVisible: false,
     sortOrder: 12,
   },
+  {
+    sectionType: 'prayers',
+    title: 'Prayers',
+    content: {
+      requireApproval: true,
+      message:
+        'We would be honored to have your prayers and blessings as we begin this new chapter together.',
+    },
+    isVisible: false,
+    sortOrder: 13,
+  },
 ]

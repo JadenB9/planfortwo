@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import type { CustomSectionContent } from '@planfortwo/types'
 import { sanitizeHtml } from '@/lib/sanitize'
-import { useTemplateStyles } from '../template-context'
+import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
 
 interface CustomSectionProps {
   title: string
@@ -11,7 +11,9 @@ interface CustomSectionProps {
 }
 
 export function CustomSection({ title, content }: CustomSectionProps) {
-  const { colors, fontPair } = useTemplateStyles()
+  const { colors } = useTemplateStyles()
+  const headingClass = useHeadingClass()
+  const bodyClass = useBodyClass()
 
   return (
     <section className="py-16 sm:py-24" style={{ backgroundColor: colors.background }}>
@@ -20,7 +22,7 @@ export function CustomSection({ title, content }: CustomSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`mb-8 text-center text-3xl sm:text-4xl ${fontPair.headingClass}`}
+          className={`mb-8 text-center text-3xl sm:text-4xl ${headingClass}`}
           style={{ color: colors.primary }}
         >
           {title}
@@ -31,7 +33,7 @@ export function CustomSection({ title, content }: CustomSectionProps) {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className={`prose mx-auto max-w-none ${fontPair.bodyClass}`}
+            className={`prose mx-auto max-w-none ${bodyClass}`}
             style={{ color: colors.primary }}
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.body) }}
           />

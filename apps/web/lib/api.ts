@@ -574,6 +574,16 @@ export const api = {
         body: JSON.stringify(data),
         token,
       }),
+    addBuiltIn: (
+      weddingId: string,
+      data: { sectionType: string; title: string; content: Record<string, unknown> },
+      token: string,
+    ) =>
+      fetchApi<{ data: WebsiteSection }>(`/website-sections/add-built-in?weddingId=${weddingId}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        token,
+      }),
     delete: (id: string, weddingId: string, token: string) =>
       fetchApi<{ data: { success: boolean } }>(`/website-sections/${id}?weddingId=${weddingId}`, {
         method: 'DELETE',

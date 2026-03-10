@@ -133,6 +133,42 @@ export const websiteSectionService = {
     return section!
   },
 
+  async createBuiltIn(
+    weddingId: string,
+    sectionType: string,
+    title: string,
+    content: Record<string, unknown>,
+    userId: string,
+  ) {
+    const sections = await this.list(weddingId)
+    const maxOrder = sections.reduce((max, s) => Math.max(max, s.sortOrder), -1)
+
+    const [section] = await db
+      .insert(websiteSections)
+      .values({
+        weddingId,
+        sectionType: sectionType as 'hero',
+        title,
+        content,
+        isVisible: false,
+        sortOrder: maxOrder + 1,
+      })
+      .returning()
+
+    if (section) {
+      await activityService.log({
+        weddingId,
+        userId,
+        action: 'website_section_updated',
+        entityType: 'website_section',
+        entityId: section.id,
+        metadata: { sectionType, title, action: 'added' },
+      })
+    }
+
+    return section!
+  },
+
   async deleteCustom(id: string, weddingId: string) {
     const [section] = await db
       .select()

@@ -31,6 +31,7 @@ import { FaqEditor } from '@/components/website/editor/faq-editor'
 import { ThingsToDoEditor } from '@/components/website/editor/things-to-do-editor'
 import { SongRequestsEditor } from '@/components/website/editor/song-requests-editor'
 import { PrayersEditor } from '@/components/website/editor/prayers-editor'
+import type { PreviewMode } from '@/components/website/editor/website-preview'
 import type { WebsiteSection } from '@planfortwo/types'
 import type {
   HeroContent,
@@ -65,6 +66,7 @@ export default function WebsitePage() {
   const { config, sections, photos, loading, refetch, analytics } = useWebsite({ weddingId })
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null)
   const [editorContent, setEditorContent] = useState<Record<string, unknown>>({})
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('phone')
 
   // Tab persistence: read from URL on mount, write to URL on change
   const [activeTab, setActiveTabState] = useState('design')
@@ -174,6 +176,17 @@ export default function WebsitePage() {
   const handleSectionEdit = useCallback((section: WebsiteSection) => {
     setEditingSection(section)
   }, [])
+
+  const handleAddBuiltIn = useCallback(
+    async (sectionType: string, title: string, content: Record<string, unknown>) => {
+      if (!weddingId) return
+      const token = await getToken()
+      if (!token) return
+      await api.websiteSections.addBuiltIn(weddingId, { sectionType, title, content }, token)
+      await refetch()
+    },
+    [weddingId, getToken, refetch],
+  )
 
   const handleSectionReorder = useCallback(
     async (reordered: { id: string; sortOrder: number }[]) => {
@@ -382,6 +395,7 @@ export default function WebsitePage() {
                 onToggleVisibility={handleToggleVisibility}
                 onEdit={handleSectionEdit}
                 onReorder={handleSectionReorder}
+                onAddBuiltIn={handleAddBuiltIn}
               />
               <SectionEditorModal
                 open={!!editingSection}
@@ -419,7 +433,10 @@ export default function WebsitePage() {
         </div>
 
         {/* Live preview panel — visible on xl screens */}
-        <div className="hidden w-[420px] shrink-0 xl:block">
+        <div
+          className="hidden shrink-0 transition-all duration-300 xl:block"
+          style={{ width: previewMode === 'desktop' ? '520px' : '300px' }}
+        >
           <div
             className="sticky top-6 overflow-hidden rounded-lg border shadow-sm"
             style={{ height: 'calc(100vh - 180px)' }}
@@ -435,6 +452,8 @@ export default function WebsitePage() {
               slug={config.subdomain ?? ''}
               editingSectionId={editingSection?.id}
               editingContent={editingSection ? editorContent : undefined}
+              previewMode={previewMode}
+              onPreviewModeChange={setPreviewMode}
             />
           </div>
         </div>

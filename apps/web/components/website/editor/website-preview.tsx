@@ -4,12 +4,15 @@ import { useRef, useState, useEffect, useMemo } from 'react'
 import { TemplateProvider } from '@/components/website/template-context'
 import { SectionRenderer } from '@/components/website/sections/section-renderer'
 import type { WebsiteSection, WebsitePhoto, CustomColors } from '@planfortwo/types'
-import { Monitor } from 'lucide-react'
+import { Monitor, Smartphone } from 'lucide-react'
 
-const PREVIEW_VIEWPORT_WIDTH = 1280
+const DESKTOP_VIEWPORT_WIDTH = 1280
+const PHONE_VIEWPORT_WIDTH = 390
 
 const GOOGLE_FONTS_URL =
-  'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&family=Cormorant+Garamond:wght@400;600;700&family=Fira+Sans:wght@300;400;600&family=Great+Vibes&family=Montserrat:wght@300;400;600;700&family=Josefin+Sans:wght@300;400;600;700&family=Open+Sans:wght@300;400;600;700&family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@300;400;600;700&family=Dancing+Script:wght@400;700&family=Nunito:wght@300;400;600;700&display=swap'
+  'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Fira+Sans:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Great+Vibes&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Josefin+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Dancing+Script:wght@400;700&family=Nunito:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Abril+Fatface&family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Sacramento&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Quicksand:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap'
+
+export type PreviewMode = 'phone' | 'desktop'
 
 interface WebsitePreviewProps {
   templateId: string
@@ -22,6 +25,8 @@ interface WebsitePreviewProps {
   slug: string
   editingSectionId?: string | null
   editingContent?: Record<string, unknown>
+  previewMode?: PreviewMode
+  onPreviewModeChange?: (mode: PreviewMode) => void
 }
 
 export function WebsitePreview({
@@ -35,11 +40,15 @@ export function WebsitePreview({
   slug,
   editingSectionId,
   editingContent,
+  previewMode = 'phone',
+  onPreviewModeChange,
 }: WebsitePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(0.3)
   const [contentHeight, setContentHeight] = useState(800)
+
+  const viewportWidth = previewMode === 'desktop' ? DESKTOP_VIEWPORT_WIDTH : PHONE_VIEWPORT_WIDTH
 
   // Load Google Fonts for section rendering
   useEffect(() => {
@@ -58,12 +67,12 @@ export function WebsitePreview({
     if (!el) return
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        setScale(entry.contentRect.width / PREVIEW_VIEWPORT_WIDTH)
+        setScale(entry.contentRect.width / viewportWidth)
       }
     })
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
+  }, [viewportWidth])
 
   // Track content height for proper scrollbar
   useEffect(() => {
@@ -99,7 +108,33 @@ export function WebsitePreview({
           <Monitor className="h-3.5 w-3.5 text-gray-400" />
           <span className="text-xs font-medium text-gray-500">Live Preview</span>
         </div>
-        <span className="text-[10px] text-gray-400">{Math.round(scale * 100)}%</span>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onPreviewModeChange?.('phone')}
+            className={`rounded p-1 transition-colors ${
+              previewMode === 'phone'
+                ? 'bg-blue-100 text-blue-600'
+                : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+            }`}
+            title="Phone view"
+          >
+            <Smartphone className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onPreviewModeChange?.('desktop')}
+            className={`rounded p-1 transition-colors ${
+              previewMode === 'desktop'
+                ? 'bg-blue-100 text-blue-600'
+                : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+            }`}
+            title="Desktop view"
+          >
+            <Monitor className="h-3.5 w-3.5" />
+          </button>
+          <span className="ml-1 text-[10px] text-gray-400">{Math.round(scale * 100)}%</span>
+        </div>
       </div>
 
       <div ref={containerRef} className="flex-1 overflow-y-auto bg-gray-100">
@@ -109,7 +144,7 @@ export function WebsitePreview({
               ref={contentRef}
               className="pointer-events-none"
               style={{
-                width: `${PREVIEW_VIEWPORT_WIDTH}px`,
+                width: `${viewportWidth}px`,
                 transform: `scale(${scale})`,
                 transformOrigin: 'top left',
                 position: 'absolute',

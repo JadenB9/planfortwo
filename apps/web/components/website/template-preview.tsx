@@ -22,12 +22,14 @@ export function TemplatePreview({ templateId, selected = false, onClick }: Templ
       )}
     >
       <TemplatePreviewContent template={template} />
-      <div className="p-3">
-        <p className="text-sm font-semibold text-gray-900">{template.name}</p>
-        <p className="mt-0.5 text-xs text-gray-500">{template.description}</p>
+      <div className="px-2.5 py-2">
+        <p className="text-xs font-semibold text-gray-900">{template.name}</p>
+        <p className="mt-0.5 line-clamp-1 text-[10px] leading-tight text-gray-500">
+          {template.description}
+        </p>
       </div>
       {selected && (
-        <div className="bg-wedding-600 absolute right-2 top-2 rounded-full px-2 py-0.5 text-xs font-medium text-white">
+        <div className="bg-wedding-600 absolute right-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white">
           Active
         </div>
       )}
@@ -40,20 +42,20 @@ function TemplatePreviewContent({ template }: { template: TemplateMetadata }) {
 
   return (
     <div
-      className="flex h-32 flex-col items-center justify-center"
+      className="flex h-20 flex-col items-center justify-center"
       style={{ backgroundColor: defaultColors.background }}
     >
       <div
-        className="mb-1 h-2 w-20 rounded-full"
+        className="mb-1 h-1.5 w-16 rounded-full"
         style={{ backgroundColor: defaultColors.primary }}
       />
       <div
-        className="mb-3 h-1.5 w-14 rounded-full"
+        className="mb-2 h-1 w-10 rounded-full"
         style={{ backgroundColor: defaultColors.accent }}
       />
       <div className="flex gap-1">
         {[defaultColors.primary, defaultColors.secondary, defaultColors.accent].map((color, i) => (
-          <div key={i} className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
+          <div key={i} className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
         ))}
       </div>
     </div>

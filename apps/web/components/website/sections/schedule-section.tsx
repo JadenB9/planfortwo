@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { ScheduleContent } from '@planfortwo/types'
-import { useTemplateStyles } from '../template-context'
+import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
 
 interface ScheduleSectionProps {
   title: string
@@ -10,7 +10,9 @@ interface ScheduleSectionProps {
 }
 
 export function ScheduleSection({ title, content }: ScheduleSectionProps) {
-  const { colors, fontPair } = useTemplateStyles()
+  const { colors } = useTemplateStyles()
+  const headingClass = useHeadingClass()
+  const bodyClass = useBodyClass()
 
   return (
     <section className="py-16 sm:py-24" style={{ backgroundColor: colors.background }}>
@@ -19,7 +21,7 @@ export function ScheduleSection({ title, content }: ScheduleSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`mb-12 text-center text-3xl sm:text-4xl ${fontPair.headingClass}`}
+          className={`mb-12 text-center text-3xl sm:text-4xl ${headingClass}`}
           style={{ color: colors.primary }}
         >
           {title}
@@ -42,31 +44,22 @@ export function ScheduleSection({ title, content }: ScheduleSectionProps) {
                 className="absolute left-4 top-1 h-4 w-4 rounded-full border-2"
                 style={{ borderColor: colors.accent, backgroundColor: colors.background }}
               />
-              <p
-                className={`text-sm font-medium ${fontPair.bodyClass}`}
-                style={{ color: colors.accent }}
-              >
+              <p className={`text-sm font-medium ${bodyClass}`} style={{ color: colors.accent }}>
                 {item.time}
               </p>
               <h3
-                className={`mt-1 text-lg font-semibold ${fontPair.headingClass}`}
+                className={`mt-1 text-lg font-semibold ${headingClass}`}
                 style={{ color: colors.primary }}
               >
                 {item.title}
               </h3>
               {item.description && (
-                <p
-                  className={`mt-1 text-sm ${fontPair.bodyClass}`}
-                  style={{ color: `${colors.primary}BB` }}
-                >
+                <p className={`mt-1 text-sm ${bodyClass}`} style={{ color: `${colors.primary}BB` }}>
                   {item.description}
                 </p>
               )}
               {item.location && (
-                <p
-                  className={`mt-1 text-xs ${fontPair.bodyClass}`}
-                  style={{ color: `${colors.primary}99` }}
-                >
+                <p className={`mt-1 text-xs ${bodyClass}`} style={{ color: `${colors.primary}99` }}>
                   {item.location}
                 </p>
               )}

@@ -9,11 +9,19 @@ interface ResolvedColors extends CustomColors {
   sectionBackground: string
 }
 
+interface TypographyOptions {
+  headingBold: boolean
+  headingItalic: boolean
+  bodyBold: boolean
+  bodyItalic: boolean
+}
+
 interface TemplateStyles {
   colors: ResolvedColors
   fontPair: FontPairConfig
   templateId: string
   cssVariables: Record<string, string>
+  typography: TypographyOptions
 }
 
 const TemplateContext = createContext<TemplateStyles | null>(null)
@@ -51,7 +59,14 @@ export function TemplateProvider({
       '--template-section-background': colors.sectionBackground,
     }
 
-    return { colors, fontPair, templateId, cssVariables }
+    const typography: TypographyOptions = {
+      headingBold: baseColors.headingBold ?? true,
+      headingItalic: baseColors.headingItalic ?? false,
+      bodyBold: baseColors.bodyBold ?? false,
+      bodyItalic: baseColors.bodyItalic ?? false,
+    }
+
+    return { colors, fontPair, templateId, cssVariables, typography }
   }, [templateId, customColors, fontPairId])
 
   return (
@@ -65,4 +80,22 @@ export function useTemplateStyles(): TemplateStyles {
   const ctx = useContext(TemplateContext)
   if (!ctx) throw new Error('useTemplateStyles must be used within TemplateProvider')
   return ctx
+}
+
+/** Build a className string for headings that respects typography options */
+export function useHeadingClass(): string {
+  const { fontPair, typography } = useTemplateStyles()
+  const parts = [fontPair.headingClass]
+  if (typography.headingBold) parts.push('font-bold')
+  if (typography.headingItalic) parts.push('italic')
+  return parts.join(' ')
+}
+
+/** Build a className string for body text that respects typography options */
+export function useBodyClass(): string {
+  const { fontPair, typography } = useTemplateStyles()
+  const parts = [fontPair.bodyClass]
+  if (typography.bodyBold) parts.push('font-bold')
+  if (typography.bodyItalic) parts.push('italic')
+  return parts.join(' ')
 }

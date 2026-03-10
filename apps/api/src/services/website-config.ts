@@ -53,7 +53,8 @@ export const websiteConfigService = {
         | 'schedule'
         | 'guestbook'
         | 'custom'
-        | 'song_requests',
+        | 'song_requests'
+        | 'prayers',
       title: s.title,
       content: s.content,
       isVisible: s.isVisible,

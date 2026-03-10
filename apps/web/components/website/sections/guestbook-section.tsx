@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import type { GuestbookSectionContent, GuestbookEntry } from '@planfortwo/types'
-import { useTemplateStyles } from '../template-context'
+import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
 
 interface GuestbookSectionProps {
   title: string
@@ -14,7 +14,9 @@ interface GuestbookSectionProps {
 }
 
 export function GuestbookSection({ title, content, entries, onSubmit }: GuestbookSectionProps) {
-  const { colors, fontPair } = useTemplateStyles()
+  const { colors } = useTemplateStyles()
+  const headingClass = useHeadingClass()
+  const bodyClass = useBodyClass()
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [honeypot, setHoneypot] = useState('')
@@ -46,16 +48,13 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`mb-4 text-center text-3xl sm:text-4xl ${fontPair.headingClass}`}
+          className={`mb-4 text-center text-3xl sm:text-4xl ${headingClass}`}
           style={{ color: colors.primary }}
         >
           {title}
         </motion.h2>
         {content.message && (
-          <p
-            className={`mb-8 text-center ${fontPair.bodyClass}`}
-            style={{ color: `${colors.primary}BB` }}
-          >
+          <p className={`mb-8 text-center ${bodyClass}`} style={{ color: `${colors.primary}BB` }}>
             {content.message}
           </p>
         )}
@@ -74,7 +73,7 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
               onChange={(e) => setName(e.target.value)}
               maxLength={100}
               required
-              className={`w-full rounded-lg border px-4 py-2 text-sm ${fontPair.bodyClass}`}
+              className={`w-full rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
@@ -86,7 +85,7 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
               maxLength={2000}
               rows={3}
               required
-              className={`w-full resize-none rounded-lg border px-4 py-2 text-sm ${fontPair.bodyClass}`}
+              className={`w-full resize-none rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
@@ -109,7 +108,7 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
             {submitting ? 'Signing...' : 'Sign Guestbook'}
           </button>
           {submitted && (
-            <p className={`mt-2 text-sm ${fontPair.bodyClass}`} style={{ color: colors.accent }}>
+            <p className={`mt-2 text-sm ${bodyClass}`} style={{ color: colors.accent }}>
               {content.requireApproval
                 ? 'Thank you! Your message will appear after approval.'
                 : 'Thank you for your message!'}
@@ -127,11 +126,11 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
                 transition={{ delay: i * 0.05 }}
                 className="rounded-2xl bg-white p-5 shadow-sm"
               >
-                <p className={`text-sm ${fontPair.bodyClass}`} style={{ color: colors.primary }}>
+                <p className={`text-sm ${bodyClass}`} style={{ color: colors.primary }}>
                   {entry.message}
                 </p>
                 <p
-                  className={`mt-2 text-xs font-medium ${fontPair.bodyClass}`}
+                  className={`mt-2 text-xs font-medium ${bodyClass}`}
                   style={{ color: colors.accent }}
                 >
                   — {entry.authorName}

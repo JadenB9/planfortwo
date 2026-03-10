@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { FaqContent } from '@planfortwo/types'
-import { useTemplateStyles } from '../template-context'
+import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
 
 interface FaqSectionProps {
   title: string
@@ -10,7 +10,9 @@ interface FaqSectionProps {
 }
 
 export function FaqSection({ title, content }: FaqSectionProps) {
-  const { colors, fontPair } = useTemplateStyles()
+  const { colors } = useTemplateStyles()
+  const headingClass = useHeadingClass()
+  const bodyClass = useBodyClass()
 
   return (
     <section className="py-16 sm:py-24" style={{ backgroundColor: colors.background }}>
@@ -19,7 +21,7 @@ export function FaqSection({ title, content }: FaqSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`mb-12 text-center text-3xl sm:text-4xl ${fontPair.headingClass}`}
+          className={`mb-12 text-center text-3xl sm:text-4xl ${headingClass}`}
           style={{ color: colors.primary }}
         >
           {title}
@@ -35,13 +37,13 @@ export function FaqSection({ title, content }: FaqSectionProps) {
               className="group rounded-2xl bg-white p-6 shadow-sm"
             >
               <summary
-                className={`cursor-pointer list-none font-semibold ${fontPair.headingClass}`}
+                className={`cursor-pointer list-none font-semibold ${headingClass}`}
                 style={{ color: colors.primary }}
               >
                 {q.question}
               </summary>
               <p
-                className={`mt-3 text-sm leading-relaxed ${fontPair.bodyClass}`}
+                className={`mt-3 text-sm leading-relaxed ${bodyClass}`}
                 style={{ color: `${colors.primary}BB` }}
               >
                 {q.answer}

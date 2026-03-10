@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import type { SongRequestsSectionContent } from '@planfortwo/types'
-import { useTemplateStyles } from '../template-context'
+import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
 import { Music } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
@@ -25,7 +25,9 @@ interface SongRequestsSectionProps {
 }
 
 export function SongRequestsSection({ title, content, slug }: SongRequestsSectionProps) {
-  const { colors, fontPair } = useTemplateStyles()
+  const { colors } = useTemplateStyles()
+  const headingClass = useHeadingClass()
+  const bodyClass = useBodyClass()
   const [guestName, setGuestName] = useState('')
   const [songTitle, setSongTitle] = useState('')
   const [artist, setArtist] = useState('')
@@ -85,16 +87,13 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`mb-4 text-center text-3xl sm:text-4xl ${fontPair.headingClass}`}
+          className={`mb-4 text-center text-3xl sm:text-4xl ${headingClass}`}
           style={{ color: colors.primary }}
         >
           {title}
         </motion.h2>
         {content.message && (
-          <p
-            className={`mb-8 text-center ${fontPair.bodyClass}`}
-            style={{ color: `${colors.primary}BB` }}
-          >
+          <p className={`mb-8 text-center ${bodyClass}`} style={{ color: `${colors.primary}BB` }}>
             {content.message}
           </p>
         )}
@@ -114,7 +113,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
               onChange={(e) => setGuestName(e.target.value)}
               maxLength={200}
               required
-              className={`w-full rounded-lg border px-4 py-2 text-sm ${fontPair.bodyClass}`}
+              className={`w-full rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
@@ -126,7 +125,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
               onChange={(e) => setSongTitle(e.target.value)}
               maxLength={300}
               required
-              className={`w-full rounded-lg border px-4 py-2 text-sm ${fontPair.bodyClass}`}
+              className={`w-full rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
             <input
@@ -136,7 +135,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
               onChange={(e) => setArtist(e.target.value)}
               maxLength={300}
               required
-              className={`w-full rounded-lg border px-4 py-2 text-sm ${fontPair.bodyClass}`}
+              className={`w-full rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
@@ -147,7 +146,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
               onChange={(e) => setNotes(e.target.value)}
               maxLength={500}
               rows={2}
-              className={`w-full resize-none rounded-lg border px-4 py-2 text-sm ${fontPair.bodyClass}`}
+              className={`w-full resize-none rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
@@ -160,7 +159,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
             {submitting ? 'Submitting...' : 'Request Song'}
           </button>
           {submitted && (
-            <p className={`mt-2 text-sm ${fontPair.bodyClass}`} style={{ color: colors.accent }}>
+            <p className={`mt-2 text-sm ${bodyClass}`} style={{ color: colors.accent }}>
               Thank you! Your song request has been submitted.
             </p>
           )}
@@ -169,7 +168,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
         {content.showApproved && approvedSongs.length > 0 && (
           <div>
             <h3
-              className={`mb-4 text-center text-xl ${fontPair.headingClass}`}
+              className={`mb-4 text-center text-xl ${headingClass}`}
               style={{ color: colors.primary }}
             >
               Requested Songs
@@ -187,13 +186,13 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
                   <Music className="h-5 w-5 shrink-0" style={{ color: colors.accent }} />
                   <div className="min-w-0 flex-1">
                     <p
-                      className={`truncate text-sm font-medium ${fontPair.bodyClass}`}
+                      className={`truncate text-sm font-medium ${bodyClass}`}
                       style={{ color: colors.primary }}
                     >
                       {song.title}
                     </p>
                     <p
-                      className={`truncate text-xs ${fontPair.bodyClass}`}
+                      className={`truncate text-xs ${bodyClass}`}
                       style={{ color: `${colors.primary}99` }}
                     >
                       {song.artist} &mdash; requested by {song.guestName}
