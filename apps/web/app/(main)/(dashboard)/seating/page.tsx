@@ -488,7 +488,7 @@ export default function SeatingPage() {
     try {
       const token = await getToken()
       if (!token) return
-      const { data } = await api.guests.list(weddingId, token, { pageSize: 9999 })
+      const { data } = await api.guests.list(weddingId, token, { pageSize: 200 })
       setGuests(data)
     } catch {
       toast.error('Failed to load guests')
@@ -1582,7 +1582,7 @@ export default function SeatingPage() {
                           <circle
                             cx={seat.x}
                             cy={seat.y}
-                            r={isFilled ? 6 : 7}
+                            r={isFilled ? 10 : 11}
                             fill={isFilled ? TABLE_COLOR : SEAT_EMPTY}
                             stroke={isFilled ? TABLE_COLOR : '#9ca3af'}
                             strokeWidth={1.5}
@@ -1598,7 +1598,7 @@ export default function SeatingPage() {
                             fontWeight={isFilled ? 600 : 400}
                             transform={`rotate(${textAngle}, ${seat.x}, ${seat.y})`}
                           >
-                            {isFilled && displayName ? displayName : i + 1}
+                            {isFilled && displayName ? displayName : ''}
                           </text>
                           {isFilled && fullName && <title>{fullName}</title>}
                         </g>

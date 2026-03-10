@@ -905,7 +905,7 @@ export const api = {
         token,
       }),
     create: (data: { weddingId: string; name: string }, token: string) =>
-      fetchApi<{ data: SeatingChart }>('/seating-charts', {
+      fetchApi<{ data: SeatingChart }>(`/seating-charts?weddingId=${data.weddingId}`, {
         method: 'POST',
         body: JSON.stringify(data),
         token,
