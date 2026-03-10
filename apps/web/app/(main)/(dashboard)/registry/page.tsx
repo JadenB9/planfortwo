@@ -42,9 +42,11 @@ import {
   Armchair,
   Share2,
   Copy,
+  Eye,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { LucideIcon } from 'lucide-react'
+import { RegistryViewer } from '@/components/registry/registry-viewer'
 
 // ── Types ──
 
@@ -135,6 +137,11 @@ export default function RegistryPage() {
   // Edit states
   const [editingFund, setEditingFund] = useState<CashFund | null>(null)
   const [editingGift, setEditingGift] = useState<Gift | null>(null)
+
+  // Inline registry viewer state
+  const [viewingRegistry, setViewingRegistry] = useState<{ url: string; storeName: string } | null>(
+    null,
+  )
 
   // ── Data Loading ──
 
@@ -525,6 +532,7 @@ export default function RegistryPage() {
               onAddCustom={openAddLinkCustom}
               onDelete={handleDeleteLink}
               onCopy={handleCopyLink}
+              onView={(link) => setViewingRegistry({ url: link.url, storeName: link.storeName })}
             />
           </motion.div>
         )}
@@ -745,6 +753,14 @@ export default function RegistryPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Inline Registry Viewer */}
+      <RegistryViewer
+        url={viewingRegistry?.url ?? ''}
+        storeName={viewingRegistry?.storeName ?? ''}
+        open={viewingRegistry !== null}
+        onClose={() => setViewingRegistry(null)}
+      />
     </motion.div>
   )
 }
@@ -757,12 +773,14 @@ function LinksTab({
   onAddCustom,
   onDelete,
   onCopy,
+  onView,
 }: {
   links: RegistryLink[]
   onAddStore: (name: string) => void
   onAddCustom: () => void
   onDelete: (id: string) => void
   onCopy: (url: string) => void
+  onView: (link: RegistryLink) => void
 }) {
   return (
     <div className="space-y-8">
@@ -858,15 +876,24 @@ function LinksTab({
                         </div>
                         <div className="min-w-0 flex-1">
                           <h3 className="truncate font-semibold text-gray-900">{link.storeName}</h3>
-                          <a
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-wedding-600 hover:text-wedding-700 mt-0.5 inline-flex items-center gap-1 text-sm"
-                          >
-                            Visit Registry
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
+                          <div className="mt-0.5 flex items-center gap-3">
+                            <button
+                              onClick={() => onView(link)}
+                              className="text-wedding-600 hover:text-wedding-700 inline-flex items-center gap-1 text-sm font-medium"
+                            >
+                              <Eye className="h-3 w-3" />
+                              View Inline
+                            </button>
+                            <a
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"
+                            >
+                              New Tab
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </div>
                           <p className="mt-1 text-xs text-gray-400">
                             {link.clickCount} click{link.clickCount !== 1 ? 's' : ''}
                           </p>

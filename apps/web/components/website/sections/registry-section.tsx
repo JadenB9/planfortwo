@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ExternalLink, Heart } from 'lucide-react'
 import type { RegistryContent } from '@planfortwo/types'
 import { useTemplateStyles } from '../template-context'
+import { RegistryViewer } from '@/components/registry/registry-viewer'
 
 interface RegistrySectionProps {
   title: string
@@ -15,11 +17,13 @@ function CashFundCard({
   index,
   colors,
   fontPair,
+  onView,
 }: {
   registry: RegistryContent['registries'][number]
   index: number
   colors: { primary: string; accent: string }
   fontPair: { headingClass: string; bodyClass: string }
+  onView: (url: string, name: string) => void
 }) {
   const hasUrl = /^https?:\/\//i.test(registry.url)
   const progress =
@@ -82,9 +86,13 @@ function CashFundCard({
 
   if (hasUrl) {
     return (
-      <a href={registry.url} target="_blank" rel="noopener noreferrer">
+      <button
+        type="button"
+        onClick={() => onView(registry.url, registry.name)}
+        className="text-left"
+      >
         {card}
-      </a>
+      </button>
     )
   }
 
@@ -93,81 +101,106 @@ function CashFundCard({
 
 export function RegistrySection({ title, content }: RegistrySectionProps) {
   const { colors, fontPair } = useTemplateStyles()
+  const [viewing, setViewing] = useState<{ url: string; name: string } | null>(null)
 
   const regularRegistries = content.registries.filter((r) => !r.isCashFund)
   const cashFunds = content.registries.filter((r) => r.isCashFund)
 
+  const handleView = (url: string, name: string) => {
+    setViewing({ url, name })
+  }
+
   return (
-    <section className="py-16 sm:py-24" style={{ backgroundColor: colors.sectionBackground }}>
-      <div className="mx-auto max-w-3xl px-4 text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className={`mb-4 text-3xl sm:text-4xl ${fontPair.headingClass}`}
-          style={{ color: colors.primary }}
-        >
-          {title}
-        </motion.h2>
-        {content.message && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+    <>
+      <section className="py-16 sm:py-24" style={{ backgroundColor: colors.sectionBackground }}>
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className={`mb-10 ${fontPair.bodyClass}`}
-            style={{ color: `${colors.primary}BB` }}
+            className={`mb-4 text-3xl sm:text-4xl ${fontPair.headingClass}`}
+            style={{ color: colors.primary }}
           >
-            {content.message}
-          </motion.p>
-        )}
+            {title}
+          </motion.h2>
+          {content.message && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className={`mb-10 ${fontPair.bodyClass}`}
+              style={{ color: `${colors.primary}BB` }}
+            >
+              {content.message}
+            </motion.p>
+          )}
 
-        {/* Regular registries */}
-        {regularRegistries.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-6">
-            {regularRegistries.map((registry, i) => (
-              <motion.a
-                key={i}
-                href={/^https?:\/\//i.test(registry.url) ? registry.url : '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex items-center gap-3 rounded-2xl bg-white px-6 py-4 shadow-sm transition-shadow hover:shadow-md"
-              >
-                {registry.logoUrl && /^https?:\/\//i.test(registry.logoUrl) && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={registry.logoUrl}
-                    alt={registry.name}
-                    className="h-8 w-8 object-contain"
-                  />
-                )}
-                <span
-                  className={`font-medium ${fontPair.bodyClass}`}
-                  style={{ color: colors.primary }}
-                >
-                  {registry.name}
-                </span>
-                <ExternalLink className="h-4 w-4" style={{ color: colors.accent }} />
-              </motion.a>
-            ))}
-          </div>
-        )}
+          {/* Regular registries */}
+          {regularRegistries.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-6">
+              {regularRegistries.map((registry, i) => {
+                const hasUrl = /^https?:\/\//i.test(registry.url)
+                return (
+                  <motion.button
+                    key={i}
+                    type="button"
+                    onClick={() => hasUrl && handleView(registry.url, registry.name)}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex cursor-pointer items-center gap-3 rounded-2xl bg-white px-6 py-4 shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    {registry.logoUrl && /^https?:\/\//i.test(registry.logoUrl) && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={registry.logoUrl}
+                        alt={registry.name}
+                        className="h-8 w-8 object-contain"
+                      />
+                    )}
+                    <span
+                      className={`font-medium ${fontPair.bodyClass}`}
+                      style={{ color: colors.primary }}
+                    >
+                      {registry.name}
+                    </span>
+                    <ExternalLink className="h-4 w-4" style={{ color: colors.accent }} />
+                  </motion.button>
+                )
+              })}
+            </div>
+          )}
 
-        {/* Cash funds */}
-        {cashFunds.length > 0 && (
-          <div
-            className={`flex flex-wrap justify-center gap-6 ${regularRegistries.length > 0 ? 'mt-8' : ''}`}
-          >
-            {cashFunds.map((fund, i) => (
-              <CashFundCard key={i} registry={fund} index={i} colors={colors} fontPair={fontPair} />
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+          {/* Cash funds */}
+          {cashFunds.length > 0 && (
+            <div
+              className={`flex flex-wrap justify-center gap-6 ${regularRegistries.length > 0 ? 'mt-8' : ''}`}
+            >
+              {cashFunds.map((fund, i) => (
+                <CashFundCard
+                  key={i}
+                  registry={fund}
+                  index={i}
+                  colors={colors}
+                  fontPair={fontPair}
+                  onView={handleView}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Inline Registry Viewer */}
+      <RegistryViewer
+        url={viewing?.url ?? ''}
+        storeName={viewing?.name ?? ''}
+        open={viewing !== null}
+        onClose={() => setViewing(null)}
+        accentColor={colors.accent}
+      />
+    </>
   )
 }
