@@ -85,9 +85,7 @@ export function WebsitePreview({
       .sort((a, b) => a.sortOrder - b.sortOrder)
 
     if (editingSectionId && editingContent) {
-      return visible.map((s) =>
-        s.id === editingSectionId ? { ...s, content: editingContent } : s,
-      )
+      return visible.map((s) => (s.id === editingSectionId ? { ...s, content: editingContent } : s))
     }
     return visible
   }, [sections, editingSectionId, editingContent])

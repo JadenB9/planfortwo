@@ -15,6 +15,7 @@ import { SettingsPanel } from '@/components/website/editor/settings-panel'
 import { PublishToggle } from '@/components/website/editor/publish-toggle'
 import { AnalyticsDashboard } from '@/components/website/analytics/analytics-dashboard'
 import { SectionEditorModal } from '@/components/website/editor/section-editor-modal'
+import dynamic from 'next/dynamic'
 import { HeroEditor } from '@/components/website/editor/hero-editor'
 import { OurStoryEditor } from '@/components/website/editor/our-story-editor'
 import { EventDetailsEditor } from '@/components/website/editor/event-details-editor'
@@ -49,15 +50,39 @@ import type {
   PrayersSectionContent,
 } from '@planfortwo/types'
 
+const WebsitePreview = dynamic(
+  () => import('@/components/website/editor/website-preview').then((m) => m.WebsitePreview),
+  { ssr: false },
+)
+
+const VALID_TABS = ['design', 'sections', 'settings', 'analytics']
+
 export default function WebsitePage() {
   const { data, features } = useWedding()
   const { getToken } = useAuth()
   const wedding = data?.wedding ?? null
   const weddingId = wedding?.id ?? null
-  const { config, sections, loading, refetch, analytics } = useWebsite({ weddingId })
+  const { config, sections, photos, loading, refetch, analytics } = useWebsite({ weddingId })
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null)
   const [editorContent, setEditorContent] = useState<Record<string, unknown>>({})
-  const [activeTab, setActiveTab] = useState('design')
+
+  // Tab persistence: read from URL on mount, write to URL on change
+  const [activeTab, setActiveTabState] = useState('design')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
+    if (tab && VALID_TABS.includes(tab)) {
+      setActiveTabState(tab)
+    }
+  }, [])
+
+  const setActiveTab = useCallback((tab: string) => {
+    setActiveTabState(tab)
+    const url = new URL(window.location.href)
+    url.searchParams.set('tab', tab)
+    window.history.replaceState(null, '', url.toString())
+  }, [])
 
   useEffect(() => {
     if (editingSection) {
@@ -309,6 +334,8 @@ export default function WebsitePage() {
     )
   }
 
+  const weddingDate = wedding?.date ? new Date(wedding.date) : null
+
   return (
     <motion.div
       className="space-y-6 p-6"
@@ -327,65 +354,91 @@ export default function WebsitePage() {
         />
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="design">Design</TabsTrigger>
-          <TabsTrigger value="sections">Sections</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+      <div className="flex gap-6">
+        {/* Editor panel */}
+        <div className="min-w-0 flex-1">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              <TabsTrigger value="design">Design</TabsTrigger>
+              <TabsTrigger value="sections">Sections</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="design" className="mt-6">
-          <TemplateSelector
-            selectedId={config.templateId}
-            onSelect={handleTemplateChange}
-            customColors={config.customColors}
-            savedPalettes={config.savedPalettes ?? null}
-            fontPair={config.fontPair}
-            onCustomize={(updates) => handleConfigUpdate(updates)}
-          />
-        </TabsContent>
+            <TabsContent value="design" className="mt-6">
+              <TemplateSelector
+                selectedId={config.templateId}
+                onSelect={handleTemplateChange}
+                customColors={config.customColors}
+                savedPalettes={config.savedPalettes ?? null}
+                fontPair={config.fontPair}
+                onCustomize={(updates) => handleConfigUpdate(updates)}
+              />
+            </TabsContent>
 
-        <TabsContent value="sections" className="mt-6">
-          <SectionManager
-            sections={sections}
-            onToggleVisibility={handleToggleVisibility}
-            onEdit={handleSectionEdit}
-            onReorder={handleSectionReorder}
-          />
-          <SectionEditorModal
-            open={!!editingSection}
-            onClose={() => setEditingSection(null)}
-            onSaved={() => {
-              void refetch()
-            }}
-            sectionId={editingSection?.id ?? ''}
-            sectionTitle={editingSection?.title ?? ''}
-            sectionType={editingSection?.sectionType ?? ''}
-            content={editorContent}
-            getToken={getToken}
-            weddingId={weddingId ?? ''}
+            <TabsContent value="sections" className="mt-6">
+              <SectionManager
+                sections={sections}
+                onToggleVisibility={handleToggleVisibility}
+                onEdit={handleSectionEdit}
+                onReorder={handleSectionReorder}
+              />
+              <SectionEditorModal
+                open={!!editingSection}
+                onClose={() => setEditingSection(null)}
+                onSaved={() => {
+                  void refetch()
+                }}
+                sectionId={editingSection?.id ?? ''}
+                sectionTitle={editingSection?.title ?? ''}
+                sectionType={editingSection?.sectionType ?? ''}
+                content={editorContent}
+                getToken={getToken}
+                weddingId={weddingId ?? ''}
+              >
+                {editingSection &&
+                  renderEditor(editingSection.sectionType, editorContent, setEditorContent)}
+              </SectionEditorModal>
+            </TabsContent>
+
+            <TabsContent value="settings" className="mt-6">
+              <SettingsPanel
+                config={config}
+                onUpdate={handleConfigUpdate}
+                onCheckSubdomain={handleCheckSubdomain}
+              />
+            </TabsContent>
+
+            <TabsContent value="analytics" className="mt-6">
+              <AnalyticsDashboard
+                analytics={analytics}
+                canAccess={features?.canWebsiteAnalytics ?? false}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Live preview panel — visible on xl screens */}
+        <div className="hidden w-[420px] shrink-0 xl:block">
+          <div
+            className="sticky top-6 overflow-hidden rounded-lg border shadow-sm"
+            style={{ height: 'calc(100vh - 180px)' }}
           >
-            {editingSection &&
-              renderEditor(editingSection.sectionType, editorContent, setEditorContent)}
-          </SectionEditorModal>
-        </TabsContent>
-
-        <TabsContent value="settings" className="mt-6">
-          <SettingsPanel
-            config={config}
-            onUpdate={handleConfigUpdate}
-            onCheckSubdomain={handleCheckSubdomain}
-          />
-        </TabsContent>
-
-        <TabsContent value="analytics" className="mt-6">
-          <AnalyticsDashboard
-            analytics={analytics}
-            canAccess={features?.canWebsiteAnalytics ?? false}
-          />
-        </TabsContent>
-      </Tabs>
+            <WebsitePreview
+              templateId={config.templateId}
+              customColors={config.customColors}
+              fontPair={config.fontPair}
+              sections={sections}
+              photos={photos}
+              weddingName={wedding?.name ?? 'Our Wedding'}
+              weddingDate={weddingDate}
+              slug={config.subdomain ?? ''}
+              editingSectionId={editingSection?.id}
+              editingContent={editingSection ? editorContent : undefined}
+            />
+          </div>
+        </div>
+      </div>
     </motion.div>
   )
 }
