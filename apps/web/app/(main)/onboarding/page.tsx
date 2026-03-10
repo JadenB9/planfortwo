@@ -2,21 +2,17 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@clerk/nextjs'
+import { useAuth, useUser } from '@clerk/nextjs'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { OnboardingData } from '@planfortwo/types'
-import { onboardingSchema } from '@planfortwo/validators'
 import { api } from '@/lib/api'
 import { springSmooth } from '@/lib/animations'
 import { ProgressBar } from '@/components/onboarding/progress-bar'
 import { NamesStep } from '@/components/onboarding/names-step'
-import { DateStep } from '@/components/onboarding/date-step'
-import { GuestCountStep } from '@/components/onboarding/guest-count-step'
-import { BudgetStep } from '@/components/onboarding/budget-step'
-import { StyleStep } from '@/components/onboarding/style-step'
-import { TimelineStep } from '@/components/onboarding/timeline-step'
+import { InviteStep } from '@/components/onboarding/invite-step'
+import { BasicsStep } from '@/components/onboarding/basics-step'
 
-const TOTAL_STEPS = 6
+const TOTAL_STEPS = 3
 
 const stepVariants = {
   enter: (direction: number) => ({
@@ -33,14 +29,18 @@ const stepVariants = {
 export default function OnboardingPage() {
   const router = useRouter()
   const { getToken } = useAuth()
+  const { user } = useUser()
 
   const [step, setStep] = useState(0)
   const [direction, setDirection] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<Partial<OnboardingData>>({
+    yourFirstName: user?.firstName ?? '',
+    yourLastName: user?.lastName ?? '',
     partnerFirstName: '',
     partnerLastName: '',
+    partnerEmail: null,
     weddingDate: null,
     guestCountEstimate: null,
     budgetTotal: null,
@@ -67,10 +67,18 @@ export default function OnboardingPage() {
     setIsSubmitting(true)
 
     try {
-      const parsed = onboardingSchema.parse({
-        ...data,
+      const submitData = {
+        yourFirstName: data.yourFirstName?.trim() || null,
+        yourLastName: data.yourLastName?.trim() || null,
+        partnerFirstName: data.partnerFirstName?.trim() || null,
+        partnerLastName: data.partnerLastName?.trim() || null,
+        partnerEmail: data.partnerEmail?.trim() || null,
+        weddingDate: data.weddingDate ?? null,
+        guestCountEstimate: data.guestCountEstimate ?? null,
+        budgetTotal: data.budgetTotal ?? null,
+        style: data.style ?? null,
         timelineTemplate: data.timelineTemplate ?? '12-month',
-      })
+      }
 
       const token = await getToken()
       if (!token) throw new Error('Not authenticated')
@@ -92,16 +100,7 @@ export default function OnboardingPage() {
       }
       if (!dashboardData) throw new Error('Unable to load your wedding. Please try again.')
 
-      const onboardingData: OnboardingData = {
-        partnerFirstName: parsed.partnerFirstName,
-        partnerLastName: parsed.partnerLastName,
-        weddingDate: parsed.weddingDate ?? null,
-        guestCountEstimate: parsed.guestCountEstimate ?? null,
-        budgetTotal: parsed.budgetTotal ?? null,
-        style: parsed.style ?? null,
-        timelineTemplate: parsed.timelineTemplate,
-      }
-      await api.weddings.completeOnboarding(dashboardData.wedding.id, onboardingData, token)
+      await api.weddings.completeOnboarding(dashboardData.wedding.id, submitData, token)
 
       router.push('/dashboard')
     } catch (err) {
@@ -112,36 +111,15 @@ export default function OnboardingPage() {
 
   const steps = [
     <NamesStep key="names" data={data} onUpdate={updateData} onNext={handleNext} />,
-    <DateStep
-      key="date"
+    <InviteStep
+      key="invite"
       data={data}
       onUpdate={updateData}
       onNext={handleNext}
       onBack={handleBack}
     />,
-    <GuestCountStep
-      key="guests"
-      data={data}
-      onUpdate={updateData}
-      onNext={handleNext}
-      onBack={handleBack}
-    />,
-    <BudgetStep
-      key="budget"
-      data={data}
-      onUpdate={updateData}
-      onNext={handleNext}
-      onBack={handleBack}
-    />,
-    <StyleStep
-      key="style"
-      data={data}
-      onUpdate={updateData}
-      onNext={handleNext}
-      onBack={handleBack}
-    />,
-    <TimelineStep
-      key="timeline"
+    <BasicsStep
+      key="basics"
       data={data}
       onUpdate={updateData}
       onSubmit={handleSubmit}

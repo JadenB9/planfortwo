@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { Check, ArrowLeft, Sparkles, Loader2, ChevronDown, Gift } from 'lucide-react'
 import { toast } from 'sonner'
 import { fadeInUp, staggerContainer, springSmooth } from '@/lib/animations'
-import { useWedding } from '@/hooks/use-wedding'
+import { useWedding, notifyWeddingUpdated } from '@/hooks/use-wedding'
 import { api } from '@/lib/api'
 
 const FREE_FEATURES = [
@@ -72,6 +72,7 @@ function UpgradePageContent() {
       setPromoCode('')
       setPromoOpen(false)
       await refetch()
+      notifyWeddingUpdated()
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Invalid promo code'
       setError(msg)

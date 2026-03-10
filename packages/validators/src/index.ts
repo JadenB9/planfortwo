@@ -66,8 +66,11 @@ export type UpdateWeddingInput = z.infer<typeof updateWeddingSchema>
 
 // ── Onboarding ──
 export const onboardingSchema = z.object({
-  partnerFirstName: z.string().min(1).max(100),
-  partnerLastName: z.string().min(1).max(100),
+  yourFirstName: z.string().max(100).nullable().optional(),
+  yourLastName: z.string().max(100).nullable().optional(),
+  partnerFirstName: z.string().max(100).nullable().optional(),
+  partnerLastName: z.string().max(100).nullable().optional(),
+  partnerEmail: z.string().email().nullable().optional(),
   weddingDate: z.string().datetime().nullable().optional(),
   guestCountEstimate: z.number().int().min(1).max(2000).nullable().optional(),
   budgetTotal: z.number().min(0).max(10_000_000).nullable().optional(),

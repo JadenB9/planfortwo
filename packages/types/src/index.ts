@@ -86,8 +86,11 @@ export interface PartnerInvitation {
 
 // ── Onboarding ──
 export interface OnboardingData {
-  partnerFirstName: string
-  partnerLastName: string
+  yourFirstName: string | null
+  yourLastName: string | null
+  partnerFirstName: string | null
+  partnerLastName: string | null
+  partnerEmail: string | null
   weddingDate: string | null
   guestCountEstimate: number | null
   budgetTotal: number | null
@@ -426,6 +429,8 @@ export type FontPair =
   | 'quicksand-crimson-text'
   | 'spectral-inter'
 
+export type TextSize = 'sm' | 'md' | 'lg'
+
 export interface CustomColors {
   primary: string
   secondary: string
@@ -436,6 +441,8 @@ export interface CustomColors {
   headingItalic?: boolean
   bodyBold?: boolean
   bodyItalic?: boolean
+  headingSize?: TextSize
+  bodySize?: TextSize
 }
 
 export interface SavedPalette {

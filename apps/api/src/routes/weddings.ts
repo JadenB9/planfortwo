@@ -121,9 +121,19 @@ weddingsRoute.post(
 
     const validated = c.req.valid('json')
 
+    // Build wedding name from provided names
+    const yourName = [validated.yourFirstName, validated.yourLastName].filter(Boolean).join(' ')
+    const partnerName = [validated.partnerFirstName, validated.partnerLastName]
+      .filter(Boolean)
+      .join(' ')
+    let weddingName = 'Our Wedding'
+    if (yourName && partnerName) weddingName = `${yourName} & ${partnerName}`
+    else if (yourName) weddingName = `${yourName}'s Wedding`
+    else if (partnerName) weddingName = `${partnerName}'s Wedding`
+
     // Map nullable fields to undefined for the service layer
     const onboardingData = {
-      name: `${validated.partnerFirstName} & Partner`,
+      name: weddingName,
       guestCountEstimate: validated.guestCountEstimate ?? undefined,
       budgetTotal: validated.budgetTotal != null ? String(validated.budgetTotal) : undefined,
       style: validated.style ?? undefined,
@@ -149,6 +159,21 @@ weddingsRoute.post(
         updated.date ? new Date(updated.date) : null,
         dbUserId,
       )
+    }
+
+    // Send partner invitation if email was provided during onboarding
+    if (validated.partnerEmail) {
+      try {
+        await invitationService.createAndSend(
+          weddingId,
+          dbUserId,
+          validated.partnerEmail,
+          'partner',
+        )
+      } catch {
+        // Partner invite is best-effort — don't fail onboarding if it errors
+        console.warn('Partner invite during onboarding failed (non-fatal)')
+      }
     }
 
     return c.json({ data: updated })

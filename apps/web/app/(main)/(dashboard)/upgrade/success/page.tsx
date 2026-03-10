@@ -1,11 +1,18 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { CheckCircle, ArrowRight } from 'lucide-react'
 import { springSmooth } from '@/lib/animations'
+import { notifyWeddingUpdated } from '@/hooks/use-wedding'
 
 export default function UpgradeSuccessPage() {
+  // Notify all useWedding instances to refetch tier/features
+  useEffect(() => {
+    notifyWeddingUpdated()
+  }, [])
+
   return (
     <motion.div
       className="mx-auto flex max-w-lg flex-col items-center py-16 text-center"

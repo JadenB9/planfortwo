@@ -7,6 +7,12 @@ import { api } from '@/lib/api'
 
 const MAX_RETRIES = 5
 const RETRY_DELAY_MS = 1000
+const WEDDING_UPDATED_EVENT = 'planfortwo:wedding-updated'
+
+/** Dispatch this event from any component to trigger all useWedding instances to refetch */
+export function notifyWeddingUpdated() {
+  window.dispatchEvent(new Event(WEDDING_UPDATED_EVENT))
+}
 
 export function useWedding() {
   const { getToken } = useAuth()
@@ -84,6 +90,13 @@ export function useWedding() {
       mountedRef.current = false
       clearTimeout(timeoutRef.current)
     }
+  }, [load])
+
+  // Listen for global wedding-updated events (e.g. after payment/promo)
+  useEffect(() => {
+    const handler = () => void load()
+    window.addEventListener(WEDDING_UPDATED_EVENT, handler)
+    return () => window.removeEventListener(WEDDING_UPDATED_EVENT, handler)
   }, [load])
 
   return { data, features, loading, error, refetch: load }

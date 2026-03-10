@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useMemo, type ReactNode, type CSSProperties } from 'react'
-import type { CustomColors } from '@planfortwo/types'
+import type { CustomColors, TextSize } from '@planfortwo/types'
 import { getTemplate } from '@/lib/templates'
 import { getFontPair, type FontPairConfig } from '@/lib/fonts'
 
@@ -14,6 +14,8 @@ interface TypographyOptions {
   headingItalic: boolean
   bodyBold: boolean
   bodyItalic: boolean
+  headingSize: TextSize
+  bodySize: TextSize
 }
 
 interface TemplateStyles {

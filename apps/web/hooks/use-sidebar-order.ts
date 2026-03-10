@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { NAV_GROUPS, type NavGroup, type NavItem } from '@/lib/navigation'
 
 const STORAGE_KEY = 'sidebar-nav-order'
-const STORAGE_VERSION = 2
+const STORAGE_VERSION = 3
 
 interface StoredOrder {
   version: number
