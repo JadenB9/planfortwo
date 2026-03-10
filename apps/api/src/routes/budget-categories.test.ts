@@ -238,21 +238,6 @@ describe('Budget Category Routes', () => {
       const body = await res.json()
       expect(body.data.name).toBe('Photography')
     })
-
-    it('should return 403 on free tier (canBudgetCategories gated)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/budget-categories?weddingId=${WEDDING_ID}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(validBody),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('POST /budget-categories/seed-defaults', () => {

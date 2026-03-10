@@ -251,20 +251,6 @@ describe('Budget Analytics Routes', () => {
       expect(body.data.totalSpent).toBe(0)
       expect(body.data.categoryBreakdown).toHaveLength(0)
     })
-
-    it('should return 403 on free tier (canBudgetAnalytics gated)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/budget/analytics?weddingId=${WEDDING_ID}`, {
-        method: 'GET',
-        headers: authHeaders(),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('GET /budget/tips', () => {
@@ -366,20 +352,6 @@ describe('Budget Analytics Routes', () => {
       expect(text).toContain('Category')
       expect(text).toContain('Grand Ballroom')
     })
-
-    it('should return 403 on free tier (canBudgetExport gated)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/budget/export/csv?weddingId=${WEDDING_ID}`, {
-        method: 'GET',
-        headers: authHeaders(),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('GET /budget/export/pdf', () => {
@@ -396,20 +368,6 @@ describe('Budget Analytics Routes', () => {
       expect(res.status).toBe(200)
       expect(res.headers.get('Content-Type')).toBe('application/pdf')
       expect(res.headers.get('Content-Disposition')).toContain('budget-report.pdf')
-    })
-
-    it('should return 403 on free tier (canBudgetExport gated)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/budget/export/pdf?weddingId=${WEDDING_ID}`, {
-        method: 'GET',
-        headers: authHeaders(),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
     })
   })
 })

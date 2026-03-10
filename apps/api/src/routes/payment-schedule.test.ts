@@ -286,21 +286,6 @@ describe('Payment Schedule Routes', () => {
       expect(body.data.title).toBe('Venue deposit installment 1')
       expect(body.data.amount).toBe(2500)
     })
-
-    it('should return 403 on free tier (canPaymentSchedule gated)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/payment-schedule?weddingId=${WEDDING_ID}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(validBody),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('PUT /payment-schedule/:id', () => {

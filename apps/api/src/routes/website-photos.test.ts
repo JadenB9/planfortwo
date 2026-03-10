@@ -217,7 +217,7 @@ describe('Website Photo Routes', () => {
         canBudgetAnalytics: true,
         canBudgetExport: true,
         canPaymentSchedule: true,
-        canWebsiteBuilder: true,
+        canWebsiteBuilder: false,
         canWebsiteAnalytics: false,
         canWebsiteCustomSections: false,
         canInbox: false,

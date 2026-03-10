@@ -49,6 +49,11 @@ vi.mock('@planfortwo/db', () => {
     websitePhotos: { weddingId: 'weddingId', sortOrder: 'sortOrder' },
     guestbookEntries: { weddingId: 'weddingId' },
     websitePageViews: {},
+    photos: {
+      weddingId: 'weddingId',
+      moderationStatus: 'moderationStatus',
+      createdAt: 'createdAt',
+    },
     weddings: { id: 'id', name: 'name', date: 'date' },
     events: {
       weddingId: 'weddingId',
@@ -69,6 +74,28 @@ vi.mock('../services/guestbook.js', () => ({
   guestbookService: {
     listApproved: vi.fn().mockResolvedValue([]),
     create: vi.fn().mockResolvedValue({ id: 'g-new', authorName: 'Test', message: 'Hello' }),
+  },
+}))
+
+vi.mock('../services/prayers.js', () => ({
+  prayersService: {
+    listApproved: vi.fn().mockResolvedValue([]),
+    create: vi.fn().mockResolvedValue({ id: 'p-new', authorName: 'Test', prayerText: 'Amen' }),
+  },
+}))
+
+vi.mock('../services/playlists.js', () => ({
+  playlistService: {
+    listSongRequests: vi.fn().mockResolvedValue([]),
+    createSongRequest: vi.fn().mockResolvedValue({ id: 'sr-new' }),
+  },
+}))
+
+vi.mock('@planfortwo/storage', () => ({
+  storageClient: {
+    buildGalleryPhotoKey: vi.fn().mockReturnValue('gallery/w-1/photo.jpg'),
+    uploadBuffer: vi.fn().mockResolvedValue(undefined),
+    getDownloadUrl: vi.fn().mockResolvedValue('https://cdn.example.com/photo.jpg'),
   },
 }))
 
@@ -189,6 +216,7 @@ describe('Website Public Routes', () => {
         [{ date: '2026-09-15T14:00:00Z', startTime: '2:00 PM' }],
         [{ id: 's-1', sectionType: 'hero', title: 'Welcome', isVisible: true }],
         [{ id: 'p-1', url: 'https://cdn.example.com/photo.jpg' }],
+        [], // approvedGuestPhotos
       )
 
       const app = createApp()

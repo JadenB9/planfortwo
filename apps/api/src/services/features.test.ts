@@ -33,14 +33,42 @@ describe('Feature Service', () => {
       const gates = await featureService.getFeatures('wedding-1')
 
       expect(gates.tier).toBe('free')
-      expect(gates.canAddTasks).toBe(false)
-      expect(gates.canEditChecklist).toBe(false)
-      expect(gates.canDeleteTasks).toBe(false)
-      expect(gates.canReorderTasks).toBe(false)
-      expect(gates.canCustomizeCategories).toBe(false)
-      expect(gates.canAddNotes).toBe(false)
-      expect(gates.canAddAttachments).toBe(false)
-      expect(gates.maxGuests).toBe(15)
+      // Checklist — free
+      expect(gates.canAddTasks).toBe(true)
+      expect(gates.canEditChecklist).toBe(true)
+      expect(gates.canDeleteTasks).toBe(true)
+      expect(gates.canReorderTasks).toBe(true)
+      expect(gates.canCustomizeCategories).toBe(true)
+      expect(gates.canAddNotes).toBe(true)
+      expect(gates.canAddAttachments).toBe(true)
+      // Guests — free (unlimited)
+      expect(gates.maxGuests).toBeNull()
+      expect(gates.canEditGuests).toBe(true)
+      expect(gates.canDeleteGuests).toBe(true)
+      expect(gates.canBulkImport).toBe(true)
+      expect(gates.canRsvp).toBe(true)
+      // Seating charts — premium
+      expect(gates.canSeatingChart).toBe(false)
+      // Vendors — free
+      expect(gates.canVendorManagement).toBe(true)
+      // Custom domain — premium
+      expect(gates.canCustomDomain).toBe(false)
+      // Data export — free
+      expect(gates.canDataExport).toBe(true)
+      // Budget — free
+      expect(gates.canBudgetCategories).toBe(true)
+      expect(gates.canBudgetExpenses).toBe(true)
+      expect(gates.canBudgetAnalytics).toBe(true)
+      expect(gates.canBudgetExport).toBe(true)
+      expect(gates.canPaymentSchedule).toBe(true)
+      // Website — basic free, customization premium
+      expect(gates.canWebsiteBuilder).toBe(true)
+      expect(gates.canWebsiteAnalytics).toBe(false)
+      expect(gates.canWebsiteCustomSections).toBe(false)
+      // Inbox, music, photos — premium
+      expect(gates.canInbox).toBe(false)
+      expect(gates.canMusicIntegration).toBe(false)
+      expect(gates.canPhotoGallery).toBe(false)
     })
 
     it('should return all unlocked for full tier', async () => {
@@ -61,6 +89,25 @@ describe('Feature Service', () => {
       expect(gates.canAddNotes).toBe(true)
       expect(gates.canAddAttachments).toBe(true)
       expect(gates.maxGuests).toBeNull()
+      expect(gates.canEditGuests).toBe(true)
+      expect(gates.canDeleteGuests).toBe(true)
+      expect(gates.canBulkImport).toBe(true)
+      expect(gates.canRsvp).toBe(true)
+      expect(gates.canSeatingChart).toBe(true)
+      expect(gates.canVendorManagement).toBe(true)
+      expect(gates.canCustomDomain).toBe(true)
+      expect(gates.canDataExport).toBe(true)
+      expect(gates.canBudgetCategories).toBe(true)
+      expect(gates.canBudgetExpenses).toBe(true)
+      expect(gates.canBudgetAnalytics).toBe(true)
+      expect(gates.canBudgetExport).toBe(true)
+      expect(gates.canPaymentSchedule).toBe(true)
+      expect(gates.canWebsiteBuilder).toBe(true)
+      expect(gates.canWebsiteAnalytics).toBe(true)
+      expect(gates.canWebsiteCustomSections).toBe(true)
+      expect(gates.canInbox).toBe(true)
+      expect(gates.canMusicIntegration).toBe(true)
+      expect(gates.canPhotoGallery).toBe(true)
     })
 
     it('should return free tier gates when wedding not found', async () => {
@@ -73,7 +120,7 @@ describe('Feature Service', () => {
       const gates = await featureService.getFeatures('missing-wedding')
 
       expect(gates.tier).toBe('free')
-      expect(gates.canAddTasks).toBe(false)
+      expect(gates.canAddTasks).toBe(true)
     })
   })
 })

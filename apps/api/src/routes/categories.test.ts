@@ -220,21 +220,6 @@ describe('Category Routes', () => {
       const body = await res.json()
       expect(body.data.name).toBe('DIY Projects')
     })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/categories?weddingId=${WEDDING_ID}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(validBody),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('PUT /categories/:id', () => {
@@ -257,21 +242,6 @@ describe('Category Routes', () => {
       const body = await res.json()
       expect(body.data.name).toBe('Updated Category')
     })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'PUT',
-        headers: authHeaders(),
-        body: JSON.stringify(updateBody),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('DELETE /categories/:id', () => {
@@ -287,20 +257,6 @@ describe('Category Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.success).toBe(true)
-    })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/categories/${CATEGORY_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
     })
   })
 })

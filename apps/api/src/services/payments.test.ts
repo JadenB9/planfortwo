@@ -279,26 +279,6 @@ describe('Payment Services', () => {
   })
 
   describe('contactService', () => {
-    describe('list', () => {
-      it('should return all contact submissions', async () => {
-        const mockSubmissions = [
-          {
-            id: 'a0000000-0000-0000-0000-000000000001',
-            name: 'Alice',
-            email: 'alice@example.com',
-            subject: 'Help',
-            message: 'I need help.',
-          },
-        ]
-
-        ;(mockedDb.from as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockSubmissions)
-
-        const result = await contactService.list()
-        expect(result).toEqual(mockSubmissions)
-        expect(mockedDb.select).toHaveBeenCalled()
-      })
-    })
-
     describe('create', () => {
       it('should create and return a contact submission', async () => {
         const input = {

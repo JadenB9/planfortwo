@@ -329,20 +329,6 @@ describe('Guest Routes', () => {
       expect(res.status).toBe(200)
       expect(res.headers.get('Content-Type')).toBe('text/csv')
     })
-
-    it('should return 403 when free tier (canDataExport gated)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/guests/export?weddingId=${WEDDING_ID}`, {
-        method: 'GET',
-        headers: authHeaders(),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('GET /guests/:id', () => {
@@ -467,21 +453,6 @@ describe('Guest Routes', () => {
       const body = await res.json()
       expect(body.data.firstName).toBe('Updated')
     })
-
-    it('should return 403 on free tier (canEditGuests)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'PUT',
-        headers: authHeaders(),
-        body: JSON.stringify(updateBody),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('DELETE /guests/:id', () => {
@@ -497,20 +468,6 @@ describe('Guest Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.success).toBe(true)
-    })
-
-    it('should return 403 on free tier (canDeleteGuests)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/guests/${GUEST_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
     })
   })
 
@@ -535,24 +492,6 @@ describe('Guest Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.imported).toBe(3)
-    })
-
-    it('should return 403 on free tier (canBulkImport)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/guests/bulk-import?weddingId=${WEDDING_ID}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({
-          weddingId: WEDDING_ID,
-          csvContent: 'firstName,lastName\nAlice,Smith',
-        }),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
     })
   })
 

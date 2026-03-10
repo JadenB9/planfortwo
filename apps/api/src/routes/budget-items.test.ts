@@ -404,21 +404,6 @@ describe('Budget Item Routes', () => {
       expect(body.data.description).toBe('Venue rental deposit')
       expect(body.data.amount).toBe(5000)
     })
-
-    it('should return 403 on free tier (canBudgetExpenses gated)', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/budget-items?weddingId=${WEDDING_ID}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(validBody),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('PUT /budget-items/:id', () => {

@@ -80,6 +80,9 @@ vi.mock('../services/features.js', () => ({
       canWebsiteBuilder: true,
       canWebsiteAnalytics: true,
       canWebsiteCustomSections: true,
+      canInbox: true,
+      canMusicIntegration: true,
+      canPhotoGallery: true,
     }),
   },
 }))

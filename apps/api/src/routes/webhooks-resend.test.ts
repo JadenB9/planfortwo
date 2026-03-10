@@ -15,6 +15,22 @@ vi.mock('svix', () => ({
   })),
 }))
 
+vi.mock('resend', () => ({
+  Resend: vi.fn().mockImplementation(() => ({
+    emails: {
+      receiving: {
+        get: vi.fn().mockResolvedValue({
+          data: { text: 'Email body text', html: '<p>Email body</p>' },
+          error: null,
+        }),
+        attachments: {
+          list: vi.fn().mockResolvedValue({ data: { data: [] }, error: null }),
+        },
+      },
+    },
+  })),
+}))
+
 vi.mock('../services/inbox.js', () => ({
   inboxService: {
     findAddressByLocalPart: vi.fn(),
@@ -22,11 +38,32 @@ vi.mock('../services/inbox.js', () => ({
   },
 }))
 
+vi.mock('../utils/sanitize.js', () => ({
+  sanitizeHtml: vi.fn((html: string) => html),
+}))
+
 vi.mock('@planfortwo/storage', () => ({
   storageClient: {
     buildEmailAttachmentKey: vi.fn().mockReturnValue('email-attachments/addr-1/att-1.pdf'),
     uploadFromUrl: vi.fn().mockResolvedValue(undefined),
   },
+}))
+
+vi.mock('@planfortwo/db', () => ({
+  db: {
+    select: vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([]),
+        }),
+      }),
+    }),
+  },
+  emails: { id: 'id', resendEmailId: 'resendEmailId' },
+}))
+
+vi.mock('drizzle-orm', () => ({
+  eq: vi.fn((...args: unknown[]) => args),
 }))
 
 import { resendWebhookRoute } from './webhooks-resend.js'
@@ -79,14 +116,7 @@ describe('Resend Webhook Route', () => {
       createdAt: new Date(),
     })
 
-    // Mock global fetch for Resend API content fetch
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ text: 'Email body text', html: '<p>Email body</p>' }),
-      }),
-    )
+    // Resend SDK is mocked via vi.mock('resend') above
   })
 
   it('stores email for known address', async () => {

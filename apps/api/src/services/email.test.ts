@@ -82,24 +82,17 @@ describe('Email Service', () => {
   })
 
   describe('sendPartnerInvite', () => {
-    it('should skip when RESEND_API_KEY is not set', async () => {
+    it('should throw when RESEND_API_KEY is not set', async () => {
       vi.stubEnv('RESEND_API_KEY', '')
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-      await emailService.sendPartnerInvite(
-        'partner@example.com',
-        'Jane',
-        'https://planfortwo.com/invite?token=abc',
-      )
-
-      expect(mockSend).not.toHaveBeenCalled()
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[email] RESEND_API_KEY not configured — skipping partner invite email',
-        expect.objectContaining({
-          to: '*******************',
-          subject: 'Jane invited you to plan your wedding on PlanForTwo',
-        }),
-      )
+      await expect(
+        emailService.sendPartnerInvite(
+          'partner@example.com',
+          'Jane',
+          'https://planfortwo.com/invite?token=abc',
+        ),
+      ).rejects.toThrow('Email service is not configured')
 
       consoleSpy.mockRestore()
       vi.unstubAllEnvs()
@@ -144,7 +137,7 @@ describe('Email Service', () => {
           'Jane',
           'https://planfortwo.com/invite?token=abc',
         ),
-      ).rejects.toThrow('Failed to send partner invite email: Rate limit exceeded')
+      ).rejects.toThrow('Failed to send invitation email: Rate limit exceeded')
 
       consoleSpy.mockRestore()
       vi.unstubAllEnvs()

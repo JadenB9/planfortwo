@@ -114,37 +114,6 @@ function authHeaders(): Record<string, string> {
   }
 }
 
-const FREE_GATES = {
-  tier: 'free' as const,
-  canAddTasks: true,
-  canEditChecklist: true,
-  canDeleteTasks: true,
-  canReorderTasks: true,
-  canCustomizeCategories: true,
-  canAddNotes: true,
-  canAddAttachments: true,
-  maxGuests: null,
-  canEditGuests: true,
-  canDeleteGuests: true,
-  canBulkImport: true,
-  canRsvp: true,
-  canSeatingChart: false,
-  canVendorManagement: true,
-  canCustomDomain: false,
-  canDataExport: true,
-  canBudgetCategories: true,
-  canBudgetExpenses: true,
-  canBudgetAnalytics: true,
-  canBudgetExport: true,
-  canPaymentSchedule: true,
-  canWebsiteBuilder: true,
-  canWebsiteAnalytics: false,
-  canWebsiteCustomSections: false,
-  canInbox: false,
-  canMusicIntegration: false,
-  canPhotoGallery: false,
-}
-
 describe('Task Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -296,21 +265,6 @@ describe('Task Routes', () => {
       const body = await res.json()
       expect(body.data.title).toBe('New task')
     })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/tasks?weddingId=${WEDDING_ID}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(validBody),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('PUT /tasks/:id', () => {
@@ -333,21 +287,6 @@ describe('Task Routes', () => {
       const body = await res.json()
       expect(body.data.title).toBe('Updated task')
     })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'PUT',
-        headers: authHeaders(),
-        body: JSON.stringify(updateBody),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('PATCH /tasks/:id/complete', () => {
@@ -366,20 +305,6 @@ describe('Task Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.id).toBe(TASK_ID)
-    })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/tasks/${TASK_ID}/complete?weddingId=${WEDDING_ID}`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
     })
   })
 
@@ -401,21 +326,6 @@ describe('Task Routes', () => {
       const body = await res.json()
       expect(body.data.sortOrder).toBe(5)
     })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/tasks/${TASK_ID}/reorder?weddingId=${WEDDING_ID}`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ sortOrder: 5 }),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
-    })
   })
 
   describe('DELETE /tasks/:id', () => {
@@ -431,20 +341,6 @@ describe('Task Routes', () => {
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body.data.success).toBe(true)
-    })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/tasks/${TASK_ID}?weddingId=${WEDDING_ID}`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
     })
   })
 
@@ -491,21 +387,6 @@ describe('Task Routes', () => {
       expect(res.status).toBe(201)
       const body = await res.json()
       expect(body.data.content).toBe('Check availability')
-    })
-
-    it('should return 403 when free tier', async () => {
-      mockedFeatureService.getFeatures.mockResolvedValue(FREE_GATES)
-
-      const app = createApp()
-      const res = await app.request(`/tasks/${TASK_ID}/notes?weddingId=${WEDDING_ID}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ content: 'Check availability' }),
-      })
-
-      expect(res.status).toBe(403)
-      const body = await res.json()
-      expect(body.code).toBe('FEATURE_LOCKED')
     })
   })
 })

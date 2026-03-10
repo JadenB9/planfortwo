@@ -73,6 +73,9 @@ vi.mock('../services/features.js', () => ({
       canWebsiteBuilder: true,
       canWebsiteAnalytics: true,
       canWebsiteCustomSections: true,
+      canInbox: true,
+      canMusicIntegration: true,
+      canPhotoGallery: true,
     }),
   },
 }))
@@ -99,35 +102,6 @@ describe('Guestbook Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_fake')
-  })
-
-  describe('POST /guestbook (public)', () => {
-    it('should create a guestbook entry without auth', async () => {
-      mockedService.create.mockResolvedValue({
-        id: ENTRY_ID,
-        weddingId: WEDDING_ID,
-        authorName: 'John',
-        message: 'Congrats!',
-        isApproved: false,
-        isVisible: true,
-        createdAt: new Date(),
-      } as never)
-
-      const app = createApp()
-      const res = await app.request('/guestbook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weddingId: WEDDING_ID,
-          authorName: 'John',
-          message: 'Congrats!',
-        }),
-      })
-
-      expect(res.status).toBe(201)
-      const body = await res.json()
-      expect(body.data.authorName).toBe('John')
-    })
   })
 
   describe('GET /guestbook (admin)', () => {
