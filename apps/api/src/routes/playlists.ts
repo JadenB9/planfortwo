@@ -274,7 +274,11 @@ playlistsRoute.get(
   async (c) => {
     const weddingId = c.get('weddingId')
     const requests = await playlistService.listSongRequests(weddingId)
-    return c.json({ data: requests })
+    const mapped = requests.map((r) => ({
+      ...r,
+      status: r.isApproved ? 'approved' : 'pending',
+    }))
+    return c.json({ data: mapped })
   },
 )
 

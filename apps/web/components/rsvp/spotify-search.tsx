@@ -20,7 +20,7 @@ interface SpotifySearchProps {
 }
 
 export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(value)
   const [results, setResults] = useState<SpotifyTrack[]>([])
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
@@ -116,7 +116,7 @@ export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
-          value={query || value}
+          value={query}
           onChange={(e) => handleInput(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="Search for a song on Spotify..."

@@ -58,6 +58,7 @@ interface Playlist {
   spotifyUrl: string | null
   appleMusicUrl: string | null
   youtubeMusicUrl: string | null
+  isAcceptedSongs: boolean
   createdAt: Date
 }
 
@@ -616,8 +617,14 @@ export default function MusicPage() {
                                       <Music className="text-wedding-600 h-4 w-4" />
                                     </div>
                                     <div className="min-w-0">
-                                      <h3 className="font-serif text-base font-semibold text-gray-900">
+                                      <h3 className="flex items-center gap-2 font-serif text-base font-semibold text-gray-900">
                                         {pl.name}
+                                        {pl.isAcceptedSongs && (
+                                          <Badge className="bg-green-100 px-1.5 py-0 text-[10px] text-green-700">
+                                            <Check className="mr-0.5 h-2.5 w-2.5" />
+                                            Approved Songs
+                                          </Badge>
+                                        )}
                                       </h3>
                                       {pl.description && (
                                         <p className="mt-0.5 truncate text-sm text-gray-500">

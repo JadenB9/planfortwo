@@ -690,6 +690,7 @@ export const api = {
           spotifyUrl: string | null
           appleMusicUrl: string | null
           youtubeMusicUrl: string | null
+          isAcceptedSongs: boolean
           createdAt: Date
         }>
       }>(`/playlists?weddingId=${weddingId}`, { token }),
@@ -783,6 +784,7 @@ export const api = {
           title: string
           artist: string
           notes: string | null
+          isApproved: boolean
           status: string
           createdAt: Date
         }>
