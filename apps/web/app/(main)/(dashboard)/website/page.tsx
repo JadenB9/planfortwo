@@ -63,7 +63,9 @@ export default function WebsitePage() {
   const { getToken } = useAuth()
   const wedding = data?.wedding ?? null
   const weddingId = wedding?.id ?? null
-  const { config, sections, photos, loading, refetch, analytics } = useWebsite({ weddingId })
+  const { config, sections, setSections, photos, loading, refetch, analytics } = useWebsite({
+    weddingId,
+  })
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null)
   const [editorContent, setEditorContent] = useState<Record<string, unknown>>({})
   const [previewMode, setPreviewMode] = useState<PreviewMode>('phone')
@@ -135,12 +137,17 @@ export default function WebsitePage() {
   const handleToggleVisibility = useCallback(
     async (sectionId: string, isVisible: boolean) => {
       if (!weddingId) return
+      // Optimistic update — toggle instantly in UI
+      setSections((prev) => prev.map((s) => (s.id === sectionId ? { ...s, isVisible } : s)))
       const token = await getToken()
       if (!token) return
-      await api.websiteSections.update(sectionId, weddingId, { isVisible }, token)
-      await refetch()
+      try {
+        await api.websiteSections.update(sectionId, weddingId, { isVisible }, token)
+      } catch {
+        await refetch()
+      }
     },
-    [weddingId, getToken, refetch],
+    [weddingId, getToken, setSections, refetch],
   )
 
   const handlePublish = useCallback(async () => {
@@ -242,12 +249,23 @@ export default function WebsitePage() {
   const handleSectionReorder = useCallback(
     async (reordered: { id: string; sortOrder: number }[]) => {
       if (!weddingId) return
+      // Optimistic update — apply new sort order instantly in UI
+      const orderMap = new Map(reordered.map((r) => [r.id, r.sortOrder]))
+      setSections((prev) =>
+        prev.map((s) => {
+          const newOrder = orderMap.get(s.id)
+          return newOrder !== undefined ? { ...s, sortOrder: newOrder } : s
+        }),
+      )
       const token = await getToken()
       if (!token) return
-      await api.websiteSections.reorder(weddingId, { sections: reordered }, token)
-      await refetch()
+      try {
+        await api.websiteSections.reorder(weddingId, { sections: reordered }, token)
+      } catch {
+        await refetch()
+      }
     },
-    [weddingId, getToken, refetch],
+    [weddingId, getToken, setSections, refetch],
   )
 
   const renderEditor = (

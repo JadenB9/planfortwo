@@ -80,6 +80,7 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
   return {
     config,
     sections,
+    setSections,
     photos,
     guestbookEntries,
     analytics,
