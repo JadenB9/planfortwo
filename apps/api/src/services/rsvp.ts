@@ -1,5 +1,5 @@
 import { eq, and, ilike, inArray } from 'drizzle-orm'
-import { db, guests, households, weddings } from '@planfortwo/db'
+import { db, guests, households, weddings, songRequests } from '@planfortwo/db'
 import type { RsvpLookupResult, Guest } from '@planfortwo/types'
 import type { RsvpSubmissionInput } from '@planfortwo/validators'
 
@@ -127,6 +127,22 @@ export const rsvpService = {
       throw new Error('Guest not found')
     }
 
+    // Bridge song request to song_requests table for Music tab visibility
+    if (submission.songRequest) {
+      try {
+        await db.insert(songRequests).values({
+          weddingId,
+          guestName: `${updated.firstName} ${updated.lastName}`.trim(),
+          title: submission.songRequest,
+          artist: 'Requested via RSVP',
+          notes: null,
+          isApproved: false,
+        })
+      } catch {
+        // Non-critical — don't fail the RSVP if song request insert fails
+      }
+    }
+
     return updated as Guest
   },
 
@@ -189,6 +205,22 @@ export const rsvpService = {
 
         if (!updated) {
           throw new Error(`Guest ${submission.guestId} not found or not in this wedding`)
+        }
+
+        // Bridge song request to song_requests table
+        if (submission.songRequest) {
+          try {
+            await tx.insert(songRequests).values({
+              weddingId,
+              guestName: `${updated.firstName} ${updated.lastName}`.trim(),
+              title: submission.songRequest,
+              artist: 'Requested via RSVP',
+              notes: null,
+              isApproved: false,
+            })
+          } catch {
+            // Non-critical
+          }
         }
 
         results.push(updated as Guest)

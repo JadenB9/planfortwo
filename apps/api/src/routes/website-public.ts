@@ -379,14 +379,26 @@ websitePublicRoute.post(
 
     const { fileName, mimeType } = c.req.valid('json')
 
-    const photoId = randomUUID()
-    const r2Key = storageClient.buildGalleryPhotoKey(config.weddingId, photoId, fileName)
-    const uploadUrl = await storageClient.getUploadUrl(r2Key, mimeType)
-    const publicUrl = await storageClient.getDownloadUrl(r2Key)
+    try {
+      const photoId = randomUUID()
+      const r2Key = storageClient.buildGalleryPhotoKey(config.weddingId, photoId, fileName)
+      const uploadUrl = await storageClient.getUploadUrl(r2Key, mimeType)
+      const publicUrl = await storageClient.getDownloadUrl(r2Key)
 
-    return c.json({
-      data: { uploadUrl, r2Key, url: publicUrl, photoId },
-    })
+      return c.json({
+        data: { uploadUrl, r2Key, url: publicUrl, photoId },
+      })
+    } catch (err) {
+      console.error('Failed to generate upload URL:', err)
+      return c.json(
+        {
+          error: 'Photo upload is temporarily unavailable',
+          code: 'STORAGE_ERROR',
+          statusCode: 503,
+        },
+        503,
+      )
+    }
   },
 )
 

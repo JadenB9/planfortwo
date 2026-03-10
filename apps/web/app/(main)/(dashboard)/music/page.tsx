@@ -45,6 +45,7 @@ import {
   RefreshCw,
   Link,
   Clock,
+  Upload,
 } from 'lucide-react'
 
 type Tab = 'playlists' | 'requests'
@@ -366,8 +367,11 @@ export default function MusicPage() {
         const { data } = await api.playlists.refreshSpotify(playlistId, weddingId, token)
         toast.success(`Refreshed ${data.imported} songs from Spotify`)
         void loadPlaylistSongs(playlistId)
+        void loadData()
       } catch {
-        toast.error('Failed to refresh from Spotify')
+        toast.error(
+          'Failed to refresh from Spotify. The playlist may have been modified — try re-importing.',
+        )
       } finally {
         setRefreshingSpotify(null)
       }
@@ -785,6 +789,19 @@ export default function MusicPage() {
                                           Add Song via Spotify URL
                                         </Button>
                                       )}
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 gap-1.5 border-[#1DB954]/30 text-xs text-[#1DB954] hover:bg-[#1DB954]/5"
+                                        onClick={() =>
+                                          toast.info(
+                                            'Export to Spotify is under construction. Stay tuned!',
+                                          )
+                                        }
+                                      >
+                                        <Upload className="h-3.5 w-3.5" />
+                                        Export to Spotify
+                                      </Button>
                                     </div>
 
                                     {/* Import from Spotify form */}

@@ -42,8 +42,20 @@ photoGalleryRoute.post(
   async (c) => {
     const { fileName, mimeType } = c.req.valid('json')
     const weddingId = c.get('weddingId')
-    const result = await photoGalleryService.getUploadUrl(weddingId, fileName, mimeType)
-    return c.json({ data: result })
+    try {
+      const result = await photoGalleryService.getUploadUrl(weddingId, fileName, mimeType)
+      return c.json({ data: result })
+    } catch (err) {
+      console.error('Failed to generate upload URL:', err)
+      return c.json(
+        {
+          error: 'Photo upload is temporarily unavailable',
+          code: 'STORAGE_ERROR',
+          statusCode: 503,
+        },
+        503,
+      )
+    }
   },
 )
 
