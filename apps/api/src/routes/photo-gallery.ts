@@ -10,6 +10,7 @@ import { storageClient } from '@planfortwo/storage'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
+import { requireFeature } from '../middleware/require-feature.js'
 import { photoGalleryService } from '../services/photo-gallery.js'
 
 type Env = {
@@ -26,15 +27,21 @@ export const photoGalleryRoute = new Hono<Env>()
 
 photoGalleryRoute.use('*', authMiddleware, resolveUserMiddleware)
 
-photoGalleryRoute.get('/', resolveWeddingMiddleware, async (c) => {
-  const weddingId = c.get('weddingId')
-  const list = await photoGalleryService.list(weddingId)
-  return c.json({ data: list })
-})
+photoGalleryRoute.get(
+  '/',
+  resolveWeddingMiddleware,
+  requireFeature('canPhotoGallery'),
+  async (c) => {
+    const weddingId = c.get('weddingId')
+    const list = await photoGalleryService.list(weddingId)
+    return c.json({ data: list })
+  },
+)
 
 photoGalleryRoute.post(
   '/upload-url',
   resolveWeddingMiddleware,
+  requireFeature('canPhotoGallery'),
   zValidator('json', requestGalleryUploadSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -59,17 +66,23 @@ photoGalleryRoute.post(
   },
 )
 
-photoGalleryRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
-  const photoId = c.req.param('id')
-  const weddingId = c.get('weddingId')
-  const photo = await photoGalleryService.getById(photoId, weddingId)
-  if (!photo) return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-  return c.json({ data: photo })
-})
+photoGalleryRoute.get(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canPhotoGallery'),
+  async (c) => {
+    const photoId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const photo = await photoGalleryService.getById(photoId, weddingId)
+    if (!photo) return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    return c.json({ data: photo })
+  },
+)
 
 photoGalleryRoute.post(
   '/',
   resolveWeddingMiddleware,
+  requireFeature('canPhotoGallery'),
   zValidator('json', createPhotoSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -93,6 +106,7 @@ photoGalleryRoute.post(
 photoGalleryRoute.put(
   '/:id',
   resolveWeddingMiddleware,
+  requireFeature('canPhotoGallery'),
   zValidator('json', updatePhotoSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -108,17 +122,24 @@ photoGalleryRoute.put(
   },
 )
 
-photoGalleryRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
-  const photoId = c.req.param('id')
-  const weddingId = c.get('weddingId')
-  const deleted = await photoGalleryService.delete(photoId, weddingId)
-  if (!deleted) return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-  return c.json({ data: { success: true } })
-})
+photoGalleryRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canPhotoGallery'),
+  async (c) => {
+    const photoId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const deleted = await photoGalleryService.delete(photoId, weddingId)
+    if (!deleted)
+      return c.json({ error: 'Photo not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    return c.json({ data: { success: true } })
+  },
+)
 
 photoGalleryRoute.post(
   '/:id/moderate',
   resolveWeddingMiddleware,
+  requireFeature('canPhotoGallery'),
   zValidator('json', moderatePhotoSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)

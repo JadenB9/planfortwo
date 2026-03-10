@@ -13,7 +13,7 @@ import { CategoryFilter } from '@/components/checklist/category-filter'
 import { TaskList } from '@/components/checklist/task-list'
 import { TaskDetail } from '@/components/checklist/task-detail'
 import { AddTaskForm } from '@/components/checklist/add-task-form'
-import { UpgradePrompt } from '@/components/checklist/upgrade-prompt'
+
 import { toast } from 'sonner'
 
 export default function ChecklistPage() {
@@ -137,16 +137,14 @@ export default function ChecklistPage() {
           <p className="mt-1 text-sm text-gray-600">Track every detail for your perfect day.</p>
         </div>
 
-        {features?.canAddTasks ? (
+        {features?.canAddTasks && (
           <button
             onClick={() => setShowAddForm(true)}
             className="bg-wedding-600 hover:bg-wedding-700 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
           >
             Add Task
           </button>
-        ) : features ? (
-          <UpgradePrompt message="Upgrade to add custom tasks" />
-        ) : null}
+        )}
       </div>
 
       <ProgressBar completed={completedCount} total={tasks.length} className="mb-8" />

@@ -7,7 +7,21 @@ import { Lock, Sparkles, ArrowRight } from 'lucide-react'
 import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
 
-const ALLOWED_FREE_PATHS = ['/dashboard', '/upgrade', '/settings', '/onboarding']
+const ALLOWED_FREE_PATHS = [
+  '/dashboard',
+  '/upgrade',
+  '/settings',
+  '/onboarding',
+  '/checklist',
+  '/budget',
+  '/guests',
+  '/vendors',
+  '/events',
+  '/registry',
+  '/ceremony',
+  '/honeymoon',
+  '/roadmap',
+]
 
 export function Paywall({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -32,8 +46,8 @@ export function Paywall({ children }: { children: React.ReactNode }) {
 
       <h2 className="mt-6 font-serif text-2xl font-bold text-gray-900">Full Plan Required</h2>
       <p className="mt-3 max-w-sm text-gray-600">
-        This feature is available on the Full Plan. Upgrade for a one-time payment of $200 to unlock
-        unlimited access to every PlanForTwo feature.
+        This feature is part of the Premium plan. Upgrade for a one-time payment of $10 to unlock
+        website customization, seating charts, inbox, music integration, photo gallery, and more.
       </p>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">

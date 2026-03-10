@@ -59,7 +59,7 @@ export const purchaseService = {
 
     const [purchase] = await db
       .insert(purchases)
-      .values({ weddingId, userId, amount: '200.00', currency: 'usd' })
+      .values({ weddingId, userId, amount: '10.00', currency: 'usd' })
       .returning()
 
     const session = await stripe.checkout.sessions.create({
@@ -70,9 +70,9 @@ export const purchaseService = {
             currency: 'usd',
             product_data: {
               name: 'PlanForTwo — Full Access',
-              description: 'One-time payment for unlimited wedding planning features.',
+              description: 'One-time payment for premium wedding planning features.',
             },
-            unit_amount: 20000,
+            unit_amount: 1000,
           },
           quantity: 1,
         },

@@ -11,12 +11,12 @@ const faqs = [
   {
     question: 'Is it really a one-time payment?',
     answer:
-      'Yes! You pay $200 once and get lifetime access to every feature. No monthly fees, no hidden charges, no surprise upsells. Your wedding planning tools are yours for as long as you need them.',
+      'Yes! You pay $10 once and get lifetime access to every premium feature. No monthly fees, no hidden charges, no surprise upsells. Your wedding planning tools are yours for as long as you need them.',
   },
   {
     question: "What's included in the free plan?",
     answer:
-      'The free plan gives you a taste of PlanForTwo with a view-only checklist, up to 15 guests in your guest list, one basic website template, and a budget total overview. It is perfect for exploring the platform before committing.',
+      'The free plan includes full checklist editing, unlimited guests with RSVP tracking, complete budget tracking and analytics, vendor management, events, registry, ceremony and honeymoon planning, data export, and partner collaboration. Premium adds website customization, seating charts, inbox, music integration, photo gallery, and email campaigns.',
   },
   {
     question: 'Can I upgrade from free to full access later?',

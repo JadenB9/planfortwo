@@ -9,6 +9,7 @@ import {
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
+import { requireFeature } from '../middleware/require-feature.js'
 import { emailCampaignService, announcementService } from '../services/email-campaigns.js'
 
 type Env = {
@@ -25,13 +26,13 @@ export const emailCampaignsRoute = new Hono<Env>()
 
 emailCampaignsRoute.use('*', authMiddleware, resolveUserMiddleware)
 
-emailCampaignsRoute.get('/', resolveWeddingMiddleware, async (c) => {
+emailCampaignsRoute.get('/', resolveWeddingMiddleware, requireFeature('canInbox'), async (c) => {
   const weddingId = c.get('weddingId')
   const campaigns = await emailCampaignService.list(weddingId)
   return c.json({ data: campaigns })
 })
 
-emailCampaignsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
+emailCampaignsRoute.get('/:id', resolveWeddingMiddleware, requireFeature('canInbox'), async (c) => {
   const campaignId = c.req.param('id')
   const weddingId = c.get('weddingId')
   const campaign = await emailCampaignService.getById(campaignId, weddingId)
@@ -43,6 +44,7 @@ emailCampaignsRoute.get('/:id', resolveWeddingMiddleware, async (c) => {
 emailCampaignsRoute.post(
   '/',
   resolveWeddingMiddleware,
+  requireFeature('canInbox'),
   zValidator('json', createEmailCampaignSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -59,6 +61,7 @@ emailCampaignsRoute.post(
 emailCampaignsRoute.put(
   '/:id',
   resolveWeddingMiddleware,
+  requireFeature('canInbox'),
   zValidator('json', updateEmailCampaignSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -74,30 +77,40 @@ emailCampaignsRoute.put(
   },
 )
 
-emailCampaignsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
-  const campaignId = c.req.param('id')
-  const weddingId = c.get('weddingId')
-  const deleted = await emailCampaignService.delete(campaignId, weddingId)
-  if (!deleted)
-    return c.json({ error: 'Campaign not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-  return c.json({ data: { success: true } })
-})
+emailCampaignsRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canInbox'),
+  async (c) => {
+    const campaignId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const deleted = await emailCampaignService.delete(campaignId, weddingId)
+    if (!deleted)
+      return c.json({ error: 'Campaign not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    return c.json({ data: { success: true } })
+  },
+)
 
-emailCampaignsRoute.get('/:id/recipients', resolveWeddingMiddleware, async (c) => {
-  const campaignId = c.req.param('id')
-  const weddingId = c.get('weddingId')
-  const campaign = await emailCampaignService.getById(campaignId, weddingId)
-  if (!campaign)
-    return c.json({ error: 'Campaign not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-  const recipients = await emailCampaignService.getRecipients(campaignId)
-  return c.json({ data: recipients })
-})
+emailCampaignsRoute.get(
+  '/:id/recipients',
+  resolveWeddingMiddleware,
+  requireFeature('canInbox'),
+  async (c) => {
+    const campaignId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const campaign = await emailCampaignService.getById(campaignId, weddingId)
+    if (!campaign)
+      return c.json({ error: 'Campaign not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    const recipients = await emailCampaignService.getRecipients(campaignId)
+    return c.json({ data: recipients })
+  },
+)
 
 export const announcementsRoute = new Hono<Env>()
 
 announcementsRoute.use('*', authMiddleware, resolveUserMiddleware)
 
-announcementsRoute.get('/', resolveWeddingMiddleware, async (c) => {
+announcementsRoute.get('/', resolveWeddingMiddleware, requireFeature('canInbox'), async (c) => {
   const weddingId = c.get('weddingId')
   const list = await announcementService.list(weddingId)
   return c.json({ data: list })
@@ -106,6 +119,7 @@ announcementsRoute.get('/', resolveWeddingMiddleware, async (c) => {
 announcementsRoute.post(
   '/',
   resolveWeddingMiddleware,
+  requireFeature('canInbox'),
   zValidator('json', createAnnouncementSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -122,6 +136,7 @@ announcementsRoute.post(
 announcementsRoute.put(
   '/:id',
   resolveWeddingMiddleware,
+  requireFeature('canInbox'),
   zValidator('json', updateAnnouncementSchema, (result, c) => {
     if (!result.success)
       return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
@@ -137,11 +152,16 @@ announcementsRoute.put(
   },
 )
 
-announcementsRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
-  const announcementId = c.req.param('id')
-  const weddingId = c.get('weddingId')
-  const deleted = await announcementService.delete(announcementId, weddingId)
-  if (!deleted)
-    return c.json({ error: 'Announcement not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-  return c.json({ data: { success: true } })
-})
+announcementsRoute.delete(
+  '/:id',
+  resolveWeddingMiddleware,
+  requireFeature('canInbox'),
+  async (c) => {
+    const announcementId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const deleted = await announcementService.delete(announcementId, weddingId)
+    if (!deleted)
+      return c.json({ error: 'Announcement not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    return c.json({ data: { success: true } })
+  },
+)

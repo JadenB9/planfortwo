@@ -245,42 +245,36 @@ const featureCategories: FeatureCategory[] = [
 ]
 
 const freePlanFeatures = [
-  { label: 'Checklist (view only)', included: true },
-  { label: 'Up to 15 guests', included: true },
-  { label: '1 basic website template', included: true },
-  { label: 'Budget total overview', included: true },
-  { label: 'Full checklist editing', included: false },
-  { label: 'Unlimited guests', included: false },
-  { label: 'RSVP tracking', included: false },
-  { label: 'All 10 website templates', included: false },
+  { label: 'Full checklist editing & customization', included: true },
+  { label: 'Unlimited guests & RSVP tracking', included: true },
+  { label: 'Complete budget tracking & analytics', included: true },
+  { label: 'Vendor management', included: true },
+  { label: 'Events & timeline planning', included: true },
+  { label: 'Registry & gift tracking', included: true },
+  { label: 'Ceremony & honeymoon planning', included: true },
+  { label: 'CSV & PDF data export', included: true },
+  { label: 'Partner collaboration', included: true },
+  { label: 'Website builder & customization', included: false },
+  { label: 'Custom seating chart builder', included: false },
+  { label: 'Inbox & email system', included: false },
+  { label: 'Spotify music integration', included: false },
+  { label: 'Photo gallery & uploads', included: false },
+  { label: 'Email campaigns & messaging', included: false },
   { label: 'Custom domain', included: false },
-  { label: 'Budget analytics & export', included: false },
-  { label: 'CSV and PDF data export', included: false },
-  { label: 'Seating chart builder', included: false },
-  { label: 'Vendor management', included: false },
-  { label: 'Event timeline & scheduling', included: false },
-  { label: 'Photo gallery & submissions', included: false },
-  { label: 'Registry & gift tracking', included: false },
-  { label: 'Ceremony & music planning', included: false },
-  { label: 'Honeymoon planning', included: false },
 ]
 
 const fullPlanFeatures = [
-  { label: 'Full checklist editing & customization', included: true },
-  { label: 'Unlimited guests', included: true },
+  { label: 'Everything in Free plan', included: true },
+  { label: 'Website builder & customization', included: true },
   { label: 'All 10 website templates', included: true },
-  { label: 'Complete budget analytics & export', included: true },
-  { label: 'RSVP tracking & management', included: true },
+  { label: 'Website visitor analytics', included: true },
+  { label: 'Custom seating chart builder', included: true },
+  { label: 'Inbox & email system', included: true },
+  { label: 'Spotify music integration', included: true },
+  { label: 'Photo gallery & uploads', included: true },
+  { label: 'Email campaigns & messaging', included: true },
   { label: 'Custom domain support', included: true },
-  { label: 'CSV and PDF data export', included: true },
-  { label: 'Seating chart builder', included: true },
-  { label: 'Vendor management', included: true },
-  { label: 'Event timeline & scheduling', included: true },
-  { label: 'Photo gallery & submissions', included: true },
-  { label: 'Registry & gift tracking', included: true },
-  { label: 'Ceremony & music planning', included: true },
-  { label: 'Honeymoon planning', included: true },
-  { label: 'Every future feature we build', included: true },
+  { label: 'Every future premium feature', included: true },
 ]
 
 export default function FeaturesPage() {
@@ -370,8 +364,8 @@ export default function FeaturesPage() {
             />
             <PricingCard
               title="Full Access"
-              price="$200"
-              description="Everything unlimited. Every feature. One payment."
+              price="$10"
+              description="Premium tools to make your wedding perfect."
               features={fullPlanFeatures}
               cta="Get Full Access"
               href="/upgrade"

@@ -831,6 +831,9 @@ export interface FeatureGates {
   canWebsiteBuilder: boolean
   canWebsiteAnalytics: boolean
   canWebsiteCustomSections: boolean
+  canInbox: boolean
+  canMusicIntegration: boolean
+  canPhotoGallery: boolean
 }
 
 // ── Dashboard ──

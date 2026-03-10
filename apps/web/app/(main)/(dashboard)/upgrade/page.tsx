@@ -12,26 +12,31 @@ import { useWedding } from '@/hooks/use-wedding'
 import { api } from '@/lib/api'
 
 const FREE_FEATURES = [
-  'Checklist with default tasks',
-  'Up to 15 guests',
-  '1 website template',
-  'Basic budget tracking',
+  'Full checklist with custom tasks',
+  'Unlimited guests & households',
+  'Complete budget tracking & analytics',
+  'Vendor management',
+  'Events & timeline planning',
+  'Registry & gift tracking',
+  'Ceremony & vow planning',
+  'Honeymoon planning',
+  'RSVP tracking & management',
+  'CSV & PDF data export',
   'Partner collaboration',
 ]
 
 const FULL_FEATURES = [
   'Everything in Free',
-  'Unlimited guests & households',
+  'Website builder & customization',
   'All 10 website templates',
-  'Full budget analytics & reports',
-  'CSV & PDF export',
-  'Receipt uploads (Cloudflare R2)',
-  'Seating chart builder',
-  'Vendor management',
-  'Music & photo management',
-  'Registry integration',
+  'Website visitor analytics',
+  'Custom seating chart builder',
+  'Inbox & email system',
+  'Spotify music integration',
+  'Photo gallery & uploads',
+  'Email campaigns & messaging',
   'Custom domain for wedding site',
-  'Priority email support',
+  'Every future premium feature',
 ]
 
 export default function UpgradePage() {
@@ -173,7 +178,7 @@ function UpgradePageContent() {
           <h2 className="font-serif text-xl font-semibold text-gray-900">Full Plan</h2>
           <p className="mt-1 text-sm text-gray-500">Everything you need, no limits</p>
           <p className="mt-6">
-            <span className="font-serif text-4xl font-bold text-gray-900">$200</span>
+            <span className="font-serif text-4xl font-bold text-gray-900">$10</span>
             <span className="ml-1 text-sm text-gray-500">one-time</span>
           </p>
 

@@ -19,7 +19,6 @@ import { PaymentCalendar } from '@/components/budget/payment-calendar'
 import { TipCalculator } from '@/components/budget/tip-calculator'
 import { SplitCosts } from '@/components/budget/split-costs'
 import { BudgetSetupWizard } from '@/components/budget/budget-setup-wizard'
-import { UpgradePrompt } from '@/components/checklist/upgrade-prompt'
 
 type Tab = 'overview' | 'expenses' | 'payments' | 'analytics' | 'tips'
 
@@ -133,33 +132,6 @@ export default function BudgetPage() {
       <div className="flex items-center justify-center py-20">
         <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
       </div>
-    )
-  }
-
-  // Free tier: show basic budget total with upgrade prompt
-  if (features && features.tier === 'free') {
-    return (
-      <motion.div
-        className="mx-auto max-w-4xl"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ...springSmooth }}
-      >
-        <div className="mb-8">
-          <h1 className="font-serif text-3xl font-bold text-gray-900">Budget</h1>
-          <p className="mt-1 text-sm text-gray-600">Track every dollar for your wedding.</p>
-        </div>
-
-        <BudgetOverview
-          analytics={null}
-          budgetTotal={weddingData?.wedding.budgetTotal ?? null}
-          onEditBudget={handleEditBudget}
-        />
-
-        <div className="mt-6">
-          <UpgradePrompt message="Upgrade to unlock full budget tracking, expense management, analytics, and more" />
-        </div>
-      </motion.div>
     )
   }
 
