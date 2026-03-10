@@ -13,6 +13,7 @@ import {
 } from '@/lib/animations'
 import Image from 'next/image'
 import { api } from '@/lib/api'
+import { refreshBadges } from '@/hooks/use-notification-badges'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -418,6 +419,7 @@ export default function MusicPage() {
         if (!token) return
         await api.playlists.approveRequest(id, weddingId, token)
         toast.success('Song request approved')
+        refreshBadges()
         void loadData()
       } catch {
         toast.error('Failed to approve request')
@@ -434,6 +436,7 @@ export default function MusicPage() {
         if (!token) return
         await api.playlists.deleteRequest(id, weddingId, token)
         toast.success('Song request rejected')
+        refreshBadges()
         void loadData()
       } catch {
         toast.error('Failed to reject request')

@@ -7,6 +7,7 @@ import { sanitizeHtml } from '@/lib/sanitize'
 import { springSmooth, fadeInUp, staggerContainer, listItem } from '@/lib/animations'
 import { api } from '@/lib/api'
 import { useWedding } from '@/hooks/use-wedding'
+import { refreshBadges } from '@/hooks/use-notification-badges'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -398,6 +399,7 @@ export default function InboxPage() {
         await api.inbox.update(email.id, { isRead: true }, token)
         setEmailList((prev) => prev.map((e) => (e.id === email.id ? { ...e, isRead: true } : e)))
         setUnreadCount((c) => Math.max(0, c - 1))
+        refreshBadges()
       }
     } catch {
       toast.error('Failed to load email')

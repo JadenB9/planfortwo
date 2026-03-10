@@ -5,6 +5,7 @@ import { useAuth } from '@clerk/nextjs'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springSmooth, fadeInUp, staggerContainer } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
+import { refreshBadges } from '@/hooks/use-notification-badges'
 import { api } from '@/lib/api'
 import type { Prayer } from '@planfortwo/types'
 import { Card, CardContent } from '@/components/ui/card'
@@ -59,6 +60,7 @@ export default function PrayersPage() {
       if (!token) return
       await api.prayers.approve(id, weddingId, token)
       toast.success('Prayer approved')
+      refreshBadges()
       void loadEntries()
     } catch {
       toast.error('Failed to approve prayer')
@@ -75,6 +77,7 @@ export default function PrayersPage() {
       if (!token) return
       await api.prayers.reject(id, weddingId, token)
       toast.success('Prayer unapproved')
+      refreshBadges()
       void loadEntries()
     } catch {
       toast.error('Failed to unapprove prayer')
@@ -92,6 +95,7 @@ export default function PrayersPage() {
       await api.prayers.delete(id, weddingId, token)
       toast.success('Prayer removed')
       setDeletingId(null)
+      refreshBadges()
       void loadEntries()
     } catch {
       toast.error('Failed to delete prayer')

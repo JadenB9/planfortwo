@@ -5,6 +5,7 @@ import { useAuth } from '@clerk/nextjs'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springSmooth, staggerGrid, fadeInUp, scaleIn } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
+import { refreshBadges } from '@/hooks/use-notification-badges'
 import { api } from '@/lib/api'
 import type { GalleryPhoto } from '@planfortwo/types'
 import { Button } from '@/components/ui/button'
@@ -224,6 +225,7 @@ export default function PhotosPage() {
       if (!token) return
       await api.photoGallery.moderate(id, weddingId, status, token)
       toast.success(`Photo ${status}`)
+      refreshBadges()
       void loadPhotos()
     } catch {
       toast.error('Failed to moderate photo')
@@ -250,6 +252,7 @@ export default function PhotosPage() {
       if (!token) return
       await api.photoGallery.delete(id, weddingId, token)
       toast.success('Photo deleted')
+      refreshBadges()
       setDeletingPhotoId(null)
       if (lightboxIndex !== null) {
         setLightboxIndex(null)

@@ -5,6 +5,7 @@ import { useAuth } from '@clerk/nextjs'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springSmooth, fadeInUp, staggerContainer } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
+import { refreshBadges } from '@/hooks/use-notification-badges'
 import { api } from '@/lib/api'
 import type { GuestbookEntry } from '@planfortwo/types'
 import { Card, CardContent } from '@/components/ui/card'
@@ -59,6 +60,7 @@ export default function MessagesPage() {
       if (!token) return
       await api.guestbook.approve(id, weddingId, token)
       toast.success('Message approved')
+      refreshBadges()
       void loadEntries()
     } catch {
       toast.error('Failed to approve message')
@@ -75,6 +77,7 @@ export default function MessagesPage() {
       if (!token) return
       await api.guestbook.reject(id, weddingId, token)
       toast.success('Message unapproved')
+      refreshBadges()
       void loadEntries()
     } catch {
       toast.error('Failed to unapprove message')
@@ -92,6 +95,7 @@ export default function MessagesPage() {
       await api.guestbook.delete(id, weddingId, token)
       toast.success('Message deleted')
       setDeletingId(null)
+      refreshBadges()
       void loadEntries()
     } catch {
       toast.error('Failed to delete message')

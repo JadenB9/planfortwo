@@ -14,6 +14,12 @@ interface BadgeCounts {
 }
 
 const POLL_INTERVAL = 60_000
+const BADGE_REFRESH_EVENT = 'badges:refresh'
+
+/** Dispatch this from any page after an approval/rejection action to update sidebar badges immediately */
+export function refreshBadges() {
+  window.dispatchEvent(new Event(BADGE_REFRESH_EVENT))
+}
 
 export function useNotificationBadges() {
   const { getToken } = useAuth()
@@ -46,6 +52,13 @@ export function useNotificationBadges() {
       void fetchBadges()
     }, POLL_INTERVAL)
     return () => clearInterval(intervalRef.current)
+  }, [fetchBadges])
+
+  // Listen for manual refresh events from approval pages
+  useEffect(() => {
+    const handler = () => void fetchBadges()
+    window.addEventListener(BADGE_REFRESH_EVENT, handler)
+    return () => window.removeEventListener(BADGE_REFRESH_EVENT, handler)
   }, [fetchBadges])
 
   return badges
