@@ -11,18 +11,55 @@ import type {
 } from '@planfortwo/types'
 import { api } from '@/lib/api'
 
+const CACHE_KEY = 'planfortwo:website-cache'
+
+interface CachedWebsiteData {
+  weddingId: string
+  config: WebsiteConfig | null
+  sections: WebsiteSection[]
+}
+
+function readCache(weddingId: string): CachedWebsiteData | null {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as CachedWebsiteData
+    if (parsed.weddingId !== weddingId) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function writeCache(weddingId: string, config: WebsiteConfig | null, sections: WebsiteSection[]) {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ weddingId, config, sections }))
+  } catch {
+    /* quota exceeded — ignore */
+  }
+}
+
 interface UseWebsiteOptions {
   weddingId: string | null
 }
 
 export function useWebsite({ weddingId }: UseWebsiteOptions) {
   const { getToken } = useAuth()
-  const [config, setConfig] = useState<WebsiteConfig | null>(null)
-  const [sections, setSections] = useState<WebsiteSection[]>([])
+  const [config, setConfig] = useState<WebsiteConfig | null>(() => {
+    if (!weddingId) return null
+    return readCache(weddingId)?.config ?? null
+  })
+  const [sections, setSections] = useState<WebsiteSection[]>(() => {
+    if (!weddingId) return []
+    return readCache(weddingId)?.sections ?? []
+  })
   const [photos, setPhotos] = useState<WebsitePhoto[]>([])
   const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
   const [analytics, setAnalytics] = useState<WebsiteAnalyticsSummary | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => {
+    if (!weddingId) return true
+    return readCache(weddingId)?.config == null
+  })
   const hasLoadedOnce = useRef(false)
 
   const loadData = useCallback(async () => {
@@ -30,8 +67,8 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
       setLoading(false)
       return
     }
-    // Only show loading skeleton on first load, not on refetches
-    if (!hasLoadedOnce.current) setLoading(true)
+    // Only show loading skeleton on first load when there's no cached data
+    if (!hasLoadedOnce.current && !readCache(weddingId)?.config) setLoading(true)
     try {
       const token = await getToken()
       if (!token) return
@@ -45,6 +82,7 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
       setConfig(configRes.data)
       setSections(sectionsRes.data)
       setGuestbookEntries(guestbookRes.data)
+      writeCache(weddingId, configRes.data, sectionsRes.data)
 
       // Load photos and analytics in parallel (may fail silently for free tier or missing config)
       const optionalPromises: Promise<void>[] = []

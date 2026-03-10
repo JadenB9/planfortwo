@@ -3,6 +3,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { useWebsite } from '@/hooks/use-website'
 import { useWedding } from '@/hooks/use-wedding'
 import { springSmooth } from '@/lib/animations'
@@ -59,13 +61,14 @@ const WebsitePreview = dynamic(
 const VALID_TABS = ['design', 'sections', 'settings', 'analytics']
 
 export default function WebsitePage() {
-  const { data, features } = useWedding()
+  const { data, features, loading: weddingLoading } = useWedding()
   const { getToken } = useAuth()
   const wedding = data?.wedding ?? null
   const weddingId = wedding?.id ?? null
   const { config, sections, setSections, photos, loading, refetch, analytics } = useWebsite({
     weddingId,
   })
+  const [creating, setCreating] = useState(false)
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null)
   const [editorContent, setEditorContent] = useState<Record<string, unknown>>({})
   const [previewMode, setPreviewMode] = useState<PreviewMode>('phone')
@@ -95,16 +98,31 @@ export default function WebsitePage() {
   }, [editingSection])
 
   const handleCreate = useCallback(async () => {
-    if (!weddingId) return
-    const token = await getToken()
-    if (!token) return
-    const slug =
-      wedding?.name
-        ?.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '') ?? 'our-wedding'
-    await api.websiteConfig.create({ weddingId, templateId: 'classic', subdomain: slug }, token)
-    await refetch()
+    if (!weddingId) {
+      toast.error('Wedding not loaded yet. Please wait a moment and try again.')
+      return
+    }
+    setCreating(true)
+    try {
+      const token = await getToken()
+      if (!token) {
+        toast.error('Unable to authenticate. Please sign in again.')
+        return
+      }
+      const slug =
+        wedding?.name
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '') || 'our-wedding'
+      await api.websiteConfig.create({ weddingId, templateId: 'classic', subdomain: slug }, token)
+      await refetch()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to create website'
+      console.error('Website create failed:', err)
+      toast.error(msg)
+    } finally {
+      setCreating(false)
+    }
   }, [weddingId, getToken, refetch, wedding?.name])
 
   const handleTemplateChange = useCallback(
@@ -389,7 +407,7 @@ export default function WebsitePage() {
     }
   }
 
-  if (loading) {
+  if (loading || weddingLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
@@ -408,8 +426,21 @@ export default function WebsitePage() {
         <h1 className="font-serif text-3xl font-bold text-gray-900">Wedding Website</h1>
         <p className="mt-2 text-gray-600">Create your personalized wedding website</p>
         <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-          <Button className="mt-6" onClick={handleCreate} disabled={!features?.canWebsiteBuilder}>
-            {features?.canWebsiteBuilder ? 'Create Website' : 'Upgrade to Create Website'}
+          <Button
+            className="mt-6"
+            onClick={handleCreate}
+            disabled={!features?.canWebsiteBuilder || creating}
+          >
+            {creating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : features?.canWebsiteBuilder ? (
+              'Create Website'
+            ) : (
+              'Upgrade to Create Website'
+            )}
           </Button>
         </motion.div>
       </motion.div>
