@@ -483,9 +483,9 @@ export default function WebsitePage() {
           </Tabs>
         </div>
 
-        {/* Live preview panel — stays fixed in place */}
+        {/* Live preview panel — stays fixed in place, scrollable within */}
         <div
-          className="hidden shrink-0 transition-all duration-300 xl:block"
+          className="hidden min-h-0 shrink-0 transition-all duration-300 xl:block"
           style={{ width: previewMode === 'desktop' ? '520px' : '300px' }}
         >
           <div className="h-full overflow-hidden rounded-lg border shadow-sm">
