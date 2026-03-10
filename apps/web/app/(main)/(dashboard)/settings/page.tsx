@@ -77,6 +77,7 @@ export default function SettingsPage() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [cancellingInvite, setCancellingInvite] = useState(false)
   const [cancelTeamDialogId, setCancelTeamDialogId] = useState<string | null>(null)
+  const [resendingInviteId, setResendingInviteId] = useState<string | null>(null)
   const [removePartnerDialogOpen, setRemovePartnerDialogOpen] = useState(false)
 
   // Theme state
@@ -293,6 +294,24 @@ export default function SettingsPage() {
       }
     },
     [weddingId, getToken, pendingPartnerInvite],
+  )
+
+  const handleResendInvitation = useCallback(
+    async (invitationId: string) => {
+      if (!weddingId) return
+      setResendingInviteId(invitationId)
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.weddings.resendInvitation(weddingId, invitationId, token)
+        toast.success('Invitation email resent!')
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to resend invitation')
+      } finally {
+        setResendingInviteId(null)
+      }
+    },
+    [weddingId, getToken],
   )
 
   const handleSaveTheme = useCallback(async () => {
@@ -656,10 +675,14 @@ export default function SettingsPage() {
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1">
-                              <Mail className="h-3.5 w-3.5 text-amber-600" />
-                              <span className="text-xs font-medium text-amber-700">Sent</span>
-                            </div>
+                            <button
+                              onClick={() => handleResendInvitation(pendingPartnerInvite.id)}
+                              disabled={resendingInviteId === pendingPartnerInvite.id}
+                              className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50"
+                              title="Resend invitation email"
+                            >
+                              <Mail className="h-4 w-4" />
+                            </button>
                             <button
                               onClick={() => setCancelDialogOpen(true)}
                               className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
@@ -756,10 +779,14 @@ export default function SettingsPage() {
                           )}
                           {invite.role}
                         </span>
-                        <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1">
-                          <Mail className="h-3.5 w-3.5 text-amber-600" />
-                          <span className="text-xs font-medium text-amber-700">Sent</span>
-                        </div>
+                        <button
+                          onClick={() => handleResendInvitation(invite.id)}
+                          disabled={resendingInviteId === invite.id}
+                          className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50"
+                          title="Resend invitation email"
+                        >
+                          <Mail className="h-4 w-4" />
+                        </button>
                         <button
                           onClick={() => setCancelTeamDialogId(invite.id)}
                           className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"

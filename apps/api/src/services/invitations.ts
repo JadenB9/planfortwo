@@ -34,6 +34,23 @@ export const invitationService = {
       throw new Error('Failed to create invitation')
     }
 
+    try {
+      await this.sendInvitationEmail(email, invitedByUserId, role, token)
+    } catch (err) {
+      // Clean up the orphaned invitation record if email fails
+      await db.delete(partnerInvitations).where(eq(partnerInvitations.id, invitation.id))
+      throw err
+    }
+
+    return invitation
+  },
+
+  async sendInvitationEmail(
+    email: string,
+    invitedByUserId: string,
+    role: 'partner' | 'planner' | 'family',
+    token: string,
+  ) {
     const inviter = await userService.findById(invitedByUserId)
     const inviterName = inviter ? `${inviter.firstName} ${inviter.lastName}` : 'Your partner'
 
@@ -46,6 +63,30 @@ export const invitationService = {
       const roleLabel = role === 'planner' ? 'wedding planner' : 'family member'
       await emailService.sendTeamMemberInvite(email, inviterName, roleLabel, inviteUrl)
     }
+  },
+
+  async resendInvitation(invitationId: string, weddingId: string) {
+    const [invitation] = await db
+      .select()
+      .from(partnerInvitations)
+      .where(
+        and(
+          eq(partnerInvitations.id, invitationId),
+          eq(partnerInvitations.weddingId, weddingId),
+          eq(partnerInvitations.status, 'pending'),
+        ),
+      )
+
+    if (!invitation) {
+      return null
+    }
+
+    await this.sendInvitationEmail(
+      invitation.email,
+      invitation.invitedByUserId,
+      invitation.role ?? 'partner',
+      invitation.token,
+    )
 
     return invitation
   },

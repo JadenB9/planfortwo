@@ -272,6 +272,49 @@ weddingsRoute.delete('/:id/invitations/:invitationId', async (c) => {
   return c.json({ data: { cancelled: true } })
 })
 
+// POST /weddings/:id/invitations/:invitationId/resend -- resend an invitation email
+weddingsRoute.post('/:id/invitations/:invitationId/resend', async (c) => {
+  const weddingId = c.req.param('id')
+  const invitationId = c.req.param('invitationId')
+  const dbUserId = c.get('dbUserId')
+
+  const membership = await weddingService.verifyMembership(weddingId, dbUserId)
+  if (!membership) {
+    return c.json(
+      { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  if (membership.role !== 'owner' && membership.role !== 'partner') {
+    return c.json(
+      { error: 'Only the couple can resend invitations', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  try {
+    const invitation = await invitationService.resendInvitation(invitationId, weddingId)
+
+    if (!invitation) {
+      return c.json(
+        {
+          error: 'Invitation not found or already processed',
+          code: 'NOT_FOUND',
+          statusCode: 404,
+        },
+        404,
+      )
+    }
+
+    return c.json({ data: { resent: true } })
+  } catch (err) {
+    console.error('Resend invitation failed:', err)
+    const message = err instanceof Error ? err.message : 'Failed to resend invitation'
+    return c.json({ error: message, code: 'EMAIL_SEND_FAILED', statusCode: 500 }, 500)
+  }
+})
+
 // GET /weddings/:id/pending-invitations -- list pending invitations for a wedding
 weddingsRoute.get('/:id/pending-invitations', async (c) => {
   const weddingId = c.req.param('id')

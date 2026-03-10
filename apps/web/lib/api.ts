@@ -164,6 +164,14 @@ export const api = {
           token,
         },
       ),
+    resendInvitation: (weddingId: string, invitationId: string, token: string) =>
+      fetchApi<{ data: { resent: boolean } }>(
+        `/weddings/${weddingId}/invitations/${invitationId}/resend`,
+        {
+          method: 'POST',
+          token,
+        },
+      ),
     getMembers: (weddingId: string, token: string) =>
       fetchApi<{
         data: Array<{

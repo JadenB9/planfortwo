@@ -48,12 +48,12 @@ export const emailService = {
         to: email.replace(/./g, '*'),
         subject: `${inviterName} invited you to plan your wedding on PlanForTwo`,
       })
-      return
+      throw new Error('Email service is not configured. Please contact support or try again later.')
     }
 
     const html = await render(PartnerInviteEmail({ inviterName, inviteUrl }))
 
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `${inviterName} invited you to plan your wedding on PlanForTwo`,
@@ -61,9 +61,11 @@ export const emailService = {
     })
 
     if (error) {
-      console.error('Failed to send partner invite email:', error)
-      throw new Error(`Failed to send partner invite email: ${error.message}`)
+      console.error('[email] Failed to send partner invite:', { to: email, error })
+      throw new Error(`Failed to send invitation email: ${error.message}`)
     }
+
+    console.log('[email] Partner invite sent:', { to: email, emailId: data?.id })
   },
 
   async sendTeamMemberInvite(
@@ -78,12 +80,12 @@ export const emailService = {
         to: email.replace(/./g, '*'),
         subject: `${inviterName} invited you to join their wedding planning team`,
       })
-      return
+      throw new Error('Email service is not configured. Please contact support or try again later.')
     }
 
     const html = await render(TeamMemberInviteEmail({ inviterName, roleLabel, inviteUrl }))
 
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `${inviterName} invited you to join their wedding planning team`,
@@ -91,9 +93,11 @@ export const emailService = {
     })
 
     if (error) {
-      console.error('Failed to send team member invite email:', error)
-      throw new Error(`Failed to send team member invite email: ${error.message}`)
+      console.error('[email] Failed to send team member invite:', { to: email, error })
+      throw new Error(`Failed to send invitation email: ${error.message}`)
     }
+
+    console.log('[email] Team member invite sent:', { to: email, emailId: data?.id })
   },
 
   async sendRsvpInvite(
