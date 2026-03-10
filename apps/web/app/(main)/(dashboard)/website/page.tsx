@@ -452,12 +452,7 @@ export default function WebsitePage() {
   const weddingDate = wedding?.date ? new Date(wedding.date) : null
 
   return (
-    <motion.div
-      className="flex h-full flex-col px-6 pt-6"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ...springSmooth }}
-    >
+    <div className="flex h-full flex-col pt-2">
       <div className="mb-4 flex shrink-0 items-center justify-between">
         <h1 className="font-serif text-2xl font-bold text-gray-900">Wedding Website</h1>
         <PublishToggle
@@ -557,6 +552,6 @@ export default function WebsitePage() {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

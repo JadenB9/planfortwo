@@ -267,6 +267,7 @@ export function TemplateSelector({
     setActivePaletteId(newPalette.id)
     setPaletteName('')
     setShowSaveDialog(false)
+    toast.success(`Palette "${newPalette.name}" saved`)
   }, [paletteName, localColors, fontPair, savedPalettes, onCustomize])
 
   const handleLoadPalette = useCallback(
@@ -301,10 +302,12 @@ export function TemplateSelector({
   const handleUpdatePalette = useCallback(() => {
     if (!activePaletteId) return
     const existing = savedPalettes ?? []
+    const activePalette = existing.find((p) => p.id === activePaletteId)
     const updated = existing.map((p) =>
       p.id === activePaletteId ? { ...p, colors: { ...localColors }, fontPair } : p,
     )
     onCustomize({ savedPalettes: updated })
+    toast.success(`Palette "${activePalette?.name ?? 'Current'}" updated`)
   }, [activePaletteId, savedPalettes, localColors, fontPair, onCustomize])
 
   const palettes = savedPalettes ?? []
@@ -387,7 +390,7 @@ export function TemplateSelector({
 
       {/* Color customization panel */}
       {showCustomizer && (
-        <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-5">
+        <div className="relative mt-4 rounded-lg border border-gray-200 bg-gray-50 p-5">
           <h4 className="mb-4 text-sm font-semibold text-gray-900">Customize Colors</h4>
 
           <div className="grid gap-4 sm:grid-cols-2">
