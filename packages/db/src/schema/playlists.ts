@@ -25,6 +25,7 @@ export const playlists = pgTable('playlists', {
   spotifyUrl: text('spotify_url'),
   appleMusicUrl: text('apple_music_url'),
   youtubeMusicUrl: text('youtube_music_url'),
+  isAcceptedSongs: boolean('is_accepted_songs').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()

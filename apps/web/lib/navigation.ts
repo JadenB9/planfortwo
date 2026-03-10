@@ -52,6 +52,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Details',
     items: [
+      { href: '/prayers', label: 'Prayers', icon: Heart, comingSoon: false },
       { href: '/vendors', label: 'Vendors', icon: Store, comingSoon: false },
       { href: '/events', label: 'Events', icon: CalendarDays, comingSoon: false },
       { href: '/music', label: 'Music', icon: Music, comingSoon: false },
@@ -59,7 +60,6 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: '/messages', label: 'Messages', icon: MessageSquare, comingSoon: false },
       { href: '/registry', label: 'Registry', icon: Gift, comingSoon: false },
       { href: '/honeymoon', label: 'Honeymoon', icon: Plane, comingSoon: false },
-      { href: '/prayers', label: 'Prayers', icon: Heart, comingSoon: false },
     ],
   },
 ]

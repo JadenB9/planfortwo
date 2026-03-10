@@ -1,4 +1,4 @@
-import { eq, and, asc } from 'drizzle-orm'
+import { eq, and, asc, sql } from 'drizzle-orm'
 import { db, playlists, playlistSongs, songRequests } from '@planfortwo/db'
 import type {
   CreatePlaylistInput,
@@ -123,17 +123,43 @@ export const playlistService = {
   },
 
   async approveSongRequest(id: string, weddingId: string) {
-    const [req] = await db
-      .select({ weddingId: songRequests.weddingId })
-      .from(songRequests)
-      .where(eq(songRequests.id, id))
+    const [req] = await db.select().from(songRequests).where(eq(songRequests.id, id))
     if (!req || req.weddingId !== weddingId) return null
     const [updated] = await db
       .update(songRequests)
       .set({ isApproved: true })
       .where(eq(songRequests.id, id))
       .returning()
-    return updated ?? null
+    if (!updated) return null
+
+    // Add approved song to the "Accepted Songs" default playlist
+    let [acceptedPlaylist] = await db
+      .select()
+      .from(playlists)
+      .where(and(eq(playlists.weddingId, weddingId), eq(playlists.isAcceptedSongs, true)))
+
+    if (!acceptedPlaylist) {
+      const [created] = await db
+        .insert(playlists)
+        .values({ weddingId, name: 'Accepted Songs', isAcceptedSongs: true })
+        .returning()
+      acceptedPlaylist = created!
+    }
+
+    const [countResult] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(playlistSongs)
+      .where(eq(playlistSongs.playlistId, acceptedPlaylist.id))
+    const sortOrder = countResult?.count ?? 0
+
+    await db.insert(playlistSongs).values({
+      playlistId: acceptedPlaylist.id,
+      title: req.title,
+      artist: req.artist,
+      sortOrder,
+    })
+
+    return updated
   },
 
   async deleteSongRequest(id: string, weddingId: string) {

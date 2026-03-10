@@ -33,16 +33,27 @@ import { staggerContainer, navItem as navItemVariant, springSmooth } from '@/lib
 import type { NavItem } from '@/lib/navigation'
 import { useSidebarOrder } from '@/hooks/use-sidebar-order'
 import { useWedding } from '@/hooks/use-wedding'
+import { useNotificationBadges } from '@/hooks/use-notification-badges'
 import { api } from '@/lib/api'
+
+const BADGE_MAP: Record<string, 'inbox' | 'music' | 'photos' | 'messages' | 'prayers'> = {
+  '/inbox': 'inbox',
+  '/music': 'music',
+  '/photos': 'photos',
+  '/messages': 'messages',
+  '/prayers': 'prayers',
+}
 
 function SortableNavItem({
   item,
   isActive,
   websiteSubdomain,
+  badgeCount,
 }: {
   item: NavItem
   isActive: boolean
   websiteSubdomain: string | null
+  badgeCount: number
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.href,
@@ -81,9 +92,12 @@ function SortableNavItem({
           >
             <GripVertical className="h-3.5 w-3.5 text-gray-300" />
           </span>
-          <Icon
-            className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-wedding-600' : 'text-gray-400'}`}
-          />
+          <div className="relative flex-shrink-0">
+            <Icon className={`h-4 w-4 ${isActive ? 'text-wedding-600' : 'text-gray-400'}`} />
+            {badgeCount > 0 && (
+              <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500" />
+            )}
+          </div>
           <div className="min-w-0 flex-1">
             <span>{item.label}</span>
             {item.href === '/website' && websiteSubdomain && (
@@ -107,6 +121,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const { getToken } = useAuth()
   const { data: weddingData, loading: weddingLoading } = useWedding()
+  const badges = useNotificationBadges()
   const tier = weddingData?.wedding.tier
   const weddingId = weddingData?.wedding.id ?? null
   const [websiteSubdomain, setWebsiteSubdomain] = useState<string | null>(null)
@@ -206,12 +221,15 @@ export function Sidebar() {
                     <div className="space-y-0.5">
                       {group.items.map((item) => {
                         const isActive = pathname === item.href
+                        const badgeKey = BADGE_MAP[item.href]
+                        const badgeCount = badgeKey ? badges[badgeKey] : 0
                         return (
                           <SortableNavItem
                             key={item.href}
                             item={item}
                             isActive={isActive}
                             websiteSubdomain={websiteSubdomain}
+                            badgeCount={badgeCount}
                           />
                         )
                       })}

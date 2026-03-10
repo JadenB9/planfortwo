@@ -1356,4 +1356,10 @@ export const api = {
         ),
     },
   },
+  notifications: {
+    badges: (weddingId: string, token: string) =>
+      fetchApi<{
+        data: { inbox: number; music: number; photos: number; messages: number; prayers: number }
+      }>(`/notifications/badges?weddingId=${weddingId}`, { token }),
+  },
 }

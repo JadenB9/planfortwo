@@ -46,6 +46,7 @@ import { playlistsRoute } from './routes/playlists.js'
 import { honeymoonRoute } from './routes/honeymoon.js'
 import { weatherRoute } from './routes/weather.js'
 import { progressRoute } from './routes/progress.js'
+import { notificationsRoute } from './routes/notifications.js'
 import { prayersRoute } from './routes/prayers.js'
 import { inboxRoute } from './routes/inbox.js'
 import { resendWebhookRoute } from './routes/webhooks-resend.js'
@@ -171,6 +172,7 @@ app.route('/playlists', playlistsRoute)
 app.route('/honeymoon', honeymoonRoute)
 app.route('/weather', weatherRoute)
 app.route('/progress', progressRoute)
+app.route('/notifications', notificationsRoute)
 app.route('/inbox', inboxRoute)
 
 // ── Webhooks ──
