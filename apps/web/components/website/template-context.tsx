@@ -66,6 +66,8 @@ export function TemplateProvider({
       headingItalic: baseColors.headingItalic ?? false,
       bodyBold: baseColors.bodyBold ?? false,
       bodyItalic: baseColors.bodyItalic ?? false,
+      headingSize: baseColors.headingSize ?? 'md',
+      bodySize: baseColors.bodySize ?? 'md',
     }
 
     return { colors, fontPair, templateId, cssVariables, typography }
@@ -114,14 +116,31 @@ export function useBodyClass(): string {
   return parts.join(' ')
 }
 
+/** Zoom multiplier for text size options */
+function sizeZoom(size: TextSize): number | undefined {
+  if (size === 'sm') return 0.85
+  if (size === 'lg') return 1.2
+  return undefined
+}
+
 /** Get inline fontFamily style for headings */
 export function useHeadingFont(): CSSProperties {
-  const { fontPair } = useTemplateStyles()
-  return { fontFamily: `'${fontPair.heading}', ${fallbackFamily(fontPair.headingClass)}` }
+  const { fontPair, typography } = useTemplateStyles()
+  const style: CSSProperties = {
+    fontFamily: `'${fontPair.heading}', ${fallbackFamily(fontPair.headingClass)}`,
+  }
+  const z = sizeZoom(typography.headingSize)
+  if (z) style.zoom = z
+  return style
 }
 
 /** Get inline fontFamily style for body text */
 export function useBodyFont(): CSSProperties {
-  const { fontPair } = useTemplateStyles()
-  return { fontFamily: `'${fontPair.body}', ${fallbackFamily(fontPair.bodyClass)}` }
+  const { fontPair, typography } = useTemplateStyles()
+  const style: CSSProperties = {
+    fontFamily: `'${fontPair.body}', ${fallbackFamily(fontPair.bodyClass)}`,
+  }
+  const z = sizeZoom(typography.bodySize)
+  if (z) style.zoom = z
+  return style
 }

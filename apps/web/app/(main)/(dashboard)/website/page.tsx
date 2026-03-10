@@ -162,6 +162,7 @@ export default function WebsitePage() {
       try {
         await api.websiteSections.update(sectionId, weddingId, { isVisible }, token)
       } catch {
+        // Revert on failure
         await refetch()
       }
     },
@@ -280,6 +281,7 @@ export default function WebsitePage() {
       try {
         await api.websiteSections.reorder(weddingId, { sections: reordered }, token)
       } catch {
+        // Revert on failure
         await refetch()
       }
     },

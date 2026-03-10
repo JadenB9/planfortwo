@@ -2,13 +2,20 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { Palette, RotateCcw, ChevronDown, ChevronUp, Save, Trash2, Plus, Check } from 'lucide-react'
-import type { CustomColors, SavedPalette } from '@planfortwo/types'
+import { toast } from 'sonner'
+import type { CustomColors, SavedPalette, TextSize } from '@planfortwo/types'
 import { templates, getTemplate } from '@/lib/templates'
 import { fontPairs } from '@/lib/fonts'
 import { TemplatePreview } from '../template-preview'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+
+const SIZE_OPTIONS: { value: TextSize; label: string }[] = [
+  { value: 'sm', label: 'Small' },
+  { value: 'md', label: 'Medium' },
+  { value: 'lg', label: 'Large' },
+]
 
 interface TemplateSelectorProps {
   selectedId: string
@@ -426,12 +433,15 @@ export function TemplateSelector({
                     <button
                       type="button"
                       onClick={() => {
-                        const updated = { ...localColors, headingBold: !localColors.headingBold }
+                        const updated = {
+                          ...localColors,
+                          headingBold: !(localColors.headingBold ?? true),
+                        }
                         setLocalColors(updated)
                         debouncedUpdate(updated)
                       }}
                       className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
-                        localColors.headingBold !== false
+                        (localColors.headingBold ?? true)
                           ? 'border-blue-500 bg-blue-50 text-blue-700'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
@@ -443,19 +453,42 @@ export function TemplateSelector({
                       onClick={() => {
                         const updated = {
                           ...localColors,
-                          headingItalic: !localColors.headingItalic,
+                          headingItalic: !(localColors.headingItalic ?? false),
                         }
                         setLocalColors(updated)
                         debouncedUpdate(updated)
                       }}
                       className={`rounded-md border px-3 py-1.5 text-xs italic transition-colors ${
-                        localColors.headingItalic
+                        (localColors.headingItalic ?? false)
                           ? 'border-blue-500 bg-blue-50 text-blue-700'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
                     >
                       I
                     </button>
+                  </div>
+                  <div className="mt-2">
+                    <p className="mb-1 text-[10px] text-gray-500">Size</p>
+                    <div className="flex gap-1">
+                      {SIZE_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            const updated = { ...localColors, headingSize: opt.value }
+                            setLocalColors(updated)
+                            debouncedUpdate(updated)
+                          }}
+                          className={`rounded-md border px-2.5 py-1 text-[10px] font-medium transition-colors ${
+                            (localColors.headingSize ?? 'md') === opt.value
+                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -464,12 +497,15 @@ export function TemplateSelector({
                     <button
                       type="button"
                       onClick={() => {
-                        const updated = { ...localColors, bodyBold: !localColors.bodyBold }
+                        const updated = {
+                          ...localColors,
+                          bodyBold: !(localColors.bodyBold ?? false),
+                        }
                         setLocalColors(updated)
                         debouncedUpdate(updated)
                       }}
                       className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
-                        localColors.bodyBold
+                        (localColors.bodyBold ?? false)
                           ? 'border-blue-500 bg-blue-50 text-blue-700'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
@@ -479,18 +515,44 @@ export function TemplateSelector({
                     <button
                       type="button"
                       onClick={() => {
-                        const updated = { ...localColors, bodyItalic: !localColors.bodyItalic }
+                        const updated = {
+                          ...localColors,
+                          bodyItalic: !(localColors.bodyItalic ?? false),
+                        }
                         setLocalColors(updated)
                         debouncedUpdate(updated)
                       }}
                       className={`rounded-md border px-3 py-1.5 text-xs italic transition-colors ${
-                        localColors.bodyItalic
+                        (localColors.bodyItalic ?? false)
                           ? 'border-blue-500 bg-blue-50 text-blue-700'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
                     >
                       I
                     </button>
+                  </div>
+                  <div className="mt-2">
+                    <p className="mb-1 text-[10px] text-gray-500">Size</p>
+                    <div className="flex gap-1">
+                      {SIZE_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            const updated = { ...localColors, bodySize: opt.value }
+                            setLocalColors(updated)
+                            debouncedUpdate(updated)
+                          }}
+                          className={`rounded-md border px-2.5 py-1 text-[10px] font-medium transition-colors ${
+                            (localColors.bodySize ?? 'md') === opt.value
+                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
