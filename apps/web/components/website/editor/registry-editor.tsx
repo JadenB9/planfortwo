@@ -53,7 +53,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
 
   const isFundSelected = useCallback(
     (fund: CashFund): boolean => {
-      return registries.some((r) => r.name === fund.name && r.url === '' && r.isCashFund === true)
+      return registries.some((r) => r.name === fund.name && r.isCashFund === true)
     },
     [registries],
   )
@@ -83,9 +83,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
     if (isFundSelected(fund)) {
       onChange({
         ...content,
-        registries: registries.filter(
-          (r) => !(r.name === fund.name && r.url === '' && r.isCashFund === true),
-        ),
+        registries: registries.filter((r) => !(r.name === fund.name && r.isCashFund === true)),
       })
     } else {
       onChange({
@@ -96,10 +94,18 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
             name: fund.name,
             url: '',
             isCashFund: true,
+            description: fund.description ?? undefined,
+            goalAmount: fund.goalAmount,
+            currentAmount: fund.currentAmount,
           },
         ],
       })
     }
+  }
+
+  function updateFundUrl(fundName: string, url: string) {
+    const updated = registries.map((r) => (r.isCashFund && r.name === fundName ? { ...r, url } : r))
+    onChange({ ...content, registries: updated })
   }
 
   function addCustomRegistry() {
@@ -275,70 +281,94 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                     .filter((f) => f.isActive)
                     .map((fund) => {
                       const selected = isFundSelected(fund)
+                      const selectedEntry = selected
+                        ? registries.find((r) => r.isCashFund && r.name === fund.name)
+                        : null
                       const progress =
                         fund.goalAmount > 0
                           ? Math.min(100, Math.round((fund.currentAmount / fund.goalAmount) * 100))
                           : 0
                       return (
-                        <button
-                          key={fund.id}
-                          type="button"
-                          onClick={() => toggleFund(fund)}
-                          className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
-                            selected
-                              ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-200'
-                              : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          {/* Toggle indicator */}
-                          <div
-                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
-                              selected ? 'border-blue-500 bg-blue-500' : 'border-gray-300 bg-white'
+                        <div key={fund.id} className="space-y-0">
+                          <button
+                            type="button"
+                            onClick={() => toggleFund(fund)}
+                            className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
+                              selected
+                                ? 'rounded-b-none border-blue-500 bg-blue-50 ring-1 ring-blue-200'
+                                : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
                             }`}
                           >
-                            {selected && (
-                              <svg
-                                className="h-3.5 w-3.5 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={3}
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            )}
-                          </div>
-
-                          {/* Info */}
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="truncate text-sm font-medium text-gray-900">
-                                {fund.name}
-                              </p>
-                              <span className="shrink-0 text-xs text-gray-500">
-                                {formatCurrency(fund.currentAmount)} /{' '}
-                                {formatCurrency(fund.goalAmount)}
-                              </span>
+                            {/* Toggle indicator */}
+                            <div
+                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                                selected
+                                  ? 'border-blue-500 bg-blue-500'
+                                  : 'border-gray-300 bg-white'
+                              }`}
+                            >
+                              {selected && (
+                                <svg
+                                  className="h-3.5 w-3.5 text-white"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth={3}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              )}
                             </div>
-                            {fund.goalAmount > 0 && (
-                              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
-                                <div
-                                  className="h-full rounded-full bg-green-500 transition-all"
-                                  style={{ width: `${progress}%` }}
-                                />
+
+                            {/* Info */}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="truncate text-sm font-medium text-gray-900">
+                                  {fund.name}
+                                </p>
+                                <span className="shrink-0 text-xs text-gray-500">
+                                  {formatCurrency(fund.currentAmount)} /{' '}
+                                  {formatCurrency(fund.goalAmount)}
+                                </span>
                               </div>
-                            )}
-                            {fund.description && (
-                              <p className="mt-1 truncate text-xs text-gray-500">
-                                {fund.description}
-                              </p>
-                            )}
-                          </div>
-                        </button>
+                              {fund.goalAmount > 0 && (
+                                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                                  <div
+                                    className="h-full rounded-full bg-green-500 transition-all"
+                                    style={{ width: `${progress}%` }}
+                                  />
+                                </div>
+                              )}
+                              {fund.description && (
+                                <p className="mt-1 truncate text-xs text-gray-500">
+                                  {fund.description}
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                          {selected && (
+                            <div className="rounded-b-lg border border-t-0 border-blue-500 bg-blue-50 px-4 pb-3 pt-2">
+                              <label className="text-xs font-medium text-gray-600">
+                                Payment Link{' '}
+                                <span className="font-normal text-gray-400">
+                                  (Venmo, PayPal, CashApp, etc.)
+                                </span>
+                              </label>
+                              <input
+                                type="text"
+                                value={selectedEntry?.url ?? ''}
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={(e) => updateFundUrl(fund.name, e.target.value)}
+                                placeholder="https://venmo.com/yourname"
+                                className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              />
+                            </div>
+                          )}
+                        </div>
                       )
                     })}
                 </div>
