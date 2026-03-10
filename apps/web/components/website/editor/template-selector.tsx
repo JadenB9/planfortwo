@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Palette, RotateCcw, ChevronDown, ChevronUp, Save, Trash2, Plus } from 'lucide-react'
+import { Palette, RotateCcw, ChevronDown, ChevronUp, Save, Trash2, Plus, Check } from 'lucide-react'
 import type { CustomColors, SavedPalette } from '@planfortwo/types'
 import { templates, getTemplate } from '@/lib/templates'
 import { fontPairs } from '@/lib/fonts'
@@ -9,13 +9,6 @@ import { TemplatePreview } from '../template-preview'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 interface TemplateSelectorProps {
   selectedId: string
@@ -55,6 +48,82 @@ function computeSectionBgDefault(secondary: string): string {
 
 function generatePaletteId(): string {
   return crypto.randomUUID()
+}
+
+// Build Google Fonts URL for all font pairs
+const GOOGLE_FONTS_URL = (() => {
+  const families = fontPairs
+    .flatMap((fp) => [fp.heading, fp.body])
+    .filter((v, i, a) => a.indexOf(v) === i)
+    .map((name) => `family=${name.replace(/\s+/g, '+')}:wght@400;700`)
+    .join('&')
+  return `https://fonts.googleapis.com/css2?${families}&display=swap`
+})()
+
+function FontPreviewPicker({
+  selected,
+  onSelect,
+}: {
+  selected: string
+  onSelect: (id: string) => void
+}) {
+  const [fontsLoaded, setFontsLoaded] = useState(false)
+
+  useEffect(() => {
+    // Inject Google Fonts stylesheet if not already present
+    const linkId = 'font-preview-gfonts'
+    if (document.getElementById(linkId)) {
+      setFontsLoaded(true)
+      return
+    }
+    const link = document.createElement('link')
+    link.id = linkId
+    link.rel = 'stylesheet'
+    link.href = GOOGLE_FONTS_URL
+    link.onload = () => setFontsLoaded(true)
+    document.head.appendChild(link)
+  }, [])
+
+  return (
+    <div className="grid gap-2 sm:grid-cols-2">
+      {fontPairs.map((fp) => (
+        <button
+          key={fp.id}
+          type="button"
+          onClick={() => onSelect(fp.id)}
+          className={`group relative rounded-lg border-2 p-3 text-left transition-all ${
+            selected === fp.id
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-200 bg-white hover:border-gray-300'
+          }`}
+        >
+          {selected === fp.id && (
+            <div className="absolute right-2 top-2">
+              <Check className="h-4 w-4 text-blue-500" />
+            </div>
+          )}
+          <p
+            className="text-lg leading-tight"
+            style={{
+              fontFamily: fontsLoaded ? `'${fp.heading}', serif` : undefined,
+              opacity: fontsLoaded ? 1 : 0.6,
+            }}
+          >
+            {fp.previewText}
+          </p>
+          <p
+            className="mt-1 text-xs"
+            style={{
+              fontFamily: fontsLoaded ? `'${fp.body}', sans-serif` : undefined,
+              color: '#666',
+            }}
+          >
+            {fp.heading} + {fp.body}
+          </p>
+        </button>
+      ))}
+    </div>
+  )
 }
 
 export function TemplateSelector({
@@ -343,23 +412,8 @@ export function TemplateSelector({
           </div>
 
           <div className="mt-5 border-t border-gray-200 pt-4">
-            <div className="flex items-center gap-3">
-              <Label htmlFor="font-pair" className="w-24 shrink-0 text-sm text-gray-700">
-                Font Style
-              </Label>
-              <Select value={fontPair} onValueChange={handleFontChange}>
-                <SelectTrigger id="font-pair" className="w-64">
-                  <SelectValue placeholder="Select a font pair" />
-                </SelectTrigger>
-                <SelectContent>
-                  {fontPairs.map((fp) => (
-                    <SelectItem key={fp.id} value={fp.id}>
-                      {fp.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <h4 className="mb-3 text-sm font-semibold text-gray-900">Font Style</h4>
+            <FontPreviewPicker selected={fontPair} onSelect={handleFontChange} />
           </div>
 
           {/* Save / Update palette actions */}
