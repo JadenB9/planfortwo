@@ -40,7 +40,7 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
   const visibleEntries = entries.filter((e) => e.isVisible)
 
   return (
-    <section className="py-16 sm:py-24" style={{ backgroundColor: `${colors.secondary}33` }}>
+    <section className="py-16 sm:py-24" style={{ backgroundColor: colors.sectionBackground }}>
       <div className="mx-auto max-w-3xl px-4">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

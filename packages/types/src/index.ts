@@ -423,6 +423,14 @@ export interface CustomColors {
   secondary: string
   accent: string
   background: string
+  sectionBackground?: string
+}
+
+export interface SavedPalette {
+  id: string
+  name: string
+  colors: CustomColors
+  fontPair: string
 }
 
 export interface WebsiteConfig {
@@ -430,6 +438,7 @@ export interface WebsiteConfig {
   weddingId: string
   templateId: string
   customColors: CustomColors | null
+  savedPalettes: SavedPalette[] | null
   fontPair: string
   privacyMode: PrivacyMode
   passwordHash: string | null

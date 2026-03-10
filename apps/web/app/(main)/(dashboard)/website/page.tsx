@@ -320,6 +320,7 @@ export default function WebsitePage() {
             selectedId={config.templateId}
             onSelect={handleTemplateChange}
             customColors={config.customColors}
+            savedPalettes={config.savedPalettes ?? null}
             fontPair={config.fontPair}
             onCustomize={(updates) => handleConfigUpdate(updates)}
           />

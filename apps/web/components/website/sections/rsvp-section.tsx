@@ -121,7 +121,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
   }
 
   return (
-    <section className="py-16 sm:py-24" style={{ backgroundColor: `${colors.secondary}33` }}>
+    <section className="py-16 sm:py-24" style={{ backgroundColor: colors.sectionBackground }}>
       <div className="mx-auto max-w-2xl px-4">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

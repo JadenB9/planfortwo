@@ -78,6 +78,7 @@ export const websiteConfigService = {
 
     if (data.templateId !== undefined) updateData.templateId = data.templateId
     if (data.customColors !== undefined) updateData.customColors = data.customColors
+    if (data.savedPalettes !== undefined) updateData.savedPalettes = data.savedPalettes
     if (data.fontPair !== undefined) updateData.fontPair = data.fontPair
     if (data.privacyMode !== undefined) updateData.privacyMode = data.privacyMode
     if (data.subdomain !== undefined) updateData.subdomain = data.subdomain

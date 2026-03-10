@@ -511,6 +511,7 @@ export const templateIdZodEnum = z.enum([
   'beach',
   'elegant',
   'whimsical',
+  'custom',
 ])
 
 // ── Website: Custom Colors ──
@@ -520,9 +521,17 @@ export const customColorsSchema = z.object({
   secondary: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
   accent: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
   background: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
+  sectionBackground: z.string().regex(hexColorRegex, 'Must be a valid hex color').optional(),
 })
 
 export type CustomColorsInput = z.infer<typeof customColorsSchema>
+
+export const savedPaletteSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(50),
+  colors: customColorsSchema,
+  fontPair: fontPairZodEnum,
+})
 
 // ── Website: Subdomain ──
 export const subdomainSchema = z
@@ -546,6 +555,7 @@ export type CreateWebsiteConfigInput = z.infer<typeof createWebsiteConfigSchema>
 export const updateWebsiteConfigSchema = z.object({
   templateId: templateIdZodEnum.optional(),
   customColors: customColorsSchema.nullable().optional(),
+  savedPalettes: z.array(savedPaletteSchema).max(10).nullable().optional(),
   fontPair: fontPairZodEnum.optional(),
   privacyMode: privacyModeZodEnum.optional(),
   subdomain: subdomainSchema.optional(),

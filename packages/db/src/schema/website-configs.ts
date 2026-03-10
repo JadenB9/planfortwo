@@ -15,7 +15,22 @@ export const websiteConfigs = pgTable('website_configs', {
     secondary: string
     accent: string
     background: string
+    sectionBackground?: string
   }>(),
+  savedPalettes: jsonb('saved_palettes').$type<
+    {
+      id: string
+      name: string
+      colors: {
+        primary: string
+        secondary: string
+        accent: string
+        background: string
+        sectionBackground?: string
+      }
+      fontPair: string
+    }[]
+  >(),
   fontPair: text('font_pair').notNull().default('playfair-lato'),
   privacyMode: privacyModeEnum('privacy_mode').notNull().default('public'),
   passwordHash: text('password_hash'),

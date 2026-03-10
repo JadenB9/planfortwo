@@ -5,8 +5,12 @@ import type { CustomColors } from '@planfortwo/types'
 import { getTemplate } from '@/lib/templates'
 import { getFontPair, type FontPairConfig } from '@/lib/fonts'
 
+interface ResolvedColors extends CustomColors {
+  sectionBackground: string
+}
+
 interface TemplateStyles {
-  colors: CustomColors
+  colors: ResolvedColors
   fontPair: FontPairConfig
   templateId: string
   cssVariables: Record<string, string>
@@ -29,7 +33,14 @@ export function TemplateProvider({
 }: TemplateProviderProps) {
   const styles = useMemo(() => {
     const template = getTemplate(templateId)
-    const colors = customColors ?? template.defaultColors
+    const baseColors = customColors ?? template.defaultColors
+    const sectionBackground = baseColors.sectionBackground || `${baseColors.secondary}33`
+
+    const colors: ResolvedColors = {
+      ...baseColors,
+      sectionBackground,
+    }
+
     const fontPair = getFontPair(fontPairId)
 
     const cssVariables: Record<string, string> = {
@@ -37,6 +48,7 @@ export function TemplateProvider({
       '--template-secondary': colors.secondary,
       '--template-accent': colors.accent,
       '--template-background': colors.background,
+      '--template-section-background': colors.sectionBackground,
     }
 
     return { colors, fontPair, templateId, cssVariables }
