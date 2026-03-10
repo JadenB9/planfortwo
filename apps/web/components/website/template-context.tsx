@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, useMemo, type ReactNode, type CSSProperties } from 'react'
 import type { CustomColors } from '@planfortwo/types'
 import { getTemplate } from '@/lib/templates'
 import { getFontPair, type FontPairConfig } from '@/lib/fonts'
@@ -82,10 +82,19 @@ export function useTemplateStyles(): TemplateStyles {
   return ctx
 }
 
+/** Determine the generic fallback family based on font pair class */
+function fallbackFamily(cls: string): string {
+  return cls.includes('font-sans') ? 'sans-serif' : 'serif'
+}
+
 /** Build a className string for headings that respects typography options */
 export function useHeadingClass(): string {
   const { fontPair, typography } = useTemplateStyles()
-  const parts = [fontPair.headingClass]
+  // Keep non-font-family classes (italic, tracking-wide, etc.)
+  const extras = fontPair.headingClass
+    .split(' ')
+    .filter((c) => c !== 'font-serif' && c !== 'font-sans')
+  const parts = [...extras]
   if (typography.headingBold) parts.push('font-bold')
   if (typography.headingItalic) parts.push('italic')
   return parts.join(' ')
@@ -94,8 +103,23 @@ export function useHeadingClass(): string {
 /** Build a className string for body text that respects typography options */
 export function useBodyClass(): string {
   const { fontPair, typography } = useTemplateStyles()
-  const parts = [fontPair.bodyClass]
+  const extras = fontPair.bodyClass
+    .split(' ')
+    .filter((c) => c !== 'font-serif' && c !== 'font-sans')
+  const parts = [...extras]
   if (typography.bodyBold) parts.push('font-bold')
   if (typography.bodyItalic) parts.push('italic')
   return parts.join(' ')
+}
+
+/** Get inline fontFamily style for headings */
+export function useHeadingFont(): CSSProperties {
+  const { fontPair } = useTemplateStyles()
+  return { fontFamily: `'${fontPair.heading}', ${fallbackFamily(fontPair.headingClass)}` }
+}
+
+/** Get inline fontFamily style for body text */
+export function useBodyFont(): CSSProperties {
+  const { fontPair } = useTemplateStyles()
+  return { fontFamily: `'${fontPair.body}', ${fallbackFamily(fontPair.bodyClass)}` }
 }

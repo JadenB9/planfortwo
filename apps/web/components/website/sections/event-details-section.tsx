@@ -3,7 +3,13 @@
 import { motion } from 'framer-motion'
 import { MapPin, Clock, Calendar } from 'lucide-react'
 import type { EventDetailsContent } from '@planfortwo/types'
-import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
+import {
+  useTemplateStyles,
+  useHeadingClass,
+  useBodyClass,
+  useHeadingFont,
+  useBodyFont,
+} from '../template-context'
 
 interface EventDetailsSectionProps {
   title: string
@@ -14,6 +20,8 @@ export function EventDetailsSection({ title, content }: EventDetailsSectionProps
   const { colors } = useTemplateStyles()
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
+  const headingFont = useHeadingFont()
+  const bodyFont = useBodyFont()
 
   return (
     <section className="py-16 sm:py-24" style={{ backgroundColor: colors.sectionBackground }}>
@@ -23,7 +31,7 @@ export function EventDetailsSection({ title, content }: EventDetailsSectionProps
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={`mb-12 text-center text-3xl sm:text-4xl ${headingClass}`}
-          style={{ color: colors.primary }}
+          style={{ ...headingFont, color: colors.primary }}
         >
           {title}
         </motion.h2>
@@ -39,11 +47,11 @@ export function EventDetailsSection({ title, content }: EventDetailsSectionProps
             >
               <h3
                 className={`text-xl font-semibold ${headingClass}`}
-                style={{ color: colors.primary }}
+                style={{ ...headingFont, color: colors.primary }}
               >
                 {event.name}
               </h3>
-              <div className={`mt-4 space-y-2 ${bodyClass}`}>
+              <div className={`mt-4 space-y-2 ${bodyClass}`} style={bodyFont}>
                 {event.date && (
                   <div
                     className="flex items-center gap-2 text-sm"

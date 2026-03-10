@@ -4,7 +4,13 @@ import { motion } from 'framer-motion'
 import { ExternalLink, Phone, MapPin } from 'lucide-react'
 import type { TravelContent } from '@planfortwo/types'
 import { sanitizeHtml } from '@/lib/sanitize'
-import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
+import {
+  useTemplateStyles,
+  useHeadingClass,
+  useBodyClass,
+  useHeadingFont,
+  useBodyFont,
+} from '../template-context'
 
 interface TravelSectionProps {
   title: string
@@ -17,6 +23,8 @@ export function TravelSection({ title, content }: TravelSectionProps) {
   const { colors } = useTemplateStyles()
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
+  const headingFont = useHeadingFont()
+  const bodyFont = useBodyFont()
 
   return (
     <section className="py-16 sm:py-24" style={{ backgroundColor: colors.sectionBackground }}>
@@ -26,7 +34,7 @@ export function TravelSection({ title, content }: TravelSectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={`mb-12 text-center text-3xl sm:text-4xl ${headingClass}`}
-          style={{ color: colors.primary }}
+          style={{ ...headingFont, color: colors.primary }}
         >
           {title}
         </motion.h2>
@@ -36,7 +44,7 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             className={`mb-10 text-center ${bodyClass}`}
-            style={{ color: `${colors.primary}CC` }}
+            style={{ ...bodyFont, color: `${colors.primary}CC` }}
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.directions) }}
           />
         )}
@@ -53,11 +61,11 @@ export function TravelSection({ title, content }: TravelSectionProps) {
               >
                 <h3
                   className={`text-lg font-semibold ${headingClass}`}
-                  style={{ color: colors.primary }}
+                  style={{ ...headingFont, color: colors.primary }}
                 >
                   {hotel.name}
                 </h3>
-                <div className={`mt-3 space-y-2 text-sm ${bodyClass}`}>
+                <div className={`mt-3 space-y-2 text-sm ${bodyClass}`} style={bodyFont}>
                   {hotel.address && (
                     <div
                       className="flex items-start gap-2"

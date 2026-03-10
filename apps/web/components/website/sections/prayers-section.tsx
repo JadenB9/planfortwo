@@ -3,7 +3,13 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import type { PrayersSectionContent, Prayer } from '@planfortwo/types'
-import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
+import {
+  useTemplateStyles,
+  useHeadingClass,
+  useBodyClass,
+  useHeadingFont,
+  useBodyFont,
+} from '../template-context'
 
 interface PrayersSectionProps {
   title: string
@@ -17,6 +23,8 @@ export function PrayersSection({ title, content, entries, onSubmit }: PrayersSec
   const { colors } = useTemplateStyles()
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
+  const headingFont = useHeadingFont()
+  const bodyFont = useBodyFont()
   const [name, setName] = useState('')
   const [prayer, setPrayer] = useState('')
   const [honeypot, setHoneypot] = useState('')
@@ -66,12 +74,15 @@ export function PrayersSection({ title, content, entries, onSubmit }: PrayersSec
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={`mb-4 text-center text-3xl sm:text-4xl ${headingClass}`}
-          style={{ color: colors.primary }}
+          style={{ ...headingFont, color: colors.primary }}
         >
           {title}
         </motion.h2>
         {content.message && (
-          <p className={`mb-8 text-center ${bodyClass}`} style={{ color: `${colors.primary}BB` }}>
+          <p
+            className={`mb-8 text-center ${bodyClass}`}
+            style={{ ...bodyFont, color: `${colors.primary}BB` }}
+          >
             {content.message}
           </p>
         )}
@@ -91,7 +102,7 @@ export function PrayersSection({ title, content, entries, onSubmit }: PrayersSec
               maxLength={100}
               required
               className={`w-full rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
-              style={{ borderColor: colors.secondary, color: colors.primary }}
+              style={{ ...bodyFont, borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
           <div className="mb-4">
@@ -103,7 +114,7 @@ export function PrayersSection({ title, content, entries, onSubmit }: PrayersSec
               rows={4}
               required
               className={`w-full resize-none rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
-              style={{ borderColor: colors.secondary, color: colors.primary }}
+              style={{ ...bodyFont, borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
           <input
@@ -125,7 +136,10 @@ export function PrayersSection({ title, content, entries, onSubmit }: PrayersSec
             {submitting ? 'Sending...' : 'Send Prayer'}
           </button>
           {submitted && (
-            <p className={`mt-2 text-sm ${bodyClass}`} style={{ color: colors.accent }}>
+            <p
+              className={`mt-2 text-sm ${bodyClass}`}
+              style={{ ...bodyFont, color: colors.accent }}
+            >
               {content.requireApproval
                 ? 'Thank you! Your prayer will appear after approval.'
                 : 'Thank you for your prayer and blessing!'}
@@ -143,12 +157,15 @@ export function PrayersSection({ title, content, entries, onSubmit }: PrayersSec
                 transition={{ delay: i * 0.05 }}
                 className="rounded-2xl bg-white p-5 shadow-sm"
               >
-                <p className={`text-sm italic ${bodyClass}`} style={{ color: colors.primary }}>
+                <p
+                  className={`text-sm italic ${bodyClass}`}
+                  style={{ ...bodyFont, color: colors.primary }}
+                >
                   &ldquo;{entry.prayerText}&rdquo;
                 </p>
                 <p
                   className={`mt-2 text-xs font-medium ${bodyClass}`}
-                  style={{ color: colors.accent }}
+                  style={{ ...bodyFont, color: colors.accent }}
                 >
                   — {entry.authorName}
                 </p>

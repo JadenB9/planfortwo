@@ -139,7 +139,7 @@ export function WebsitePreview({
 
       <div ref={containerRef} className="flex-1 overflow-y-auto bg-gray-100">
         {previewSections.length > 0 ? (
-          <div style={{ height: `${scaledHeight}px`, position: 'relative' }}>
+          <div style={{ height: `${scaledHeight}px`, position: 'relative', overflow: 'hidden' }}>
             <div
               ref={contentRef}
               className="pointer-events-none"

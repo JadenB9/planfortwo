@@ -3,7 +3,13 @@
 import { useState, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import type { GalleryContent, WebsitePhoto } from '@planfortwo/types'
-import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
+import {
+  useTemplateStyles,
+  useHeadingClass,
+  useBodyClass,
+  useHeadingFont,
+  useBodyFont,
+} from '../template-context'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
@@ -58,6 +64,8 @@ export function GallerySection({
   const { colors } = useTemplateStyles()
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
+  const headingFont = useHeadingFont()
+  const bodyFont = useBodyFont()
   const columns = content.columns ?? 3
 
   const [showUploadForm, setShowUploadForm] = useState(false)
@@ -166,7 +174,10 @@ export function GallerySection({
   ) => {
     if (photoList.length === 0) {
       return (
-        <p className={`text-center ${bodyClass}`} style={{ color: `${colors.primary}99` }}>
+        <p
+          className={`text-center ${bodyClass}`}
+          style={{ ...bodyFont, color: `${colors.primary}99` }}
+        >
           No photos yet. Be the first to share!
         </p>
       )
@@ -234,7 +245,7 @@ export function GallerySection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={`mb-12 text-center text-3xl sm:text-4xl ${headingClass}`}
-          style={{ color: colors.primary }}
+          style={{ ...headingFont, color: colors.primary }}
         >
           {title}
         </motion.h2>
@@ -254,6 +265,7 @@ export function GallerySection({
                 onClick={() => setShowUploadForm(true)}
                 className={`inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90 ${bodyClass}`}
                 style={{
+                  ...bodyFont,
                   backgroundColor: colors.primary,
                   color: colors.background,
                 }}
@@ -288,7 +300,7 @@ export function GallerySection({
             >
               <h3
                 className={`mb-4 text-lg font-semibold ${headingClass}`}
-                style={{ color: colors.primary }}
+                style={{ ...headingFont, color: colors.primary }}
               >
                 Share Your Photos
               </h3>
@@ -298,7 +310,7 @@ export function GallerySection({
                 <div>
                   <label
                     className={`mb-1 block text-sm ${bodyClass}`}
-                    style={{ color: colors.primary }}
+                    style={{ ...bodyFont, color: colors.primary }}
                   >
                     Your Name <span className="text-red-500">*</span>
                   </label>
@@ -321,7 +333,7 @@ export function GallerySection({
                 <div>
                   <label
                     className={`mb-1 block text-sm ${bodyClass}`}
-                    style={{ color: colors.primary }}
+                    style={{ ...bodyFont, color: colors.primary }}
                   >
                     Email <span style={{ color: `${colors.primary}60` }}>(optional)</span>
                   </label>
@@ -344,7 +356,7 @@ export function GallerySection({
                 <div>
                   <label
                     className={`mb-1 block text-sm ${bodyClass}`}
-                    style={{ color: colors.primary }}
+                    style={{ ...bodyFont, color: colors.primary }}
                   >
                     Photos <span className="text-red-500">*</span>
                   </label>
@@ -370,12 +382,15 @@ export function GallerySection({
                       <circle cx="9" cy="9" r="2" />
                       <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                     </svg>
-                    <p className={`text-sm ${bodyClass}`} style={{ color: `${colors.primary}80` }}>
+                    <p
+                      className={`text-sm ${bodyClass}`}
+                      style={{ ...bodyFont, color: `${colors.primary}80` }}
+                    >
                       Click to select photos
                     </p>
                     <p
                       className={`mt-1 text-xs ${bodyClass}`}
-                      style={{ color: `${colors.primary}50` }}
+                      style={{ ...bodyFont, color: `${colors.primary}50` }}
                     >
                       JPG, PNG, GIF, WebP, HEIC - Max 20MB each
                     </p>
@@ -395,7 +410,7 @@ export function GallerySection({
                   <div className="space-y-2">
                     <p
                       className={`text-sm font-medium ${bodyClass}`}
-                      style={{ color: colors.primary }}
+                      style={{ ...bodyFont, color: colors.primary }}
                     >
                       {selectedFiles.length} photo{selectedFiles.length !== 1 ? 's' : ''} selected
                     </p>
@@ -456,7 +471,7 @@ export function GallerySection({
                     </div>
                     <p
                       className={`text-center text-sm ${bodyClass}`}
-                      style={{ color: `${colors.primary}80` }}
+                      style={{ ...bodyFont, color: `${colors.primary}80` }}
                     >
                       Uploading {uploadedCount} of {selectedFiles.length}...
                     </p>
@@ -487,6 +502,7 @@ export function GallerySection({
                     }}
                     className={`flex-1 rounded-lg border px-4 py-2 text-sm transition-colors hover:opacity-80 ${bodyClass}`}
                     style={{
+                      ...bodyFont,
                       borderColor: `${colors.primary}30`,
                       color: colors.primary,
                     }}
@@ -503,6 +519,7 @@ export function GallerySection({
                     }
                     className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50 ${bodyClass}`}
                     style={{
+                      ...bodyFont,
                       backgroundColor: colors.primary,
                       color: colors.background,
                     }}
@@ -540,11 +557,14 @@ export function GallerySection({
               </div>
               <p
                 className={`text-lg font-medium ${headingClass}`}
-                style={{ color: colors.primary }}
+                style={{ ...headingFont, color: colors.primary }}
               >
                 Photos uploaded!
               </p>
-              <p className={`mt-1 text-sm ${bodyClass}`} style={{ color: `${colors.primary}80` }}>
+              <p
+                className={`mt-1 text-sm ${bodyClass}`}
+                style={{ ...bodyFont, color: `${colors.primary}80` }}
+              >
                 Your photos will appear after the couple reviews them.
               </p>
               <button
@@ -554,6 +574,7 @@ export function GallerySection({
                 }}
                 className={`mt-4 rounded-lg px-6 py-2 text-sm font-medium transition-opacity hover:opacity-90 ${bodyClass}`}
                 style={{
+                  ...bodyFont,
                   backgroundColor: colors.primary,
                   color: colors.background,
                 }}

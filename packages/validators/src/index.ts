@@ -515,6 +515,10 @@ export const customColorsSchema = z.object({
   accent: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
   background: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
   sectionBackground: z.string().regex(hexColorRegex, 'Must be a valid hex color').optional(),
+  headingBold: z.boolean().optional(),
+  headingItalic: z.boolean().optional(),
+  bodyBold: z.boolean().optional(),
+  bodyItalic: z.boolean().optional(),
 })
 
 export type CustomColorsInput = z.infer<typeof customColorsSchema>

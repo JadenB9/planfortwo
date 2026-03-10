@@ -2,7 +2,13 @@
 
 import { motion } from 'framer-motion'
 import type { HeroContent } from '@planfortwo/types'
-import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
+import {
+  useTemplateStyles,
+  useHeadingClass,
+  useBodyClass,
+  useHeadingFont,
+  useBodyFont,
+} from '../template-context'
 
 interface HeroSectionProps {
   content: HeroContent
@@ -45,6 +51,8 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
   const { colors } = useTemplateStyles()
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
+  const headingFont = useHeadingFont()
+  const bodyFont = useBodyFont()
   const countdown = content.showCountdown ? getCountdown(weddingDate) : null
   const bgUrl = safeImageUrl(content.backgroundImageUrl)
 
@@ -67,7 +75,7 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl ${headingClass}`}
-          style={{ color: bgUrl ? '#FFFFFF' : colors.primary }}
+          style={{ ...headingFont, color: bgUrl ? '#FFFFFF' : colors.primary }}
         >
           {content.headline || weddingName}
         </motion.h1>
@@ -77,7 +85,7 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className={`mt-4 text-lg sm:text-xl md:text-2xl ${bodyClass}`}
-            style={{ color: bgUrl ? '#FFFFFFCC' : colors.accent }}
+            style={{ ...bodyFont, color: bgUrl ? '#FFFFFFCC' : colors.accent }}
           >
             {content.subheadline}
           </motion.p>
@@ -88,7 +96,7 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className={`mt-6 text-base sm:text-lg ${bodyClass}`}
-            style={{ color: bgUrl ? '#FFFFFFBB' : colors.primary }}
+            style={{ ...bodyFont, color: bgUrl ? '#FFFFFFBB' : colors.primary }}
           >
             {formatWeddingDate(weddingDate)}
           </motion.p>
@@ -103,13 +111,13 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
             <div className="text-center">
               <span
                 className={`block text-3xl font-bold sm:text-4xl ${headingClass}`}
-                style={{ color: bgUrl ? '#FFFFFF' : colors.primary }}
+                style={{ ...headingFont, color: bgUrl ? '#FFFFFF' : colors.primary }}
               >
                 {countdown.days}
               </span>
               <span
                 className={`text-sm ${bodyClass}`}
-                style={{ color: bgUrl ? '#FFFFFFAA' : colors.accent }}
+                style={{ ...bodyFont, color: bgUrl ? '#FFFFFFAA' : colors.accent }}
               >
                 days
               </span>
@@ -117,13 +125,13 @@ export function HeroSection({ content, weddingName, weddingDate }: HeroSectionPr
             <div className="text-center">
               <span
                 className={`block text-3xl font-bold sm:text-4xl ${headingClass}`}
-                style={{ color: bgUrl ? '#FFFFFF' : colors.primary }}
+                style={{ ...headingFont, color: bgUrl ? '#FFFFFF' : colors.primary }}
               >
                 {countdown.hours}
               </span>
               <span
                 className={`text-sm ${bodyClass}`}
-                style={{ color: bgUrl ? '#FFFFFFAA' : colors.accent }}
+                style={{ ...bodyFont, color: bgUrl ? '#FFFFFFAA' : colors.accent }}
               >
                 hours
               </span>

@@ -3,7 +3,13 @@
 import { motion } from 'framer-motion'
 import type { OurStoryContent } from '@planfortwo/types'
 import { sanitizeHtml } from '@/lib/sanitize'
-import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
+import {
+  useTemplateStyles,
+  useHeadingClass,
+  useBodyClass,
+  useHeadingFont,
+  useBodyFont,
+} from '../template-context'
 
 interface OurStorySectionProps {
   title: string
@@ -14,6 +20,8 @@ export function OurStorySection({ title, content }: OurStorySectionProps) {
   const { colors } = useTemplateStyles()
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
+  const headingFont = useHeadingFont()
+  const bodyFont = useBodyFont()
 
   return (
     <section className="py-16 sm:py-24" style={{ backgroundColor: colors.background }}>
@@ -23,7 +31,7 @@ export function OurStorySection({ title, content }: OurStorySectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={`mb-8 text-center text-3xl sm:text-4xl ${headingClass}`}
-          style={{ color: colors.primary }}
+          style={{ ...headingFont, color: colors.primary }}
         >
           {title}
         </motion.h2>
@@ -34,7 +42,7 @@ export function OurStorySection({ title, content }: OurStorySectionProps) {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
             className={`prose mx-auto max-w-none text-center ${bodyClass}`}
-            style={{ color: colors.primary }}
+            style={{ ...bodyFont, color: colors.primary }}
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.body) }}
           />
         )}
@@ -61,19 +69,19 @@ export function OurStorySection({ title, content }: OurStorySectionProps) {
                 <div className="max-w-xs">
                   <p
                     className={`text-sm font-medium ${bodyClass}`}
-                    style={{ color: colors.accent }}
+                    style={{ ...bodyFont, color: colors.accent }}
                   >
                     {event.date}
                   </p>
                   <h3
                     className={`mt-1 text-lg font-semibold ${headingClass}`}
-                    style={{ color: colors.primary }}
+                    style={{ ...headingFont, color: colors.primary }}
                   >
                     {event.title}
                   </h3>
                   <p
                     className={`mt-1 text-sm ${bodyClass}`}
-                    style={{ color: `${colors.primary}CC` }}
+                    style={{ ...bodyFont, color: `${colors.primary}CC` }}
                   >
                     {event.description}
                   </p>

@@ -3,7 +3,13 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import type { RsvpSectionContent, RsvpLookupResult } from '@planfortwo/types'
-import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
+import {
+  useTemplateStyles,
+  useHeadingClass,
+  useBodyClass,
+  useHeadingFont,
+  useBodyFont,
+} from '../template-context'
 import { RsvpForm } from '@/components/rsvp/rsvp-form'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
@@ -35,6 +41,8 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
   const { colors } = useTemplateStyles()
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
+  const headingFont = useHeadingFont()
+  const bodyFont = useBodyFont()
   const [state, setState] = useState<RsvpState>('search')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -130,7 +138,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={`mb-4 text-center text-3xl sm:text-4xl ${headingClass}`}
-          style={{ color: colors.primary }}
+          style={{ ...headingFont, color: colors.primary }}
         >
           {title}
         </motion.h2>
@@ -142,7 +150,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
             className={`mb-8 text-center ${bodyClass}`}
-            style={{ color: `${colors.primary}BB` }}
+            style={{ ...bodyFont, color: `${colors.primary}BB` }}
           >
             {content.message}
           </motion.p>
@@ -160,7 +168,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
           >
             <p
               className={`text-center text-sm ${bodyClass}`}
-              style={{ color: `${colors.primary}99` }}
+              style={{ ...bodyFont, color: `${colors.primary}99` }}
             >
               Enter your name as it appears on your invitation
             </p>
@@ -210,7 +218,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
             <p
               className={`text-center text-sm ${bodyClass}`}
-              style={{ color: `${colors.primary}BB` }}
+              style={{ ...bodyFont, color: `${colors.primary}BB` }}
             >
               We found multiple guests with that name. Please select yourself:
             </p>
@@ -220,7 +228,10 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
                 onClick={() => handleSelectGuest(guest.id)}
                 className="w-full rounded-lg border border-gray-200 bg-white p-4 text-left transition-shadow hover:shadow-md"
               >
-                <span className={`font-medium ${bodyClass}`} style={{ color: colors.primary }}>
+                <span
+                  className={`font-medium ${bodyClass}`}
+                  style={{ ...bodyFont, color: colors.primary }}
+                >
                   {guest.firstName} {guest.lastName}
                 </span>
               </button>
@@ -238,7 +249,10 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
         {/* Not Found */}
         {state === 'not-found' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-            <p className={`mb-4 ${bodyClass}`} style={{ color: `${colors.primary}BB` }}>
+            <p
+              className={`mb-4 ${bodyClass}`}
+              style={{ ...bodyFont, color: `${colors.primary}BB` }}
+            >
               We couldn&apos;t find your name on the guest list. Please check your spelling and try
               again.
             </p>
@@ -269,7 +283,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
         {/* Expired */}
         {state === 'expired' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-            <p className={`${bodyClass}`} style={{ color: `${colors.primary}BB` }}>
+            <p className={`${bodyClass}`} style={{ ...bodyFont, color: `${colors.primary}BB` }}>
               The RSVP deadline has passed. Please contact the couple directly.
             </p>
           </motion.div>
@@ -279,7 +293,10 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
         {state === 'found' && lookupResult && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="mb-4 text-center">
-              <p className={`text-sm ${bodyClass}`} style={{ color: `${colors.primary}99` }}>
+              <p
+                className={`text-sm ${bodyClass}`}
+                style={{ ...bodyFont, color: `${colors.primary}99` }}
+              >
                 Welcome, {lookupResult.guest.firstName}!
                 {lookupResult.householdGuests.length > 1
                   ? ` You're RSVPing for ${lookupResult.householdGuests.length} family members.`
@@ -323,11 +340,14 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
             </div>
             <h3
               className={`text-xl font-semibold ${headingClass}`}
-              style={{ color: colors.primary }}
+              style={{ ...headingFont, color: colors.primary }}
             >
               Thank You!
             </h3>
-            <p className={`mt-2 ${bodyClass}`} style={{ color: `${colors.primary}BB` }}>
+            <p
+              className={`mt-2 ${bodyClass}`}
+              style={{ ...bodyFont, color: `${colors.primary}BB` }}
+            >
               Your RSVP has been received. We look forward to celebrating with you!
             </p>
           </motion.div>

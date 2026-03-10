@@ -2,7 +2,13 @@
 
 import { motion } from 'framer-motion'
 import type { WeddingPartyContent } from '@planfortwo/types'
-import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
+import {
+  useTemplateStyles,
+  useHeadingClass,
+  useBodyClass,
+  useHeadingFont,
+  useBodyFont,
+} from '../template-context'
 
 /** Only allow http(s) image URLs */
 function safeImgSrc(url: string | undefined | null): string | null {
@@ -20,6 +26,8 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
   const { colors } = useTemplateStyles()
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
+  const headingFont = useHeadingFont()
+  const bodyFont = useBodyFont()
 
   return (
     <section className="py-16 sm:py-24" style={{ backgroundColor: colors.background }}>
@@ -29,7 +37,7 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={`mb-12 text-center text-3xl sm:text-4xl ${headingClass}`}
-          style={{ color: colors.primary }}
+          style={{ ...headingFont, color: colors.primary }}
         >
           {title}
         </motion.h2>
@@ -62,15 +70,18 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
               )}
               <h3
                 className={`mt-4 text-lg font-semibold ${headingClass}`}
-                style={{ color: colors.primary }}
+                style={{ ...headingFont, color: colors.primary }}
               >
                 {member.name}
               </h3>
-              <p className={`text-sm ${bodyClass}`} style={{ color: colors.accent }}>
+              <p className={`text-sm ${bodyClass}`} style={{ ...bodyFont, color: colors.accent }}>
                 {member.role}
               </p>
               {member.description && (
-                <p className={`mt-2 text-sm ${bodyClass}`} style={{ color: `${colors.primary}99` }}>
+                <p
+                  className={`mt-2 text-sm ${bodyClass}`}
+                  style={{ ...bodyFont, color: `${colors.primary}99` }}
+                >
                   {member.description}
                 </p>
               )}
