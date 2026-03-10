@@ -1,11 +1,28 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import type { WebsiteSection, WebsiteSectionType } from '@planfortwo/types'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { sectionIcons, sectionLabels } from '@/lib/section-icons'
 import { GripVertical, Pencil, Trash2, Plus, ChevronDown } from 'lucide-react'
+
 // Default built-in sections that can be added to a website
 // Duplicated from packages/db/src/templates/website-sections.ts to avoid server-only imports
 const ADDABLE_SECTIONS: { sectionType: string; title: string; content: Record<string, unknown> }[] =
@@ -25,6 +42,67 @@ const ADDABLE_SECTIONS: { sectionType: string; title: string; content: Record<st
     { sectionType: 'faq', title: 'FAQ', content: { questions: [] } },
   ]
 
+function SortableSection({
+  section,
+  onToggleVisibility,
+  onEdit,
+  onDeleteCustom,
+}: {
+  section: WebsiteSection
+  onToggleVisibility: (id: string, visible: boolean) => void
+  onEdit: (section: WebsiteSection) => void
+  onDeleteCustom?: (id: string) => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: section.id,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    position: 'relative' as const,
+  }
+
+  const Icon = sectionIcons[section.sectionType]
+  const label = sectionLabels[section.sectionType]
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 transition-shadow ${
+        isDragging
+          ? 'border-wedding-200 bg-wedding-50 ring-wedding-200 shadow-md ring-1'
+          : 'border-gray-200 shadow-sm'
+      }`}
+    >
+      <span
+        {...listeners}
+        className="flex shrink-0 cursor-grab items-center active:cursor-grabbing"
+        aria-label={`Drag to reorder ${section.title || label}`}
+      >
+        <GripVertical className="h-4 w-4 text-gray-400" />
+      </span>
+      <Icon className="h-4 w-4 text-gray-500" />
+      <span className="flex-1 text-sm font-medium text-gray-900">{section.title || label}</span>
+      <Switch
+        checked={section.isVisible}
+        onCheckedChange={(checked) => onToggleVisibility(section.id, checked)}
+      />
+      <Button variant="ghost" size="sm" onClick={() => onEdit(section)}>
+        <Pencil className="h-3.5 w-3.5" />
+      </Button>
+      {section.sectionType === 'custom' && onDeleteCustom && (
+        <Button variant="ghost" size="sm" onClick={() => onDeleteCustom(section.id)}>
+          <Trash2 className="h-3.5 w-3.5 text-red-500" />
+        </Button>
+      )}
+    </div>
+  )
+}
+
 interface SectionManagerProps {
   sections: WebsiteSection[]
   onToggleVisibility: (id: string, visible: boolean) => void
@@ -42,11 +120,13 @@ export function SectionManager({
   onDeleteCustom,
   onAddBuiltIn,
 }: SectionManagerProps) {
-  const [dragIndex, setDragIndex] = useState<number | null>(null)
-  const [overIndex, setOverIndex] = useState<number | null>(null)
   const [showAddMenu, setShowAddMenu] = useState(false)
   const sorted = [...sections].sort((a, b) => a.sortOrder - b.sortOrder)
-  const dragNode = useRef<HTMLDivElement | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
 
   // Find built-in sections that are missing from this website
   const existingTypes = new Set(sections.map((s) => s.sectionType))
@@ -54,98 +134,43 @@ export function SectionManager({
     (d) => !existingTypes.has(d.sectionType as WebsiteSectionType),
   )
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    setDragIndex(index)
-    dragNode.current = e.currentTarget
-    e.dataTransfer.effectAllowed = 'move'
-    // Make the drag image slightly transparent
-    requestAnimationFrame(() => {
-      if (dragNode.current) {
-        dragNode.current.style.opacity = '0.4'
-      }
-    })
-  }
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    if (dragIndex === null || dragIndex === index) return
-    setOverIndex(index)
-  }
+      const oldIndex = sorted.findIndex((s) => s.id === active.id)
+      const newIndex = sorted.findIndex((s) => s.id === over.id)
+      if (oldIndex === -1 || newIndex === -1) return
 
-  const handleDragLeave = () => {
-    setOverIndex(null)
-  }
+      const reordered = [...sorted]
+      const [moved] = reordered.splice(oldIndex, 1)
+      if (!moved) return
+      reordered.splice(newIndex, 0, moved)
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropIndex: number) => {
-    e.preventDefault()
-    if (dragIndex === null || dragIndex === dropIndex) return
-
-    const reordered = [...sorted]
-    const [moved] = reordered.splice(dragIndex, 1)
-    if (!moved) return
-    reordered.splice(dropIndex, 0, moved)
-
-    const mapped = reordered.map((s, i) => ({ id: s.id, sortOrder: i }))
-    onReorder(mapped)
-
-    setDragIndex(null)
-    setOverIndex(null)
-  }
-
-  const handleDragEnd = () => {
-    if (dragNode.current) {
-      dragNode.current.style.opacity = '1'
-    }
-    setDragIndex(null)
-    setOverIndex(null)
-    dragNode.current = null
-  }
+      onReorder(reordered.map((s, i) => ({ id: s.id, sortOrder: i })))
+    },
+    [sorted, onReorder],
+  )
 
   return (
     <div>
       <h3 className="mb-4 text-lg font-semibold text-gray-900">Manage Sections</h3>
-      <div className="space-y-2">
-        {sorted.map((section, i) => {
-          const Icon = sectionIcons[section.sectionType]
-          const label = sectionLabels[section.sectionType]
-          const isDragging = dragIndex === i
-          const isOver = overIndex === i && dragIndex !== i
-
-          return (
-            <div
-              key={section.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, i)}
-              onDragOver={(e) => handleDragOver(e, i)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, i)}
-              onDragEnd={handleDragEnd}
-              className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 transition-all ${
-                isDragging ? 'opacity-40 shadow-md' : 'shadow-sm'
-              } ${isOver ? 'border-blue-400 ring-2 ring-blue-100' : 'border-gray-200'}`}
-            >
-              <GripVertical className="h-4 w-4 cursor-grab text-gray-400 active:cursor-grabbing" />
-              <Icon className="h-4 w-4 text-gray-500" />
-              <span className="flex-1 text-sm font-medium text-gray-900">
-                {section.title || label}
-              </span>
-              <Switch
-                checked={section.isVisible}
-                onCheckedChange={(checked) => onToggleVisibility(section.id, checked)}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={sorted.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2">
+            {sorted.map((section) => (
+              <SortableSection
+                key={section.id}
+                section={section}
+                onToggleVisibility={onToggleVisibility}
+                onEdit={onEdit}
+                onDeleteCustom={onDeleteCustom}
               />
-              <Button variant="ghost" size="sm" onClick={() => onEdit(section)}>
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
-              {section.sectionType === 'custom' && onDeleteCustom && (
-                <Button variant="ghost" size="sm" onClick={() => onDeleteCustom(section.id)}>
-                  <Trash2 className="h-3.5 w-3.5 text-red-500" />
-                </Button>
-              )}
-            </div>
-          )
-        })}
-      </div>
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       {/* Add missing built-in sections */}
       {missingSections.length > 0 && onAddBuiltIn && (

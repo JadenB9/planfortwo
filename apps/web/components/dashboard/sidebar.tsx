@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
@@ -49,11 +49,13 @@ function SortableNavItem({
   isActive,
   websiteSubdomain,
   badgeCount,
+  dragEndTimeRef,
 }: {
   item: NavItem
   isActive: boolean
   websiteSubdomain: string | null
   badgeCount: number
+  dragEndTimeRef: { current: number }
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.href,
@@ -82,7 +84,20 @@ function SortableNavItem({
                   ? 'cursor-default text-gray-400'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
           }`}
-          onClick={item.comingSoon ? (e) => e.preventDefault() : undefined}
+          onClick={(e) => {
+            if (item.comingSoon) {
+              e.preventDefault()
+              return
+            }
+            if (Date.now() - dragEndTimeRef.current < 200) {
+              e.preventDefault()
+              return
+            }
+            if (isActive) {
+              e.preventDefault()
+              return
+            }
+          }}
           draggable={false}
         >
           <span
@@ -126,6 +141,7 @@ export function Sidebar() {
   const weddingId = weddingData?.wedding.id ?? null
   const [websiteSubdomain, setWebsiteSubdomain] = useState<string | null>(null)
   const { orderedGroups, reorderGroup } = useSidebarOrder()
+  const dragEndTimeRef = useRef(0)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
     Details: false,
     More: false,
@@ -212,7 +228,13 @@ export function Sidebar() {
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd(group.label, group.items)}
+                  onDragEnd={(event) => {
+                    dragEndTimeRef.current = Date.now()
+                    handleDragEnd(group.label, group.items)(event)
+                  }}
+                  onDragCancel={() => {
+                    dragEndTimeRef.current = Date.now()
+                  }}
                 >
                   <SortableContext
                     items={group.items.map((item) => item.href)}
@@ -230,6 +252,7 @@ export function Sidebar() {
                             isActive={isActive}
                             websiteSubdomain={websiteSubdomain}
                             badgeCount={badgeCount}
+                            dragEndTimeRef={dragEndTimeRef}
                           />
                         )
                       })}
