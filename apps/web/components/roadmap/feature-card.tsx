@@ -66,14 +66,14 @@ export function FeatureCard({
 
   const cardContent = (
     <>
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="bg-wedding-50 flex h-9 w-9 items-center justify-center rounded-lg">
+      <div className="mb-3 flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <div className="bg-wedding-50 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg">
             <Icon className="text-wedding-600 h-5 w-5" />
           </div>
-          <h3 className="text-sm font-semibold text-gray-900">{feature.label}</h3>
+          <h3 className="truncate text-sm font-semibold text-gray-900">{feature.label}</h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-2">
           {isSettingsMode && (
             <button
               type="button"
@@ -89,7 +89,7 @@ export function FeatureCard({
             </button>
           )}
           <span
-            className={`flex-shrink-0 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}
+            className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}
           >
             {statusStyle.label}
           </span>

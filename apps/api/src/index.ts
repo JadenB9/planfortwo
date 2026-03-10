@@ -46,6 +46,7 @@ import { playlistsRoute } from './routes/playlists.js'
 import { honeymoonRoute } from './routes/honeymoon.js'
 import { weatherRoute } from './routes/weather.js'
 import { progressRoute } from './routes/progress.js'
+import { prayersRoute } from './routes/prayers.js'
 import { inboxRoute } from './routes/inbox.js'
 import { resendWebhookRoute } from './routes/webhooks-resend.js'
 import { stripeWebhookRoute } from './routes/webhooks-stripe.js'
@@ -101,6 +102,7 @@ const inviteSendRateLimit = rateLimit({ windowMs: 60_000, max: 5, prefix: 'invit
 const inviteBulkRateLimit = rateLimit({ windowMs: 60_000, max: 2, prefix: 'invite-bulk' })
 app.use('/website-public/*', publicRateLimit)
 app.use('/guestbook/*', publicRateLimit)
+app.use('/prayers/*', publicRateLimit)
 // RSVP lookup: 10/min for token/guest-id lookup, 5/min for name lookup (probes PII)
 app.use('/rsvp/lookup', strictRateLimit)
 app.use('/rsvp/lookup-by-name', rsvpLookupRateLimit)
@@ -148,6 +150,7 @@ app.route('/website-photos', websitePhotosRoute)
 app.route('/website-public', websitePublicRoute)
 app.route('/website-analytics', websiteAnalyticsRouteHandler)
 app.route('/guestbook', guestbookRoute)
+app.route('/prayers', prayersRoute)
 app.route('/seating-charts', seatingChartsRoute)
 app.route('/email-campaigns', emailCampaignsRoute)
 app.route('/announcements', announcementsRoute)

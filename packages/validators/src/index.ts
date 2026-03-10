@@ -682,6 +682,16 @@ export const createGuestbookEntrySchema = z.object({
 
 export type CreateGuestbookEntryInput = z.infer<typeof createGuestbookEntrySchema>
 
+// ── Prayers ──
+export const createPrayerSchema = z.object({
+  weddingId: z.string().uuid(),
+  authorName: z.string().trim().min(1).max(100),
+  prayerText: z.string().trim().min(1).max(2000),
+  website: z.string().url().max(200).optional(),
+})
+
+export type CreatePrayerInput = z.infer<typeof createPrayerSchema>
+
 // ── Website: Analytics Track ──
 export const trackPageViewSchema = z.object({
   path: z.string().max(500).default('/'),

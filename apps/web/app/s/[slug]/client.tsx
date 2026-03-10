@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { GuestbookEntry, WebsiteSectionType } from '@planfortwo/types'
+import type { GuestbookEntry, Prayer, WebsiteSectionType } from '@planfortwo/types'
 import { TemplateProvider } from '@/components/website/template-context'
 import { SectionRenderer } from '@/components/website/sections/section-renderer'
 import { AnalyticsTracker } from '@/components/website/public/analytics-tracker'
@@ -92,13 +92,35 @@ export function PublicWebsiteClient({
   ceremonyStartTime,
 }: PublicWebsiteClientProps) {
   const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
+  const [prayerEntries, setPrayerEntries] = useState<Prayer[]>([])
 
   useEffect(() => {
     fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`)
       .then((res) => (res.ok ? res.json() : { data: [] }))
       .then((json) => setGuestbookEntries(json.data ?? []))
       .catch(() => {})
+    fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/prayers`)
+      .then((res) => (res.ok ? res.json() : { data: [] }))
+      .then((json) => setPrayerEntries(json.data ?? []))
+      .catch(() => {})
   }, [slug])
+
+  const handlePrayerSubmit = async (authorName: string, prayerText: string, website?: string) => {
+    const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/prayers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ authorName, prayerText, ...(website ? { website } : {}) }),
+    })
+    if (res.ok) {
+      const refreshRes = await fetch(
+        `${API_URL}/website-public/${encodeURIComponent(slug)}/prayers`,
+      )
+      if (refreshRes.ok) {
+        const json = await refreshRes.json()
+        setPrayerEntries(json.data ?? [])
+      }
+    }
+  }
 
   const handleGuestbookSubmit = async (authorName: string, message: string, website?: string) => {
     const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`, {
@@ -141,10 +163,12 @@ export function PublicWebsiteClient({
           photos={photos}
           guestPhotos={guestPhotos}
           guestbookEntries={guestbookEntries}
+          prayerEntries={prayerEntries}
           weddingName={weddingName}
           weddingDate={parsedDate}
           slug={slug}
           onGuestbookSubmit={handleGuestbookSubmit}
+          onPrayerSubmit={handlePrayerSubmit}
         />
       ))}
     </TemplateProvider>

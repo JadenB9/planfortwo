@@ -446,6 +446,10 @@ export default function HomePage() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6 }}
         >
+          <p className="mb-4 text-xs italic text-gray-500">
+            &ldquo;And over all these virtues put on love, which binds them all together in perfect
+            unity.&rdquo; — Colossians 3:14
+          </p>
           <h2 className="font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Your wedding deserves better than a spreadsheet.
           </h2>

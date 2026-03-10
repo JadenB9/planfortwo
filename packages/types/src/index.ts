@@ -410,6 +410,7 @@ export type WebsiteSectionType =
   | 'guestbook'
   | 'custom'
   | 'song_requests'
+  | 'prayers'
 
 export type FontPair =
   | 'playfair-lato'
@@ -489,6 +490,16 @@ export interface GuestbookEntry {
   weddingId: string
   authorName: string
   message: string
+  isApproved: boolean
+  isVisible: boolean
+  createdAt: Date
+}
+
+export interface Prayer {
+  id: string
+  weddingId: string
+  authorName: string
+  prayerText: string
   isApproved: boolean
   isVisible: boolean
   createdAt: Date
@@ -608,6 +619,11 @@ export interface CustomSectionContent {
 export interface SongRequestsSectionContent {
   message: string
   showApproved: boolean
+}
+
+export interface PrayersSectionContent {
+  requireApproval: boolean
+  message: string
 }
 
 export interface WebsiteWithSections extends WebsiteConfig {

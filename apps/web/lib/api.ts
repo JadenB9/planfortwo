@@ -50,6 +50,7 @@ import type {
   PlanningProgress,
   Email,
   EmailAddress,
+  Prayer,
 } from '@planfortwo/types'
 import type {
   CreateTaskInput,
@@ -659,6 +660,24 @@ export const api = {
       }),
     delete: (id: string, weddingId: string, token: string) =>
       fetchApi<void>(`/guestbook/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
+  },
+  prayers: {
+    list: (weddingId: string, token: string) =>
+      fetchApi<{ data: Prayer[] }>(`/prayers?weddingId=${weddingId}`, { token }),
+    approve: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: Prayer }>(`/prayers/${id}/approve?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ approved: true }),
+        token,
+      }),
+    reject: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: Prayer }>(`/prayers/${id}/approve?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ approved: false }),
+        token,
+      }),
+    delete: (id: string, weddingId: string, token: string) =>
+      fetchApi<void>(`/prayers/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
   },
   playlists: {
     list: (weddingId: string, token: string) =>

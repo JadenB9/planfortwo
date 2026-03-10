@@ -100,5 +100,8 @@ export { honeymoonPlans, honeymoonActivities } from './honeymoon'
 // Roadmap Preferences
 export { roadmapPreferences } from './roadmap-preferences'
 
+// Prayers
+export { prayers } from './prayers'
+
 // Inbox
 export { emailAddresses, emails, emailDirectionEnum, type EmailAttachment } from './inbox'

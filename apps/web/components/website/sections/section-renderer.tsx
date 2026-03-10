@@ -16,6 +16,8 @@ import type {
   GuestbookSectionContent,
   CustomSectionContent,
   SongRequestsSectionContent,
+  PrayersSectionContent,
+  Prayer,
 } from '@planfortwo/types'
 import { HeroSection } from './hero-section'
 import { OurStorySection } from './our-story-section'
@@ -31,6 +33,7 @@ import { ScheduleSection } from './schedule-section'
 import { GuestbookSection } from './guestbook-section'
 import { CustomSection } from './custom-section'
 import { SongRequestsSection } from './song-requests-section'
+import { PrayersSection } from './prayers-section'
 
 interface GuestPhoto {
   id: string
@@ -45,10 +48,12 @@ interface SectionRendererProps {
   photos: Omit<WebsitePhoto, 'weddingId'>[]
   guestPhotos?: GuestPhoto[]
   guestbookEntries: GuestbookEntry[]
+  prayerEntries?: Prayer[]
   weddingName: string
   weddingDate: Date | null
   slug: string
   onGuestbookSubmit?: (authorName: string, message: string) => Promise<void>
+  onPrayerSubmit?: (authorName: string, prayerText: string) => Promise<void>
 }
 
 export function SectionRenderer({
@@ -56,10 +61,12 @@ export function SectionRenderer({
   photos,
   guestPhotos,
   guestbookEntries,
+  prayerEntries,
   weddingName,
   weddingDate,
   slug,
   onGuestbookSubmit,
+  onPrayerSubmit,
 }: SectionRendererProps) {
   if (!section.isVisible) return null
 
@@ -166,6 +173,16 @@ export function SectionRenderer({
           title={section.title}
           content={section.content as unknown as SongRequestsSectionContent}
           slug={slug}
+        />
+      )
+    case 'prayers':
+      return (
+        <PrayersSection
+          title={section.title}
+          content={section.content as unknown as PrayersSectionContent}
+          entries={prayerEntries ?? []}
+          slug={slug}
+          onSubmit={onPrayerSubmit}
         />
       )
     default:

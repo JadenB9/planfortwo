@@ -14,6 +14,7 @@ import {
 import { asc } from 'drizzle-orm'
 import { websiteAnalyticsService } from '../services/website-analytics.js'
 import { guestbookService } from '../services/guestbook.js'
+import { prayersService } from '../services/prayers.js'
 import { playlistService } from '../services/playlists.js'
 import { storageClient } from '@planfortwo/storage'
 import { createHash, randomUUID } from 'node:crypto'
@@ -273,6 +274,77 @@ websitePublicRoute.post(
       weddingId: config.weddingId,
       authorName: data.authorName,
       message: data.message,
+    })
+    return c.json({ data: entry }, 201)
+  },
+)
+
+// --- Prayers ---
+
+// GET /website-public/:slug/prayers — approved prayers (NO auth)
+websitePublicRoute.get('/:slug/prayers', async (c) => {
+  const slug = c.req.param('slug')
+
+  const config = await resolvePublicConfig(slug)
+  if (!config) {
+    return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
+
+  if (config.privacyMode === 'password') {
+    return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
+
+  const entries = await prayersService.listApproved(config.weddingId)
+  return c.json({ data: entries })
+})
+
+// POST /website-public/:slug/prayers — submit prayer via slug (NO auth)
+const publicPrayerSchema = z.object({
+  authorName: z.string().trim().min(1).max(100),
+  prayerText: z.string().trim().min(1).max(2000),
+  website: z.string().url().max(200).optional(),
+})
+
+websitePublicRoute.post(
+  '/:slug/prayers',
+  zValidator('json', publicPrayerSchema, (result, c) => {
+    if (!result.success) {
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    }
+  }),
+  async (c) => {
+    const slug = c.req.param('slug')
+
+    const config = await resolvePublicConfig(slug)
+    if (!config) {
+      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    if (config.privacyMode === 'password') {
+      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    const data = c.req.valid('json')
+
+    // Honeypot check — bots fill hidden "website" field
+    if (data.website) {
+      return c.json(
+        {
+          data: {
+            id: 'ok',
+            authorName: data.authorName,
+            prayerText: data.prayerText,
+            isVisible: false,
+          },
+        },
+        201,
+      )
+    }
+
+    const entry = await prayersService.create({
+      weddingId: config.weddingId,
+      authorName: data.authorName,
+      prayerText: data.prayerText,
     })
     return c.json({ data: entry }, 201)
   },

@@ -62,6 +62,9 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 border-t border-gray-100 pt-6">
+          <p className="mb-2 text-[11px] italic text-gray-300">
+            &ldquo;Therefore what God has joined together, let no one separate.&rdquo; — Mark 10:9
+          </p>
           <p className="text-xs text-gray-400">
             &copy; {new Date().getFullYear()} PlanForTwo. All rights reserved.
           </p>

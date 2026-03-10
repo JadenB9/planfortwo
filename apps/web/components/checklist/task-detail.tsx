@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import type { TaskWithDetails, FeatureGates, CategoryWithCount } from '@planfortwo/types'
 import { api } from '@/lib/api'
+import { toast } from 'sonner'
 
 interface TaskDetailProps {
   taskId: string
@@ -32,6 +33,7 @@ export function TaskDetail({
   const [task, setTask] = useState<TaskWithDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [noteContent, setNoteContent] = useState('')
@@ -85,8 +87,11 @@ export function TaskDetail({
       )
       onUpdated()
       void loadTask()
+      setSaved(true)
+      toast.success('Changes saved')
+      setTimeout(() => setSaved(false), 2000)
     } catch {
-      /* silent */
+      toast.error('Failed to save changes')
     } finally {
       setSaving(false)
     }
@@ -250,9 +255,13 @@ export function TaskDetail({
                 <button
                   onClick={handleSave}
                   disabled={saving || !editTitle.trim()}
-                  className="bg-wedding-600 hover:bg-wedding-700 w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                  className={`w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                    saved
+                      ? 'bg-green-600 hover:bg-green-700'
+                      : 'bg-wedding-600 hover:bg-wedding-700'
+                  }`}
                 >
-                  {saving ? 'Saving...' : 'Save Changes'}
+                  {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
                 </button>
               )}
             </div>

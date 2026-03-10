@@ -137,31 +137,36 @@ export function TaskCard({
 
       <button
         onClick={() => onSelect(task.id)}
-        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+        className="flex min-w-0 flex-1 flex-col gap-1 text-left"
       >
-        <span
-          className={`flex-1 truncate text-sm font-medium ${
-            isCompleted ? 'text-gray-400 line-through' : 'text-gray-900'
-          }`}
-        >
-          {task.title}
-        </span>
-
-        <div className="flex flex-shrink-0 items-center gap-2">
-          {dueDateInfo && !isCompleted && (
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${dueDateInfo.className}`}
-            >
-              {dueDateInfo.label}
-            </span>
-          )}
+        <div className="flex w-full items-center gap-3">
           <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}
+            className={`flex-1 truncate text-sm font-medium ${
+              isCompleted ? 'text-gray-400 line-through' : 'text-gray-900'
+            }`}
           >
-            {PRIORITY_LABELS[task.priority]}
+            {task.title}
           </span>
-          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: categoryColor }} />
+
+          <div className="flex flex-shrink-0 items-center gap-2">
+            {dueDateInfo && !isCompleted && (
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${dueDateInfo.className}`}
+              >
+                {dueDateInfo.label}
+              </span>
+            )}
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_STYLES[task.priority]}`}
+            >
+              {PRIORITY_LABELS[task.priority]}
+            </span>
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: categoryColor }} />
+          </div>
         </div>
+        {task.description && !isCompleted && (
+          <span className="truncate text-xs text-gray-400">{task.description}</span>
+        )}
       </button>
 
       {sectionLink && !isCompleted && (

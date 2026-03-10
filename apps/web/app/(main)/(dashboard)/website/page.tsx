@@ -29,6 +29,7 @@ import { CustomEditor } from '@/components/website/editor/custom-editor'
 import { FaqEditor } from '@/components/website/editor/faq-editor'
 import { ThingsToDoEditor } from '@/components/website/editor/things-to-do-editor'
 import { SongRequestsEditor } from '@/components/website/editor/song-requests-editor'
+import { PrayersEditor } from '@/components/website/editor/prayers-editor'
 import type { WebsiteSection } from '@planfortwo/types'
 import type {
   HeroContent,
@@ -45,6 +46,7 @@ import type {
   GuestbookSectionContent,
   CustomSectionContent,
   SongRequestsSectionContent,
+  PrayersSectionContent,
 } from '@planfortwo/types'
 
 export default function WebsitePage() {
@@ -265,6 +267,13 @@ export default function WebsitePage() {
         return (
           <SongRequestsEditor
             content={content as unknown as SongRequestsSectionContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'prayers':
+        return (
+          <PrayersEditor
+            content={content as unknown as PrayersSectionContent}
             onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
           />
         )
