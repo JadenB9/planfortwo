@@ -89,7 +89,7 @@ export function FeatureCard({
             </button>
           )}
           <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}
+            className={`flex-shrink-0 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}
           >
             {statusStyle.label}
           </span>

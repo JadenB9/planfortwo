@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Plus, Trash2, ChevronUp, ChevronDown, Pencil, X, Check, User } from 'lucide-react'
+import { Plus, Trash2, ChevronUp, ChevronDown, X, Check, User } from 'lucide-react'
 import type { WeddingPartyContent } from '@planfortwo/types'
 
 interface WeddingPartyEditorProps {
@@ -414,9 +414,6 @@ export function WeddingPartyEditor({ content, onChange }: WeddingPartyEditorProp
                     <p className="truncate text-sm font-semibold text-gray-900">{member.name}</p>
                     <p className="truncate text-xs text-gray-500">{member.role}</p>
                   </div>
-
-                  {/* Edit icon */}
-                  <Pencil className="mt-0.5 h-3 w-3 flex-shrink-0 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100" />
                 </button>
               </div>
             ),

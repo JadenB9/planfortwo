@@ -351,120 +351,78 @@ const ALLOWED_IMAGE_TYPES = [
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
 
-const requestGuestUploadSchema = z.object({
-  fileName: z.string().trim().min(1).max(255),
-  mimeType: z.enum(ALLOWED_IMAGE_TYPES),
-  fileSize: z.number().int().positive().max(MAX_FILE_SIZE),
-  uploaderName: z.string().trim().min(1).max(100),
-})
+// POST /website-public/:slug/photos/upload — proxy upload to R2 (NO auth, avoids CORS)
+websitePublicRoute.post('/:slug/photos/upload', async (c) => {
+  const slug = c.req.param('slug')
 
-// POST /website-public/:slug/photos/upload-url — get presigned R2 upload URL (NO auth)
-websitePublicRoute.post(
-  '/:slug/photos/upload-url',
-  zValidator('json', requestGuestUploadSchema, (result, c) => {
-    if (!result.success)
-      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
-  }),
-  async (c) => {
-    const slug = c.req.param('slug')
+  const config = await resolvePublicConfig(slug)
+  if (!config) {
+    return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
 
-    const config = await resolvePublicConfig(slug)
-    if (!config) {
-      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-    }
+  if (config.privacyMode === 'password') {
+    return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
 
-    if (config.privacyMode === 'password') {
-      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-    }
+  const body = await c.req.parseBody()
+  const file = body['file']
+  const uploaderName = typeof body['uploaderName'] === 'string' ? body['uploaderName'].trim() : ''
+  const uploaderEmail =
+    typeof body['uploaderEmail'] === 'string' && body['uploaderEmail'].trim()
+      ? body['uploaderEmail'].trim()
+      : null
 
-    const { fileName, mimeType } = c.req.valid('json')
+  if (!(file instanceof File) || !uploaderName) {
+    return c.json(
+      { error: 'Missing file or uploaderName', code: 'VALIDATION_ERROR', statusCode: 400 },
+      400,
+    )
+  }
 
-    try {
-      const photoId = randomUUID()
-      const r2Key = storageClient.buildGalleryPhotoKey(config.weddingId, photoId, fileName)
-      const uploadUrl = await storageClient.getUploadUrl(r2Key, mimeType)
-      const publicUrl = await storageClient.getDownloadUrl(r2Key)
+  if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
+    return c.json({ error: 'Invalid image type', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }
 
-      return c.json({
-        data: { uploadUrl, r2Key, url: publicUrl, photoId },
-      })
-    } catch (err) {
-      console.error('Failed to generate upload URL:', err)
-      return c.json(
-        {
-          error: 'Photo upload is temporarily unavailable',
-          code: 'STORAGE_ERROR',
-          statusCode: 503,
-        },
-        503,
-      )
-    }
-  },
-)
+  if (file.size > MAX_FILE_SIZE) {
+    return c.json(
+      { error: 'File too large (max 20MB)', code: 'VALIDATION_ERROR', statusCode: 400 },
+      400,
+    )
+  }
 
-const createGuestPhotoSchema = z.object({
-  r2Key: z.string().trim().min(1),
-  url: z.string().url(),
-  fileName: z.string().trim().min(1).max(255),
-  mimeType: z.enum(ALLOWED_IMAGE_TYPES),
-  fileSize: z.number().int().positive().max(MAX_FILE_SIZE),
-  uploaderName: z.string().trim().min(1).max(100),
-  uploaderEmail: z.string().email().max(255).optional(),
-})
+  if (uploaderName.length > 100) {
+    return c.json({ error: 'Name too long', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }
 
-// POST /website-public/:slug/photos — register uploaded guest photo (NO auth)
-websitePublicRoute.post(
-  '/:slug/photos',
-  zValidator('json', createGuestPhotoSchema, (result, c) => {
-    if (!result.success)
-      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
-  }),
-  async (c) => {
-    const slug = c.req.param('slug')
-
-    const config = await resolvePublicConfig(slug)
-    if (!config) {
-      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-    }
-
-    if (config.privacyMode === 'password') {
-      return c.json({ error: 'Website not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
-    }
-
-    const data = c.req.valid('json')
-
-    // Validate R2 key ownership — must belong to this wedding
-    if (!data.r2Key.startsWith(`gallery/${config.weddingId}/`)) {
-      return c.json(
-        { error: 'Invalid storage key', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
-    }
-
-    // Reject path traversal
-    if (data.r2Key.includes('..') || data.r2Key.includes('//')) {
-      return c.json(
-        { error: 'Invalid storage key', code: 'VALIDATION_ERROR', statusCode: 400 },
-        400,
-      )
-    }
+  try {
+    const photoId = randomUUID()
+    const r2Key = storageClient.buildGalleryPhotoKey(config.weddingId, photoId, file.name)
+    const buffer = Buffer.from(await file.arrayBuffer())
+    await storageClient.uploadBuffer(r2Key, buffer, file.type)
+    const publicUrl = await storageClient.getDownloadUrl(r2Key)
 
     const [photo] = await db
       .insert(photos)
       .values({
         weddingId: config.weddingId,
-        r2Key: data.r2Key,
-        url: data.url,
-        fileName: data.fileName,
-        mimeType: data.mimeType,
-        fileSize: data.fileSize,
-        uploaderName: data.uploaderName,
-        uploaderEmail: data.uploaderEmail ?? null,
+        r2Key,
+        url: publicUrl,
+        fileName: file.name.slice(0, 255),
+        mimeType: file.type,
+        fileSize: file.size,
+        uploaderName,
+        uploaderEmail,
         source: 'guest',
         moderationStatus: 'pending',
       })
       .returning()
 
     return c.json({ data: photo }, 201)
-  },
-)
+  } catch (err) {
+    console.error('Failed to upload guest photo:', err)
+    return c.json(
+      { error: 'Photo upload is temporarily unavailable', code: 'STORAGE_ERROR', statusCode: 503 },
+      503,
+    )
+  }
+})

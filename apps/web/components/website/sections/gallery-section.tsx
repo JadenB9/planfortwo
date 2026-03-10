@@ -97,59 +97,21 @@ export function GallerySection({
 
     for (const file of selectedFiles) {
       try {
-        // 1. Get presigned upload URL
-        const urlRes = await fetch(
-          `${API_URL}/website-public/${encodeURIComponent(slug)}/photos/upload-url`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fileName: file.name,
-              mimeType: file.type,
-              fileSize: file.size,
-              uploaderName: uploaderName.trim(),
-            }),
-          },
-        )
-
-        if (!urlRes.ok) {
-          const err = await urlRes.json().catch(() => ({ error: 'Failed to get upload URL' }))
-          throw new Error(err.error ?? 'Failed to get upload URL')
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('uploaderName', uploaderName.trim())
+        if (uploaderEmail.trim()) {
+          formData.append('uploaderEmail', uploaderEmail.trim())
         }
 
-        const { data } = await urlRes.json()
-
-        // 2. Upload file directly to R2
-        const putRes = await fetch(data.uploadUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': file.type },
-          body: file,
-        })
-
-        if (!putRes.ok) {
-          throw new Error('Failed to upload file to storage')
-        }
-
-        // 3. Register photo in database
-        const createRes = await fetch(
-          `${API_URL}/website-public/${encodeURIComponent(slug)}/photos`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              r2Key: data.r2Key,
-              url: data.url,
-              fileName: file.name,
-              mimeType: file.type,
-              fileSize: file.size,
-              uploaderName: uploaderName.trim(),
-              ...(uploaderEmail.trim() ? { uploaderEmail: uploaderEmail.trim() } : {}),
-            }),
-          },
+        const res = await fetch(
+          `${API_URL}/website-public/${encodeURIComponent(slug)}/photos/upload`,
+          { method: 'POST', body: formData },
         )
 
-        if (!createRes.ok) {
-          throw new Error('Failed to register photo')
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Upload failed' }))
+          throw new Error(err.error ?? 'Upload failed')
         }
 
         completed++

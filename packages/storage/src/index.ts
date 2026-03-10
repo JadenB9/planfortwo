@@ -134,6 +134,18 @@ export const storageClient = {
     return r2Key.startsWith(`email-attachments/${emailAddressId}/`)
   },
 
+  async uploadBuffer(key: string, body: Buffer | Uint8Array, contentType: string): Promise<void> {
+    const client = getR2Client()
+    await client.send(
+      new PutObjectCommand({
+        Bucket: getBucket(),
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+      }),
+    )
+  },
+
   async uploadFromUrl(key: string, sourceUrl: string, contentType: string): Promise<void> {
     if (!isAllowedUploadSource(sourceUrl)) {
       throw new Error('Upload source URL not from allowed host')
