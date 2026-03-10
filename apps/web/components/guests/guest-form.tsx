@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import type { GuestWithTags, Household, GuestTag, GuestSide, RsvpStatus } from '@planfortwo/types'
 
 interface GuestFormProps {
@@ -18,6 +18,7 @@ export interface GuestFormData {
   email?: string | null
   phone?: string | null
   householdId?: string | null
+  newHouseholdName?: string
   side?: GuestSide | null
   isChild?: boolean
   isVip?: boolean
@@ -36,8 +37,6 @@ export function GuestForm({
   onSubmit,
   onClose,
 }: GuestFormProps) {
-  // Adult guests that can be selected as parents (exclude self and other children)
-  const adultGuests = guests.filter((g) => !g.isChild && g.id !== guest?.id)
   const [formData, setFormData] = useState<GuestFormData>({
     firstName: guest?.firstName ?? '',
     lastName: guest?.lastName ?? '',
@@ -55,50 +54,21 @@ export function GuestForm({
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [creatingNewHousehold, setCreatingNewHousehold] = useState(false)
+  const [newHouseholdName, setNewHouseholdName] = useState('')
 
-  // Parent type-ahead search state
-  const [parentSearch, setParentSearch] = useState(() => {
-    if (guest?.isChild && guest?.householdId) {
-      const parent = adultGuests.find((g) => g.householdId && g.householdId === guest.householdId)
-      return parent ? `${parent.firstName} ${parent.lastName}` : ''
-    }
-    return ''
-  })
-  const [showParentDropdown, setShowParentDropdown] = useState(false)
-  const [selectedParent, setSelectedParent] = useState<GuestWithTags | null>(() => {
-    if (guest?.isChild && guest?.householdId) {
-      return adultGuests.find((g) => g.householdId && g.householdId === guest.householdId) ?? null
-    }
-    return null
-  })
-  const parentSearchRef = useRef<HTMLDivElement>(null)
-
-  // Close parent dropdown on outside click
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (parentSearchRef.current && !parentSearchRef.current.contains(e.target as Node)) {
-        setShowParentDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
-
-  // Get children in a parent's household
-  function getChildrenForParent(parent: GuestWithTags): GuestWithTags[] {
-    if (!parent.householdId) return []
-    return guests.filter(
-      (g) => g.isChild && g.householdId === parent.householdId && g.id !== guest?.id,
-    )
+  function getHouseholdMembers(householdId: string): GuestWithTags[] {
+    return guests.filter((g) => g.householdId === householdId && g.id !== guest?.id)
   }
 
-  // Filter parents based on search
-  const filteredParents = parentSearch.trim()
-    ? adultGuests.filter((g) => {
-        const name = `${g.firstName} ${g.lastName}`.toLowerCase()
-        return name.includes(parentSearch.toLowerCase())
-      })
-    : adultGuests
+  function getHouseholdDisplay(h: Household): string {
+    const adults = guests.filter((g) => g.householdId === h.id && !g.isChild && g.id !== guest?.id)
+    if (adults.length > 0) {
+      const names = adults.map((g) => `${g.firstName} ${g.lastName}`).join(' & ')
+      return `${h.name} (${names})`
+    }
+    return h.name
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -106,7 +76,12 @@ export function GuestForm({
     setSubmitting(true)
     setError(null)
     try {
-      await onSubmit(formData)
+      const submitData = { ...formData }
+      if (creatingNewHousehold && newHouseholdName.trim()) {
+        submitData.newHouseholdName = newHouseholdName.trim()
+        submitData.householdId = null
+      }
+      await onSubmit(submitData)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save guest')
     } finally {
@@ -127,6 +102,9 @@ export function GuestForm({
     }))
   }
 
+  const inputClass =
+    'focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2'
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white shadow-xl">
@@ -141,6 +119,7 @@ export function GuestForm({
 
         <form onSubmit={handleSubmit} className="max-h-[70vh] overflow-y-auto p-6">
           <div className="space-y-4">
+            {/* Name */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">First Name *</label>
@@ -149,7 +128,7 @@ export function GuestForm({
                   value={formData.firstName}
                   onChange={(e) => update('firstName', e.target.value)}
                   required
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                  className={inputClass}
                 />
               </div>
               <div>
@@ -159,11 +138,12 @@ export function GuestForm({
                   value={formData.lastName}
                   onChange={(e) => update('lastName', e.target.value)}
                   required
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                  className={inputClass}
                 />
               </div>
             </div>
 
+            {/* Email / Phone */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
@@ -171,7 +151,7 @@ export function GuestForm({
                   type="email"
                   value={formData.email ?? ''}
                   onChange={(e) => update('email', e.target.value || null)}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                  className={inputClass}
                 />
               </div>
               <div>
@@ -180,33 +160,82 @@ export function GuestForm({
                   type="tel"
                   value={formData.phone ?? ''}
                   onChange={(e) => update('phone', e.target.value || null)}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                  className={inputClass}
                 />
               </div>
             </div>
 
+            {/* Household (adults) + Side */}
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Household</label>
-                <select
-                  value={formData.householdId ?? ''}
-                  onChange={(e) => update('householdId', e.target.value || null)}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
-                >
-                  <option value="">None</option>
-                  {households.map((h) => (
-                    <option key={h.id} value={h.id}>
-                      {h.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {!formData.isChild ? (
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Household</label>
+                  {creatingNewHousehold ? (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        value={newHouseholdName}
+                        onChange={(e) => setNewHouseholdName(e.target.value)}
+                        placeholder="Family name (e.g., McDermott)"
+                        className={inputClass}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCreatingNewHousehold(false)
+                          setNewHouseholdName('')
+                        }}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <select
+                        value={formData.householdId ?? ''}
+                        onChange={(e) => {
+                          if (e.target.value === '__new__') {
+                            setCreatingNewHousehold(true)
+                            setNewHouseholdName(formData.lastName || '')
+                            update('householdId', null)
+                          } else {
+                            update('householdId', e.target.value || null)
+                          }
+                        }}
+                        className={inputClass}
+                      >
+                        <option value="">None</option>
+                        {households.map((h) => (
+                          <option key={h.id} value={h.id}>
+                            {getHouseholdDisplay(h)}
+                          </option>
+                        ))}
+                        <option value="__new__">+ Create New Family</option>
+                      </select>
+                      {formData.householdId &&
+                        (() => {
+                          const members = getHouseholdMembers(formData.householdId)
+                          if (members.length === 0) return null
+                          return (
+                            <p className="text-xs text-gray-500">
+                              Members:{' '}
+                              {members.map((g) => `${g.firstName} ${g.lastName}`).join(', ')}
+                            </p>
+                          )
+                        })()}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div />
+              )}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">Side</label>
                 <select
                   value={formData.side ?? ''}
                   onChange={(e) => update('side', (e.target.value as GuestSide) || null)}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                  className={inputClass}
                 >
                   <option value="">Not specified</option>
                   <option value="bride">Bride</option>
@@ -216,6 +245,7 @@ export function GuestForm({
               </div>
             </div>
 
+            {/* RSVP Status (edit only) */}
             {guest && (
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">RSVP Status</label>
@@ -251,6 +281,7 @@ export function GuestForm({
               </div>
             )}
 
+            {/* Checkboxes */}
             <div className="flex flex-wrap gap-4">
               <label className="flex items-center gap-2 text-sm text-gray-700">
                 <input
@@ -258,10 +289,9 @@ export function GuestForm({
                   checked={formData.isChild ?? false}
                   onChange={(e) => {
                     update('isChild', e.target.checked)
-                    if (!e.target.checked) {
-                      setSelectedParent(null)
-                      setParentSearch('')
-                      setShowParentDropdown(false)
+                    if (e.target.checked) {
+                      setCreatingNewHousehold(false)
+                      setNewHouseholdName('')
                     }
                   }}
                   className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
@@ -288,139 +318,66 @@ export function GuestForm({
               </label>
             </div>
 
-            {formData.isChild && adultGuests.length > 0 && (
+            {/* Family selector (children only) */}
+            {formData.isChild && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Parent</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Family</label>
                 <p className="mb-1.5 text-xs text-gray-500">
-                  Type a parent&apos;s name to assign this child to their family group.
+                  Select the household this child belongs to.
                 </p>
-                <div ref={parentSearchRef} className="relative">
-                  {selectedParent ? (
-                    <div className="flex items-center gap-2 rounded-xl border border-gray-300 px-3 py-2">
-                      <span className="flex-1 text-sm text-gray-900">
-                        {selectedParent.firstName} {selectedParent.lastName}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedParent(null)
-                          setParentSearch('')
-                          // Don't clear householdId — user may want to keep the group
-                        }}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  ) : (
-                    <input
-                      type="text"
-                      value={parentSearch}
-                      onChange={(e) => {
-                        setParentSearch(e.target.value)
-                        setShowParentDropdown(true)
-                      }}
-                      onFocus={() => setShowParentDropdown(true)}
-                      placeholder="Search by parent name..."
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
-                    />
-                  )}
-
-                  {showParentDropdown && !selectedParent && (
-                    <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg">
-                      {filteredParents.length === 0 ? (
-                        <p className="px-3 py-2 text-xs text-gray-500">No matching parents found</p>
-                      ) : (
-                        filteredParents.slice(0, 15).map((g) => {
-                          const children = getChildrenForParent(g)
-                          const hasChildren = children.length > 0
-                          const allCheckedIn =
-                            hasChildren && children.every((c) => c.rsvpStatus === 'accepted')
-                          const checkedInCount = children.filter(
-                            (c) => c.rsvpStatus === 'accepted',
-                          ).length
-                          return (
-                            <button
-                              key={g.id}
-                              type="button"
-                              disabled={!g.householdId}
-                              onClick={() => {
-                                if (!g.householdId) return
-                                setSelectedParent(g)
-                                setParentSearch(`${g.firstName} ${g.lastName}`)
-                                setShowParentDropdown(false)
-                                update('householdId', g.householdId)
-                              }}
-                              className="flex w-full flex-col items-start px-3 py-2 text-left hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              <span className="text-sm font-medium text-gray-900">
-                                {g.firstName} {g.lastName}
-                                {!g.householdId && (
-                                  <span className="ml-1 text-xs font-normal text-gray-400">
-                                    (no family group)
-                                  </span>
-                                )}
-                              </span>
-                              {hasChildren && (
-                                <span className="text-xs text-gray-500">
-                                  {allCheckedIn
-                                    ? `All ${children.length} children already registered`
-                                    : checkedInCount > 0
-                                      ? `${checkedInCount} of ${children.length} children registered`
-                                      : `${children.length} ${children.length === 1 ? 'child' : 'children'} to register`}
-                                </span>
-                              )}
-                            </button>
-                          )
-                        })
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Show children in this parent's household */}
-                {selectedParent &&
+                {households.length === 0 ? (
+                  <p className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                    No families created yet. Add the parents first and assign them to a household.
+                  </p>
+                ) : (
+                  <select
+                    value={formData.householdId ?? ''}
+                    onChange={(e) => update('householdId', e.target.value || null)}
+                    className={inputClass}
+                  >
+                    <option value="">Select a family...</option>
+                    {households.map((h) => {
+                      const adults = guests.filter(
+                        (g) => g.householdId === h.id && !g.isChild && g.id !== guest?.id,
+                      )
+                      const adultNames = adults
+                        .map((g) => `${g.firstName} ${g.lastName}`)
+                        .join(' & ')
+                      return (
+                        <option key={h.id} value={h.id}>
+                          {adultNames ? `${adultNames} — ${h.name}` : h.name}
+                        </option>
+                      )
+                    })}
+                  </select>
+                )}
+                {formData.householdId &&
                   (() => {
-                    const children = getChildrenForParent(selectedParent)
-                    if (children.length === 0) return null
-                    const allRegistered = children.every((c) => c.rsvpStatus === 'accepted')
+                    const members = getHouseholdMembers(formData.householdId)
+                    if (members.length === 0) return null
                     return (
                       <div className="mt-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
-                        <p className="mb-2 text-xs font-medium text-gray-700">
-                          {allRegistered ? (
-                            <span className="text-green-600">
-                              All children in this family are already registered.
-                            </span>
-                          ) : (
-                            <>Children in {selectedParent.firstName}&apos;s family:</>
-                          )}
-                        </p>
+                        <p className="mb-2 text-xs font-medium text-gray-700">Family members:</p>
                         <div className="space-y-1">
-                          {children.map((child) => {
-                            const isRegistered = child.rsvpStatus === 'accepted'
-                            return (
-                              <div
-                                key={child.id}
-                                className="flex items-center justify-between text-xs"
-                              >
-                                <span className={isRegistered ? 'text-gray-500' : 'text-gray-900'}>
-                                  {child.firstName} {child.lastName}
-                                  {child.age != null && (
-                                    <span className="ml-1 text-gray-400">(age {child.age})</span>
-                                  )}
-                                </span>
-                                {isRegistered ? (
-                                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
-                                    Registered
-                                  </span>
-                                ) : (
-                                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">
-                                    Not registered
-                                  </span>
+                          {members.map((m) => (
+                            <div key={m.id} className="flex items-center justify-between text-xs">
+                              <span className="text-gray-900">
+                                {m.firstName} {m.lastName}
+                                {m.isChild && m.age != null && (
+                                  <span className="ml-1 text-gray-400">(age {m.age})</span>
                                 )}
-                              </div>
-                            )
-                          })}
+                              </span>
+                              <span
+                                className={`rounded-full px-2 py-0.5 text-xs ${
+                                  m.isChild
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                {m.isChild ? 'Child' : 'Adult'}
+                              </span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )
@@ -428,6 +385,7 @@ export function GuestForm({
               </div>
             )}
 
+            {/* Plus-One Name */}
             {formData.hasPlusOne && (
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -437,11 +395,12 @@ export function GuestForm({
                   type="text"
                   value={formData.plusOneName ?? ''}
                   onChange={(e) => update('plusOneName', e.target.value || null)}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                  className={inputClass}
                 />
               </div>
             )}
 
+            {/* Dietary Notes */}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Dietary Notes</label>
               <input
@@ -451,10 +410,11 @@ export function GuestForm({
                   update('dietary', e.target.value ? { notes: e.target.value } : null)
                 }
                 placeholder="Allergies, restrictions, etc."
-                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                className={inputClass}
               />
             </div>
 
+            {/* Tags */}
             {tags.length > 0 && (
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">Tags</label>

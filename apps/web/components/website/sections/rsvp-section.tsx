@@ -284,7 +284,10 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
                 className={`text-sm ${fontPair.bodyClass}`}
                 style={{ color: `${colors.primary}99` }}
               >
-                Welcome, {lookupResult.guest.firstName}! Please complete your RSVP below.
+                Welcome, {lookupResult.guest.firstName}!
+                {lookupResult.householdGuests.length > 1
+                  ? ` You're RSVPing for ${lookupResult.householdGuests.length} family members.`
+                  : ' Please complete your RSVP below.'}
               </p>
             </div>
             <RsvpForm

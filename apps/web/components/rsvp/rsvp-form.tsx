@@ -68,6 +68,13 @@ function buildSubmission(state: GuestFormState): RsvpSubmission {
   }
 }
 
+function formatRsvpStatus(status: string): string {
+  if (status === 'accepted') return 'Accepted'
+  if (status === 'declined') return 'Declined'
+  if (status === 'maybe') return 'Maybe'
+  return 'Pending'
+}
+
 const RSVP_OPTIONS: { value: RsvpStatus; label: string; icon: string }[] = [
   { value: 'accepted', label: 'Joyfully Accept', icon: '\u2714' },
   { value: 'declined', label: 'Respectfully Decline', icon: '\u2718' },
@@ -164,11 +171,33 @@ export function RsvpForm({
     }
   }
 
+  const alreadyResponded = guestsToRsvp.filter((g) => g.rsvpRespondedAt)
+
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Household status banner */}
+      {isBatch && (
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <p className="text-sm font-medium text-gray-700">
+            RSVPing for the {lookupResult.household?.name || 'Family'} household
+          </p>
+          <p className="mt-0.5 text-xs text-gray-500">
+            {guestsToRsvp.length} family member{guestsToRsvp.length !== 1 ? 's' : ''}
+          </p>
+          {alreadyResponded.length > 0 && (
+            <p className="mt-1 text-xs text-gray-500">
+              {alreadyResponded.length} of {guestsToRsvp.length} member
+              {alreadyResponded.length !== 1 ? 's have' : ' has'} previously responded. You can
+              update any responses below.
+            </p>
+          )}
+        </div>
+      )}
+
       {forms.map((form, index) => {
         const guest = guestsToRsvp[index]!
-        const showPlusOne = guest.hasPlusOne
+        const isChild = guest.isChild
+        const showPlusOne = guest.hasPlusOne && !isChild
 
         return (
           <div
@@ -177,10 +206,18 @@ export function RsvpForm({
           >
             <h3 className="font-serif text-xl font-semibold text-gray-900">
               {guest.firstName} {guest.lastName}
+              {isChild && <span className="ml-2 text-xs font-normal text-gray-400">(child)</span>}
             </h3>
+            {guest.rsvpRespondedAt && (
+              <p className="mt-1 text-xs text-gray-500">
+                Previously responded: {formatRsvpStatus(guest.rsvpStatus ?? 'pending')}
+              </p>
+            )}
 
             <div className="mt-6">
-              <p className="mb-3 text-sm font-medium text-gray-700">Your Response</p>
+              <p className="mb-3 text-sm font-medium text-gray-700">
+                {isChild ? 'Will they be attending?' : 'Your Response'}
+              </p>
               <div className="grid gap-3 sm:grid-cols-3">
                 {RSVP_OPTIONS.map((opt) => (
                   <button
@@ -206,7 +243,7 @@ export function RsvpForm({
 
             {(form.rsvpStatus === 'accepted' || form.rsvpStatus === 'maybe') && (
               <div className="mt-6 space-y-5">
-                {showEmailField && (
+                {showEmailField && !isChild && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Email Address (preferred)
@@ -227,7 +264,7 @@ export function RsvpForm({
                 {showDietary && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Allergies{' '}
+                      {isChild ? 'Allergies' : 'Allergies'}{' '}
                       <span className="font-normal text-gray-400">(leave blank for none)</span>
                     </label>
                     <input
@@ -240,7 +277,7 @@ export function RsvpForm({
                   </div>
                 )}
 
-                {showSongRequest && (
+                {showSongRequest && !isChild && (
                   <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700">
                       Song Request
@@ -252,18 +289,20 @@ export function RsvpForm({
                   </div>
                 )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Additional Notes
-                  </label>
-                  <textarea
-                    value={form.rsvpNotes}
-                    onChange={(e) => updateForm(index, { rsvpNotes: e.target.value })}
-                    placeholder="Anything else the couple should know?"
-                    rows={3}
-                    className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                  />
-                </div>
+                {!isChild && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Additional Notes
+                    </label>
+                    <textarea
+                      value={form.rsvpNotes}
+                      onChange={(e) => updateForm(index, { rsvpNotes: e.target.value })}
+                      placeholder="Anything else the couple should know?"
+                      rows={3}
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    />
+                  </div>
+                )}
 
                 {showPlusOne && (
                   <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">

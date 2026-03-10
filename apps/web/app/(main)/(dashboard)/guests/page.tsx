@@ -55,6 +55,17 @@ export default function GuestsPage() {
       if (!weddingId) return
       const token = await getToken()
       if (!token) return
+
+      let householdId = data.householdId || null
+
+      if (data.newHouseholdName) {
+        const { data: newHousehold } = await api.households.create(
+          { weddingId, name: data.newHouseholdName },
+          token,
+        )
+        householdId = newHousehold.id
+      }
+
       await api.guests.create(
         {
           weddingId,
@@ -62,7 +73,7 @@ export default function GuestsPage() {
           lastName: data.lastName,
           email: data.email || null,
           phone: data.phone || null,
-          householdId: data.householdId || null,
+          householdId,
           side: data.side || null,
           isChild: data.isChild ?? false,
           isVip: data.isVip ?? false,
@@ -85,6 +96,17 @@ export default function GuestsPage() {
       if (!weddingId) return
       const token = await getToken()
       if (!token) return
+
+      let householdId = data.householdId || null
+
+      if (data.newHouseholdName) {
+        const { data: newHousehold } = await api.households.create(
+          { weddingId, name: data.newHouseholdName },
+          token,
+        )
+        householdId = newHousehold.id
+      }
+
       await api.guests.update(
         guestId,
         {
@@ -92,7 +114,7 @@ export default function GuestsPage() {
           lastName: data.lastName,
           email: data.email || null,
           phone: data.phone || null,
-          householdId: data.householdId || null,
+          householdId,
           side: data.side || null,
           isChild: data.isChild ?? false,
           isVip: data.isVip ?? false,

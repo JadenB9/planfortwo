@@ -71,7 +71,8 @@ export const rsvpService = {
     | { type: 'multiple'; guests: Omit<Guest, 'email' | 'phone' | 'rsvpToken'>[] }
     | { type: 'none' }
   > {
-    const results = await db
+    // Exclude children — they only appear via household batch RSVP
+    const allMatches = await db
       .select()
       .from(guests)
       .where(
@@ -81,6 +82,7 @@ export const rsvpService = {
           ilike(guests.lastName, lastName.replace(/[%_\\]/g, '\\$&')),
         ),
       )
+    const results = allMatches.filter((g) => !g.isChild)
 
     if (results.length === 0) {
       return { type: 'none' }
