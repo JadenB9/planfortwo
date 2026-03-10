@@ -41,6 +41,7 @@ export const photoGalleryService = {
         uploaderEmail: data.uploaderEmail,
         source: data.source,
         caption: data.caption,
+        moderationStatus: data.source === 'couple' ? 'approved' : 'pending',
       })
       .returning()
     return photo!

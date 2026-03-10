@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import { useWebsite } from '@/hooks/use-website'
@@ -187,6 +187,42 @@ export default function WebsitePage() {
     },
     [weddingId, getToken, refetch],
   )
+
+  // Auto-create song_requests section if missing (default hidden)
+  const songRequestsAutoCreated = useRef(false)
+  useEffect(() => {
+    if (!weddingId || !config || loading || songRequestsAutoCreated.current) return
+    if (sections.length === 0) return // Wait for sections to load
+    const hasSongRequests = sections.some((s) => s.sectionType === 'song_requests')
+    if (!hasSongRequests) {
+      songRequestsAutoCreated.current = true
+      void (async () => {
+        const token = await getToken()
+        if (!token) return
+        await api.websiteSections.addBuiltIn(
+          weddingId,
+          {
+            sectionType: 'song_requests',
+            title: 'Song Requests',
+            content: { message: 'Help us build our playlist!', showApproved: false },
+          },
+          token,
+        )
+        // Refetch to get the new section, then toggle it off
+        await refetch()
+      })()
+    }
+  }, [weddingId, config, loading, sections, getToken, refetch])
+
+  // After song_requests section is created, toggle it off
+  useEffect(() => {
+    if (!songRequestsAutoCreated.current || !weddingId) return
+    const songRequestsSection = sections.find((s) => s.sectionType === 'song_requests')
+    if (songRequestsSection && songRequestsSection.isVisible) {
+      songRequestsAutoCreated.current = false // Reset so we don't loop
+      void handleToggleVisibility(songRequestsSection.id, false)
+    }
+  }, [sections, weddingId, handleToggleVisibility])
 
   const handleSectionReorder = useCallback(
     async (reordered: { id: string; sortOrder: number }[]) => {

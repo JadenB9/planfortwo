@@ -20,11 +20,6 @@ const ADDABLE_SECTIONS: { sectionType: string; title: string; content: Record<st
       },
     },
     {
-      sectionType: 'song_requests',
-      title: 'Song Requests',
-      content: { message: 'Help us build our playlist!', showApproved: false },
-    },
-    {
       sectionType: 'guestbook',
       title: 'Guestbook',
       content: { requireApproval: true, message: 'Leave us a message!' },

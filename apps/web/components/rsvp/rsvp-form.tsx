@@ -8,7 +8,6 @@ import type {
   DietaryInfo,
   RsvpSubmission,
 } from '@planfortwo/types'
-import { SpotifySearch } from './spotify-search'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
@@ -17,7 +16,6 @@ interface GuestFormState {
   rsvpStatus: RsvpStatus
   rsvpEmail: string
   dietary: DietaryInfo
-  songRequest: string
   rsvpNotes: string
   plusOneName: string
   plusOneConfirmed: boolean
@@ -38,7 +36,6 @@ function createGuestFormState(guest: Guest): GuestFormState {
       allergies: guest.dietary?.allergies ?? [],
       notes: guest.dietary?.notes ?? '',
     },
-    songRequest: guest.songRequest ?? '',
     rsvpNotes: guest.rsvpNotes ?? '',
     plusOneName: guest.plusOneName ?? '',
     plusOneConfirmed: guest.plusOneConfirmed ?? false,
@@ -60,7 +57,6 @@ function buildSubmission(state: GuestFormState): RsvpSubmission {
     rsvpStatus: state.rsvpStatus,
     rsvpEmail: state.rsvpEmail || null,
     dietary: state.dietary,
-    songRequest: state.songRequest || null,
     rsvpNotes: state.rsvpNotes || null,
     plusOneName: state.plusOneName || null,
     plusOneConfirmed: state.plusOneConfirmed,
@@ -86,7 +82,6 @@ interface RsvpFormProps {
   onSuccess: () => void
   showEmailField?: boolean
   showDietary?: boolean
-  showSongRequest?: boolean
 }
 
 export function RsvpForm({
@@ -94,7 +89,6 @@ export function RsvpForm({
   onSuccess,
   showEmailField = false,
   showDietary = true,
-  showSongRequest = true,
 }: RsvpFormProps) {
   const isBatch = lookupResult.householdGuests.length > 1
   const guestsToRsvp = isBatch ? lookupResult.householdGuests : [lookupResult.guest]
@@ -273,18 +267,6 @@ export function RsvpForm({
                       onChange={(e) => updateDietary(index, 'notes', e.target.value)}
                       placeholder="e.g. peanuts, shellfish, dairy..."
                       className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
-                    />
-                  </div>
-                )}
-
-                {showSongRequest && !isChild && (
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                      Song Request
-                    </label>
-                    <SpotifySearch
-                      value={form.songRequest}
-                      onChange={(val) => updateForm(index, { songRequest: val })}
                     />
                   </div>
                 )}

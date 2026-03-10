@@ -4,9 +4,10 @@ import { useState, useCallback, useEffect } from 'react'
 import { NAV_GROUPS, type NavGroup, type NavItem } from '@/lib/navigation'
 
 const STORAGE_KEY = 'sidebar-nav-order'
+const STORAGE_VERSION = 2
 
 interface StoredOrder {
-  /** Map of group label -> ordered hrefs */
+  version: number
   groups: Record<string, string[]>
 }
 
@@ -15,7 +16,7 @@ function getDefaultOrder(): StoredOrder {
   for (const group of NAV_GROUPS) {
     groups[group.label] = group.items.map((item) => item.href)
   }
-  return { groups }
+  return { version: STORAGE_VERSION, groups }
 }
 
 function loadOrder(): StoredOrder {
@@ -25,6 +26,8 @@ function loadOrder(): StoredOrder {
     if (!raw) return getDefaultOrder()
     const parsed = JSON.parse(raw) as StoredOrder
     if (!parsed.groups || typeof parsed.groups !== 'object') return getDefaultOrder()
+    // Reset to defaults if version doesn't match
+    if (parsed.version !== STORAGE_VERSION) return getDefaultOrder()
     return parsed
   } catch {
     return getDefaultOrder()
@@ -93,6 +96,7 @@ export function useSidebarOrder() {
       updated.splice(newIndex, 0, moved)
 
       const next: StoredOrder = {
+        version: STORAGE_VERSION,
         groups: { ...prev.groups, [groupLabel]: updated },
       }
       saveOrder(next)

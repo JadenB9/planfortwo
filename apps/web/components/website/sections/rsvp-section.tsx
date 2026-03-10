@@ -291,7 +291,6 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
               onSuccess={() => setState('success')}
               showEmailField
               showDietary={content.showDietary}
-              showSongRequest={content.showSongRequest}
             />
           </motion.div>
         )}

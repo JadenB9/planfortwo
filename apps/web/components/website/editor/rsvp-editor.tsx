@@ -46,19 +46,6 @@ export function RsvpEditor({ content, onChange }: RsvpEditorProps) {
         <p className="-mt-2 ml-7 text-xs text-gray-500">
           Guests can note allergies or dietary needs (e.g., gluten-free, nut allergy).
         </p>
-
-        <label className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={content.showSongRequest}
-            onChange={(e) => update({ showSongRequest: e.target.checked })}
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <span className="text-sm text-gray-700">Show song request field</span>
-        </label>
-        <p className="-mt-2 ml-7 text-xs text-gray-500">
-          Guests can suggest a song they&apos;d love to hear at the reception.
-        </p>
       </div>
     </div>
   )

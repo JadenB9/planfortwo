@@ -1,12 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import type { SongRequestsSectionContent } from '@planfortwo/types'
 import { useTemplateStyles, useHeadingClass, useBodyClass } from '../template-context'
-import { Music } from 'lucide-react'
+import { Music, Search, X } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
+
+interface SpotifyTrack {
+  spotifyTrackId: string
+  title: string
+  artist: string
+  album: string
+  albumArt: string | null
+  durationMs: number
+}
 
 interface SongRequest {
   id: string
@@ -29,12 +38,35 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
   const [guestName, setGuestName] = useState('')
-  const [songTitle, setSongTitle] = useState('')
-  const [artist, setArtist] = useState('')
   const [notes, setNotes] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [approvedSongs, setApprovedSongs] = useState<SongRequest[]>([])
+
+  // Spotify search state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SpotifyTrack[]>([])
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [showResults, setShowResults] = useState(false)
+  const [selectedTrack, setSelectedTrack] = useState<SpotifyTrack | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowResults(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     if (!content.showApproved) return
@@ -46,15 +78,50 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
           setApprovedSongs(json.data)
         }
       } catch {
-        // Silently fail — approved songs are optional display
+        // Silently fail
       }
     }
     void fetchApproved()
   }, [slug, content.showApproved])
 
+  async function searchSpotify(q: string) {
+    if (q.length < 2) {
+      setSearchResults([])
+      return
+    }
+    setSearchLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/rsvp/spotify-search?q=${encodeURIComponent(q)}`)
+      const json = (await res.json()) as { data: SpotifyTrack[] }
+      setSearchResults(json.data ?? [])
+    } catch {
+      setSearchResults([])
+    } finally {
+      setSearchLoading(false)
+    }
+  }
+
+  function handleSearchInput(val: string) {
+    setSearchQuery(val)
+    setShowResults(true)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => void searchSpotify(val), 350)
+  }
+
+  function selectTrack(track: SpotifyTrack) {
+    setSelectedTrack(track)
+    setSearchQuery('')
+    setSearchResults([])
+    setShowResults(false)
+  }
+
+  function clearTrack() {
+    setSelectedTrack(null)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!guestName.trim() || !songTitle.trim() || !artist.trim()) return
+    if (!guestName.trim() || !selectedTrack) return
     setSubmitting(true)
     try {
       const res = await fetch(`${API_URL}/website-public/${slug}/song-requests`, {
@@ -62,15 +129,14 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           guestName: guestName.trim(),
-          title: songTitle.trim(),
-          artist: artist.trim(),
+          title: selectedTrack.title,
+          artist: selectedTrack.artist,
           notes: notes.trim() || null,
         }),
       })
       if (res.ok) {
         setGuestName('')
-        setSongTitle('')
-        setArtist('')
+        setSelectedTrack(null)
         setNotes('')
         setSubmitted(true)
         setTimeout(() => setSubmitted(false), 4000)
@@ -105,6 +171,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
           viewport={{ once: true }}
           className="mb-10 rounded-2xl bg-white p-6 shadow-sm"
         >
+          {/* Guest name */}
           <div className="mb-4">
             <input
               type="text"
@@ -117,28 +184,146 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
-          <div className="mb-4 grid gap-4 sm:grid-cols-2">
-            <input
-              type="text"
-              placeholder="Song title"
-              value={songTitle}
-              onChange={(e) => setSongTitle(e.target.value)}
-              maxLength={300}
-              required
-              className={`w-full rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
-              style={{ borderColor: colors.secondary, color: colors.primary }}
-            />
-            <input
-              type="text"
-              placeholder="Artist"
-              value={artist}
-              onChange={(e) => setArtist(e.target.value)}
-              maxLength={300}
-              required
-              className={`w-full rounded-lg border px-4 py-2 text-sm ${bodyClass}`}
-              style={{ borderColor: colors.secondary, color: colors.primary }}
-            />
+
+          {/* Spotify search */}
+          <div className="mb-4">
+            {selectedTrack ? (
+              <div
+                className="flex items-center gap-3 rounded-lg border px-3 py-2"
+                style={{ borderColor: colors.secondary, backgroundColor: `${colors.primary}08` }}
+              >
+                {selectedTrack.albumArt ? (
+                  <img
+                    src={selectedTrack.albumArt}
+                    alt={selectedTrack.album}
+                    className="h-10 w-10 rounded-md object-cover"
+                  />
+                ) : (
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-md"
+                    style={{ backgroundColor: `${colors.primary}15` }}
+                  >
+                    <Music className="h-5 w-5" style={{ color: `${colors.primary}66` }} />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={`truncate text-sm font-medium ${bodyClass}`}
+                    style={{ color: colors.primary }}
+                  >
+                    {selectedTrack.title}
+                  </p>
+                  <p
+                    className={`truncate text-xs ${bodyClass}`}
+                    style={{ color: `${colors.primary}99` }}
+                  >
+                    {selectedTrack.artist}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={clearTrack}
+                  className="shrink-0 rounded-md p-1 transition-colors hover:opacity-70"
+                  style={{ color: `${colors.primary}66` }}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <div ref={searchContainerRef} className="relative">
+                <div className="relative">
+                  <Search
+                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                    style={{ color: `${colors.primary}66` }}
+                  />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleSearchInput(e.target.value)}
+                    onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                    placeholder="Search for a song on Spotify..."
+                    className={`w-full rounded-lg border py-2 pl-9 pr-4 text-sm ${bodyClass}`}
+                    style={{ borderColor: colors.secondary, color: colors.primary }}
+                  />
+                  {searchLoading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div
+                        className="h-4 w-4 animate-spin rounded-full border-2"
+                        style={{
+                          borderColor: `${colors.primary}33`,
+                          borderTopColor: colors.primary,
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {showResults && searchResults.length > 0 && (
+                  <div
+                    className="absolute z-20 mt-1 w-full rounded-lg border bg-white shadow-lg"
+                    style={{ borderColor: colors.secondary }}
+                  >
+                    {searchResults.map((track) => (
+                      <button
+                        key={track.spotifyTrackId}
+                        type="button"
+                        onClick={() => selectTrack(track)}
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-gray-50"
+                      >
+                        {track.albumArt ? (
+                          <img
+                            src={track.albumArt}
+                            alt={track.album}
+                            className="h-10 w-10 shrink-0 rounded-md object-cover"
+                          />
+                        ) : (
+                          <div
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md"
+                            style={{ backgroundColor: `${colors.primary}15` }}
+                          >
+                            <Music className="h-5 w-5" style={{ color: `${colors.primary}66` }} />
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className={`truncate text-sm font-medium ${bodyClass}`}
+                            style={{ color: colors.primary }}
+                          >
+                            {track.title}
+                          </p>
+                          <p
+                            className={`truncate text-xs ${bodyClass}`}
+                            style={{ color: `${colors.primary}99` }}
+                          >
+                            {track.artist}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {showResults &&
+                  searchQuery.length >= 2 &&
+                  !searchLoading &&
+                  searchResults.length === 0 && (
+                    <div
+                      className="absolute z-20 mt-1 w-full rounded-lg border bg-white p-3 text-center shadow-lg"
+                      style={{ borderColor: colors.secondary }}
+                    >
+                      <p
+                        className={`text-sm ${bodyClass}`}
+                        style={{ color: `${colors.primary}99` }}
+                      >
+                        No songs found
+                      </p>
+                    </div>
+                  )}
+              </div>
+            )}
           </div>
+
+          {/* Notes */}
           <div className="mb-4">
             <textarea
               placeholder="Any notes? (optional)"
@@ -150,9 +335,10 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
               style={{ borderColor: colors.secondary, color: colors.primary }}
             />
           </div>
+
           <button
             type="submit"
-            disabled={submitting || !guestName.trim() || !songTitle.trim() || !artist.trim()}
+            disabled={submitting || !guestName.trim() || !selectedTrack}
             className="rounded-full px-6 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
             style={{ backgroundColor: colors.primary }}
           >
