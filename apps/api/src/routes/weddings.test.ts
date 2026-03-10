@@ -152,7 +152,7 @@ describe('Wedding Routes', () => {
       const res = await app.request('/weddings/wedding-1/onboarding', {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({}),
+        body: JSON.stringify({ budgetTotal: 'not-a-number' }),
       })
 
       expect(res.status).toBe(400)
