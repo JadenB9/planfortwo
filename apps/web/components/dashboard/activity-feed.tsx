@@ -87,7 +87,7 @@ const ACTION_LINKS: Record<ActivityAction, string> = {
   event_created: '/events',
   seating_chart_created: '/seating',
   vendor_created: '/vendors',
-  party_member_added: '/ceremony',
+  party_member_added: '/events',
   payment_deleted: '/budget',
 }
 

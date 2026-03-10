@@ -8,7 +8,6 @@ import {
   Armchair,
   Store,
   CalendarDays,
-  Church,
   Music,
   Camera,
   Gift,
@@ -45,20 +44,14 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: '/guests', label: 'Guest List', icon: Users, comingSoon: false },
       { href: '/budget', label: 'Budget', icon: DollarSign, comingSoon: false },
       { href: '/website', label: 'Website', icon: Globe, comingSoon: false },
+      { href: '/seating', label: 'Seating Chart', icon: Armchair, comingSoon: false },
     ],
   },
   {
     label: 'Details',
     items: [
-      { href: '/seating', label: 'Seating Chart', icon: Armchair, comingSoon: false },
       { href: '/vendors', label: 'Vendors', icon: Store, comingSoon: false },
       { href: '/events', label: 'Events', icon: CalendarDays, comingSoon: false },
-      { href: '/ceremony', label: 'Ceremony', icon: Church, comingSoon: false },
-    ],
-  },
-  {
-    label: 'More',
-    items: [
       { href: '/music', label: 'Music', icon: Music, comingSoon: false },
       { href: '/photos', label: 'Photos', icon: Camera, comingSoon: false },
       { href: '/registry', label: 'Registry', icon: Gift, comingSoon: false },

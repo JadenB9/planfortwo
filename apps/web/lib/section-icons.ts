@@ -12,6 +12,7 @@ import {
   Clock,
   MessageSquare,
   FileText,
+  Music,
   type LucideIcon,
 } from 'lucide-react'
 import type { WebsiteSectionType } from '@planfortwo/types'
@@ -29,6 +30,7 @@ export const sectionIcons: Record<WebsiteSectionType, LucideIcon> = {
   rsvp: Mail,
   schedule: Clock,
   guestbook: MessageSquare,
+  song_requests: Music,
   custom: FileText,
 }
 
@@ -45,5 +47,6 @@ export const sectionLabels: Record<WebsiteSectionType, string> = {
   rsvp: 'RSVP',
   schedule: 'Schedule',
   guestbook: 'Guestbook',
+  song_requests: 'Song Requests',
   custom: 'Custom Section',
 }

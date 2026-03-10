@@ -82,11 +82,6 @@ import type {
   VerifyWebsitePasswordInput,
   TrackPageViewInput,
   CreateGuestbookEntryInput,
-  CreateCeremonyOutlineInput,
-  UpdateCeremonyOutlineInput,
-  UpdateVowInput,
-  CreateProcessionalEntryInput,
-  UpdateProcessionalEntryInput,
   CreatePlaylistInput,
   UpdatePlaylistInput,
   CreatePlaylistSongInput,
@@ -657,84 +652,6 @@ export const api = {
     delete: (id: string, weddingId: string, token: string) =>
       fetchApi<void>(`/guestbook/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
   },
-  ceremony: {
-    listOutlines: (weddingId: string, token: string) =>
-      fetchApi<{
-        data: Array<{
-          id: string
-          weddingId: string
-          moment: string
-          title: string
-          description: string | null
-          duration: number | null
-          sortOrder: number
-          createdAt: Date
-        }>
-      }>(`/ceremony/outlines?weddingId=${weddingId}`, { token }),
-    createOutline: (data: CreateCeremonyOutlineInput, token: string) =>
-      fetchApi<{ data: Record<string, unknown> }>('/ceremony/outlines', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        token,
-      }),
-    updateOutline: (
-      id: string,
-      weddingId: string,
-      data: UpdateCeremonyOutlineInput,
-      token: string,
-    ) =>
-      fetchApi<{ data: Record<string, unknown> }>(
-        `/ceremony/outlines/${id}?weddingId=${weddingId}`,
-        { method: 'PUT', body: JSON.stringify(data), token },
-      ),
-    deleteOutline: (id: string, weddingId: string, token: string) =>
-      fetchApi<{ data: { success: boolean } }>(`/ceremony/outlines/${id}?weddingId=${weddingId}`, {
-        method: 'DELETE',
-        token,
-      }),
-    getVow: (weddingId: string, token: string) =>
-      fetchApi<{ data: { id: string; content: string; isRevealed: boolean } | null }>(
-        `/ceremony/vows?weddingId=${weddingId}`,
-        { token },
-      ),
-    upsertVow: (weddingId: string, data: UpdateVowInput, token: string) =>
-      fetchApi<{ data: Record<string, unknown> }>(`/ceremony/vows?weddingId=${weddingId}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        token,
-      }),
-    listProcessional: (weddingId: string, token: string) =>
-      fetchApi<{
-        data: Array<{
-          id: string
-          weddingId: string
-          name: string
-          role: string | null
-          sortOrder: number
-        }>
-      }>(`/ceremony/processional?weddingId=${weddingId}`, { token }),
-    createProcessional: (data: CreateProcessionalEntryInput, token: string) =>
-      fetchApi<{ data: Record<string, unknown> }>('/ceremony/processional', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        token,
-      }),
-    updateProcessional: (
-      id: string,
-      weddingId: string,
-      data: UpdateProcessionalEntryInput,
-      token: string,
-    ) =>
-      fetchApi<{ data: Record<string, unknown> }>(
-        `/ceremony/processional/${id}?weddingId=${weddingId}`,
-        { method: 'PUT', body: JSON.stringify(data), token },
-      ),
-    deleteProcessional: (id: string, weddingId: string, token: string) =>
-      fetchApi<{ data: { success: boolean } }>(
-        `/ceremony/processional/${id}?weddingId=${weddingId}`,
-        { method: 'DELETE', token },
-      ),
-  },
   playlists: {
     list: (weddingId: string, token: string) =>
       fetchApi<{
@@ -762,6 +679,10 @@ export const api = {
             id: string
             title: string
             artist: string
+            album: string | null
+            albumArt: string | null
+            durationMs: number | null
+            spotifyTrackId: string | null
             category: string | null
             sortOrder: number
           }>
@@ -798,6 +719,32 @@ export const api = {
         `/playlists/songs/${songId}?weddingId=${weddingId}`,
         {
           method: 'DELETE',
+          token,
+        },
+      ),
+    importSpotify: (playlistId: string, weddingId: string, spotifyUrl: string, token: string) =>
+      fetchApi<{ data: { imported: number; songs: Array<Record<string, unknown>> } }>(
+        `/playlists/${playlistId}/import-spotify?weddingId=${weddingId}`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ spotifyUrl }),
+          token,
+        },
+      ),
+    addSpotifyTrack: (playlistId: string, weddingId: string, spotifyUrl: string, token: string) =>
+      fetchApi<{ data: Record<string, unknown> }>(
+        `/playlists/${playlistId}/add-spotify-track?weddingId=${weddingId}`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ spotifyUrl }),
+          token,
+        },
+      ),
+    refreshSpotify: (playlistId: string, weddingId: string, token: string) =>
+      fetchApi<{ data: { imported: number; songs: Array<Record<string, unknown>> } }>(
+        `/playlists/${playlistId}/refresh-spotify?weddingId=${weddingId}`,
+        {
+          method: 'POST',
           token,
         },
       ),

@@ -41,7 +41,7 @@ import {
   notificationPrefsRoute,
 } from './routes/post-wedding.js'
 import { purchasesRoute, referralsRoute, contactRoute } from './routes/payments.js'
-import { ceremonyRoute } from './routes/ceremony.js'
+// ceremony route removed from UI — keeping files for potential future use
 import { playlistsRoute } from './routes/playlists.js'
 import { honeymoonRoute } from './routes/honeymoon.js'
 import { weatherRoute } from './routes/weather.js'
@@ -159,7 +159,7 @@ app.route('/notification-prefs', notificationPrefsRoute)
 app.route('/purchases', purchasesRoute)
 app.route('/referrals', referralsRoute)
 app.route('/contact', contactRoute)
-app.route('/ceremony', ceremonyRoute)
+// ceremony route removed
 app.route('/playlists', playlistsRoute)
 app.route('/honeymoon', honeymoonRoute)
 app.route('/weather', weatherRoute)
