@@ -143,12 +143,7 @@ export default function GuestsPage() {
       if (!weddingId || !selectedGuest) return
       const token = await getToken()
       if (!token) return
-      await api.guests.update(
-        selectedGuest.id,
-        { rsvpStatus: status },
-        weddingId,
-        token,
-      )
+      await api.guests.update(selectedGuest.id, { rsvpStatus: status }, weddingId, token)
       toast.success(`RSVP updated to ${status}`)
       await refetch()
     },

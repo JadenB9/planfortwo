@@ -218,9 +218,7 @@ export function GuestForm({
 
             {guest && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  RSVP Status
-                </label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">RSVP Status</label>
                 <div className="flex flex-wrap gap-2">
                   {(['pending', 'accepted', 'maybe', 'declined'] as const).map((status) => {
                     const active = formData.rsvpStatus === status
