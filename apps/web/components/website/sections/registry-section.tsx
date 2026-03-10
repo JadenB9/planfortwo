@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ExternalLink, Heart } from 'lucide-react'
 import type { RegistryContent } from '@planfortwo/types'
@@ -11,7 +10,6 @@ import {
   useHeadingFont,
   useBodyFont,
 } from '../template-context'
-import { RegistryViewer } from '@/components/registry/registry-viewer'
 
 interface RegistrySectionProps {
   title: string
@@ -22,12 +20,10 @@ function CashFundCard({
   registry,
   index,
   colors,
-  onView,
 }: {
   registry: RegistryContent['registries'][number]
   index: number
   colors: { primary: string; accent: string }
-  onView: (url: string, name: string) => void
 }) {
   const headingClass = useHeadingClass()
   const bodyClass = useBodyClass()
@@ -94,13 +90,9 @@ function CashFundCard({
 
   if (hasUrl) {
     return (
-      <button
-        type="button"
-        onClick={() => onView(registry.url, registry.name)}
-        className="text-left"
-      >
+      <a href={registry.url} target="_blank" rel="noopener noreferrer" className="text-left">
         {card}
-      </button>
+      </a>
     )
   }
 
@@ -113,105 +105,85 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
   const bodyClass = useBodyClass()
   const headingFont = useHeadingFont()
   const bodyFont = useBodyFont()
-  const [viewing, setViewing] = useState<{ url: string; name: string } | null>(null)
 
-  const regularRegistries = content.registries.filter((r) => !r.isCashFund)
-  const cashFunds = content.registries.filter((r) => r.isCashFund)
-
-  const handleView = (url: string, name: string) => {
-    setViewing({ url, name })
-  }
+  const registries = content.registries ?? []
+  const regularRegistries = registries.filter((r) => !r.isCashFund)
+  const cashFunds = registries.filter((r) => r.isCashFund)
 
   return (
-    <>
-      <section className="py-16 sm:py-24" style={{ backgroundColor: colors.sectionBackground }}>
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+    <section className="py-16 sm:py-24" style={{ backgroundColor: colors.sectionBackground }}>
+      <div className="mx-auto max-w-3xl px-4 text-center">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className={`mb-4 text-3xl sm:text-4xl ${headingClass}`}
+          style={{ ...headingFont, color: colors.primary }}
+        >
+          {title}
+        </motion.h2>
+        {content.message && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className={`mb-4 text-3xl sm:text-4xl ${headingClass}`}
-            style={{ ...headingFont, color: colors.primary }}
+            transition={{ delay: 0.2 }}
+            className={`mb-10 ${bodyClass}`}
+            style={{ ...bodyFont, color: `${colors.primary}BB` }}
           >
-            {title}
-          </motion.h2>
-          {content.message && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className={`mb-10 ${bodyClass}`}
-              style={{ ...bodyFont, color: `${colors.primary}BB` }}
-            >
-              {content.message}
-            </motion.p>
-          )}
+            {content.message}
+          </motion.p>
+        )}
 
-          {/* Regular registries */}
-          {regularRegistries.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-6">
-              {regularRegistries.map((registry, i) => {
-                const hasUrl = /^https?:\/\//i.test(registry.url)
-                return (
-                  <motion.button
-                    key={i}
-                    type="button"
-                    onClick={() => hasUrl && handleView(registry.url, registry.name)}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex cursor-pointer items-center gap-3 rounded-2xl bg-white px-6 py-4 shadow-sm transition-shadow hover:shadow-md"
-                  >
-                    {registry.logoUrl && /^https?:\/\//i.test(registry.logoUrl) && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={registry.logoUrl}
-                        alt={registry.name}
-                        className="h-8 w-8 object-contain"
-                      />
-                    )}
-                    <span
-                      className={`font-medium ${bodyClass}`}
-                      style={{ ...bodyFont, color: colors.primary }}
-                    >
-                      {registry.name}
-                    </span>
-                    <ExternalLink className="h-4 w-4" style={{ color: colors.accent }} />
-                  </motion.button>
-                )
-              })}
-            </div>
-          )}
-
-          {/* Cash funds */}
-          {cashFunds.length > 0 && (
-            <div
-              className={`flex flex-wrap justify-center gap-6 ${regularRegistries.length > 0 ? 'mt-8' : ''}`}
-            >
-              {cashFunds.map((fund, i) => (
-                <CashFundCard
+        {/* Regular registries */}
+        {regularRegistries.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-6">
+            {regularRegistries.map((registry, i) => {
+              const hasUrl = /^https?:\/\//i.test(registry.url)
+              return (
+                <motion.a
                   key={i}
-                  registry={fund}
-                  index={i}
-                  colors={colors}
-                  onView={handleView}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+                  href={hasUrl ? registry.url : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex cursor-pointer items-center gap-3 rounded-2xl bg-white px-6 py-4 shadow-sm transition-shadow hover:shadow-md"
+                >
+                  {registry.logoUrl && /^https?:\/\//i.test(registry.logoUrl) && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={registry.logoUrl}
+                      alt={registry.name}
+                      className="h-8 w-8 object-contain"
+                    />
+                  )}
+                  <span
+                    className={`font-medium ${bodyClass}`}
+                    style={{ ...bodyFont, color: colors.primary }}
+                  >
+                    {registry.name}
+                  </span>
+                  <ExternalLink className="h-4 w-4" style={{ color: colors.accent }} />
+                </motion.a>
+              )
+            })}
+          </div>
+        )}
 
-      {/* Inline Registry Viewer */}
-      <RegistryViewer
-        url={viewing?.url ?? ''}
-        storeName={viewing?.name ?? ''}
-        open={viewing !== null}
-        onClose={() => setViewing(null)}
-        accentColor={colors.accent}
-      />
-    </>
+        {/* Cash funds */}
+        {cashFunds.length > 0 && (
+          <div
+            className={`flex flex-wrap justify-center gap-6 ${regularRegistries.length > 0 ? 'mt-8' : ''}`}
+          >
+            {cashFunds.map((fund, i) => (
+              <CashFundCard key={i} registry={fund} index={i} colors={colors} />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   )
 }

@@ -46,7 +46,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { LucideIcon } from 'lucide-react'
-import { RegistryViewer } from '@/components/registry/registry-viewer'
+import { openRegistryLink } from '@/components/registry/registry-viewer'
 
 // ── Types ──
 
@@ -137,11 +137,6 @@ export default function RegistryPage() {
   // Edit states
   const [editingFund, setEditingFund] = useState<CashFund | null>(null)
   const [editingGift, setEditingGift] = useState<Gift | null>(null)
-
-  // Inline registry viewer state
-  const [viewingRegistry, setViewingRegistry] = useState<{ url: string; storeName: string } | null>(
-    null,
-  )
 
   // ── Data Loading ──
 
@@ -532,7 +527,7 @@ export default function RegistryPage() {
               onAddCustom={openAddLinkCustom}
               onDelete={handleDeleteLink}
               onCopy={handleCopyLink}
-              onView={(link) => setViewingRegistry({ url: link.url, storeName: link.storeName })}
+              onView={(link) => openRegistryLink(link.url)}
             />
           </motion.div>
         )}
@@ -753,14 +748,6 @@ export default function RegistryPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Inline Registry Viewer */}
-      <RegistryViewer
-        url={viewingRegistry?.url ?? ''}
-        storeName={viewingRegistry?.storeName ?? ''}
-        open={viewingRegistry !== null}
-        onClose={() => setViewingRegistry(null)}
-      />
     </motion.div>
   )
 }
