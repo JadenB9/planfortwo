@@ -41,7 +41,7 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
         >
           {title}
         </motion.h2>
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-3 gap-4 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {content.members.map((member, i) => (
             <motion.div
               key={i}
@@ -49,10 +49,10 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="text-center"
+              className="min-w-0 text-center"
             >
               {safeImgSrc(member.imageUrl) ? (
-                <div className="mx-auto h-40 w-40 overflow-hidden rounded-full">
+                <div className="mx-auto aspect-square w-full max-w-[10rem] overflow-hidden rounded-full">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={safeImgSrc(member.imageUrl)!}
@@ -62,7 +62,7 @@ export function WeddingPartySection({ title, content }: WeddingPartySectionProps
                 </div>
               ) : (
                 <div
-                  className="mx-auto flex h-40 w-40 items-center justify-center rounded-full text-3xl font-bold"
+                  className="mx-auto flex aspect-square w-full max-w-[10rem] items-center justify-center rounded-full text-3xl font-bold"
                   style={{ backgroundColor: colors.secondary, color: colors.primary }}
                 >
                   {member.name.charAt(0)}
