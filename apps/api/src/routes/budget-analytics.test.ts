@@ -120,37 +120,6 @@ const FULL_GATES = {
   canPhotoGallery: true,
 }
 
-const FREE_GATES = {
-  tier: 'free' as const,
-  canAddTasks: true,
-  canEditChecklist: true,
-  canDeleteTasks: true,
-  canReorderTasks: true,
-  canCustomizeCategories: true,
-  canAddNotes: true,
-  canAddAttachments: true,
-  maxGuests: null,
-  canEditGuests: true,
-  canDeleteGuests: true,
-  canBulkImport: true,
-  canRsvp: true,
-  canSeatingChart: false,
-  canVendorManagement: true,
-  canCustomDomain: false,
-  canDataExport: true,
-  canBudgetCategories: true,
-  canBudgetExpenses: true,
-  canBudgetAnalytics: true,
-  canBudgetExport: true,
-  canPaymentSchedule: true,
-  canWebsiteBuilder: true,
-  canWebsiteAnalytics: false,
-  canWebsiteCustomSections: false,
-  canInbox: false,
-  canMusicIntegration: false,
-  canPhotoGallery: false,
-}
-
 function createApp() {
   const app = new Hono()
   app.route('/budget', budgetAnalyticsRoute)
