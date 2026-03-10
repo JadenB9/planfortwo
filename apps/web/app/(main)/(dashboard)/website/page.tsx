@@ -215,6 +215,8 @@ export default function WebsitePage() {
           <RegistryEditor
             content={content as unknown as RegistryContent}
             onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+            getToken={getToken}
+            weddingId={weddingId ?? ''}
           />
         )
       case 'rsvp':

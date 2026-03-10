@@ -1,30 +1,117 @@
 'use client'
 
-import { Plus, Trash2 } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Plus, Trash2, Loader2, ExternalLink, Gift, Banknote } from 'lucide-react'
+import { toast } from 'sonner'
+import { api } from '@/lib/api'
 import type { RegistryContent } from '@planfortwo/types'
+import type { RegistryLink, CashFund } from '@planfortwo/types'
 
 interface RegistryEditorProps {
   content: RegistryContent
   onChange: (content: RegistryContent) => void
+  getToken: () => Promise<string | null>
+  weddingId: string
 }
 
-export function RegistryEditor({ content, onChange }: RegistryEditorProps) {
+export function RegistryEditor({ content, onChange, getToken, weddingId }: RegistryEditorProps) {
+  const [links, setLinks] = useState<RegistryLink[]>([])
+  const [funds, setFunds] = useState<CashFund[]>([])
+  const [loading, setLoading] = useState(true)
+
   const registries = content.registries ?? []
 
-  function updateRegistry(
-    index: number,
-    field: keyof RegistryContent['registries'][number],
-    value: string,
-  ) {
-    const updated = registries.map((reg, i) => (i === index ? { ...reg, [field]: value } : reg))
-    onChange({ ...content, registries: updated })
+  const fetchData = useCallback(async () => {
+    try {
+      const token = await getToken()
+      if (!token || !weddingId) return
+
+      const [linksRes, fundsRes] = await Promise.all([
+        api.registry.listLinks(weddingId, token),
+        api.registry.listFunds(weddingId, token),
+      ])
+
+      setLinks(linksRes.data ?? [])
+      setFunds(fundsRes.data ?? [])
+    } catch {
+      toast.error('Failed to load registries')
+    } finally {
+      setLoading(false)
+    }
+  }, [getToken, weddingId])
+
+  useEffect(() => {
+    void fetchData()
+  }, [fetchData])
+
+  const isLinkSelected = useCallback(
+    (link: RegistryLink): boolean => {
+      return registries.some((r) => r.name === link.storeName && r.url === link.url)
+    },
+    [registries],
+  )
+
+  const isFundSelected = useCallback(
+    (fund: CashFund): boolean => {
+      return registries.some((r) => r.name === fund.name && r.url === '' && r.isCashFund === true)
+    },
+    [registries],
+  )
+
+  function toggleLink(link: RegistryLink) {
+    if (isLinkSelected(link)) {
+      onChange({
+        ...content,
+        registries: registries.filter((r) => !(r.name === link.storeName && r.url === link.url)),
+      })
+    } else {
+      onChange({
+        ...content,
+        registries: [
+          ...registries,
+          {
+            name: link.storeName,
+            url: link.url,
+            logoUrl: link.logoUrl ?? undefined,
+          },
+        ],
+      })
+    }
   }
 
-  function addRegistry() {
+  function toggleFund(fund: CashFund) {
+    if (isFundSelected(fund)) {
+      onChange({
+        ...content,
+        registries: registries.filter(
+          (r) => !(r.name === fund.name && r.url === '' && r.isCashFund === true),
+        ),
+      })
+    } else {
+      onChange({
+        ...content,
+        registries: [
+          ...registries,
+          {
+            name: fund.name,
+            url: '',
+            isCashFund: true,
+          },
+        ],
+      })
+    }
+  }
+
+  function addCustomRegistry() {
     onChange({
       ...content,
       registries: [...registries, { name: '', url: '', logoUrl: '' }],
     })
+  }
+
+  function updateCustomRegistry(index: number, field: 'name' | 'url' | 'logoUrl', value: string) {
+    const updated = registries.map((reg, i) => (i === index ? { ...reg, [field]: value } : reg))
+    onChange({ ...content, registries: updated })
   }
 
   function removeRegistry(index: number) {
@@ -32,6 +119,29 @@ export function RegistryEditor({ content, onChange }: RegistryEditorProps) {
       ...content,
       registries: registries.filter((_, i) => i !== index),
     })
+  }
+
+  /** Identify custom entries -- those not matching any known link or fund */
+  const isCustomEntry = useCallback(
+    (reg: RegistryContent['registries'][number]): boolean => {
+      if (reg.isCashFund) return false
+      const matchesLink = links.some((l) => l.storeName === reg.name && l.url === reg.url)
+      return !matchesLink
+    },
+    [links],
+  )
+
+  const customRegistries = registries
+    .map((reg, index) => ({ reg, index }))
+    .filter(({ reg }) => isCustomEntry(reg))
+
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount / 100)
   }
 
   return (
@@ -51,28 +161,215 @@ export function RegistryEditor({ content, onChange }: RegistryEditorProps) {
         />
       </div>
 
-      {/* Registries */}
-      <div className="mt-4 border-t border-gray-100 pt-4">
+      {/* Import from existing registries */}
+      <div className="border-t border-gray-100 pt-4">
+        <h3 className="text-sm font-medium text-gray-700">Import from your registries</h3>
+        <p className="mt-1 text-xs text-gray-500">
+          Select registries and cash funds from your dashboard to display on your website.
+        </p>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+            <span className="ml-2 text-sm text-gray-500">Loading registries...</span>
+          </div>
+        ) : links.length === 0 && funds.length === 0 ? (
+          <div className="mt-3 flex flex-col items-center gap-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+            <Gift className="h-8 w-8 text-gray-400" />
+            <div>
+              <p className="text-sm font-medium text-gray-700">No registries found</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Add registry links or cash funds in the{' '}
+                <a
+                  href="/registry"
+                  className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Registry <ExternalLink className="h-3 w-3" />
+                </a>{' '}
+                section first, or add custom registries below.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-3 space-y-4">
+            {/* Registry Links */}
+            {links.length > 0 && (
+              <div>
+                <div className="mb-2 flex items-center gap-1.5">
+                  <Gift className="h-4 w-4 text-gray-500" />
+                  <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                    Your Registries
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {links.map((link) => {
+                    const selected = isLinkSelected(link)
+                    return (
+                      <button
+                        key={link.id}
+                        type="button"
+                        onClick={() => toggleLink(link)}
+                        className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
+                          selected
+                            ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-200'
+                            : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {/* Toggle indicator */}
+                        <div
+                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                            selected ? 'border-blue-500 bg-blue-500' : 'border-gray-300 bg-white'
+                          }`}
+                        >
+                          {selected && (
+                            <svg
+                              className="h-3.5 w-3.5 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={3}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </div>
+
+                        {/* Logo */}
+                        {link.logoUrl && (
+                          <img
+                            src={link.logoUrl}
+                            alt=""
+                            className="h-8 w-8 shrink-0 rounded-md object-contain"
+                          />
+                        )}
+
+                        {/* Info */}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-gray-900">
+                            {link.storeName}
+                          </p>
+                          <p className="truncate text-xs text-gray-500">{link.url}</p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Cash Funds */}
+            {funds.length > 0 && (
+              <div>
+                <div className="mb-2 flex items-center gap-1.5">
+                  <Banknote className="h-4 w-4 text-gray-500" />
+                  <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                    Cash Funds
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {funds
+                    .filter((f) => f.isActive)
+                    .map((fund) => {
+                      const selected = isFundSelected(fund)
+                      const progress =
+                        fund.goalAmount > 0
+                          ? Math.min(100, Math.round((fund.currentAmount / fund.goalAmount) * 100))
+                          : 0
+                      return (
+                        <button
+                          key={fund.id}
+                          type="button"
+                          onClick={() => toggleFund(fund)}
+                          className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
+                            selected
+                              ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-200'
+                              : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {/* Toggle indicator */}
+                          <div
+                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                              selected ? 'border-blue-500 bg-blue-500' : 'border-gray-300 bg-white'
+                            }`}
+                          >
+                            {selected && (
+                              <svg
+                                className="h-3.5 w-3.5 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={3}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                          </div>
+
+                          {/* Info */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="truncate text-sm font-medium text-gray-900">
+                                {fund.name}
+                              </p>
+                              <span className="shrink-0 text-xs text-gray-500">
+                                {formatCurrency(fund.currentAmount)} /{' '}
+                                {formatCurrency(fund.goalAmount)}
+                              </span>
+                            </div>
+                            {fund.goalAmount > 0 && (
+                              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                                <div
+                                  className="h-full rounded-full bg-green-500 transition-all"
+                                  style={{ width: `${progress}%` }}
+                                />
+                              </div>
+                            )}
+                            {fund.description && (
+                              <p className="mt-1 truncate text-xs text-gray-500">
+                                {fund.description}
+                              </p>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Custom Registries */}
+      <div className="border-t border-gray-100 pt-4">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-700">Registries</label>
+          <label className="text-sm font-medium text-gray-700">Custom Registries</label>
           <button
             type="button"
-            onClick={addRegistry}
+            onClick={addCustomRegistry}
             className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
           >
             <Plus className="h-4 w-4" />
-            Add
+            Add Custom
           </button>
         </div>
 
-        {registries.length === 0 && (
+        {customRegistries.length === 0 && (
           <p className="mt-2 text-sm text-gray-500">
-            No registries added yet. Link to your gift registries so guests know where to shop.
+            Add registries not listed above by entering the name and URL manually.
           </p>
         )}
 
         <div className="mt-3 space-y-4">
-          {registries.map((reg, index) => (
+          {customRegistries.map(({ reg, index }) => (
             <div key={index} className="relative rounded-lg border border-gray-200 p-4">
               <button
                 type="button"
@@ -95,7 +392,7 @@ export function RegistryEditor({ content, onChange }: RegistryEditorProps) {
                     id={`reg-name-${index}`}
                     type="text"
                     value={reg.name}
-                    onChange={(e) => updateRegistry(index, 'name', e.target.value)}
+                    onChange={(e) => updateCustomRegistry(index, 'name', e.target.value)}
                     placeholder="e.g. Amazon, Crate & Barrel, Zola"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
@@ -109,7 +406,7 @@ export function RegistryEditor({ content, onChange }: RegistryEditorProps) {
                     id={`reg-url-${index}`}
                     type="text"
                     value={reg.url}
-                    onChange={(e) => updateRegistry(index, 'url', e.target.value)}
+                    onChange={(e) => updateCustomRegistry(index, 'url', e.target.value)}
                     placeholder="https://www.amazon.com/wedding/your-registry"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
@@ -126,7 +423,7 @@ export function RegistryEditor({ content, onChange }: RegistryEditorProps) {
                     id={`reg-logo-${index}`}
                     type="text"
                     value={reg.logoUrl ?? ''}
-                    onChange={(e) => updateRegistry(index, 'logoUrl', e.target.value)}
+                    onChange={(e) => updateCustomRegistry(index, 'logoUrl', e.target.value)}
                     placeholder="https://example.com/logo.png"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
@@ -136,6 +433,16 @@ export function RegistryEditor({ content, onChange }: RegistryEditorProps) {
           ))}
         </div>
       </div>
+
+      {/* Summary */}
+      {registries.length > 0 && (
+        <div className="rounded-lg bg-gray-50 px-4 py-3">
+          <p className="text-xs text-gray-500">
+            {registries.length} {registries.length === 1 ? 'registry' : 'registries'} will be shown
+            on your website.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

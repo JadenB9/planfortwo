@@ -566,6 +566,7 @@ export interface RegistryContent {
     name: string
     url: string
     logoUrl?: string
+    isCashFund?: boolean
   }[]
 }
 
