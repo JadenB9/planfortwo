@@ -188,39 +188,54 @@ export default function WebsitePage() {
     [weddingId, getToken, refetch],
   )
 
-  // Auto-create song_requests section if missing (default hidden)
-  const songRequestsAutoCreated = useRef(false)
+  // Auto-create song_requests and prayers sections if missing (default hidden)
+  const defaultSectionsCreated = useRef(false)
+  const DEFAULT_SECTIONS = useRef([
+    {
+      sectionType: 'song_requests',
+      title: 'Song Requests',
+      content: { message: 'Help us build our playlist!', showApproved: false },
+    },
+    {
+      sectionType: 'prayers',
+      title: 'Prayers',
+      content: {
+        requireApproval: true,
+        message:
+          'We would be honored to have your prayers and blessings as we begin this new chapter together.',
+      },
+    },
+  ])
+
   useEffect(() => {
-    if (!weddingId || !config || loading || songRequestsAutoCreated.current) return
-    if (sections.length === 0) return // Wait for sections to load
-    const hasSongRequests = sections.some((s) => s.sectionType === 'song_requests')
-    if (!hasSongRequests) {
-      songRequestsAutoCreated.current = true
-      void (async () => {
-        const token = await getToken()
-        if (!token) return
-        await api.websiteSections.addBuiltIn(
-          weddingId,
-          {
-            sectionType: 'song_requests',
-            title: 'Song Requests',
-            content: { message: 'Help us build our playlist!', showApproved: false },
-          },
-          token,
-        )
-        // Refetch to get the new section, then toggle it off
-        await refetch()
-      })()
-    }
+    if (!weddingId || !config || loading || defaultSectionsCreated.current) return
+    if (sections.length === 0) return
+    const existingTypes = new Set<string>(sections.map((s) => s.sectionType))
+    const missing = DEFAULT_SECTIONS.current.filter((d) => !existingTypes.has(d.sectionType))
+    if (missing.length === 0) return
+
+    defaultSectionsCreated.current = true
+    void (async () => {
+      const token = await getToken()
+      if (!token) return
+      for (const section of missing) {
+        await api.websiteSections.addBuiltIn(weddingId, section, token)
+      }
+      await refetch()
+    })()
   }, [weddingId, config, loading, sections, getToken, refetch])
 
-  // After song_requests section is created, toggle it off
+  // After default sections are created, toggle them off
   useEffect(() => {
-    if (!songRequestsAutoCreated.current || !weddingId) return
-    const songRequestsSection = sections.find((s) => s.sectionType === 'song_requests')
-    if (songRequestsSection && songRequestsSection.isVisible) {
-      songRequestsAutoCreated.current = false // Reset so we don't loop
-      void handleToggleVisibility(songRequestsSection.id, false)
+    if (!defaultSectionsCreated.current || !weddingId) return
+    const newSections = sections.filter(
+      (s) => (s.sectionType === 'song_requests' || s.sectionType === 'prayers') && s.isVisible,
+    )
+    if (newSections.length > 0) {
+      defaultSectionsCreated.current = false
+      for (const section of newSections) {
+        void handleToggleVisibility(section.id, false)
+      }
     }
   }, [sections, weddingId, handleToggleVisibility])
 
@@ -387,12 +402,12 @@ export default function WebsitePage() {
 
   return (
     <motion.div
-      className="space-y-6 p-6"
+      className="flex h-full flex-col px-6 pt-6"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ...springSmooth }}
     >
-      <div className="flex items-center justify-between">
+      <div className="mb-4 flex shrink-0 items-center justify-between">
         <h1 className="font-serif text-2xl font-bold text-gray-900">Wedding Website</h1>
         <PublishToggle
           isPublished={!!config.publishedAt}
@@ -403,9 +418,9 @@ export default function WebsitePage() {
         />
       </div>
 
-      <div className="flex gap-6">
-        {/* Editor panel */}
-        <div className="min-w-0 flex-1">
+      <div className="flex min-h-0 flex-1 gap-6">
+        {/* Editor panel — scrollable independently */}
+        <div className="min-w-0 flex-1 overflow-y-auto pb-6 pr-1">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
               <TabsTrigger value="design">Design</TabsTrigger>
@@ -468,15 +483,12 @@ export default function WebsitePage() {
           </Tabs>
         </div>
 
-        {/* Live preview panel — visible on xl screens */}
+        {/* Live preview panel — stays fixed in place */}
         <div
           className="hidden shrink-0 transition-all duration-300 xl:block"
           style={{ width: previewMode === 'desktop' ? '520px' : '300px' }}
         >
-          <div
-            className="sticky top-6 overflow-hidden rounded-lg border shadow-sm"
-            style={{ height: 'calc(100vh - 180px)' }}
-          >
+          <div className="h-full overflow-hidden rounded-lg border shadow-sm">
             <WebsitePreview
               templateId={config.templateId}
               customColors={config.customColors}

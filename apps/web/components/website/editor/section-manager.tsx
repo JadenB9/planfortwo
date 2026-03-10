@@ -11,15 +11,6 @@ import { GripVertical, Pencil, Trash2, Plus, ChevronDown } from 'lucide-react'
 const ADDABLE_SECTIONS: { sectionType: string; title: string; content: Record<string, unknown> }[] =
   [
     {
-      sectionType: 'prayers',
-      title: 'Prayers',
-      content: {
-        requireApproval: true,
-        message:
-          'We would be honored to have your prayers and blessings as we begin this new chapter together.',
-      },
-    },
-    {
       sectionType: 'guestbook',
       title: 'Guestbook',
       content: { requireApproval: true, message: 'Leave us a message!' },
