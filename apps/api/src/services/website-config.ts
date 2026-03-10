@@ -52,7 +52,8 @@ export const websiteConfigService = {
         | 'rsvp'
         | 'schedule'
         | 'guestbook'
-        | 'custom',
+        | 'custom'
+        | 'song_requests',
       title: s.title,
       content: s.content,
       isVisible: s.isVisible,

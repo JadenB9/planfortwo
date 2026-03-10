@@ -35,6 +35,7 @@ interface PublicWebsiteData {
       | 'schedule'
       | 'guestbook'
       | 'custom'
+      | 'song_requests'
     title: string
     content: Record<string, unknown>
     isVisible: boolean

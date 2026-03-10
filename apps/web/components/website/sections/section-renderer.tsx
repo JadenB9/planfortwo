@@ -15,6 +15,7 @@ import type {
   ScheduleContent,
   GuestbookSectionContent,
   CustomSectionContent,
+  SongRequestsSectionContent,
 } from '@planfortwo/types'
 import { HeroSection } from './hero-section'
 import { OurStorySection } from './our-story-section'
@@ -29,10 +30,20 @@ import { RsvpSection } from './rsvp-section'
 import { ScheduleSection } from './schedule-section'
 import { GuestbookSection } from './guestbook-section'
 import { CustomSection } from './custom-section'
+import { SongRequestsSection } from './song-requests-section'
+
+interface GuestPhoto {
+  id: string
+  url: string
+  caption: string | null
+  uploaderName: string | null
+  createdAt: Date | string
+}
 
 interface SectionRendererProps {
   section: Omit<WebsiteSection, 'weddingId'>
   photos: Omit<WebsitePhoto, 'weddingId'>[]
+  guestPhotos?: GuestPhoto[]
   guestbookEntries: GuestbookEntry[]
   weddingName: string
   weddingDate: Date | null
@@ -43,6 +54,7 @@ interface SectionRendererProps {
 export function SectionRenderer({
   section,
   photos,
+  guestPhotos,
   guestbookEntries,
   weddingName,
   weddingDate,
@@ -89,6 +101,8 @@ export function SectionRenderer({
           title={section.title}
           content={section.content as unknown as GalleryContent}
           photos={(sectionPhotos.length > 0 ? sectionPhotos : photos) as WebsitePhoto[]}
+          slug={slug}
+          guestPhotos={guestPhotos}
         />
       )
     case 'travel':
@@ -144,6 +158,14 @@ export function SectionRenderer({
         <CustomSection
           title={section.title}
           content={section.content as unknown as CustomSectionContent}
+        />
+      )
+    case 'song_requests':
+      return (
+        <SongRequestsSection
+          title={section.title}
+          content={section.content as unknown as SongRequestsSectionContent}
+          slug={slug}
         />
       )
     default:

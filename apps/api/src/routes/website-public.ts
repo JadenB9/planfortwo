@@ -94,9 +94,7 @@ websitePublicRoute.get('/:slug', async (c) => {
   const approvedGuestPhotos = await db
     .select()
     .from(photos)
-    .where(
-      and(eq(photos.weddingId, config.weddingId), eq(photos.moderationStatus, 'approved')),
-    )
+    .where(and(eq(photos.weddingId, config.weddingId), eq(photos.moderationStatus, 'approved')))
     .orderBy(asc(photos.createdAt))
 
   const headers: Record<string, string> = {}
