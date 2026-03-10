@@ -48,6 +48,7 @@ export default function GuestsPage() {
   const [deletingGuestId, setDeletingGuestId] = useState<string | null>(null)
   const [sendingBulk, setSendingBulk] = useState(false)
   const [showBulkInviteConfirm, setShowBulkInviteConfirm] = useState(false)
+  const [activeTab, setActiveTab] = useState<'guests' | 'allergies'>('guests')
 
   const handleCreateGuest = useCallback(
     async (data: GuestFormData) => {
@@ -380,39 +381,129 @@ export default function GuestsPage() {
         {/* Stats */}
         <GuestStatsBar stats={stats} />
 
-        {/* Filters */}
-        <GuestFilters
-          filters={filters}
-          tags={tags}
-          onFilterChange={updateFilters}
-          onSearchChange={setSearchDebounced}
-        />
+        {/* Tabs */}
+        <div className="flex gap-1 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('guests')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === 'guests'
+                ? 'border-wedding-600 text-wedding-700 border-b-2'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Guests
+          </button>
+          <button
+            onClick={() => setActiveTab('allergies')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === 'allergies'
+                ? 'border-wedding-600 text-wedding-700 border-b-2'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Allergies
+          </button>
+        </div>
 
-        {/* Pagination (top) */}
-        {!loading && total > 0 && paginationControls}
+        {activeTab === 'guests' && (
+          <>
+            {/* Filters */}
+            <GuestFilters
+              filters={filters}
+              tags={tags}
+              onFilterChange={updateFilters}
+              onSearchChange={setSearchDebounced}
+            />
 
-        {/* Table */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
-          </div>
-        ) : (
-          <GuestTable
-            guests={guests}
-            onSelectGuest={setSelectedGuest}
-            onEditGuest={setEditingGuest}
-            onDeleteGuest={handleDeleteGuestInline}
-            onSendInvite={handleSendInvite}
-            sendingInviteId={sendingInviteId}
-            deletingGuestId={deletingGuestId}
-          />
+            {/* Pagination (top) */}
+            {!loading && total > 0 && paginationControls}
+
+            {/* Table */}
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+              </div>
+            ) : (
+              <GuestTable
+                guests={guests}
+                onSelectGuest={setSelectedGuest}
+                onEditGuest={setEditingGuest}
+                onDeleteGuest={handleDeleteGuestInline}
+                onSendInvite={handleSendInvite}
+                sendingInviteId={sendingInviteId}
+                deletingGuestId={deletingGuestId}
+              />
+            )}
+
+            {/* Pagination (bottom) */}
+            {!loading && total > 0 && paginationControls}
+
+            {/* Dietary Summary */}
+            {stats && stats.totalGuests > 0 && (
+              <DietarySummaryCard summary={stats.dietarySummary} />
+            )}
+          </>
         )}
 
-        {/* Pagination (bottom) */}
-        {!loading && total > 0 && paginationControls}
+        {activeTab === 'allergies' && (
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-200 px-5 py-3">
+              <h3 className="font-serif text-sm font-semibold text-gray-900">Guest Allergies</h3>
+              <p className="mt-0.5 text-xs text-gray-500">
+                Guests with reported allergies or dietary notes
+              </p>
+            </div>
+            {(() => {
+              const guestsWithAllergies = guests.filter((g) => {
+                const d = g.dietary as Record<string, unknown> | null
+                if (!d) return false
+                const hasNotes = typeof d.notes === 'string' && d.notes.trim().length > 0
+                const hasAllergies = Array.isArray(d.allergies) && d.allergies.length > 0
+                return hasNotes || hasAllergies
+              })
 
-        {/* Dietary Summary */}
-        {stats && stats.totalGuests > 0 && <DietarySummaryCard summary={stats.dietarySummary} />}
+              if (loading) {
+                return (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+                  </div>
+                )
+              }
+
+              if (guestsWithAllergies.length === 0) {
+                return (
+                  <div className="px-5 py-8 text-center">
+                    <p className="text-sm text-gray-500">No allergies reported yet.</p>
+                  </div>
+                )
+              }
+
+              return (
+                <div className="divide-y divide-gray-100">
+                  {guestsWithAllergies.map((g) => {
+                    const d = g.dietary as Record<string, unknown>
+                    const notes =
+                      typeof d.notes === 'string' && d.notes.trim() ? d.notes.trim() : null
+                    const allergies =
+                      Array.isArray(d.allergies) && d.allergies.length > 0
+                        ? (d.allergies as string[]).join(', ')
+                        : null
+                    return (
+                      <div key={g.id} className="flex items-center justify-between px-5 py-3">
+                        <span className="text-sm font-medium text-gray-900">
+                          {g.firstName} {g.lastName}
+                        </span>
+                        <span className="max-w-[60%] text-right text-sm text-gray-600">
+                          {notes ?? allergies}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </div>
+        )}
       </div>
 
       {/* Guest Detail Slide-over */}

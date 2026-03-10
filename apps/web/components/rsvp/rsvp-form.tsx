@@ -8,6 +8,7 @@ import type {
   DietaryInfo,
   RsvpSubmission,
 } from '@planfortwo/types'
+import { SpotifySearch } from './spotify-search'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
@@ -225,38 +226,15 @@ export function RsvpForm({
 
                 {showDietary && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Dietary Restrictions</p>
-                    <div className="mt-2 flex flex-wrap gap-3">
-                      {(['vegetarian', 'vegan', 'glutenFree', 'kosher', 'halal'] as const).map(
-                        (key) => (
-                          <label key={key} className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              checked={!!form.dietary[key]}
-                              onChange={(e) => updateDietary(index, key, e.target.checked)}
-                              className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
-                            />
-                            <span className="text-sm capitalize text-gray-700">
-                              {key === 'glutenFree' ? 'Gluten Free' : key}
-                            </span>
-                          </label>
-                        ),
-                      )}
-                    </div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Allergies{' '}
+                      <span className="font-normal text-gray-400">(leave blank for none)</span>
+                    </label>
                     <input
                       type="text"
-                      value={(form.dietary.allergies ?? []).join(', ')}
-                      onChange={(e) =>
-                        updateDietary(
-                          index,
-                          'allergies',
-                          e.target.value
-                            .split(',')
-                            .map((s) => s.trim())
-                            .filter(Boolean),
-                        )
-                      }
-                      placeholder="Allergies (comma separated)"
+                      value={form.dietary.notes ?? ''}
+                      onChange={(e) => updateDietary(index, 'notes', e.target.value)}
+                      placeholder="e.g. peanuts, shellfish, dairy..."
                       className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
                     />
                   </div>
@@ -264,13 +242,12 @@ export function RsvpForm({
 
                 {showSongRequest && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Song Request</label>
-                    <input
-                      type="text"
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                      Song Request
+                    </label>
+                    <SpotifySearch
                       value={form.songRequest}
-                      onChange={(e) => updateForm(index, { songRequest: e.target.value })}
-                      placeholder="What song will get you on the dance floor?"
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                      onChange={(val) => updateForm(index, { songRequest: val })}
                     />
                   </div>
                 )}
@@ -322,28 +299,21 @@ export function RsvpForm({
 
                           {showDietary && (
                             <div>
-                              <p className="text-sm font-medium text-gray-700">
-                                Their Dietary Restrictions
-                              </p>
-                              <div className="mt-2 flex flex-wrap gap-3">
-                                {(
-                                  ['vegetarian', 'vegan', 'glutenFree', 'kosher', 'halal'] as const
-                                ).map((key) => (
-                                  <label key={key} className="flex items-center gap-2">
-                                    <input
-                                      type="checkbox"
-                                      checked={!!form.plusOneDietary[key]}
-                                      onChange={(e) =>
-                                        updatePlusOneDietary(index, key, e.target.checked)
-                                      }
-                                      className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
-                                    />
-                                    <span className="text-sm capitalize text-gray-700">
-                                      {key === 'glutenFree' ? 'Gluten Free' : key}
-                                    </span>
-                                  </label>
-                                ))}
-                              </div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Their Allergies{' '}
+                                <span className="font-normal text-gray-400">
+                                  (leave blank for none)
+                                </span>
+                              </label>
+                              <input
+                                type="text"
+                                value={form.plusOneDietary.notes ?? ''}
+                                onChange={(e) =>
+                                  updatePlusOneDietary(index, 'notes', e.target.value)
+                                }
+                                placeholder="e.g. peanuts, shellfish, dairy..."
+                                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                              />
                             </div>
                           )}
                         </>

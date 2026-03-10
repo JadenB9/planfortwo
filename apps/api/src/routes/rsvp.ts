@@ -13,6 +13,7 @@ import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
 import { rsvpService } from '../services/rsvp.js'
+import { spotifyService } from '../services/spotify.js'
 
 async function resolveSlugToWeddingId(slug: string): Promise<string | null> {
   const tokenMatch = slug.match(/([0-9a-f]{32})$/)
@@ -256,6 +257,21 @@ rsvpRoute.post(
     }
   },
 )
+
+// GET /rsvp/spotify-search?q=... — public Spotify track search for RSVP song requests
+rsvpRoute.get('/spotify-search', async (c) => {
+  const q = c.req.query('q')?.trim()
+  if (!q || q.length < 2) {
+    return c.json({ data: [] })
+  }
+
+  try {
+    const tracks = await spotifyService.searchTracks(q, 5)
+    return c.json({ data: tracks })
+  } catch {
+    return c.json({ data: [] })
+  }
+})
 
 // ── Auth-Required Endpoint ──
 

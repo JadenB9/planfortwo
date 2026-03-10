@@ -126,6 +126,45 @@ export const spotifyService = {
     return tracks
   },
 
+  async searchTracks(query: string, limit = 5): Promise<SpotifyTrackData[]> {
+    const token = await this.getAccessToken()
+    const resp = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    )
+
+    if (!resp.ok) {
+      throw new Error(`Spotify search failed: ${resp.status}`)
+    }
+
+    const data = (await resp.json()) as {
+      tracks: {
+        items: Array<{
+          id: string
+          name: string
+          artists: Array<{ name: string }>
+          album: { name: string; images: Array<{ url: string; width: number }> }
+          duration_ms: number
+        }>
+      }
+    }
+
+    return data.tracks.items.map((t) => {
+      const art =
+        t.album.images.find((img) => img.width <= 300)?.url ??
+        t.album.images[t.album.images.length - 1]?.url ??
+        null
+      return {
+        spotifyTrackId: t.id,
+        title: t.name,
+        artist: t.artists.map((a) => a.name).join(', '),
+        album: t.album.name,
+        albumArt: art,
+        durationMs: t.duration_ms,
+      }
+    })
+  },
+
   async getTrack(trackId: string): Promise<SpotifyTrackData> {
     const token = await this.getAccessToken()
     const resp = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
