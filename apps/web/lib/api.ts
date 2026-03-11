@@ -806,7 +806,7 @@ export const api = {
           token,
         },
       ),
-    searchSpotify: (playlistId: string, weddingId: string, query: string, token: string) =>
+    searchSpotify: (weddingId: string, query: string, token: string) =>
       fetchApi<{
         data: Array<{
           spotifyTrackId: string
@@ -816,7 +816,7 @@ export const api = {
           albumArt: string | null
           durationMs: number
         }>
-      }>(`/playlists/${playlistId}/search-spotify?weddingId=${weddingId}`, {
+      }>(`/playlists/search-spotify?weddingId=${weddingId}`, {
         method: 'POST',
         body: JSON.stringify({ query }),
         token,

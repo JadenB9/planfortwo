@@ -392,28 +392,24 @@ function MusicPageInner() {
     [weddingId, getToken, spotifyImportUrl, loadPlaylistSongs, loadData],
   )
 
-  const handleSpotifySearch = useCallback(
-    async (playlistId: string) => {
-      if (!weddingId || !spotifySearchQuery.trim()) return
-      setSearchingSpotify(true)
-      try {
-        const token = await getToken()
-        if (!token) return
-        const { data } = await api.playlists.searchSpotify(
-          playlistId,
-          weddingId,
-          spotifySearchQuery.trim(),
-          token,
-        )
-        setSpotifySearchResults(data)
-      } catch {
-        toast.error('Failed to search Spotify')
-      } finally {
-        setSearchingSpotify(false)
-      }
-    },
-    [weddingId, getToken, spotifySearchQuery],
-  )
+  const handleSpotifySearch = useCallback(async () => {
+    if (!weddingId || !spotifySearchQuery.trim()) return
+    setSearchingSpotify(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      const { data } = await api.playlists.searchSpotify(
+        weddingId,
+        spotifySearchQuery.trim(),
+        token,
+      )
+      setSpotifySearchResults(data)
+    } catch {
+      toast.error('Failed to search Spotify')
+    } finally {
+      setSearchingSpotify(false)
+    }
+  }, [weddingId, getToken, spotifySearchQuery])
 
   const handleAddSearchResult = useCallback(
     async (
@@ -1119,8 +1115,7 @@ function MusicPageInner() {
                                                 placeholder="Search for a song..."
                                                 className="flex-1 bg-white"
                                                 onKeyDown={(e) => {
-                                                  if (e.key === 'Enter')
-                                                    void handleSpotifySearch(pl.id)
+                                                  if (e.key === 'Enter') void handleSpotifySearch()
                                                 }}
                                               />
                                               <Button
@@ -1129,7 +1124,7 @@ function MusicPageInner() {
                                                 disabled={
                                                   !spotifySearchQuery.trim() || searchingSpotify
                                                 }
-                                                onClick={() => handleSpotifySearch(pl.id)}
+                                                onClick={() => handleSpotifySearch()}
                                               >
                                                 {searchingSpotify ? (
                                                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
