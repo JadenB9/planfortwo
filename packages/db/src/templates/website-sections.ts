@@ -31,6 +31,17 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
     sortOrder: 1,
   },
   {
+    sectionType: 'rsvp',
+    title: 'RSVP',
+    content: {
+      message: 'Please let us know if you can make it!',
+      showDietary: true,
+      showSongRequest: true,
+    },
+    isVisible: true,
+    sortOrder: 2,
+  },
+  {
     sectionType: 'event_details',
     title: 'Event Details',
     content: {
@@ -53,8 +64,8 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
         },
       ],
     },
-    isVisible: true,
-    sortOrder: 2,
+    isVisible: false,
+    sortOrder: 3,
   },
   {
     sectionType: 'wedding_party',
@@ -62,8 +73,8 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
     content: {
       members: [],
     },
-    isVisible: true,
-    sortOrder: 3,
+    isVisible: false,
+    sortOrder: 4,
   },
   {
     sectionType: 'gallery',
@@ -72,8 +83,8 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
       layout: 'grid',
       columns: 3,
     },
-    isVisible: true,
-    sortOrder: 4,
+    isVisible: false,
+    sortOrder: 5,
   },
   {
     sectionType: 'travel',
@@ -83,8 +94,8 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
       directions: '',
       mapEmbed: null,
     },
-    isVisible: true,
-    sortOrder: 5,
+    isVisible: false,
+    sortOrder: 6,
   },
   {
     sectionType: 'things_to_do',
@@ -93,7 +104,7 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
       activities: [],
     },
     isVisible: false,
-    sortOrder: 6,
+    sortOrder: 7,
   },
   {
     sectionType: 'registry',
@@ -102,8 +113,8 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
       message: '',
       registries: [],
     },
-    isVisible: true,
-    sortOrder: 7,
+    isVisible: false,
+    sortOrder: 8,
   },
   {
     sectionType: 'faq',
@@ -111,18 +122,7 @@ export const defaultWebsiteSections: DefaultWebsiteSection[] = [
     content: {
       questions: [],
     },
-    isVisible: true,
-    sortOrder: 8,
-  },
-  {
-    sectionType: 'rsvp',
-    title: 'RSVP',
-    content: {
-      message: 'Please let us know if you can make it!',
-      showDietary: true,
-      showSongRequest: true,
-    },
-    isVisible: true,
+    isVisible: false,
     sortOrder: 9,
   },
   {
