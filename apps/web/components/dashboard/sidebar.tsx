@@ -37,7 +37,7 @@ import {
 import { staggerContainer, navItem as navItemVariant, springSmooth } from '@/lib/animations'
 import type { NavItem } from '@/lib/navigation'
 import { useSidebarOrder } from '@/hooks/use-sidebar-order'
-import { useWedding, notifyWeddingUpdated } from '@/hooks/use-wedding'
+import { useWedding } from '@/hooks/use-wedding'
 import { useNotificationBadges } from '@/hooks/use-notification-badges'
 import { api } from '@/lib/api'
 import { toast } from 'sonner'
@@ -212,11 +212,10 @@ export function Sidebar() {
       if (!token) return
       await api.weddings.setActive(targetWeddingId, token)
       setSwitcherOpen(false)
-      notifyWeddingUpdated()
       toast.success('Switched wedding')
+      window.location.reload()
     } catch {
       toast.error('Failed to switch wedding')
-    } finally {
       setSwitching(false)
     }
   }

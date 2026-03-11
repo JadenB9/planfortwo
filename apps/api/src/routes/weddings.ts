@@ -155,15 +155,13 @@ weddingsRoute.post(
 
     const validated = c.req.valid('json')
 
-    // Build wedding name from provided names
-    const yourName = [validated.yourFirstName, validated.yourLastName].filter(Boolean).join(' ')
-    const partnerName = [validated.partnerFirstName, validated.partnerLastName]
-      .filter(Boolean)
-      .join(' ')
+    // Build wedding name from first names only
+    const yourFirst = validated.yourFirstName?.trim() || ''
+    const partnerFirst = validated.partnerFirstName?.trim() || ''
     let weddingName = 'Our Wedding'
-    if (yourName && partnerName) weddingName = `${yourName} & ${partnerName}`
-    else if (yourName) weddingName = `${yourName}'s Wedding`
-    else if (partnerName) weddingName = `${partnerName}'s Wedding`
+    if (yourFirst && partnerFirst) weddingName = `${yourFirst} & ${partnerFirst}`
+    else if (yourFirst) weddingName = `${yourFirst}'s Wedding`
+    else if (partnerFirst) weddingName = `${partnerFirst}'s Wedding`
 
     // Map nullable fields to undefined for the service layer
     const onboardingData = {

@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm'
+import { eq, and, inArray } from 'drizzle-orm'
 import { db, weddings, weddingMembers, users } from '@planfortwo/db'
 import { invitationService } from './invitations.js'
 
@@ -77,15 +77,51 @@ export const weddingService = {
       .innerJoin(weddings, eq(weddingMembers.weddingId, weddings.id))
       .where(eq(weddingMembers.userId, userId))
 
-    return results.map((r) => ({
-      id: r.wedding.id,
-      name: r.wedding.name,
-      date: r.wedding.date,
-      tier: r.wedding.tier,
-      role: r.role,
-      onboardingCompleted: r.wedding.onboardingCompleted,
-      joinedAt: r.joinedAt,
-    }))
+    if (results.length === 0) return []
+
+    // Fetch owner/partner first names to compute display names
+    const weddingIds = results.map((r) => r.wedding.id)
+    const memberNames = await db
+      .select({
+        weddingId: weddingMembers.weddingId,
+        role: weddingMembers.role,
+        firstName: users.firstName,
+      })
+      .from(weddingMembers)
+      .innerJoin(users, eq(weddingMembers.userId, users.id))
+      .where(
+        and(
+          inArray(weddingMembers.weddingId, weddingIds),
+          inArray(weddingMembers.role, ['owner', 'partner']),
+        ),
+      )
+
+    const nameMap = new Map<string, { owner?: string; partner?: string }>()
+    for (const m of memberNames) {
+      const entry = nameMap.get(m.weddingId) ?? {}
+      if (m.role === 'owner') entry.owner = m.firstName
+      if (m.role === 'partner') entry.partner = m.firstName
+      nameMap.set(m.weddingId, entry)
+    }
+
+    return results.map((r) => {
+      const names = nameMap.get(r.wedding.id)
+      let displayName = r.wedding.name
+      if (names?.owner && names?.partner) {
+        displayName = `${names.owner} & ${names.partner}`
+      } else if (names?.owner) {
+        displayName = `${names.owner}'s Wedding`
+      }
+      return {
+        id: r.wedding.id,
+        name: displayName,
+        date: r.wedding.date,
+        tier: r.wedding.tier,
+        role: r.role,
+        onboardingCompleted: r.wedding.onboardingCompleted,
+        joinedAt: r.joinedAt,
+      }
+    })
   },
 
   async setActiveWedding(userId: string, weddingId: string) {

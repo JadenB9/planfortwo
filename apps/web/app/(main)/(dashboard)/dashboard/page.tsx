@@ -193,6 +193,14 @@ export default function DashboardPage() {
   const wedding = dashboardData?.wedding
   const members = dashboardData?.members ?? []
   const daysUntil = dashboardData?.daysUntilWedding
+  const ownerUser = members.find((m) => m.member.role === 'owner')?.user
+  const partnerUser = members.find((m) => m.member.role === 'partner')?.user
+  const displayName =
+    ownerUser && partnerUser
+      ? `${ownerUser.firstName} & ${partnerUser.firstName}`
+      : ownerUser
+        ? `${ownerUser.firstName}'s Wedding`
+        : wedding?.name
   const hasPartner = members.some((m) => m.member.role === 'partner')
   const pendingPartnerInvite = pendingInvitations.find(
     (i) => i.status === 'pending' && i.role === 'partner',
@@ -214,7 +222,7 @@ export default function DashboardPage() {
         transition={{ duration: 0.5, delay: 0.1 }}
       >
         <h1 className="font-serif text-3xl font-bold text-gray-900">
-          {wedding?.name ? `Welcome, ${wedding.name}` : 'Welcome'}
+          {displayName ? `Welcome, ${displayName}` : 'Welcome'}
         </h1>
         {daysUntil !== null && daysUntil !== undefined && daysUntil > 0 && (
           <p className="mt-2 text-lg text-gray-600">
