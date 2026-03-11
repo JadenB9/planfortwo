@@ -69,7 +69,14 @@ describe('Wedding Service', () => {
 
   describe('findByUserId', () => {
     it('should return null when no weddings found', async () => {
-      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+      // First select: user lookup (no activeWeddingId)
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ activeWeddingId: null }]),
+        }),
+      })
+      // Second select: wedding memberships
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
         from: vi.fn().mockReturnValue({
           innerJoin: vi.fn().mockReturnValue({
             where: vi.fn().mockResolvedValue([]),
@@ -88,7 +95,14 @@ describe('Wedding Service', () => {
         onboardingCompleted: false,
       }
 
-      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+      // First select: user lookup (no activeWeddingId)
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ activeWeddingId: null }]),
+        }),
+      })
+      // Second select: wedding memberships
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
         from: vi.fn().mockReturnValue({
           innerJoin: vi.fn().mockReturnValue({
             where: vi.fn().mockResolvedValue([{ wedding: mockWedding, role: 'owner' }]),
@@ -112,7 +126,14 @@ describe('Wedding Service', () => {
         onboardingCompleted: true,
       }
 
-      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+      // First select: user lookup (no activeWeddingId)
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ activeWeddingId: null }]),
+        }),
+      })
+      // Second select: wedding memberships
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
         from: vi.fn().mockReturnValue({
           innerJoin: vi.fn().mockReturnValue({
             where: vi.fn().mockResolvedValue([
@@ -128,22 +149,29 @@ describe('Wedding Service', () => {
     })
 
     it('should prefer partner role when no onboarded wedding exists', async () => {
-      const ownerWedding = {
-        id: 'b0000000-0000-0000-0000-000000000001',
-        name: 'Owner Wedding',
-        onboardingCompleted: false,
-      }
       const partnerWedding = {
-        id: 'b0000000-0000-0000-0000-000000000002',
+        id: 'b0000000-0000-0000-0000-000000000001',
         name: 'Partner Wedding',
         onboardingCompleted: false,
       }
+      const plannerWedding = {
+        id: 'b0000000-0000-0000-0000-000000000002',
+        name: 'Planner Wedding',
+        onboardingCompleted: false,
+      }
 
-      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+      // First select: user lookup (no activeWeddingId)
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ activeWeddingId: null }]),
+        }),
+      })
+      // Second select: wedding memberships (no owner, no onboarded)
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
         from: vi.fn().mockReturnValue({
           innerJoin: vi.fn().mockReturnValue({
             where: vi.fn().mockResolvedValue([
-              { wedding: ownerWedding, role: 'owner' },
+              { wedding: plannerWedding, role: 'planner' },
               { wedding: partnerWedding, role: 'partner' },
             ]),
           }),
@@ -166,7 +194,14 @@ describe('Wedding Service', () => {
         onboardingCompleted: false,
       }
 
-      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValue({
+      // First select: user lookup (no activeWeddingId)
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ activeWeddingId: null }]),
+        }),
+      })
+      // Second select: wedding memberships
+      ;(mockedDb.select as ReturnType<typeof vi.fn>).mockReturnValueOnce({
         from: vi.fn().mockReturnValue({
           innerJoin: vi.fn().mockReturnValue({
             where: vi.fn().mockResolvedValue([
