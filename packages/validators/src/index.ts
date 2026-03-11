@@ -495,6 +495,12 @@ export const fontPairZodEnum = z.enum([
   'josefin-open-sans',
   'libre-baskerville-source-sans',
   'dancing-script-nunito',
+  'raleway-merriweather',
+  'abril-fatface-poppins',
+  'cinzel-lora',
+  'sacramento-roboto',
+  'quicksand-crimson-text',
+  'spectral-inter',
 ])
 export const templateIdZodEnum = z.enum([
   'classic',
@@ -522,6 +528,8 @@ export const customColorsSchema = z.object({
   headingItalic: z.boolean().optional(),
   bodyBold: z.boolean().optional(),
   bodyItalic: z.boolean().optional(),
+  headingSize: z.enum(['sm', 'md', 'lg']).optional(),
+  bodySize: z.enum(['sm', 'md', 'lg']).optional(),
 })
 
 export type CustomColorsInput = z.infer<typeof customColorsSchema>

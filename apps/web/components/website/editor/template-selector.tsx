@@ -149,6 +149,9 @@ export function TemplateSelector({
   const [paletteName, setPaletteName] = useState('')
   const [activePaletteId, setActivePaletteId] = useState<string | null>(null)
 
+  // Local optimistic font pair state — updates instantly on click
+  const [localFontPair, setLocalFontPair] = useState(fontPair)
+
   // Keep a local copy of colors for debouncing
   const template = getTemplate(selectedId)
   const activeColors = customColors ?? template.defaultColors
@@ -159,9 +162,20 @@ export function TemplateSelector({
   }
   const [localColors, setLocalColors] = useState<CustomColors>(colorsWithSectionBg)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Track whether we have a pending local change so the sync effect doesn't clobber it
+  const pendingLocalUpdate = useRef(false)
+
+  // Sync local font pair from prop (after API confirms)
+  useEffect(() => {
+    if (!pendingLocalUpdate.current) {
+      setLocalFontPair(fontPair)
+    }
+  }, [fontPair])
 
   // Sync local colors when customColors or selectedId changes externally
   useEffect(() => {
+    // Skip sync while a local change is pending (debounce or API in flight)
+    if (pendingLocalUpdate.current) return
     const t = getTemplate(selectedId)
     const base = customColors ?? t.defaultColors
     setLocalColors({
@@ -177,12 +191,59 @@ export function TemplateSelector({
     }
   }, [isCustomTemplate])
 
-  const debouncedUpdate = useCallback(
+  // Auto-detect active palette on mount/when palettes change
+  useEffect(() => {
+    if (activePaletteId) return // Already have one
+    const palettes = savedPalettes ?? []
+    if (palettes.length === 0) return
+    // Find a palette whose colors match the current customColors
+    if (!customColors) return
+    const match = palettes.find((p) => {
+      const colorKeys: (keyof CustomColors)[] = [
+        'primary',
+        'secondary',
+        'accent',
+        'background',
+        'sectionBackground',
+      ]
+      return (
+        colorKeys.every((k) => (p.colors[k] ?? '') === (customColors[k] ?? '')) &&
+        p.fontPair === fontPair
+      )
+    })
+    if (match) {
+      setActivePaletteId(match.id)
+    }
+  }, [savedPalettes, customColors, fontPair, activePaletteId])
+
+  const debouncedColorUpdate = useCallback(
     (colors: CustomColors) => {
+      pendingLocalUpdate.current = true
       if (debounceRef.current) clearTimeout(debounceRef.current)
       debounceRef.current = setTimeout(() => {
         onCustomize({ customColors: colors })
+        // Clear pending flag after a delay to allow refetch to complete
+        setTimeout(() => {
+          pendingLocalUpdate.current = false
+        }, 2000)
       }, 500)
+    },
+    [onCustomize],
+  )
+
+  // Immediate update for toggles (bold/italic/size) — no debounce
+  const immediateUpdate = useCallback(
+    (colors: CustomColors) => {
+      pendingLocalUpdate.current = true
+      // Cancel any pending color debounce so we don't overwrite with stale data
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+        debounceRef.current = null
+      }
+      onCustomize({ customColors: colors })
+      setTimeout(() => {
+        pendingLocalUpdate.current = false
+      }, 2000)
     },
     [onCustomize],
   )
@@ -195,9 +256,9 @@ export function TemplateSelector({
         updated.sectionBackground = computeSectionBgDefault(value)
       }
       setLocalColors(updated)
-      debouncedUpdate(updated)
+      debouncedColorUpdate(updated)
     },
-    [localColors, debouncedUpdate, customColors?.sectionBackground],
+    [localColors, debouncedColorUpdate, customColors?.sectionBackground],
   )
 
   const handleHexInput = useCallback(
@@ -208,15 +269,20 @@ export function TemplateSelector({
       }
       setLocalColors(updated)
       if (HEX_REGEX.test(value)) {
-        debouncedUpdate(updated)
+        debouncedColorUpdate(updated)
       }
     },
-    [localColors, debouncedUpdate, customColors?.sectionBackground],
+    [localColors, debouncedColorUpdate, customColors?.sectionBackground],
   )
 
   const handleFontChange = useCallback(
     (fontPairId: string) => {
+      setLocalFontPair(fontPairId)
+      pendingLocalUpdate.current = true
       onCustomize({ fontPair: fontPairId })
+      setTimeout(() => {
+        pendingLocalUpdate.current = false
+      }, 2000)
     },
     [onCustomize],
   )
@@ -228,6 +294,7 @@ export function TemplateSelector({
       sectionBackground: computeSectionBgDefault(t.defaultColors.secondary),
     }
     setLocalColors(reset)
+    setLocalFontPair(t.fontPair)
     onCustomize({ customColors: reset, fontPair: t.fontPair })
     setActivePaletteId(null)
   }, [selectedId, onCustomize])
@@ -248,6 +315,7 @@ export function TemplateSelector({
         sectionBackground: computeSectionBgDefault(t.defaultColors.secondary),
       }
       setLocalColors(colors)
+      setLocalFontPair(t.fontPair)
       onCustomize({ customColors: colors, fontPair: t.fontPair })
       setActivePaletteId(null)
     },
@@ -260,7 +328,7 @@ export function TemplateSelector({
       id: generatePaletteId(),
       name: paletteName.trim(),
       colors: { ...localColors },
-      fontPair,
+      fontPair: localFontPair,
     }
     const existing = savedPalettes ?? []
     onCustomize({ savedPalettes: [...existing, newPalette] })
@@ -268,7 +336,7 @@ export function TemplateSelector({
     setPaletteName('')
     setShowSaveDialog(false)
     toast.success(`Palette "${newPalette.name}" saved`)
-  }, [paletteName, localColors, fontPair, savedPalettes, onCustomize])
+  }, [paletteName, localColors, localFontPair, savedPalettes, onCustomize])
 
   const handleLoadPalette = useCallback(
     (palette: SavedPalette) => {
@@ -278,6 +346,7 @@ export function TemplateSelector({
           palette.colors.sectionBackground || computeSectionBgDefault(palette.colors.secondary),
       }
       setLocalColors(colors)
+      setLocalFontPair(palette.fontPair)
       onCustomize({ customColors: colors, fontPair: palette.fontPair })
       setActivePaletteId(palette.id)
       // Switch to custom template when loading a saved palette
@@ -304,13 +373,37 @@ export function TemplateSelector({
     const existing = savedPalettes ?? []
     const activePalette = existing.find((p) => p.id === activePaletteId)
     const updated = existing.map((p) =>
-      p.id === activePaletteId ? { ...p, colors: { ...localColors }, fontPair } : p,
+      p.id === activePaletteId ? { ...p, colors: { ...localColors }, fontPair: localFontPair } : p,
     )
     onCustomize({ savedPalettes: updated })
     toast.success(`Palette "${activePalette?.name ?? 'Current'}" updated`)
-  }, [activePaletteId, savedPalettes, localColors, fontPair, onCustomize])
+  }, [activePaletteId, savedPalettes, localColors, localFontPair, onCustomize])
 
+  // Determine whether "Update Current Palette" should show:
+  // Show when there's an active palette AND current state differs from it
   const palettes = savedPalettes ?? []
+  const activePalette = activePaletteId ? palettes.find((p) => p.id === activePaletteId) : null
+  const paletteHasChanges = (() => {
+    if (!activePalette) return false
+    const colorKeys: (keyof CustomColors)[] = [
+      'primary',
+      'secondary',
+      'accent',
+      'background',
+      'sectionBackground',
+      'headingBold',
+      'headingItalic',
+      'bodyBold',
+      'bodyItalic',
+      'headingSize',
+      'bodySize',
+    ]
+    const colorsChanged = colorKeys.some(
+      (k) => (localColors[k] ?? '') !== (activePalette.colors[k] ?? ''),
+    )
+    const fontChanged = localFontPair !== activePalette.fontPair
+    return colorsChanged || fontChanged
+  })()
 
   return (
     <div>
@@ -425,7 +518,7 @@ export function TemplateSelector({
 
           <div className="mt-5 border-t border-gray-200 pt-4">
             <h4 className="mb-3 text-sm font-semibold text-gray-900">Font Style</h4>
-            <FontPreviewPicker selected={fontPair} onSelect={handleFontChange} />
+            <FontPreviewPicker selected={localFontPair} onSelect={handleFontChange} />
 
             <div className="mt-4 space-y-3">
               <h4 className="text-sm font-semibold text-gray-900">Typography Options</h4>
@@ -441,7 +534,7 @@ export function TemplateSelector({
                           headingBold: !(localColors.headingBold ?? true),
                         }
                         setLocalColors(updated)
-                        debouncedUpdate(updated)
+                        immediateUpdate(updated)
                       }}
                       className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
                         (localColors.headingBold ?? true)
@@ -459,7 +552,7 @@ export function TemplateSelector({
                           headingItalic: !(localColors.headingItalic ?? false),
                         }
                         setLocalColors(updated)
-                        debouncedUpdate(updated)
+                        immediateUpdate(updated)
                       }}
                       className={`rounded-md border px-3 py-1.5 text-xs italic transition-colors ${
                         (localColors.headingItalic ?? false)
@@ -480,7 +573,7 @@ export function TemplateSelector({
                           onClick={() => {
                             const updated = { ...localColors, headingSize: opt.value }
                             setLocalColors(updated)
-                            debouncedUpdate(updated)
+                            immediateUpdate(updated)
                           }}
                           className={`rounded-md border px-2.5 py-1 text-[10px] font-medium transition-colors ${
                             (localColors.headingSize ?? 'md') === opt.value
@@ -505,7 +598,7 @@ export function TemplateSelector({
                           bodyBold: !(localColors.bodyBold ?? false),
                         }
                         setLocalColors(updated)
-                        debouncedUpdate(updated)
+                        immediateUpdate(updated)
                       }}
                       className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
                         (localColors.bodyBold ?? false)
@@ -523,7 +616,7 @@ export function TemplateSelector({
                           bodyItalic: !(localColors.bodyItalic ?? false),
                         }
                         setLocalColors(updated)
-                        debouncedUpdate(updated)
+                        immediateUpdate(updated)
                       }}
                       className={`rounded-md border px-3 py-1.5 text-xs italic transition-colors ${
                         (localColors.bodyItalic ?? false)
@@ -544,7 +637,7 @@ export function TemplateSelector({
                           onClick={() => {
                             const updated = { ...localColors, bodySize: opt.value }
                             setLocalColors(updated)
-                            debouncedUpdate(updated)
+                            immediateUpdate(updated)
                           }}
                           className={`rounded-md border px-2.5 py-1 text-[10px] font-medium transition-colors ${
                             (localColors.bodySize ?? 'md') === opt.value
@@ -604,7 +697,7 @@ export function TemplateSelector({
                   <Plus className="h-3.5 w-3.5" />
                   Save as New Palette
                 </Button>
-                {activePaletteId && (
+                {activePaletteId && paletteHasChanges && (
                   <Button
                     size="sm"
                     variant="outline"
