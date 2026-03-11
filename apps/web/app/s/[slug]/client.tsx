@@ -1,12 +1,26 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { GuestbookEntry, Prayer, WebsiteSectionType } from '@planfortwo/types'
+import type { CustomColors, GuestbookEntry, Prayer, WebsiteSectionType } from '@planfortwo/types'
 import { TemplateProvider } from '@/components/website/template-context'
 import { SectionRenderer } from '@/components/website/sections/section-renderer'
 import { AnalyticsTracker } from '@/components/website/public/analytics-tracker'
+import { fontPairs } from '@/lib/fonts'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
+
+// Build Google Fonts URL for all font pairs
+const GOOGLE_FONTS_URL = (() => {
+  const families = fontPairs
+    .flatMap((fp) => [fp.heading, fp.body])
+    .filter((v, i, a) => a.indexOf(v) === i)
+    .map(
+      (name) =>
+        `family=${name.replace(/\s+/g, '+')}:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700`,
+    )
+    .join('&')
+  return `https://fonts.googleapis.com/css2?${families}&display=swap`
+})()
 
 /** Sections that use sectionBackground; all others use background */
 const SECTION_BG_TYPES = new Set([
@@ -63,7 +77,7 @@ interface PublicWebsiteClientProps {
   slug: string
   config: {
     templateId: string
-    customColors: { primary: string; secondary: string; accent: string; background: string } | null
+    customColors: CustomColors | null
     fontPair: string
   }
   sections: PublicSection[]
@@ -110,6 +124,17 @@ export function PublicWebsiteClient({
 }: PublicWebsiteClientProps) {
   const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
   const [prayerEntries, setPrayerEntries] = useState<Prayer[]>([])
+
+  // Load Google Fonts for all font pairs
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (document.getElementById('public-gfonts')) return
+    const link = document.createElement('link')
+    link.id = 'public-gfonts'
+    link.rel = 'stylesheet'
+    link.href = GOOGLE_FONTS_URL
+    document.head.appendChild(link)
+  }, [])
 
   useEffect(() => {
     fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`)

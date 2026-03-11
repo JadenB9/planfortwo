@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { CustomColors } from '@planfortwo/types'
 import { notFound } from 'next/navigation'
 import { PublicWebsiteClient } from './client'
 
@@ -11,7 +12,7 @@ interface PageProps {
 interface PublicWebsiteData {
   config: {
     templateId: string
-    customColors: { primary: string; secondary: string; accent: string; background: string } | null
+    customColors: CustomColors | null
     fontPair: string
     privacyMode: string
     metaTitle: string | null

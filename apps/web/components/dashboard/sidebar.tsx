@@ -410,7 +410,7 @@ export function Sidebar() {
       <div className="mt-auto space-y-2 border-t border-gray-200 p-3 dark:border-gray-800">
         <Link
           href="/settings"
-          className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+          className={`flex items-center justify-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
             pathname === '/settings'
               ? 'bg-wedding-50 text-wedding-700 dark:bg-wedding-950 dark:text-wedding-300'
               : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
