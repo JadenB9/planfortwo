@@ -26,12 +26,19 @@ export const websiteConfigService = {
     const existing = await this.get(data.weddingId)
     if (existing) throw new Error('Website config already exists for this wedding')
 
+    // Ensure subdomain is unique — append random suffix if taken
+    let subdomain = data.subdomain
+    const isAvailable = await this.checkSubdomain(subdomain)
+    if (!isAvailable) {
+      subdomain = `${subdomain}-${randomBytes(3).toString('hex')}`
+    }
+
     const [config] = await db
       .insert(websiteConfigs)
       .values({
         weddingId: data.weddingId,
         templateId: data.templateId,
-        subdomain: data.subdomain,
+        subdomain,
         accessToken: randomBytes(16).toString('hex'),
       })
       .returning()
