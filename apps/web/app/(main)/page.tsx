@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import {
   CheckSquare,
@@ -11,12 +11,15 @@ import {
   ArrowRight,
   Heart,
   Sparkles,
+  Search,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { NavBar } from '@/components/layout/nav-bar'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { springSmooth, slideFromLeft, slideFromRight, drawLine } from '@/lib/animations'
+import { api } from '@/lib/api'
 
 const rotatingWords = ['checklists', 'guest lists', 'budgets', 'websites', 'seating charts']
 
@@ -219,6 +222,109 @@ function FeatureShowcase({
           ))}
         </ul>
       </div>
+    </motion.div>
+  )
+}
+
+function CoupleSearch() {
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<
+    Array<{ name: string; slug: string; date: string | null }>
+  >([])
+  const [searched, setSearched] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
+
+  const handleSearch = (value: string) => {
+    setQuery(value)
+    clearTimeout(debounceRef.current)
+
+    if (value.trim().length < 2) {
+      setResults([])
+      setSearched(false)
+      return
+    }
+
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true)
+      try {
+        const { data } = await api.websitePublic.search(value.trim())
+        setResults(data)
+        setSearched(true)
+      } catch {
+        setResults([])
+        setSearched(true)
+      } finally {
+        setLoading(false)
+      }
+    }, 400)
+  }
+
+  useEffect(() => {
+    return () => clearTimeout(debounceRef.current)
+  }, [])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.6 }}
+      className="mx-auto max-w-xl text-center"
+    >
+      <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
+        Find a couple
+      </span>
+      <h2 className="font-serif text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+        Looking for someone&apos;s wedding?
+      </h2>
+      <p className="mt-3 text-sm leading-relaxed text-gray-500">
+        Search by name to find a couple&apos;s wedding website.
+      </p>
+      <div className="relative mt-6">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Input
+          type="text"
+          placeholder="Search by name (e.g. Jaden Butler)"
+          value={query}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="pl-10 text-center"
+        />
+      </div>
+
+      {loading && <p className="mt-4 text-sm text-gray-400">Searching...</p>}
+
+      {searched && !loading && results.length === 0 && (
+        <p className="mt-4 text-sm text-gray-400">
+          No public wedding websites found for &quot;{query}&quot;
+        </p>
+      )}
+
+      {results.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {results.map((r) => (
+            <Link
+              key={r.slug}
+              href={`/s/${r.slug}`}
+              className="hover:border-wedding-300 hover:bg-wedding-50 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 text-left transition-colors"
+            >
+              <div>
+                <p className="font-medium text-gray-900">{r.name}</p>
+                {r.date && (
+                  <p className="text-xs text-gray-400">
+                    {new Date(r.date).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </p>
+                )}
+              </div>
+              <ArrowRight className="h-4 w-4 text-gray-400" />
+            </Link>
+          ))}
+        </div>
+      )}
     </motion.div>
   )
 }
@@ -435,6 +541,11 @@ export default function HomePage() {
             />
           </div>
         </div>
+      </section>
+
+      {/* ─── Couple Search ─── */}
+      <section className="px-5 py-20 sm:px-8">
+        <CoupleSearch />
       </section>
 
       {/* ─── Final CTA ─── */}

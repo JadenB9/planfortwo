@@ -28,13 +28,19 @@ import {
   CheckCircle,
   Settings,
   GripVertical,
+  ChevronsUpDown,
+  Crown,
+  Heart,
+  Users,
+  UserCog,
 } from 'lucide-react'
 import { staggerContainer, navItem as navItemVariant, springSmooth } from '@/lib/animations'
 import type { NavItem } from '@/lib/navigation'
 import { useSidebarOrder } from '@/hooks/use-sidebar-order'
-import { useWedding } from '@/hooks/use-wedding'
+import { useWedding, notifyWeddingUpdated } from '@/hooks/use-wedding'
 import { useNotificationBadges } from '@/hooks/use-notification-badges'
 import { api } from '@/lib/api'
+import { toast } from 'sonner'
 
 const BADGE_MAP: Record<string, 'inbox' | 'music' | 'photos' | 'messages' | 'prayers'> = {
   '/inbox': 'inbox',
@@ -132,6 +138,13 @@ function SortableNavItem({
   )
 }
 
+const ROLE_ICONS: Record<string, typeof Crown> = {
+  owner: Crown,
+  partner: Heart,
+  planner: UserCog,
+  family: Users,
+}
+
 export function Sidebar() {
   const pathname = usePathname()
   const { getToken } = useAuth()
@@ -146,6 +159,67 @@ export function Sidebar() {
     Details: false,
     More: false,
   })
+  const [allWeddings, setAllWeddings] = useState<
+    Array<{
+      id: string
+      name: string
+      date: string | null
+      tier: string
+      role: string
+      onboardingCompleted: boolean
+      joinedAt: string | null
+    }>
+  >([])
+  const [switcherOpen, setSwitcherOpen] = useState(false)
+  const [switching, setSwitching] = useState(false)
+  const switcherRef = useRef<HTMLDivElement>(null)
+
+  // Load all weddings for the switcher
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const token = await getToken()
+        if (!token || cancelled) return
+        const { data } = await api.weddings.all(token)
+        if (!cancelled) setAllWeddings(data)
+      } catch {
+        /* silent */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [getToken, weddingId])
+
+  // Close switcher when clicking outside
+  useEffect(() => {
+    if (!switcherOpen) return
+    const handleClick = (e: MouseEvent) => {
+      if (switcherRef.current && !switcherRef.current.contains(e.target as Node)) {
+        setSwitcherOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [switcherOpen])
+
+  const handleSwitchWedding = async (targetWeddingId: string) => {
+    if (targetWeddingId === weddingId || switching) return
+    setSwitching(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.weddings.setActive(targetWeddingId, token)
+      setSwitcherOpen(false)
+      notifyWeddingUpdated()
+      toast.success('Switched wedding')
+    } catch {
+      toast.error('Failed to switch wedding')
+    } finally {
+      setSwitching(false)
+    }
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -195,6 +269,62 @@ export function Sidebar() {
           Plan<span className="text-wedding-600">For</span>Two
         </Link>
       </div>
+
+      {/* Wedding Switcher — only show if user belongs to multiple weddings */}
+      {allWeddings.length > 1 && (
+        <div className="relative border-b border-gray-100 px-3 py-2" ref={switcherRef}>
+          <button
+            onClick={() => setSwitcherOpen((prev) => !prev)}
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-gray-50"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-gray-900">
+                {weddingData?.wedding.name ?? 'Loading...'}
+              </p>
+              <p className="truncate text-xs text-gray-400">
+                {allWeddings.find((w) => w.id === weddingId)?.role ?? ''}
+              </p>
+            </div>
+            <ChevronsUpDown className="h-4 w-4 shrink-0 text-gray-400" />
+          </button>
+
+          {switcherOpen && (
+            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+              <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Your Weddings
+              </p>
+              {allWeddings.map((w) => {
+                const RoleIcon = ROLE_ICONS[w.role] ?? Users
+                const isActive = w.id === weddingId
+                return (
+                  <button
+                    key={w.id}
+                    onClick={() => void handleSwitchWedding(w.id)}
+                    disabled={isActive || switching}
+                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
+                      isActive ? 'bg-wedding-50 text-wedding-700' : 'text-gray-700 hover:bg-gray-50'
+                    } ${switching ? 'opacity-50' : ''}`}
+                  >
+                    <RoleIcon
+                      className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-wedding-500' : 'text-gray-400'}`}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{w.name}</p>
+                      <p className="text-xs text-gray-400">{w.role}</p>
+                    </div>
+                    {w.tier === 'full' && (
+                      <span className="bg-sage-100 text-sage-700 rounded-full px-1.5 py-0.5 text-[10px] font-medium">
+                        Full
+                      </span>
+                    )}
+                    {isActive && <CheckCircle className="text-wedding-600 h-3.5 w-3.5 shrink-0" />}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       <motion.nav
         className="mt-4 flex-1 space-y-4 overflow-y-auto px-3"

@@ -27,6 +27,21 @@ interface OnboardingData {
 
 export const weddingService = {
   async findByUserId(userId: string) {
+    // Check if user has an active wedding preference
+    const [user] = await db.select().from(users).where(eq(users.id, userId))
+    if (user?.activeWeddingId) {
+      const membership = await this.verifyMembership(user.activeWeddingId, userId)
+      if (membership) {
+        const [wedding] = await db
+          .select()
+          .from(weddings)
+          .where(eq(weddings.id, user.activeWeddingId))
+        if (wedding) return wedding
+      }
+      // Active wedding no longer valid — clear it
+      await db.update(users).set({ activeWeddingId: null }).where(eq(users.id, userId))
+    }
+
     const results = await db
       .select({ wedding: weddings, role: weddingMembers.role })
       .from(weddingMembers)
@@ -40,11 +55,45 @@ export const weddingService = {
     const onboarded = results.find((r) => r.wedding.onboardingCompleted)
     if (onboarded) return onboarded.wedding
 
+    // Prefer the wedding where the user is owner
+    const asOwner = results.find((r) => r.role === 'owner')
+    if (asOwner) return asOwner.wedding
+
     // Prefer the wedding where the user is a partner (they were invited to it)
     const asPartner = results.find((r) => r.role === 'partner')
     if (asPartner) return asPartner.wedding
 
     return results[0]!.wedding
+  },
+
+  async findAllByUserId(userId: string) {
+    const results = await db
+      .select({
+        wedding: weddings,
+        role: weddingMembers.role,
+        joinedAt: weddingMembers.joinedAt,
+      })
+      .from(weddingMembers)
+      .innerJoin(weddings, eq(weddingMembers.weddingId, weddings.id))
+      .where(eq(weddingMembers.userId, userId))
+
+    return results.map((r) => ({
+      id: r.wedding.id,
+      name: r.wedding.name,
+      date: r.wedding.date,
+      tier: r.wedding.tier,
+      role: r.role,
+      onboardingCompleted: r.wedding.onboardingCompleted,
+      joinedAt: r.joinedAt,
+    }))
+  },
+
+  async setActiveWedding(userId: string, weddingId: string) {
+    const membership = await this.verifyMembership(weddingId, userId)
+    if (!membership) return null
+
+    await db.update(users).set({ activeWeddingId: weddingId }).where(eq(users.id, userId))
+    return { weddingId }
   },
 
   async completeOnboarding(weddingId: string, data: OnboardingData) {

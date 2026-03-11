@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { trackPageViewSchema } from '@planfortwo/validators'
-import { eq, and, or } from 'drizzle-orm'
+import { eq, and, or, isNotNull } from 'drizzle-orm'
 import {
   db,
   websiteConfigs,
@@ -18,7 +18,9 @@ import { prayersService } from '../services/prayers.js'
 import { playlistService } from '../services/playlists.js'
 import { storageClient } from '@planfortwo/storage'
 import { createHash, randomUUID } from 'node:crypto'
+import { ilike } from 'drizzle-orm'
 import { z } from 'zod'
+import { rateLimit } from '../middleware/rate-limit.js'
 
 export const websitePublicRoute = new Hono()
 
@@ -31,6 +33,51 @@ function slugCondition(slug: string) {
   }
   return eq(websiteConfigs.subdomain, slug)
 }
+
+// GET /website-public/search?q=name — public couple name search (NO auth, rate-limited)
+websitePublicRoute.get(
+  '/search',
+  rateLimit({ windowMs: 60_000, max: 15, prefix: 'public-search' }),
+  async (c) => {
+    const query = c.req.query('q')?.trim() ?? ''
+
+    if (query.length < 2) {
+      return c.json({ data: [] })
+    }
+
+    // Sanitize SQL wildcards in user input
+    const sanitized = query.replace(/%/g, '\\%').replace(/_/g, '\\_')
+
+    const results = await db
+      .select({
+        name: weddings.name,
+        slug: websiteConfigs.subdomain,
+        date: weddings.date,
+      })
+      .from(weddings)
+      .innerJoin(websiteConfigs, eq(websiteConfigs.weddingId, weddings.id))
+      .where(
+        and(
+          eq(weddings.websitePublished, true),
+          eq(websiteConfigs.privacyMode, 'public'),
+          isNotNull(websiteConfigs.publishedAt),
+          ilike(weddings.name, `%${sanitized}%`),
+        ),
+      )
+      .limit(10)
+
+    // Only return results that actually have a published site and a slug
+    const filtered = results.filter((r) => r.slug)
+
+    return c.json({
+      data: filtered.map((r) => ({
+        name: r.name,
+        slug: r.slug,
+        date: r.date,
+      })),
+    })
+  },
+)
 
 // GET /website-public/:slug — public wedding website data (NO auth)
 websitePublicRoute.get('/:slug', async (c) => {

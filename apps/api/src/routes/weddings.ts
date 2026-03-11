@@ -25,6 +25,38 @@ export const weddingsRoute = new Hono<Env>()
 
 weddingsRoute.use('*', authMiddleware, resolveUserMiddleware)
 
+// GET /weddings/all -- list all weddings the user is a member of
+weddingsRoute.get('/all', async (c) => {
+  const dbUserId = c.get('dbUserId')
+  const allWeddings = await weddingService.findAllByUserId(dbUserId)
+  return c.json({ data: allWeddings })
+})
+
+// PUT /weddings/set-active -- switch to a different wedding
+weddingsRoute.put('/set-active', async (c) => {
+  const dbUserId = c.get('dbUserId')
+  const body = await c.req.json()
+  const weddingId = body?.weddingId
+
+  if (!weddingId || typeof weddingId !== 'string') {
+    return c.json(
+      { error: 'weddingId is required', code: 'VALIDATION_ERROR', statusCode: 400 },
+      400,
+    )
+  }
+
+  const result = await weddingService.setActiveWedding(dbUserId, weddingId)
+
+  if (!result) {
+    return c.json(
+      { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+      403,
+    )
+  }
+
+  return c.json({ data: result })
+})
+
 // GET /weddings/mine -- fetch the current user's wedding + members + countdown
 weddingsRoute.get('/mine', async (c) => {
   const dbUserId = c.get('dbUserId')

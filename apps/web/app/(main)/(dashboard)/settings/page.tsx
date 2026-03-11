@@ -25,7 +25,11 @@ import {
   XCircle,
   Palette,
   Check,
+  ArrowRight,
+  UserCog,
+  LogOut,
 } from 'lucide-react'
+import { notifyWeddingUpdated } from '@/hooks/use-wedding'
 import { useTheme } from '@/components/theme-provider'
 import {
   Dialog,
@@ -80,6 +84,22 @@ export default function SettingsPage() {
   const [resendingInviteId, setResendingInviteId] = useState<string | null>(null)
   const [removePartnerDialogOpen, setRemovePartnerDialogOpen] = useState(false)
 
+  // My Weddings state
+  const [allWeddings, setAllWeddings] = useState<
+    Array<{
+      id: string
+      name: string
+      date: string | null
+      tier: string
+      role: string
+      onboardingCompleted: boolean
+      joinedAt: string | null
+    }>
+  >([])
+  const [switchingTo, setSwitchingTo] = useState<string | null>(null)
+  const [leavingFrom, setLeavingFrom] = useState<string | null>(null)
+  const [leaveDialogWeddingId, setLeaveDialogWeddingId] = useState<string | null>(null)
+
   // Theme state
   const { setThemeColors: applyTheme } = useTheme()
   const [selectedPrimary, setSelectedPrimary] = useState<string | null>(null)
@@ -127,6 +147,13 @@ export default function SettingsPage() {
         setPendingInvitations(invites)
       } catch {
         /* no pending invitations */
+      }
+
+      try {
+        const { data: allW } = await api.weddings.all(token)
+        setAllWeddings(allW)
+      } catch {
+        /* silent */
       }
     } catch {
       toast.error('Failed to load settings')
@@ -406,13 +433,168 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="wedding">
-        <TabsList className="mb-6">
+        <TabsList className="mb-6 flex-wrap">
+          {allWeddings.length > 1 && <TabsTrigger value="my-weddings">My Weddings</TabsTrigger>}
           <TabsTrigger value="wedding">Wedding Details</TabsTrigger>
           <TabsTrigger value="team">Planning Team</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
         </TabsList>
+
+        {allWeddings.length > 1 && (
+          <TabsContent value="my-weddings">
+            <Card>
+              <CardHeader>
+                <CardTitle>My Weddings</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-gray-500">
+                  You belong to multiple weddings. Switch between them or leave weddings you no
+                  longer need access to.
+                </p>
+                {allWeddings.map((w) => {
+                  const isActive = w.id === weddingId
+                  const RoleIcon =
+                    w.role === 'owner'
+                      ? Crown
+                      : w.role === 'partner'
+                        ? Heart
+                        : w.role === 'planner'
+                          ? UserCog
+                          : Users
+                  return (
+                    <div
+                      key={w.id}
+                      className={`flex items-center gap-4 rounded-lg border p-4 ${
+                        isActive ? 'border-wedding-300 bg-wedding-50' : 'border-gray-200'
+                      }`}
+                    >
+                      <RoleIcon
+                        className={`h-5 w-5 shrink-0 ${isActive ? 'text-wedding-600' : 'text-gray-400'}`}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium text-gray-900">{w.name}</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span className="capitalize">{w.role}</span>
+                          <span className="text-gray-300">|</span>
+                          <span>{w.tier === 'full' ? 'Full plan' : 'Free plan'}</span>
+                          {w.date && (
+                            <>
+                              <span className="text-gray-300">|</span>
+                              <span>{new Date(w.date).toLocaleDateString()}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {isActive ? (
+                        <span className="bg-wedding-100 text-wedding-700 rounded-full px-3 py-1 text-xs font-medium">
+                          Active
+                        </span>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={!!switchingTo}
+                            onClick={async () => {
+                              setSwitchingTo(w.id)
+                              try {
+                                const token = await getToken()
+                                if (!token) return
+                                await api.weddings.setActive(w.id, token)
+                                notifyWeddingUpdated()
+                                toast.success(`Switched to ${w.name}`)
+                                void loadData()
+                              } catch {
+                                toast.error('Failed to switch')
+                              } finally {
+                                setSwitchingTo(null)
+                              }
+                            }}
+                          >
+                            {switchingTo === w.id ? 'Switching...' : 'Switch'}
+                            <ArrowRight className="ml-1 h-3 w-3" />
+                          </Button>
+                          {w.role !== 'owner' && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-red-500 hover:text-red-700"
+                                onClick={() => setLeaveDialogWeddingId(w.id)}
+                              >
+                                <LogOut className="h-3.5 w-3.5" />
+                              </Button>
+                              <Dialog
+                                open={leaveDialogWeddingId === w.id}
+                                onOpenChange={(open) => !open && setLeaveDialogWeddingId(null)}
+                              >
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>Leave Wedding?</DialogTitle>
+                                    <DialogDescription>
+                                      You will lose access to &quot;{w.name}&quot;. You&apos;ll need
+                                      a new invitation to rejoin.
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <DialogFooter>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setLeaveDialogWeddingId(null)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      variant="destructive"
+                                      disabled={!!leavingFrom}
+                                      onClick={async () => {
+                                        setLeavingFrom(w.id)
+                                        try {
+                                          const token = await getToken()
+                                          if (!token) return
+                                          // Find your own member record in that wedding
+                                          const { data: memberList } =
+                                            await api.weddings.getMembers(w.id, token)
+                                          const myMember = memberList.find(
+                                            (m) =>
+                                              m.user.email ===
+                                              user?.primaryEmailAddress?.emailAddress,
+                                          )
+                                          if (myMember) {
+                                            await api.weddings.removeMember(
+                                              w.id,
+                                              myMember.member.id,
+                                              token,
+                                            )
+                                          }
+                                          setLeaveDialogWeddingId(null)
+                                          toast.success(`Left ${w.name}`)
+                                          void loadData()
+                                          notifyWeddingUpdated()
+                                        } catch {
+                                          toast.error('Failed to leave wedding')
+                                        } finally {
+                                          setLeavingFrom(null)
+                                        }
+                                      }}
+                                    >
+                                      {leavingFrom === w.id ? 'Leaving...' : 'Leave Wedding'}
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
 
         <TabsContent value="wedding">
           <Card>

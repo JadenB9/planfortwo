@@ -130,6 +130,24 @@ export const api = {
   },
   weddings: {
     mine: (token: string) => fetchApi<{ data: DashboardData }>('/weddings/mine', { token }),
+    all: (token: string) =>
+      fetchApi<{
+        data: Array<{
+          id: string
+          name: string
+          date: string | null
+          tier: string
+          role: string
+          onboardingCompleted: boolean
+          joinedAt: string | null
+        }>
+      }>('/weddings/all', { token }),
+    setActive: (weddingId: string, token: string) =>
+      fetchApi<{ data: { weddingId: string } }>('/weddings/set-active', {
+        method: 'PUT',
+        body: JSON.stringify({ weddingId }),
+        token,
+      }),
     update: (weddingId: string, data: Record<string, unknown>, token: string) =>
       fetchApi<{ data: Wedding }>(`/weddings/${weddingId}`, {
         method: 'PUT',
@@ -635,6 +653,10 @@ export const api = {
       ),
   },
   websitePublic: {
+    search: (query: string) =>
+      fetchApi<{
+        data: Array<{ name: string; slug: string; date: string | null }>
+      }>(`/website-public/search?q=${encodeURIComponent(query)}`),
     getBySlug: (slug: string) =>
       fetchApi<{ data: WebsiteWithSections }>(`/website-public/${encodeURIComponent(slug)}`),
     verifyPassword: (subdomain: string, data: VerifyWebsitePasswordInput) =>
