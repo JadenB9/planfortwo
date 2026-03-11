@@ -147,7 +147,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(amount / 100)
+    }).format(amount)
   }
 
   return (
