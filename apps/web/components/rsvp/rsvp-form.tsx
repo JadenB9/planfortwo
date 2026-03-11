@@ -91,7 +91,13 @@ export function RsvpForm({
   showDietary = true,
 }: RsvpFormProps) {
   const isBatch = lookupResult.householdGuests.length > 1
-  const guestsToRsvp = isBatch ? lookupResult.householdGuests : [lookupResult.guest]
+  const guestsToRsvp = isBatch
+    ? [...lookupResult.householdGuests].sort((a, b) => {
+        // Adults first, children last
+        if (a.isChild === b.isChild) return 0
+        return a.isChild ? 1 : -1
+      })
+    : [lookupResult.guest]
 
   const [forms, setForms] = useState<GuestFormState[]>(guestsToRsvp.map(createGuestFormState))
   const [submitting, setSubmitting] = useState(false)
