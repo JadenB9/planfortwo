@@ -166,6 +166,24 @@ function MusicPageInner() {
   const [addingSpotifyTrack, setAddingSpotifyTrack] = useState(false)
   const [refreshingSpotify, setRefreshingSpotify] = useState<string | null>(null)
 
+  // Spotify OAuth state
+  const [spotifyConnected, setSpotifyConnected] = useState(false)
+  const [spotifyDisplayName, setSpotifyDisplayName] = useState<string | null>(null)
+  const [connectingSpotify, setConnectingSpotify] = useState(false)
+  const [showExportDialog, setShowExportDialog] = useState<string | null>(null)
+  const [spotifyUserPlaylists, setSpotifyUserPlaylists] = useState<
+    Array<{
+      id: string
+      name: string
+      description: string | null
+      trackCount: number
+      imageUrl: string | null
+      externalUrl: string
+    }>
+  >([])
+  const [loadingSpotifyPlaylists, setLoadingSpotifyPlaylists] = useState(false)
+  const [exportingToSpotify, setExportingToSpotify] = useState<string | null>(null)
+
   const loadData = useCallback(async () => {
     try {
       const token = await getToken()
@@ -180,6 +198,15 @@ function MusicPageInner() {
       ])
       setPlaylists(playlistRes.data)
       setRequests(requestsRes.data)
+
+      // Check Spotify connection status
+      try {
+        const spotifyStatus = await api.spotify.getStatus(token)
+        setSpotifyConnected(spotifyStatus.data.connected)
+        setSpotifyDisplayName(spotifyStatus.data.spotifyDisplayName)
+      } catch {
+        // Spotify status check is non-critical
+      }
     } catch {
       toast.error('Failed to load music data')
     } finally {
@@ -463,6 +490,92 @@ function MusicPageInner() {
     [getToken, weddingId, loadData],
   )
 
+  // ── Spotify OAuth handlers ──
+  const handleConnectSpotify = useCallback(async () => {
+    setConnectingSpotify(true)
+    try {
+      const token = await getToken()
+      if (!token) return
+      const { data } = await api.spotify.getAuthUrl(token)
+      // Navigate to Spotify auth in same window (callback page redirects back)
+      window.location.href = data.url
+    } catch {
+      toast.error('Failed to start Spotify connection')
+      setConnectingSpotify(false)
+    }
+  }, [getToken])
+
+  const handleDisconnectSpotify = useCallback(async () => {
+    try {
+      const token = await getToken()
+      if (!token) return
+      await api.spotify.disconnect(token)
+      setSpotifyConnected(false)
+      setSpotifyDisplayName(null)
+      toast.success('Spotify disconnected')
+    } catch {
+      toast.error('Failed to disconnect Spotify')
+    }
+  }, [getToken])
+
+  const handleExportToSpotify = useCallback(
+    async (playlistId: string) => {
+      if (!spotifyConnected) {
+        toast.info('Connect your Spotify account first to export songs.')
+        void handleConnectSpotify()
+        return
+      }
+
+      const songs = playlistSongs[playlistId] ?? []
+      const trackIds = songs.map((s) => s.spotifyTrackId).filter((id): id is string => !!id)
+
+      if (trackIds.length === 0) {
+        toast.error('No songs with Spotify IDs to export')
+        return
+      }
+
+      // Load user's Spotify playlists and show picker
+      setShowExportDialog(playlistId)
+      setLoadingSpotifyPlaylists(true)
+      try {
+        const token = await getToken()
+        if (!token) return
+        const { data } = await api.spotify.getUserPlaylists(token)
+        setSpotifyUserPlaylists(data)
+      } catch {
+        toast.error('Failed to load your Spotify playlists')
+        setShowExportDialog(null)
+      } finally {
+        setLoadingSpotifyPlaylists(false)
+      }
+    },
+    [spotifyConnected, playlistSongs, getToken, handleConnectSpotify],
+  )
+
+  const handleAddToSpotifyPlaylist = useCallback(
+    async (spotifyPlaylistId: string) => {
+      if (!showExportDialog) return
+      const songs = playlistSongs[showExportDialog] ?? []
+      const trackIds = songs.map((s) => s.spotifyTrackId).filter((id): id is string => !!id)
+
+      if (trackIds.length === 0) return
+
+      setExportingToSpotify(spotifyPlaylistId)
+      try {
+        const token = await getToken()
+        if (!token) return
+        const { data } = await api.spotify.addToPlaylist(spotifyPlaylistId, trackIds, token)
+        toast.success(`Added ${data.added} songs to Spotify playlist!`)
+        setShowExportDialog(null)
+      } catch {
+        toast.error('Failed to add songs to Spotify playlist')
+      } finally {
+        setExportingToSpotify(null)
+      }
+    },
+    [showExportDialog, playlistSongs, getToken],
+  )
+
   const pendingCount = requests.filter((r) => r.status === 'pending').length
 
   if (loading) {
@@ -493,6 +606,51 @@ function MusicPageInner() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Spotify connection banner */}
+      <div className="mb-4">
+        {spotifyConnected ? (
+          <div className="flex items-center justify-between rounded-lg border border-[#1DB954]/20 bg-[#1DB954]/5 px-4 py-2.5">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1DB954]">
+                <Check className="h-3.5 w-3.5 text-white" />
+              </div>
+              <span className="font-medium text-gray-700">Spotify Connected</span>
+              {spotifyDisplayName && <span className="text-gray-500">as {spotifyDisplayName}</span>}
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-gray-500 hover:text-red-600"
+              onClick={handleDisconnectSpotify}
+            >
+              Disconnect
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-300">
+                <Music className="h-3.5 w-3.5 text-white" />
+              </div>
+              <span>Connect Spotify to export songs directly to your playlists</span>
+            </div>
+            <Button
+              size="sm"
+              className="h-8 gap-1.5 bg-[#1DB954] text-xs hover:bg-[#1aa34a]"
+              disabled={connectingSpotify}
+              onClick={handleConnectSpotify}
+            >
+              {connectingSpotify ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <ExternalLink className="h-3.5 w-3.5" />
+              )}
+              Connect Spotify
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Tab navigation */}
@@ -762,7 +920,7 @@ function MusicPageInner() {
                                         <iframe
                                           src={getSpotifyEmbedUrl(pl.spotifyUrl)!}
                                           width="100%"
-                                          height="152"
+                                          height="352"
                                           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                                           loading="lazy"
                                           className="rounded-xl"
@@ -821,14 +979,12 @@ function MusicPageInner() {
                                         variant="outline"
                                         size="sm"
                                         className="h-8 gap-1.5 border-[#1DB954]/30 text-xs text-[#1DB954] hover:bg-[#1DB954]/5"
-                                        onClick={() =>
-                                          toast.info(
-                                            'Export to Spotify is under construction. Stay tuned!',
-                                          )
-                                        }
+                                        onClick={() => handleExportToSpotify(pl.id)}
                                       >
                                         <Upload className="h-3.5 w-3.5" />
-                                        Export to Spotify
+                                        {spotifyConnected
+                                          ? 'Export to Spotify'
+                                          : 'Connect & Export to Spotify'}
                                       </Button>
                                     </div>
 
@@ -1412,6 +1568,84 @@ function MusicPageInner() {
               {editingPlaylist ? 'Update' : 'Create'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export to Spotify Dialog */}
+      <Dialog
+        open={!!showExportDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowExportDialog(null)
+            setSpotifyUserPlaylists([])
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-serif">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1DB954]">
+                <Upload className="h-3.5 w-3.5 text-white" />
+              </div>
+              Export to Spotify
+            </DialogTitle>
+          </DialogHeader>
+          <div>
+            {loadingSpotifyPlaylists ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-[#1DB954]" />
+                <span className="ml-2 text-sm text-gray-500">
+                  Loading your Spotify playlists...
+                </span>
+              </div>
+            ) : spotifyUserPlaylists.length === 0 ? (
+              <div className="py-6 text-center">
+                <p className="text-sm text-gray-500">No Spotify playlists found.</p>
+              </div>
+            ) : (
+              <div className="max-h-80 space-y-1.5 overflow-y-auto">
+                <p className="mb-2 text-xs text-gray-500">
+                  Select a Spotify playlist to add{' '}
+                  {showExportDialog
+                    ? (playlistSongs[showExportDialog] ?? []).filter((s) => s.spotifyTrackId).length
+                    : 0}{' '}
+                  songs to:
+                </p>
+                {spotifyUserPlaylists.map((sp) => (
+                  <button
+                    key={sp.id}
+                    className="flex w-full items-center gap-3 rounded-lg border border-gray-100 px-3 py-2.5 text-left transition-colors hover:border-[#1DB954]/20 hover:bg-[#1DB954]/5"
+                    disabled={exportingToSpotify === sp.id}
+                    onClick={() => handleAddToSpotifyPlaylist(sp.id)}
+                  >
+                    {sp.imageUrl ? (
+                      <Image
+                        src={sp.imageUrl}
+                        alt={sp.name}
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 shrink-0 rounded object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-gray-100">
+                        <Music className="h-4 w-4 text-gray-400" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-gray-900">{sp.name}</p>
+                      <p className="text-xs text-gray-500">{sp.trackCount} songs</p>
+                    </div>
+                    {exportingToSpotify === sp.id ? (
+                      <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#1DB954]" />
+                    ) : (
+                      <Plus className="h-4 w-4 shrink-0 text-gray-400" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </motion.div>

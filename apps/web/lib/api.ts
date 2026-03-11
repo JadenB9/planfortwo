@@ -833,6 +833,42 @@ export const api = {
         token,
       }),
   },
+  spotify: {
+    getAuthUrl: (token: string) =>
+      fetchApi<{ data: { url: string } }>('/spotify/auth-url', { token }),
+    exchange: (code: string, token: string) =>
+      fetchApi<{ data: { connected: boolean; spotifyDisplayName: string | null } }>(
+        '/spotify/exchange',
+        { method: 'POST', body: JSON.stringify({ code }), token },
+      ),
+    getStatus: (token: string) =>
+      fetchApi<{ data: { connected: boolean; spotifyDisplayName: string | null } }>(
+        '/spotify/status',
+        { token },
+      ),
+    disconnect: (token: string) =>
+      fetchApi<{ data: { success: boolean } }>('/spotify/disconnect', {
+        method: 'DELETE',
+        token,
+      }),
+    getUserPlaylists: (token: string) =>
+      fetchApi<{
+        data: Array<{
+          id: string
+          name: string
+          description: string | null
+          trackCount: number
+          imageUrl: string | null
+          externalUrl: string
+        }>
+      }>('/spotify/user-playlists', { token }),
+    addToPlaylist: (spotifyPlaylistId: string, trackIds: string[], token: string) =>
+      fetchApi<{ data: { added: number } }>('/spotify/add-to-playlist', {
+        method: 'POST',
+        body: JSON.stringify({ spotifyPlaylistId, trackIds }),
+        token,
+      }),
+  },
   honeymoon: {
     list: (weddingId: string, token: string) =>
       fetchApi<{

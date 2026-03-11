@@ -105,3 +105,6 @@ export { prayers } from './prayers'
 
 // Inbox
 export { emailAddresses, emails, emailDirectionEnum, type EmailAttachment } from './inbox'
+
+// Spotify
+export { spotifyConnections } from './spotify-connections'

@@ -43,6 +43,7 @@ import {
 import { purchasesRoute, referralsRoute, contactRoute } from './routes/payments.js'
 // ceremony route removed from UI — keeping files for potential future use
 import { playlistsRoute } from './routes/playlists.js'
+import { spotifyRoute } from './routes/spotify.js'
 import { honeymoonRoute } from './routes/honeymoon.js'
 import { weatherRoute } from './routes/weather.js'
 import { progressRoute } from './routes/progress.js'
@@ -169,6 +170,7 @@ app.route('/referrals', referralsRoute)
 app.route('/contact', contactRoute)
 // ceremony route removed
 app.route('/playlists', playlistsRoute)
+app.route('/spotify', spotifyRoute)
 app.route('/honeymoon', honeymoonRoute)
 app.route('/weather', weatherRoute)
 app.route('/progress', progressRoute)

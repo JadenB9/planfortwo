@@ -1,3 +1,6 @@
+import { eq } from 'drizzle-orm'
+import { db, spotifyConnections } from '@planfortwo/db'
+
 interface SpotifyToken {
   access_token: string
   expires_at: number
@@ -15,6 +18,15 @@ interface SpotifyTrackData {
 interface SpotifyParsedUrl {
   type: 'playlist' | 'track' | 'album'
   id: string
+}
+
+interface SpotifyUserPlaylist {
+  id: string
+  name: string
+  description: string | null
+  trackCount: number
+  imageUrl: string | null
+  externalUrl: string
 }
 
 let cachedToken: SpotifyToken | null = null
@@ -197,5 +209,284 @@ export const spotifyService = {
       albumArt: art,
       durationMs: t.duration_ms,
     }
+  },
+
+  // ── User OAuth Methods ──
+
+  getAuthUrl(): string {
+    const clientId = process.env.SPOTIFY_CLIENT_ID
+    const redirectUri = process.env.SPOTIFY_REDIRECT_URI
+    if (!clientId || !redirectUri) {
+      throw new Error(
+        'Spotify OAuth not configured (missing SPOTIFY_CLIENT_ID or SPOTIFY_REDIRECT_URI)',
+      )
+    }
+
+    const scopes = [
+      'playlist-modify-public',
+      'playlist-modify-private',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+    ].join(' ')
+
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: clientId,
+      scope: scopes,
+      redirect_uri: redirectUri,
+      show_dialog: 'true',
+    })
+
+    return `https://accounts.spotify.com/authorize?${params.toString()}`
+  },
+
+  async exchangeCode(code: string): Promise<{
+    accessToken: string
+    refreshToken: string
+    expiresIn: number
+    spotifyUserId: string
+    spotifyDisplayName: string | null
+  }> {
+    const clientId = process.env.SPOTIFY_CLIENT_ID
+    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
+    const redirectUri = process.env.SPOTIFY_REDIRECT_URI
+    if (!clientId || !clientSecret || !redirectUri) {
+      throw new Error('Spotify OAuth not configured')
+    }
+
+    const resp = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+      }).toString(),
+    })
+
+    if (!resp.ok) {
+      const text = await resp.text()
+      throw new Error(`Spotify token exchange failed: ${resp.status} ${text}`)
+    }
+
+    const tokenData = (await resp.json()) as {
+      access_token: string
+      refresh_token: string
+      expires_in: number
+    }
+
+    // Fetch user profile
+    const profileResp = await fetch('https://api.spotify.com/v1/me', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    })
+    let spotifyUserId = 'unknown'
+    let spotifyDisplayName: string | null = null
+    if (profileResp.ok) {
+      const profile = (await profileResp.json()) as { id: string; display_name: string | null }
+      spotifyUserId = profile.id
+      spotifyDisplayName = profile.display_name
+    }
+
+    return {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      expiresIn: tokenData.expires_in,
+      spotifyUserId,
+      spotifyDisplayName,
+    }
+  },
+
+  async refreshUserToken(refreshToken: string): Promise<{
+    accessToken: string
+    refreshToken: string
+    expiresIn: number
+  }> {
+    const clientId = process.env.SPOTIFY_CLIENT_ID
+    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
+    if (!clientId || !clientSecret) {
+      throw new Error('Spotify credentials not configured')
+    }
+
+    const resp = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      }).toString(),
+    })
+
+    if (!resp.ok) {
+      throw new Error(`Spotify token refresh failed: ${resp.status}`)
+    }
+
+    const data = (await resp.json()) as {
+      access_token: string
+      refresh_token?: string
+      expires_in: number
+    }
+
+    return {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token ?? refreshToken,
+      expiresIn: data.expires_in,
+    }
+  },
+
+  async getUserAccessToken(userId: string): Promise<string> {
+    const [conn] = await db
+      .select()
+      .from(spotifyConnections)
+      .where(eq(spotifyConnections.userId, userId))
+
+    if (!conn) {
+      throw new Error('Spotify not connected')
+    }
+
+    // Check if token is still valid (with 60s buffer)
+    if (conn.expiresAt.getTime() > Date.now() + 60_000) {
+      return conn.accessToken
+    }
+
+    // Refresh the token
+    const refreshed = await this.refreshUserToken(conn.refreshToken)
+
+    await db
+      .update(spotifyConnections)
+      .set({
+        accessToken: refreshed.accessToken,
+        refreshToken: refreshed.refreshToken,
+        expiresAt: new Date(Date.now() + refreshed.expiresIn * 1000),
+      })
+      .where(eq(spotifyConnections.userId, userId))
+
+    return refreshed.accessToken
+  },
+
+  async saveConnection(
+    userId: string,
+    data: {
+      accessToken: string
+      refreshToken: string
+      expiresIn: number
+      spotifyUserId: string
+      spotifyDisplayName: string | null
+    },
+  ) {
+    const expiresAt = new Date(Date.now() + data.expiresIn * 1000)
+
+    // Upsert — delete existing and insert new
+    await db.delete(spotifyConnections).where(eq(spotifyConnections.userId, userId))
+    await db.insert(spotifyConnections).values({
+      userId,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      expiresAt,
+      spotifyUserId: data.spotifyUserId,
+      spotifyDisplayName: data.spotifyDisplayName,
+    })
+  },
+
+  async getConnection(userId: string) {
+    const [conn] = await db
+      .select({
+        id: spotifyConnections.id,
+        spotifyUserId: spotifyConnections.spotifyUserId,
+        spotifyDisplayName: spotifyConnections.spotifyDisplayName,
+      })
+      .from(spotifyConnections)
+      .where(eq(spotifyConnections.userId, userId))
+    return conn ?? null
+  },
+
+  async deleteConnection(userId: string) {
+    const [deleted] = await db
+      .delete(spotifyConnections)
+      .where(eq(spotifyConnections.userId, userId))
+      .returning()
+    return deleted ?? null
+  },
+
+  async getUserPlaylists(userId: string): Promise<SpotifyUserPlaylist[]> {
+    const token = await this.getUserAccessToken(userId)
+    const playlists: SpotifyUserPlaylist[] = []
+    let url: string | null = 'https://api.spotify.com/v1/me/playlists?limit=50'
+
+    while (url) {
+      const resp = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (!resp.ok) {
+        throw new Error(`Failed to fetch Spotify playlists: ${resp.status}`)
+      }
+
+      const data = (await resp.json()) as {
+        items: Array<{
+          id: string
+          name: string
+          description: string | null
+          tracks: { total: number }
+          images: Array<{ url: string }> | null
+          external_urls: { spotify: string }
+        }>
+        next: string | null
+      }
+
+      for (const p of data.items) {
+        playlists.push({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          trackCount: p.tracks.total,
+          imageUrl: p.images?.[0]?.url ?? null,
+          externalUrl: p.external_urls.spotify,
+        })
+      }
+
+      url = data.next
+    }
+
+    return playlists
+  },
+
+  async addTracksToSpotifyPlaylist(
+    userId: string,
+    spotifyPlaylistId: string,
+    trackIds: string[],
+  ): Promise<{ added: number }> {
+    if (trackIds.length === 0) return { added: 0 }
+
+    const token = await this.getUserAccessToken(userId)
+    const uris = trackIds.map((id) => `spotify:track:${id}`)
+
+    // Spotify allows max 100 tracks per request
+    let totalAdded = 0
+    for (let i = 0; i < uris.length; i += 100) {
+      const batch = uris.slice(i, i + 100)
+      const resp = await fetch(`https://api.spotify.com/v1/playlists/${spotifyPlaylistId}/tracks`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uris: batch }),
+      })
+
+      if (!resp.ok) {
+        const text = await resp.text()
+        throw new Error(`Failed to add tracks to Spotify: ${resp.status} ${text}`)
+      }
+
+      totalAdded += batch.length
+    }
+
+    return { added: totalAdded }
   },
 }
