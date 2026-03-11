@@ -33,7 +33,7 @@ function formatBudgetValue(amount: number): string {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { getToken } = useAuth()
+  const { getToken, isLoaded, isSignedIn } = useAuth()
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [guestStats, setGuestStats] = useState<GuestStats | null>(null)
@@ -114,8 +114,9 @@ export default function DashboardPage() {
   }, [getToken, router])
 
   useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
     void loadDashboard()
-  }, [loadDashboard])
+  }, [isLoaded, isSignedIn, loadDashboard])
 
   async function handleInvitePartner() {
     if (!inviteEmail.trim() || !dashboardData) return
