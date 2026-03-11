@@ -1351,6 +1351,8 @@ export const api = {
         '/inbox/upload-url',
         { method: 'POST', body: JSON.stringify(data), token },
       ),
+    getAttachmentUrl: (attachmentId: string, token: string) =>
+      fetchApi<{ data: { url: string } }>(`/inbox/attachments/${attachmentId}/url`, { token }),
     update: (id: string, data: UpdateEmailInput, token: string) =>
       fetchApi<{ data: Email }>(`/inbox/${id}`, {
         method: 'PATCH',

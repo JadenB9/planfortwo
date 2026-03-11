@@ -291,6 +291,8 @@ export default function InboxPage() {
   const [massForm, setMassForm] = useState({ subject: '', textBody: '' })
   const [massSending, setMassSending] = useState(false)
   const [massSendProgress, setMassSendProgress] = useState({ sent: 0, total: 0 })
+  const [massAttachments, setMassAttachments] = useState<PendingAttachment[]>([])
+  const massFileInputRef = useRef<HTMLInputElement>(null)
 
   const fetchAddresses = useCallback(async () => {
     const token = await getToken()
@@ -591,6 +593,74 @@ export default function InboxPage() {
     }
   }
 
+  const handleMassFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const token = await getToken()
+    if (!token || addresses.length === 0) return
+
+    const emailAddressId = addresses[0]!.id
+    const remaining = MAX_ATTACHMENTS - massAttachments.length
+    const selected = Array.from(files).slice(0, remaining)
+
+    for (const file of selected) {
+      if (!ALLOWED_ATTACHMENT_TYPES[file.type]) {
+        toast.error(`${file.name}: unsupported file type`)
+        continue
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name}: exceeds 25MB limit`)
+        continue
+      }
+
+      const tempId = crypto.randomUUID()
+      const pending: PendingAttachment = {
+        id: tempId,
+        filename: file.name,
+        contentType: file.type,
+        size: file.size,
+        r2Key: '',
+        status: 'uploading',
+      }
+
+      setMassAttachments((prev) => [...prev, pending])
+
+      try {
+        const res = await api.inbox.getUploadUrl(
+          { emailAddressId, fileName: file.name, contentType: file.type },
+          token,
+        )
+        const { uploadUrl, r2Key, attachmentId } = res.data
+
+        await fetch(uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        })
+
+        setMassAttachments((prev) =>
+          prev.map((a) =>
+            a.id === tempId ? { ...a, id: attachmentId, r2Key, status: 'done' as const } : a,
+          ),
+        )
+      } catch {
+        setMassAttachments((prev) =>
+          prev.map((a) =>
+            a.id === tempId ? { ...a, status: 'error' as const, errorMessage: 'Upload failed' } : a,
+          ),
+        )
+        toast.error(`Failed to upload ${file.name}`)
+      }
+    }
+
+    if (massFileInputRef.current) massFileInputRef.current.value = ''
+  }
+
+  const removeMassAttachment = (id: string) => {
+    setMassAttachments((prev) => prev.filter((a) => a.id !== id))
+  }
+
   const openMassEmail = useCallback(async () => {
     if (!weddingId) return
     setShowMassEmail(true)
@@ -598,6 +668,7 @@ export default function InboxPage() {
     setMassSelected(new Set())
     setMassGuestSearch('')
     setMassForm({ subject: '', textBody: '' })
+    setMassAttachments([])
     try {
       const token = await getToken()
       if (!token) return
@@ -650,6 +721,21 @@ export default function InboxPage() {
     const token = await getToken()
     if (!token || addresses.length === 0 || massSelected.size === 0) return
 
+    if (massAttachments.some((a) => a.status === 'uploading')) {
+      toast.error('Please wait for attachments to finish uploading')
+      return
+    }
+
+    const doneAttachments = massAttachments
+      .filter((a) => a.status === 'done')
+      .map((a) => ({
+        id: a.id,
+        filename: a.filename,
+        contentType: a.contentType,
+        size: a.size,
+        r2Key: a.r2Key,
+      }))
+
     const recipients = guestsWithEmail.filter((g) => massSelected.has(g.id))
     setMassSending(true)
     setMassSendProgress({ sent: 0, total: recipients.length })
@@ -664,6 +750,7 @@ export default function InboxPage() {
             toAddress: guest.email!,
             subject: massForm.subject,
             textBody: massForm.textBody,
+            ...(doneAttachments.length > 0 ? { attachments: doneAttachments } : {}),
           },
           token,
         )
@@ -681,6 +768,7 @@ export default function InboxPage() {
       toast.warning(`Sent ${sent}, failed ${failed}`)
     }
     setShowMassEmail(false)
+    setMassAttachments([])
     await fetchEmails()
   }
 
@@ -1137,29 +1225,34 @@ export default function InboxPage() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {selectedEmail.attachments.map((att: EmailAttachment) => (
-                      <div
+                      <button
                         key={att.id}
-                        className="flex items-center gap-2 rounded-lg border bg-gray-50 px-3 py-2"
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            if (att.url) {
+                              window.open(att.url, '_blank', 'noopener,noreferrer')
+                            } else {
+                              const token = await getToken()
+                              if (!token) return
+                              const res = await api.inbox.getAttachmentUrl(att.id, token)
+                              window.open(res.data.url, '_blank', 'noopener,noreferrer')
+                            }
+                          } catch {
+                            toast.error('Failed to open attachment')
+                          }
+                        }}
+                        className="flex cursor-pointer items-center gap-2 rounded-lg border bg-gray-50 px-3 py-2 transition-colors hover:border-rose-200 hover:bg-rose-50"
                       >
                         <span className="text-base">{getFileIcon(att.contentType)}</span>
-                        <div className="min-w-0">
+                        <div className="min-w-0 text-left">
                           <p className="truncate text-xs font-medium text-gray-700">
                             {att.filename}
                           </p>
                           <p className="text-[10px] text-gray-400">{formatFileSize(att.size)}</p>
                         </div>
-                        {att.url && (
-                          <a
-                            href={att.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-1 text-rose-500 hover:text-rose-600"
-                            title="Download"
-                          >
-                            <Download className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                      </div>
+                        <Download className="ml-1 h-3.5 w-3.5 text-rose-500" />
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -1415,6 +1508,72 @@ export default function InboxPage() {
                 />
               </div>
 
+              {/* Attachments */}
+              <div>
+                <input
+                  ref={massFileInputRef}
+                  type="file"
+                  multiple
+                  accept={ACCEPT_STRING}
+                  onChange={handleMassFileSelect}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => massFileInputRef.current?.click()}
+                  disabled={massAttachments.length >= MAX_ATTACHMENTS || massSending}
+                  className="gap-2"
+                >
+                  <Paperclip className="h-4 w-4" />
+                  Attach Files
+                </Button>
+                <span className="ml-2 text-xs text-gray-400">
+                  PDF, JPG, PNG, HEIC up to 25MB each
+                </span>
+
+                {massAttachments.length > 0 && (
+                  <div className="mt-2 space-y-1.5">
+                    {massAttachments.map((att) => (
+                      <div
+                        key={att.id}
+                        className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                      >
+                        {att.contentType.startsWith('image/') ? (
+                          <FileImage className="h-4 w-4 shrink-0 text-blue-500" />
+                        ) : (
+                          <FileText className="h-4 w-4 shrink-0 text-red-500" />
+                        )}
+                        <span className="min-w-0 flex-1 truncate text-gray-700">
+                          {att.filename}
+                        </span>
+                        <span className="shrink-0 text-xs text-gray-400">
+                          {formatFileSize(att.size)}
+                        </span>
+                        {att.status === 'uploading' && (
+                          <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-gray-400" />
+                        )}
+                        {att.status === 'done' && (
+                          <Check className="h-3.5 w-3.5 shrink-0 text-green-500" />
+                        )}
+                        {att.status === 'error' && (
+                          <span className="shrink-0 text-xs text-red-500">Failed</span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeMassAttachment(att.id)}
+                          disabled={massSending}
+                          className="shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {massSending && (
                 <div className="space-y-1">
                   <div className="h-2 overflow-hidden rounded-full bg-gray-200">
@@ -1436,7 +1595,10 @@ export default function InboxPage() {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowMassEmail(false)}
+              onClick={() => {
+                setShowMassEmail(false)
+                setMassAttachments([])
+              }}
               disabled={massSending}
             >
               Cancel
@@ -1444,7 +1606,11 @@ export default function InboxPage() {
             <Button
               onClick={handleMassSend}
               disabled={
-                massSending || massSelected.size === 0 || !massForm.subject || !massForm.textBody
+                massSending ||
+                massSelected.size === 0 ||
+                !massForm.subject ||
+                !massForm.textBody ||
+                massAttachments.some((a) => a.status === 'uploading')
               }
               className="bg-rose-500 hover:bg-rose-600"
             >
