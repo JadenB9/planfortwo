@@ -303,9 +303,9 @@ function CoupleSearch() {
       {results.length > 0 && (
         <div className="mt-4 space-y-2">
           {results.map((r) => (
-            <Link
+            <a
               key={r.slug}
-              href={`/s/${r.slug}`}
+              href={`https://${r.slug}.planfortwo.com`}
               className="hover:border-wedding-300 hover:bg-wedding-50 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 text-left transition-colors"
             >
               <div>
@@ -321,7 +321,7 @@ function CoupleSearch() {
                 )}
               </div>
               <ArrowRight className="h-4 w-4 text-gray-400" />
-            </Link>
+            </a>
           ))}
         </div>
       )}
