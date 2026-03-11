@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, Suspense } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -20,8 +20,26 @@ import { GuestForm } from '@/components/guests/guest-form'
 import { DietarySummaryCard } from '@/components/guests/dietary-summary'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { GuestFormData } from '@/components/guests/guest-form'
+import { useTabParam } from '@/hooks/use-tab-param'
+
+type GuestsTab = 'guests' | 'allergies'
+const VALID_GUESTS_TABS: GuestsTab[] = ['guests', 'allergies']
 
 export default function GuestsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+        </div>
+      }
+    >
+      <GuestsPageInner />
+    </Suspense>
+  )
+}
+
+function GuestsPageInner() {
   const { getToken } = useAuth()
   const { data: weddingData, loading: weddingLoading, error: weddingError } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
@@ -48,7 +66,7 @@ export default function GuestsPage() {
   const [deletingGuestId, setDeletingGuestId] = useState<string | null>(null)
   const [sendingBulk, setSendingBulk] = useState(false)
   const [showBulkInviteConfirm, setShowBulkInviteConfirm] = useState(false)
-  const [activeTab, setActiveTab] = useState<'guests' | 'allergies'>('guests')
+  const [activeTab, setActiveTab] = useTabParam<GuestsTab>('tab', 'guests', VALID_GUESTS_TABS)
 
   const handleCreateGuest = useCallback(
     async (data: GuestFormData) => {

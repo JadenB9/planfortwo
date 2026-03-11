@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
@@ -34,6 +34,7 @@ import { FaqEditor } from '@/components/website/editor/faq-editor'
 import { ThingsToDoEditor } from '@/components/website/editor/things-to-do-editor'
 import { SongRequestsEditor } from '@/components/website/editor/song-requests-editor'
 import { PrayersEditor } from '@/components/website/editor/prayers-editor'
+import { useTabParam } from '@/hooks/use-tab-param'
 import type { PreviewMode } from '@/components/website/editor/website-preview'
 import type { WebsiteSection } from '@planfortwo/types'
 import type {
@@ -59,9 +60,24 @@ const WebsitePreview = dynamic(
   { ssr: false },
 )
 
-const VALID_TABS = ['design', 'sections', 'settings', 'qr-code', 'analytics']
+type WebsiteTab = 'design' | 'sections' | 'settings' | 'qr-code' | 'analytics'
+const VALID_TABS: WebsiteTab[] = ['design', 'sections', 'settings', 'qr-code', 'analytics']
 
 export default function WebsitePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+        </div>
+      }
+    >
+      <WebsitePageInner />
+    </Suspense>
+  )
+}
+
+function WebsitePageInner() {
   const { data, features, loading: weddingLoading } = useWedding()
   const { getToken } = useAuth()
   const wedding = data?.wedding ?? null
@@ -75,23 +91,7 @@ export default function WebsitePage() {
   const [editorContent, setEditorContent] = useState<Record<string, unknown>>({})
   const [previewMode, setPreviewMode] = useState<PreviewMode>('phone')
 
-  // Tab persistence: read from URL on mount, write to URL on change
-  const [activeTab, setActiveTabState] = useState('design')
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const tab = params.get('tab')
-    if (tab && VALID_TABS.includes(tab)) {
-      setActiveTabState(tab)
-    }
-  }, [])
-
-  const setActiveTab = useCallback((tab: string) => {
-    setActiveTabState(tab)
-    const url = new URL(window.location.href)
-    url.searchParams.set('tab', tab)
-    window.history.replaceState(null, '', url.toString())
-  }, [])
+  const [activeTab, setActiveTab] = useTabParam<WebsiteTab>('tab', 'design', VALID_TABS)
 
   // editorContent is set synchronously in handleSectionEdit and onClose
   // to avoid a one-render stale-content flash that crashes section renderers
@@ -467,7 +467,7 @@ export default function WebsitePage() {
       <div className="flex min-h-0 flex-1 gap-6">
         {/* Editor panel — scrollable independently */}
         <div className="min-w-0 flex-1 overflow-y-auto pb-6 pr-1">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as WebsiteTab)}>
             <TabsList>
               <TabsTrigger value="design">Design</TabsTrigger>
               <TabsTrigger value="sections">Sections</TabsTrigger>

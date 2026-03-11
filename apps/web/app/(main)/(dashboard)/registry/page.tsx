@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springSmooth, staggerGrid, staggerContainer, fadeInUp, scaleIn } from '@/lib/animations'
@@ -47,10 +47,12 @@ import {
 import { toast } from 'sonner'
 import type { LucideIcon } from 'lucide-react'
 import { openRegistryLink } from '@/components/registry/registry-viewer'
+import { useTabParam } from '@/hooks/use-tab-param'
 
 // ── Types ──
 
 type Tab = 'links' | 'funds' | 'gifts'
+const VALID_REGISTRY_TABS: Tab[] = ['links', 'funds', 'gifts']
 
 interface PopularStore {
   name: string
@@ -109,11 +111,25 @@ function getThankYouLevel(status: ThankYouStatus): number {
 // ── Component ──
 
 export default function RegistryPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+        </div>
+      }
+    >
+      <RegistryPageInner />
+    </Suspense>
+  )
+}
+
+function RegistryPageInner() {
   const { getToken } = useAuth()
   const { data: weddingData, loading: weddingLoading } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
 
-  const [activeTab, setActiveTab] = useState<Tab>('links')
+  const [activeTab, setActiveTab] = useTabParam<Tab>('tab', 'links', VALID_REGISTRY_TABS)
   const [links, setLinks] = useState<RegistryLink[]>([])
   const [funds, setFunds] = useState<CashFund[]>([])
   const [gifts, setGifts] = useState<Gift[]>([])

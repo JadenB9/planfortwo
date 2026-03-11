@@ -48,8 +48,10 @@ import {
 } from 'lucide-react'
 import type { Email, EmailAddress, EmailAttachment, GuestWithTags } from '@planfortwo/types'
 import { toast } from 'sonner'
+import { useTabParam } from '@/hooks/use-tab-param'
 
 type TabFilter = 'all' | 'inbound' | 'outbound' | 'unread' | 'starred'
+const VALID_TAB_FILTERS: TabFilter[] = ['all', 'inbound', 'outbound', 'unread', 'starred']
 
 const ALLOWED_ATTACHMENT_TYPES: Record<string, string> = {
   'application/pdf': 'application/pdf',
@@ -235,7 +237,7 @@ export default function InboxPage() {
   const [addresses, setAddresses] = useState<EmailAddress[]>([])
   const [emailList, setEmailList] = useState<Email[]>([])
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null)
-  const [activeTab, setActiveTab] = useState<TabFilter>('all')
+  const [activeTab, setActiveTab] = useTabParam<TabFilter>('filter', 'all', VALID_TAB_FILTERS)
   const [totalEmails, setTotalEmails] = useState(0)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)

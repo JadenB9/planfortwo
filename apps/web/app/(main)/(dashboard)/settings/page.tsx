@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useAuth, useUser } from '@clerk/nextjs'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -39,10 +39,40 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { useTabParam } from '@/hooks/use-tab-param'
+
+type SettingsTab = 'my-weddings' | 'wedding' | 'team' | 'appearance' | 'notifications' | 'account'
+const VALID_SETTINGS_TABS: SettingsTab[] = [
+  'my-weddings',
+  'wedding',
+  'team',
+  'appearance',
+  'notifications',
+  'account',
+]
 
 export default function SettingsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+        </div>
+      }
+    >
+      <SettingsPageInner />
+    </Suspense>
+  )
+}
+
+function SettingsPageInner() {
   const { getToken } = useAuth()
   const { user } = useUser()
+  const [settingsTab, setSettingsTab] = useTabParam<SettingsTab>(
+    'tab',
+    'wedding',
+    VALID_SETTINGS_TABS,
+  )
   const [loading, setLoading] = useState(true)
   const [weddingId, setWeddingId] = useState<string | null>(null)
   const [wedding, setWedding] = useState<Wedding | null>(null)
@@ -450,7 +480,7 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="wedding">
+      <Tabs value={settingsTab} onValueChange={(v) => setSettingsTab(v as SettingsTab)}>
         <TabsList className="mb-6 flex-wrap">
           {allWeddings.length > 1 && <TabsTrigger value="my-weddings">My Weddings</TabsTrigger>}
           <TabsTrigger value="wedding">Wedding Details</TabsTrigger>

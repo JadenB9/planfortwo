@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion, AnimatePresence } from 'framer-motion'
 import { springSmooth, fadeInUp, staggerContainer } from '@/lib/animations'
@@ -20,17 +20,33 @@ import {
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { MessageSquare, Clock, CheckCircle2, Eye, Check, X, Trash2, Loader2 } from 'lucide-react'
+import { useTabParam } from '@/hooks/use-tab-param'
 
 type FilterTab = 'all' | 'pending' | 'approved'
+const VALID_FILTER_TABS: FilterTab[] = ['all', 'pending', 'approved']
 
 export default function MessagesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+        </div>
+      }
+    >
+      <MessagesPageInner />
+    </Suspense>
+  )
+}
+
+function MessagesPageInner() {
   const { getToken } = useAuth()
   const { data: weddingData, loading: weddingLoading } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
 
   const [entries, setEntries] = useState<GuestbookEntry[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<FilterTab>('all')
+  const [filter, setFilter] = useTabParam<FilterTab>('filter', 'all', VALID_FILTER_TABS)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 

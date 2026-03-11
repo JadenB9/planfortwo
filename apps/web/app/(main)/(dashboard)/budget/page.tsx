@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, Suspense } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -19,8 +19,10 @@ import { PaymentCalendar } from '@/components/budget/payment-calendar'
 import { TipCalculator } from '@/components/budget/tip-calculator'
 import { SplitCosts } from '@/components/budget/split-costs'
 import { BudgetSetupWizard } from '@/components/budget/budget-setup-wizard'
+import { useTabParam } from '@/hooks/use-tab-param'
 
 type Tab = 'overview' | 'expenses' | 'payments' | 'analytics' | 'tips'
+const VALID_TAB_KEYS: Tab[] = ['overview', 'expenses', 'payments', 'analytics', 'tips']
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'overview', label: 'Overview' },
@@ -31,6 +33,20 @@ const TABS: { key: Tab; label: string }[] = [
 ]
 
 export default function BudgetPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+        </div>
+      }
+    >
+      <BudgetPageInner />
+    </Suspense>
+  )
+}
+
+function BudgetPageInner() {
   const { getToken } = useAuth()
   const { data: weddingData, loading: weddingLoading } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
@@ -49,7 +65,7 @@ export default function BudgetPage() {
     refetch,
   } = useBudget({ weddingId })
 
-  const [activeTab, setActiveTab] = useState<Tab>('overview')
+  const [activeTab, setActiveTab] = useTabParam<Tab>('tab', 'overview', VALID_TAB_KEYS)
   const [showExpenseForm, setShowExpenseForm] = useState(false)
   const [editingItem, setEditingItem] = useState<BudgetItemWithCategory | undefined>(undefined)
   const [showSetupWizard, setShowSetupWizard] = useState(false)

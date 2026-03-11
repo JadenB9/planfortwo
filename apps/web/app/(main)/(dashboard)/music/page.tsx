@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -48,8 +48,10 @@ import {
   Clock,
   Upload,
 } from 'lucide-react'
+import { useTabParam } from '@/hooks/use-tab-param'
 
 type Tab = 'playlists' | 'requests'
+const VALID_MUSIC_TABS: Tab[] = ['playlists', 'requests']
 
 interface Playlist {
   id: string
@@ -116,10 +118,24 @@ const STATUS_STYLES: Record<string, string> = {
 }
 
 export default function MusicPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />
+        </div>
+      }
+    >
+      <MusicPageInner />
+    </Suspense>
+  )
+}
+
+function MusicPageInner() {
   const { getToken } = useAuth()
   const [weddingId, setWeddingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<Tab>('playlists')
+  const [activeTab, setActiveTab] = useTabParam<Tab>('tab', 'playlists', VALID_MUSIC_TABS)
 
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [expandedPlaylist, setExpandedPlaylist] = useState<string | null>(null)
