@@ -696,7 +696,7 @@ export default function HoneymoonPage() {
                 placeholder="e.g. Bali, Indonesia"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Start Date</Label>
                 <Input
@@ -766,7 +766,7 @@ export default function HoneymoonPage() {
             <DialogTitle>{editingActivity ? 'Edit Activity' : 'Add Activity'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Day Number</Label>
                 <Input
@@ -801,7 +801,7 @@ export default function HoneymoonPage() {
                 onChange={(e) => setActivityForm({ ...activityForm, location: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Start Time</Label>
                 <Input

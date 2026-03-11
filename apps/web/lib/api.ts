@@ -124,6 +124,27 @@ async function fetchApi<T>(
   return res.json() as Promise<T>
 }
 
+function createModerationApi<T>(endpoint: string) {
+  return {
+    list: (weddingId: string, token: string) =>
+      fetchApi<{ data: T[] }>(`/${endpoint}?weddingId=${weddingId}`, { token }),
+    approve: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: T }>(`/${endpoint}/${id}/approve?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ approved: true }),
+        token,
+      }),
+    reject: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: T }>(`/${endpoint}/${id}/approve?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ approved: false }),
+        token,
+      }),
+    delete: (id: string, weddingId: string, token: string) =>
+      fetchApi<void>(`/${endpoint}/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
+  }
+}
+
 export const api = {
   users: {
     me: (token: string) => fetchApi<{ data: User }>('/users/me', { token }),
@@ -686,42 +707,8 @@ export const api = {
         body: JSON.stringify(data),
       }),
   },
-  guestbook: {
-    list: (weddingId: string, token: string) =>
-      fetchApi<{ data: GuestbookEntry[] }>(`/guestbook?weddingId=${weddingId}`, { token }),
-    approve: (id: string, weddingId: string, token: string) =>
-      fetchApi<{ data: GuestbookEntry }>(`/guestbook/${id}/approve?weddingId=${weddingId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ approved: true }),
-        token,
-      }),
-    reject: (id: string, weddingId: string, token: string) =>
-      fetchApi<{ data: GuestbookEntry }>(`/guestbook/${id}/approve?weddingId=${weddingId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ approved: false }),
-        token,
-      }),
-    delete: (id: string, weddingId: string, token: string) =>
-      fetchApi<void>(`/guestbook/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
-  },
-  prayers: {
-    list: (weddingId: string, token: string) =>
-      fetchApi<{ data: Prayer[] }>(`/prayers?weddingId=${weddingId}`, { token }),
-    approve: (id: string, weddingId: string, token: string) =>
-      fetchApi<{ data: Prayer }>(`/prayers/${id}/approve?weddingId=${weddingId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ approved: true }),
-        token,
-      }),
-    reject: (id: string, weddingId: string, token: string) =>
-      fetchApi<{ data: Prayer }>(`/prayers/${id}/approve?weddingId=${weddingId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ approved: false }),
-        token,
-      }),
-    delete: (id: string, weddingId: string, token: string) =>
-      fetchApi<void>(`/prayers/${id}?weddingId=${weddingId}`, { method: 'DELETE', token }),
-  },
+  guestbook: createModerationApi<GuestbookEntry>('guestbook'),
+  prayers: createModerationApi<Prayer>('prayers'),
   playlists: {
     list: (weddingId: string, token: string) =>
       fetchApi<{

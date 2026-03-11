@@ -45,6 +45,7 @@ import {
   X,
   FileImage,
   FileText,
+  ChevronLeft,
 } from 'lucide-react'
 import type { Email, EmailAddress, EmailAttachment, GuestWithTags } from '@planfortwo/types'
 import { toast } from 'sonner'
@@ -482,15 +483,16 @@ export default function InboxPage() {
     }
   }
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
-
+  const uploadAttachments = async (
+    files: FileList,
+    currentAttachments: PendingAttachment[],
+    setAttachments: React.Dispatch<React.SetStateAction<PendingAttachment[]>>,
+  ) => {
     const token = await getToken()
     if (!token || addresses.length === 0) return
 
     const emailAddressId = addresses[0]!.id
-    const remaining = MAX_ATTACHMENTS - composeAttachments.length
+    const remaining = MAX_ATTACHMENTS - currentAttachments.length
     const selected = Array.from(files).slice(0, remaining)
 
     for (const file of selected) {
@@ -513,7 +515,7 @@ export default function InboxPage() {
         status: 'uploading',
       }
 
-      setComposeAttachments((prev) => [...prev, pending])
+      setAttachments((prev) => [...prev, pending])
 
       try {
         const res = await api.inbox.getUploadUrl(
@@ -528,13 +530,13 @@ export default function InboxPage() {
           body: file,
         })
 
-        setComposeAttachments((prev) =>
+        setAttachments((prev) =>
           prev.map((a) =>
             a.id === tempId ? { ...a, id: attachmentId, r2Key, status: 'done' as const } : a,
           ),
         )
       } catch {
-        setComposeAttachments((prev) =>
+        setAttachments((prev) =>
           prev.map((a) =>
             a.id === tempId ? { ...a, status: 'error' as const, errorMessage: 'Upload failed' } : a,
           ),
@@ -542,8 +544,11 @@ export default function InboxPage() {
         toast.error(`Failed to upload ${file.name}`)
       }
     }
+  }
 
-    // Reset input so user can re-select same file
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+    await uploadAttachments(e.target.files, composeAttachments, setComposeAttachments)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -596,66 +601,8 @@ export default function InboxPage() {
   }
 
   const handleMassFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
-
-    const token = await getToken()
-    if (!token || addresses.length === 0) return
-
-    const emailAddressId = addresses[0]!.id
-    const remaining = MAX_ATTACHMENTS - massAttachments.length
-    const selected = Array.from(files).slice(0, remaining)
-
-    for (const file of selected) {
-      if (!ALLOWED_ATTACHMENT_TYPES[file.type]) {
-        toast.error(`${file.name}: unsupported file type`)
-        continue
-      }
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error(`${file.name}: exceeds 25MB limit`)
-        continue
-      }
-
-      const tempId = crypto.randomUUID()
-      const pending: PendingAttachment = {
-        id: tempId,
-        filename: file.name,
-        contentType: file.type,
-        size: file.size,
-        r2Key: '',
-        status: 'uploading',
-      }
-
-      setMassAttachments((prev) => [...prev, pending])
-
-      try {
-        const res = await api.inbox.getUploadUrl(
-          { emailAddressId, fileName: file.name, contentType: file.type },
-          token,
-        )
-        const { uploadUrl, r2Key, attachmentId } = res.data
-
-        await fetch(uploadUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': file.type },
-          body: file,
-        })
-
-        setMassAttachments((prev) =>
-          prev.map((a) =>
-            a.id === tempId ? { ...a, id: attachmentId, r2Key, status: 'done' as const } : a,
-          ),
-        )
-      } catch {
-        setMassAttachments((prev) =>
-          prev.map((a) =>
-            a.id === tempId ? { ...a, status: 'error' as const, errorMessage: 'Upload failed' } : a,
-          ),
-        )
-        toast.error(`Failed to upload ${file.name}`)
-      }
-    }
-
+    if (!e.target.files) return
+    await uploadAttachments(e.target.files, massAttachments, setMassAttachments)
     if (massFileInputRef.current) massFileInputRef.current.value = ''
   }
 
@@ -984,7 +931,9 @@ export default function InboxPage() {
         className="flex h-[calc(100%-7rem)] gap-4"
       >
         {/* Email list */}
-        <Card className="w-full flex-shrink-0 overflow-hidden md:w-[380px]">
+        <Card
+          className={`${selectedEmail ? 'hidden md:block' : 'block'} w-full flex-shrink-0 overflow-hidden md:w-[380px]`}
+        >
           <div className="h-full overflow-y-auto">
             {emailList.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center p-8 text-gray-400">
@@ -1080,121 +1029,129 @@ export default function InboxPage() {
         </Card>
 
         {/* Email detail */}
-        <Card className="hidden flex-1 overflow-hidden md:block">
+        <Card className={`${selectedEmail ? 'block' : 'hidden md:block'} flex-1 overflow-hidden`}>
           {selectedEmail ? (
             <div className="flex h-full flex-col">
               {/* Detail header */}
-              <div className="flex items-start justify-between border-b p-4">
-                <div className="min-w-0 flex-1">
-                  <div className="mb-2 flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={
-                        selectedEmail.direction === 'inbound'
-                          ? 'border-blue-200 bg-blue-50 text-blue-700'
-                          : 'border-green-200 bg-green-50 text-green-700'
+              <div className="border-b p-4">
+                <button
+                  onClick={() => setSelectedEmail(null)}
+                  className="mb-2 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 md:hidden"
+                >
+                  <ChevronLeft className="h-4 w-4" /> Back to inbox
+                </button>
+                <div className="flex items-start justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={
+                          selectedEmail.direction === 'inbound'
+                            ? 'border-blue-200 bg-blue-50 text-blue-700'
+                            : 'border-green-200 bg-green-50 text-green-700'
+                        }
+                      >
+                        {selectedEmail.direction === 'inbound' ? 'Received' : 'Sent'}
+                      </Badge>
+                    </div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {selectedEmail.subject || '(No subject)'}
+                    </h2>
+                    <div className="mt-2 space-y-0.5 text-sm text-gray-600">
+                      <p>
+                        <span className="font-medium text-gray-700">From:</span>{' '}
+                        {selectedEmail.fromName
+                          ? `${selectedEmail.fromName} <${selectedEmail.fromAddress}>`
+                          : selectedEmail.fromAddress}
+                      </p>
+                      <p>
+                        <span className="font-medium text-gray-700">To:</span>{' '}
+                        {selectedEmail.toAddress}
+                      </p>
+                      {selectedEmail.ccAddresses && (
+                        <p>
+                          <span className="font-medium text-gray-700">CC:</span>{' '}
+                          {selectedEmail.ccAddresses}
+                        </p>
+                      )}
+                      {selectedEmail.replyTo && (
+                        <p>
+                          <span className="font-medium text-gray-700">Reply-To:</span>{' '}
+                          {selectedEmail.replyTo}
+                        </p>
+                      )}
+                      <p>
+                        <span className="font-medium text-gray-700">Date:</span>{' '}
+                        {new Date(selectedEmail.createdAt).toLocaleString([], {
+                          weekday: 'short',
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title={selectedEmail.isRead ? 'Mark as unread' : 'Mark as read'}
+                      onClick={() => handleToggleRead(selectedEmail)}
+                    >
+                      {selectedEmail.isRead ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title={selectedEmail.isStarred ? 'Unstar' : 'Star'}
+                      onClick={() =>
+                        handleToggleStar(selectedEmail, {
+                          stopPropagation: () => {},
+                        } as React.MouseEvent)
                       }
                     >
-                      {selectedEmail.direction === 'inbound' ? 'Received' : 'Sent'}
-                    </Badge>
+                      {selectedEmail.isStarred ? (
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ) : (
+                        <StarOff className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Reply"
+                      onClick={() => {
+                        setComposeForm({
+                          toAddress:
+                            selectedEmail.direction === 'inbound'
+                              ? selectedEmail.fromAddress
+                              : selectedEmail.toAddress,
+                          subject: selectedEmail.subject.startsWith('Re:')
+                            ? selectedEmail.subject
+                            : `Re: ${selectedEmail.subject}`,
+                          textBody: '',
+                        })
+                        setShowCompose(true)
+                      }}
+                    >
+                      <Reply className="h-4 w-4 text-gray-500" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Delete"
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => handleDelete(selectedEmail.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {selectedEmail.subject || '(No subject)'}
-                  </h2>
-                  <div className="mt-2 space-y-0.5 text-sm text-gray-600">
-                    <p>
-                      <span className="font-medium text-gray-700">From:</span>{' '}
-                      {selectedEmail.fromName
-                        ? `${selectedEmail.fromName} <${selectedEmail.fromAddress}>`
-                        : selectedEmail.fromAddress}
-                    </p>
-                    <p>
-                      <span className="font-medium text-gray-700">To:</span>{' '}
-                      {selectedEmail.toAddress}
-                    </p>
-                    {selectedEmail.ccAddresses && (
-                      <p>
-                        <span className="font-medium text-gray-700">CC:</span>{' '}
-                        {selectedEmail.ccAddresses}
-                      </p>
-                    )}
-                    {selectedEmail.replyTo && (
-                      <p>
-                        <span className="font-medium text-gray-700">Reply-To:</span>{' '}
-                        {selectedEmail.replyTo}
-                      </p>
-                    )}
-                    <p>
-                      <span className="font-medium text-gray-700">Date:</span>{' '}
-                      {new Date(selectedEmail.createdAt).toLocaleString([], {
-                        weekday: 'short',
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    title={selectedEmail.isRead ? 'Mark as unread' : 'Mark as read'}
-                    onClick={() => handleToggleRead(selectedEmail)}
-                  >
-                    {selectedEmail.isRead ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    title={selectedEmail.isStarred ? 'Unstar' : 'Star'}
-                    onClick={() =>
-                      handleToggleStar(selectedEmail, {
-                        stopPropagation: () => {},
-                      } as React.MouseEvent)
-                    }
-                  >
-                    {selectedEmail.isStarred ? (
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ) : (
-                      <StarOff className="h-4 w-4 text-gray-400" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    title="Reply"
-                    onClick={() => {
-                      setComposeForm({
-                        toAddress:
-                          selectedEmail.direction === 'inbound'
-                            ? selectedEmail.fromAddress
-                            : selectedEmail.toAddress,
-                        subject: selectedEmail.subject.startsWith('Re:')
-                          ? selectedEmail.subject
-                          : `Re: ${selectedEmail.subject}`,
-                        textBody: '',
-                      })
-                      setShowCompose(true)
-                    }}
-                  >
-                    <Reply className="h-4 w-4 text-gray-500" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    title="Delete"
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => handleDelete(selectedEmail.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
 

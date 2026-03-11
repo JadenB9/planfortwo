@@ -12,11 +12,7 @@ export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
         <div
           key={i}
           className={`h-2 flex-1 rounded-full transition-colors duration-300 ${
-            i < currentStep
-              ? 'bg-wedding-600'
-              : i === currentStep
-                ? 'bg-wedding-600'
-                : 'bg-wedding-200'
+            i <= currentStep ? 'bg-wedding-600' : 'bg-wedding-200'
           }`}
         />
       ))}

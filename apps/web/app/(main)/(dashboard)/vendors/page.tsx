@@ -409,7 +409,7 @@ export default function VendorsPage() {
                 placeholder="e.g., Elegant Events"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="v-category">Category</Label>
                 <select
@@ -450,7 +450,7 @@ export default function VendorsPage() {
                 placeholder="Contact person"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="v-email">Email</Label>
                 <Input

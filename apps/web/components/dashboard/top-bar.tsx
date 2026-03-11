@@ -72,7 +72,7 @@ export function TopBar() {
           <div className="absolute inset-0 bg-black/20" onClick={closeMenu} />
 
           {/* Menu panel */}
-          <div className="absolute inset-x-0 bottom-0 top-0 flex flex-col overflow-y-auto bg-white shadow-xl">
+          <div className="absolute bottom-0 left-0 top-0 flex w-72 flex-col overflow-y-auto bg-white shadow-xl sm:w-80">
             {/* Header with close button */}
             <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 sm:px-6">
               <div className="flex items-center gap-3">
