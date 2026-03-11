@@ -881,6 +881,7 @@ export interface DashboardData {
   wedding: Wedding
   members: DashboardMember[]
   daysUntilWedding: number | null
+  myRole: WeddingRole | null
   stats?: DashboardStats
 }
 

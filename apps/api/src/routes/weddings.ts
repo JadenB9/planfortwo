@@ -68,6 +68,7 @@ weddingsRoute.get('/mine', async (c) => {
   }
 
   const members = await weddingService.getMembers(wedding.id)
+  const myMember = members.find((m) => m.member.userId === dbUserId)
 
   let daysUntilWedding: number | null = null
   if (wedding.date) {
@@ -82,6 +83,7 @@ weddingsRoute.get('/mine', async (c) => {
       wedding,
       members,
       daysUntilWedding,
+      myRole: myMember?.member.role ?? null,
     },
   })
 })

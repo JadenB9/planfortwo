@@ -299,6 +299,8 @@ function WebsitePageInner() {
           <HeroEditor
             content={content as unknown as HeroContent}
             onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+            getToken={getToken}
+            weddingId={weddingId ?? ''}
           />
         )
       case 'our_story':

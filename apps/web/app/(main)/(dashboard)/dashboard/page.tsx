@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import type { DashboardData, DashboardStats, GuestStats } from '@planfortwo/types'
@@ -31,6 +32,7 @@ function formatBudgetValue(amount: number): string {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const { getToken } = useAuth()
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [stats, setStats] = useState<DashboardStats | null>(null)
@@ -53,6 +55,12 @@ export default function DashboardPage() {
       if (!token) return
       const { data } = await api.weddings.mine(token)
       setDashboardData(data)
+
+      // Redirect new owners to onboarding (invited users skip this)
+      if (!data.wedding.onboardingCompleted && data.myRole === 'owner') {
+        router.push('/onboarding')
+        return
+      }
 
       if (data.wedding.id) {
         const promises: Promise<void>[] = []
@@ -103,7 +111,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }, [getToken])
+  }, [getToken, router])
 
   useEffect(() => {
     void loadDashboard()
@@ -141,7 +149,11 @@ export default function DashboardPage() {
     try {
       const token = await getToken()
       if (!token) throw new Error('Not authenticated')
-      await api.weddings.update(dashboardData.wedding.id, { date: dateInput }, token)
+      await api.weddings.update(
+        dashboardData.wedding.id,
+        { date: new Date(dateInput).toISOString() },
+        token,
+      )
       await loadDashboard()
       setEditingDate(false)
       toast.success('Wedding date updated')

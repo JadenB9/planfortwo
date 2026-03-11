@@ -1,16 +1,43 @@
 'use client'
 
-import type { HeroContent } from '@planfortwo/types'
+import { useState, useEffect, useCallback } from 'react'
+import { Check, Loader2, ExternalLink } from 'lucide-react'
+import { api } from '@/lib/api'
+import type { HeroContent, GalleryPhoto } from '@planfortwo/types'
 
 interface HeroEditorProps {
   content: HeroContent
   onChange: (content: HeroContent) => void
+  getToken: () => Promise<string | null>
+  weddingId: string
 }
 
-export function HeroEditor({ content, onChange }: HeroEditorProps) {
+export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEditorProps) {
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([])
+  const [loadingPhotos, setLoadingPhotos] = useState(true)
+
   const update = (fields: Partial<HeroContent>) => {
     onChange({ ...content, ...fields })
   }
+
+  const fetchPhotos = useCallback(async () => {
+    try {
+      const token = await getToken()
+      if (!token || !weddingId) return
+      const { data } = await api.photoGallery.list(weddingId, token)
+      setGalleryPhotos(data ?? [])
+    } catch {
+      /* silent */
+    } finally {
+      setLoadingPhotos(false)
+    }
+  }, [getToken, weddingId])
+
+  useEffect(() => {
+    void fetchPhotos()
+  }, [fetchPhotos])
+
+  const isPhotoSelected = (url: string) => content.backgroundImageUrl === url
 
   return (
     <div className="space-y-5">
@@ -43,20 +70,91 @@ export function HeroEditor({ content, onChange }: HeroEditorProps) {
       </div>
 
       <div>
-        <label htmlFor="hero-bg-image" className="text-sm font-medium text-gray-700">
-          Background Image URL
-        </label>
-        <input
-          id="hero-bg-image"
-          type="text"
-          value={content.backgroundImageUrl ?? ''}
-          onChange={(e) => update({ backgroundImageUrl: e.target.value || null })}
-          placeholder="https://example.com/photo.jpg"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-        <p className="mt-1 text-xs text-gray-500">
-          Leave blank for a solid-color background using your template colors.
-        </p>
+        <label className="text-sm font-medium text-gray-700">Background Image</label>
+
+        {/* URL Input */}
+        <div className="mt-1">
+          <input
+            id="hero-bg-image"
+            type="text"
+            value={content.backgroundImageUrl ?? ''}
+            onChange={(e) => update({ backgroundImageUrl: e.target.value || null })}
+            placeholder="https://example.com/photo.jpg"
+            className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Paste a URL above, or select from your uploaded photos below.
+          </p>
+        </div>
+
+        {/* Photo Picker from Gallery */}
+        <div className="mt-3 border-t border-gray-100 pt-3">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-500">Your Photos</span>
+            {content.backgroundImageUrl && (
+              <button
+                type="button"
+                onClick={() => update({ backgroundImageUrl: null })}
+                className="text-xs text-red-500 hover:text-red-600"
+              >
+                Remove background
+              </button>
+            )}
+          </div>
+
+          {loadingPhotos ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+              <span className="ml-2 text-xs text-gray-500">Loading photos...</span>
+            </div>
+          ) : galleryPhotos.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
+              <p className="text-xs text-gray-500">
+                No photos uploaded yet.{' '}
+                <a
+                  href="/photos"
+                  className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Upload photos <ExternalLink className="h-3 w-3" />
+                </a>
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-1.5">
+              {galleryPhotos.map((photo) => {
+                const selected = isPhotoSelected(photo.url)
+                return (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    onClick={() =>
+                      update({
+                        backgroundImageUrl: selected ? null : photo.url,
+                      })
+                    }
+                    className={`group relative aspect-square overflow-hidden rounded-md border-2 transition-all ${
+                      selected
+                        ? 'border-blue-500 ring-2 ring-blue-200'
+                        : 'border-transparent hover:border-gray-300'
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photo.thumbnailUrl ?? photo.url}
+                      alt={photo.caption ?? 'Gallery photo'}
+                      className="h-full w-full object-cover"
+                    />
+                    {selected && (
+                      <div className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 shadow-sm">
+                        <Check className="h-3 w-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
