@@ -420,11 +420,13 @@ function MusicPageInner() {
         await api.playlists.deleteSong(songId, weddingId, token)
         toast.success('Song removed')
         void loadPlaylistSongs(playlistId)
+        // Reload requests too — removing from Accepted Songs resets request to pending
+        void loadData()
       } catch {
         toast.error('Failed to remove song')
       }
     },
-    [getToken, weddingId, loadPlaylistSongs],
+    [getToken, weddingId, loadPlaylistSongs, loadData],
   )
 
   const handleApproveRequest = useCallback(

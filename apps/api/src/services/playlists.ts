@@ -86,26 +86,55 @@ export const playlistService = {
   async clearPlaylistSongs(playlistId: string, weddingId: string) {
     // Verify ownership first
     const [pl] = await db
-      .select({ id: playlists.id })
+      .select({ id: playlists.id, isAcceptedSongs: playlists.isAcceptedSongs })
       .from(playlists)
       .where(and(eq(playlists.id, playlistId), eq(playlists.weddingId, weddingId)))
     if (!pl) return false
+
+    // If clearing the Accepted Songs playlist, reset all approved requests to pending
+    if (pl.isAcceptedSongs) {
+      await db
+        .update(songRequests)
+        .set({ isApproved: false })
+        .where(and(eq(songRequests.weddingId, weddingId), eq(songRequests.isApproved, true)))
+    }
+
     await db.delete(playlistSongs).where(eq(playlistSongs.playlistId, playlistId))
     return true
   },
 
   async deleteSong(songId: string, weddingId: string) {
     const [song] = await db
-      .select({ playlistId: playlistSongs.playlistId })
+      .select({
+        playlistId: playlistSongs.playlistId,
+        title: playlistSongs.title,
+        artist: playlistSongs.artist,
+      })
       .from(playlistSongs)
       .where(eq(playlistSongs.id, songId))
     if (!song) return null
     const [pl] = await db
-      .select({ id: playlists.id })
+      .select({ id: playlists.id, isAcceptedSongs: playlists.isAcceptedSongs })
       .from(playlists)
       .where(and(eq(playlists.id, song.playlistId), eq(playlists.weddingId, weddingId)))
     if (!pl) return null
     const [deleted] = await db.delete(playlistSongs).where(eq(playlistSongs.id, songId)).returning()
+
+    // If removed from the Accepted Songs playlist, reset matching request to pending
+    if (pl.isAcceptedSongs && deleted) {
+      await db
+        .update(songRequests)
+        .set({ isApproved: false })
+        .where(
+          and(
+            eq(songRequests.weddingId, weddingId),
+            eq(songRequests.title, song.title),
+            eq(songRequests.artist, song.artist),
+            eq(songRequests.isApproved, true),
+          ),
+        )
+    }
+
     return deleted ?? null
   },
 
