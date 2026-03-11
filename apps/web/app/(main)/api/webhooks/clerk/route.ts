@@ -114,7 +114,34 @@ export async function POST(req: Request) {
       }
 
       case 'user.deleted': {
-        await db.delete(users).where(eq(users.clerkId, event.data.id))
+        await db.transaction(async (tx) => {
+          // Find the user being deleted
+          const [user] = await tx.select().from(users).where(eq(users.clerkId, event.data.id))
+          if (!user) return
+
+          // Find all weddings this user belongs to
+          const memberships = await tx
+            .select({ weddingId: weddingMembers.weddingId })
+            .from(weddingMembers)
+            .where(eq(weddingMembers.userId, user.id))
+
+          // Delete the user first (cascades to wedding_members, activity_log, etc.)
+          await tx.delete(users).where(eq(users.id, user.id))
+
+          // For each wedding, check if any members remain — delete orphaned weddings
+          for (const { weddingId } of memberships) {
+            const remainingMembers = await tx
+              .select({ id: weddingMembers.id })
+              .from(weddingMembers)
+              .where(eq(weddingMembers.weddingId, weddingId))
+              .limit(1)
+
+            if (remainingMembers.length === 0) {
+              // No members left — delete wedding (cascades to all related data)
+              await tx.delete(weddings).where(eq(weddings.id, weddingId))
+            }
+          }
+        })
         break
       }
 
