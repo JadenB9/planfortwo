@@ -13,14 +13,13 @@ import {
   events,
   photos,
 } from '@planfortwo/db'
-import { asc, sql, inArray } from 'drizzle-orm'
+import { asc, inArray } from 'drizzle-orm'
 import { websiteAnalyticsService } from '../services/website-analytics.js'
 import { guestbookService } from '../services/guestbook.js'
 import { prayersService } from '../services/prayers.js'
 import { playlistService } from '../services/playlists.js'
 import { storageClient } from '@planfortwo/storage'
 import { createHash, randomUUID } from 'node:crypto'
-import { ilike } from 'drizzle-orm'
 import { z } from 'zod'
 import { rateLimit } from '../middleware/rate-limit.js'
 
@@ -37,6 +36,8 @@ function slugCondition(slug: string) {
 }
 
 // GET /website-public/search?q=name — public couple name search (NO auth, rate-limited)
+// Returns results ONLY when the query contains BOTH partner first names (case-insensitive).
+// Display format: "FirstName and FirstName" (derived from owner + partner members).
 websitePublicRoute.get(
   '/search',
   rateLimit({ windowMs: 60_000, max: 15, prefix: 'public-search' }),
@@ -47,56 +48,66 @@ websitePublicRoute.get(
       return c.json({ data: [] })
     }
 
-    // Sanitize SQL wildcards in user input
-    const sanitized = query.replace(/%/g, '\\%').replace(/_/g, '\\_')
+    const queryLower = query.toLowerCase()
 
-    // Search by wedding name OR partner first/last names
-    const results = await db
+    // Get all public published weddings with owner/partner first names
+    const rows = await db
       .select({
         weddingId: weddings.id,
-        name: weddings.name,
         slug: websiteConfigs.subdomain,
         date: weddings.date,
+        firstName: users.firstName,
+        role: weddingMembers.role,
       })
       .from(weddings)
       .innerJoin(websiteConfigs, eq(websiteConfigs.weddingId, weddings.id))
-      .leftJoin(
+      .innerJoin(
         weddingMembers,
         and(
           eq(weddingMembers.weddingId, weddings.id),
           inArray(weddingMembers.role, ['owner', 'partner']),
         ),
       )
-      .leftJoin(users, eq(users.id, weddingMembers.userId))
-      .where(
-        and(
-          eq(websiteConfigs.privacyMode, 'public'),
-          isNotNull(websiteConfigs.publishedAt),
-          or(
-            ilike(weddings.name, `%${sanitized}%`),
-            ilike(users.firstName, `%${sanitized}%`),
-            ilike(users.lastName, `%${sanitized}%`),
-            ilike(sql`${users.firstName} || ' ' || ${users.lastName}`, `%${sanitized}%`),
-          ),
-        ),
-      )
-      .limit(20)
+      .innerJoin(users, eq(users.id, weddingMembers.userId))
+      .where(and(eq(websiteConfigs.privacyMode, 'public'), isNotNull(websiteConfigs.publishedAt)))
 
-    // Deduplicate by weddingId (a wedding may match via both partners)
-    const seen = new Set<string>()
-    const filtered = results.filter((r) => {
-      if (!r.slug || seen.has(r.weddingId)) return false
-      seen.add(r.weddingId)
-      return true
-    })
+    // Group by wedding to collect owner + partner first names
+    const weddingMap = new Map<
+      string,
+      { slug: string | null; date: Date | null; ownerName: string; partnerName: string }
+    >()
+    for (const row of rows) {
+      const existing = weddingMap.get(row.weddingId)
+      if (!existing) {
+        weddingMap.set(row.weddingId, {
+          slug: row.slug,
+          date: row.date,
+          ownerName: row.role === 'owner' ? row.firstName : '',
+          partnerName: row.role === 'partner' ? row.firstName : '',
+        })
+      } else {
+        if (row.role === 'owner' && !existing.ownerName) existing.ownerName = row.firstName
+        if (row.role === 'partner' && !existing.partnerName) existing.partnerName = row.firstName
+      }
+    }
 
-    return c.json({
-      data: filtered.slice(0, 10).map((r) => ({
-        name: r.name,
-        slug: r.slug,
-        date: r.date,
-      })),
-    })
+    // Only return matches where query contains BOTH first names (case-insensitive)
+    const matches = Array.from(weddingMap.values())
+      .filter((w) => {
+        if (!w.slug || !w.ownerName || !w.partnerName) return false
+        return (
+          queryLower.includes(w.ownerName.toLowerCase()) &&
+          queryLower.includes(w.partnerName.toLowerCase())
+        )
+      })
+      .slice(0, 10)
+      .map((w) => ({
+        name: `${w.ownerName} and ${w.partnerName}`,
+        slug: w.slug,
+        date: w.date,
+      }))
+
+    return c.json({ data: matches })
   },
 )
 

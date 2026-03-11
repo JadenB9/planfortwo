@@ -279,13 +279,13 @@ function CoupleSearch() {
         Looking for someone&apos;s wedding?
       </h2>
       <p className="mt-3 text-sm leading-relaxed text-gray-500">
-        Search by either partner&apos;s name to find their wedding website.
+        Enter both partners&apos; first names to find their wedding website.
       </p>
       <div className="relative mt-6">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <Input
           type="text"
-          placeholder="Search by name (e.g. Sarah or Michael)"
+          placeholder="e.g. Sarah and Michael"
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
           className="pl-10 text-center"
@@ -455,6 +455,11 @@ export default function HomePage() {
         />
       </div>
 
+      {/* ─── Couple Search ─── */}
+      <section className="px-5 pb-20 sm:px-8">
+        <CoupleSearch />
+      </section>
+
       {/* ─── Features ─── */}
       <section className="px-5 pb-24 sm:px-8 lg:pb-32">
         <div className="mx-auto max-w-6xl">
@@ -541,11 +546,6 @@ export default function HomePage() {
             />
           </div>
         </div>
-      </section>
-
-      {/* ─── Couple Search ─── */}
-      <section className="px-5 py-20 sm:px-8">
-        <CoupleSearch />
       </section>
 
       {/* ─── Final CTA ─── */}
