@@ -212,6 +212,29 @@ export const inboxService = {
     return true
   },
 
+  async getAttachmentUploadUrl(
+    userId: string,
+    emailAddressId: string,
+    fileName: string,
+    contentType: string,
+  ) {
+    const [address] = await db
+      .select()
+      .from(emailAddresses)
+      .where(and(eq(emailAddresses.id, emailAddressId), eq(emailAddresses.userId, userId)))
+      .limit(1)
+
+    if (!address) {
+      throw new Error('Email address not found or not owned by you')
+    }
+
+    const attachmentId = crypto.randomUUID()
+    const r2Key = storageClient.buildEmailAttachmentKey(address.id, attachmentId, fileName)
+    const uploadUrl = await storageClient.getUploadUrl(r2Key, contentType)
+
+    return { uploadUrl, r2Key, attachmentId }
+  },
+
   async sendEmail(
     userId: string,
     data: {
@@ -277,12 +300,18 @@ export const inboxService = {
       sendPayload.html = sanitizeHtml(data.htmlBody)
     }
     if (data.attachments && data.attachments.length > 0) {
-      sendPayload.attachments = data.attachments
-        .filter((att) => att.url && isAllowedAttachmentUrl(att.url))
-        .map((att) => ({
-          path: att.url!,
-          filename: att.filename,
-        }))
+      const resolvedAttachments: Array<{ path: string; filename: string }> = []
+      for (const att of data.attachments) {
+        if (att.url && isAllowedAttachmentUrl(att.url)) {
+          resolvedAttachments.push({ path: att.url, filename: att.filename })
+        } else if (att.r2Key) {
+          const downloadUrl = await storageClient.getDownloadUrl(att.r2Key)
+          resolvedAttachments.push({ path: downloadUrl, filename: att.filename })
+        }
+      }
+      if (resolvedAttachments.length > 0) {
+        sendPayload.attachments = resolvedAttachments
+      }
     }
 
     const { data: sent, error } = await resend.emails.send(sendPayload)

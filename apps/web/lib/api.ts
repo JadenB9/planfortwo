@@ -1343,6 +1343,14 @@ export const api = {
         body: JSON.stringify(data),
         token,
       }),
+    getUploadUrl: (
+      data: { emailAddressId: string; fileName: string; contentType: string },
+      token: string,
+    ) =>
+      fetchApi<{ data: { uploadUrl: string; r2Key: string; attachmentId: string } }>(
+        '/inbox/upload-url',
+        { method: 'POST', body: JSON.stringify(data), token },
+      ),
     update: (id: string, data: UpdateEmailInput, token: string) =>
       fetchApi<{ data: Email }>(`/inbox/${id}`, {
         method: 'PATCH',

@@ -42,11 +42,38 @@ import {
   Reply,
   Search,
   Users,
+  X,
+  FileImage,
+  FileText,
 } from 'lucide-react'
 import type { Email, EmailAddress, EmailAttachment, GuestWithTags } from '@planfortwo/types'
 import { toast } from 'sonner'
 
 type TabFilter = 'all' | 'inbound' | 'outbound' | 'unread' | 'starred'
+
+const ALLOWED_ATTACHMENT_TYPES: Record<string, string> = {
+  'application/pdf': 'application/pdf',
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+  'image/gif': 'image/gif',
+  'image/webp': 'image/webp',
+  'image/heic': 'image/heic',
+  'image/heif': 'image/heif',
+}
+
+const ACCEPT_STRING = Object.keys(ALLOWED_ATTACHMENT_TYPES).join(',')
+const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB
+const MAX_ATTACHMENTS = 10
+
+interface PendingAttachment {
+  id: string
+  filename: string
+  contentType: string
+  size: number
+  r2Key: string
+  status: 'uploading' | 'done' | 'error'
+  errorMessage?: string
+}
 
 function buildEmailSrcDoc(html: string): string {
   const sanitized = sanitizeHtml(html, {
@@ -252,6 +279,8 @@ export default function InboxPage() {
     textBody: '',
   })
   const [sending, setSending] = useState(false)
+  const [composeAttachments, setComposeAttachments] = useState<PendingAttachment[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Mass email
   const [showMassEmail, setShowMassEmail] = useState(false)
@@ -449,24 +478,111 @@ export default function InboxPage() {
     }
   }
 
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const token = await getToken()
+    if (!token || addresses.length === 0) return
+
+    const emailAddressId = addresses[0]!.id
+    const remaining = MAX_ATTACHMENTS - composeAttachments.length
+    const selected = Array.from(files).slice(0, remaining)
+
+    for (const file of selected) {
+      if (!ALLOWED_ATTACHMENT_TYPES[file.type]) {
+        toast.error(`${file.name}: unsupported file type`)
+        continue
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name}: exceeds 25MB limit`)
+        continue
+      }
+
+      const tempId = crypto.randomUUID()
+      const pending: PendingAttachment = {
+        id: tempId,
+        filename: file.name,
+        contentType: file.type,
+        size: file.size,
+        r2Key: '',
+        status: 'uploading',
+      }
+
+      setComposeAttachments((prev) => [...prev, pending])
+
+      try {
+        const res = await api.inbox.getUploadUrl(
+          { emailAddressId, fileName: file.name, contentType: file.type },
+          token,
+        )
+        const { uploadUrl, r2Key, attachmentId } = res.data
+
+        await fetch(uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        })
+
+        setComposeAttachments((prev) =>
+          prev.map((a) =>
+            a.id === tempId ? { ...a, id: attachmentId, r2Key, status: 'done' as const } : a,
+          ),
+        )
+      } catch {
+        setComposeAttachments((prev) =>
+          prev.map((a) =>
+            a.id === tempId ? { ...a, status: 'error' as const, errorMessage: 'Upload failed' } : a,
+          ),
+        )
+        toast.error(`Failed to upload ${file.name}`)
+      }
+    }
+
+    // Reset input so user can re-select same file
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const removeAttachment = (id: string) => {
+    setComposeAttachments((prev) => prev.filter((a) => a.id !== id))
+  }
+
   const handleSend = async () => {
     const token = await getToken()
     if (!token || addresses.length === 0) return
 
+    // Don't send if attachments are still uploading
+    if (composeAttachments.some((a) => a.status === 'uploading')) {
+      toast.error('Please wait for attachments to finish uploading')
+      return
+    }
+
     setSending(true)
     try {
+      const doneAttachments = composeAttachments
+        .filter((a) => a.status === 'done')
+        .map((a) => ({
+          id: a.id,
+          filename: a.filename,
+          contentType: a.contentType,
+          size: a.size,
+          r2Key: a.r2Key,
+        }))
+
       await api.inbox.send(
         {
           emailAddressId: addresses[0]!.id,
           toAddress: composeForm.toAddress,
           subject: composeForm.subject,
           textBody: composeForm.textBody,
+          ...(doneAttachments.length > 0 ? { attachments: doneAttachments } : {}),
         },
         token,
       )
       toast.success('Email sent')
       setShowCompose(false)
       setComposeForm({ toAddress: '', subject: '', textBody: '' })
+      setComposeAttachments([])
       await fetchEmails()
     } catch {
       toast.error('Failed to send email')
@@ -1060,7 +1176,13 @@ export default function InboxPage() {
       </motion.div>
 
       {/* Compose Dialog */}
-      <Dialog open={showCompose} onOpenChange={setShowCompose}>
+      <Dialog
+        open={showCompose}
+        onOpenChange={(open) => {
+          setShowCompose(open)
+          if (!open) setComposeAttachments([])
+        }}
+      >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Compose Email</DialogTitle>
@@ -1100,15 +1222,88 @@ export default function InboxPage() {
                 onChange={(e) => setComposeForm((f) => ({ ...f, textBody: e.target.value }))}
               />
             </div>
+
+            {/* Attachments */}
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept={ACCEPT_STRING}
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={composeAttachments.length >= MAX_ATTACHMENTS}
+                className="gap-2"
+              >
+                <Paperclip className="h-4 w-4" />
+                Attach Files
+              </Button>
+              <span className="ml-2 text-xs text-gray-400">
+                PDF, JPG, PNG, HEIC up to 25MB each
+              </span>
+
+              {composeAttachments.length > 0 && (
+                <div className="mt-2 space-y-1.5">
+                  {composeAttachments.map((att) => (
+                    <div
+                      key={att.id}
+                      className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                    >
+                      {att.contentType.startsWith('image/') ? (
+                        <FileImage className="h-4 w-4 shrink-0 text-blue-500" />
+                      ) : (
+                        <FileText className="h-4 w-4 shrink-0 text-red-500" />
+                      )}
+                      <span className="min-w-0 flex-1 truncate text-gray-700">{att.filename}</span>
+                      <span className="shrink-0 text-xs text-gray-400">
+                        {formatFileSize(att.size)}
+                      </span>
+                      {att.status === 'uploading' && (
+                        <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-gray-400" />
+                      )}
+                      {att.status === 'done' && (
+                        <Check className="h-3.5 w-3.5 shrink-0 text-green-500" />
+                      )}
+                      {att.status === 'error' && (
+                        <span className="shrink-0 text-xs text-red-500">Failed</span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(att.id)}
+                        className="shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCompose(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCompose(false)
+                setComposeAttachments([])
+              }}
+            >
               Cancel
             </Button>
             <Button
               onClick={handleSend}
               disabled={
-                sending || !composeForm.toAddress || !composeForm.subject || !composeForm.textBody
+                sending ||
+                !composeForm.toAddress ||
+                !composeForm.subject ||
+                !composeForm.textBody ||
+                composeAttachments.some((a) => a.status === 'uploading')
               }
               className="bg-rose-500 hover:bg-rose-600"
             >

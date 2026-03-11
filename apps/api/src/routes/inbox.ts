@@ -86,6 +86,50 @@ inboxRoute.get('/attachments/:attachmentId', async (c) => {
   return c.redirect(result.url)
 })
 
+// ── Upload URL for attachments ──
+inboxRoute.post(
+  '/upload-url',
+  zValidator(
+    'json',
+    z.object({
+      emailAddressId: z.string().uuid(),
+      fileName: z.string().min(1).max(255),
+      contentType: z
+        .string()
+        .regex(
+          /^(image\/(jpeg|png|gif|webp|heic|heif)|application\/pdf)$/,
+          'Must be an image (JPEG, PNG, GIF, WebP, HEIC) or PDF',
+        ),
+    }),
+    (result, c) => {
+      if (!result.success)
+        return c.json(
+          { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
+          400,
+        )
+    },
+  ),
+  async (c) => {
+    const userId = c.get('dbUserId')
+    const { emailAddressId, fileName, contentType } = c.req.valid('json')
+    try {
+      const result = await inboxService.getAttachmentUploadUrl(
+        userId,
+        emailAddressId,
+        fileName,
+        contentType,
+      )
+      return c.json({ data: result })
+    } catch (err) {
+      console.error('Get upload URL failed:', err)
+      return c.json(
+        { error: 'Failed to get upload URL', code: 'UPLOAD_URL_FAILED', statusCode: 400 },
+        400,
+      )
+    }
+  },
+)
+
 // ── Send ──
 inboxRoute.post(
   '/send',
