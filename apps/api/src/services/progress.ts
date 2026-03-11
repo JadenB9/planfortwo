@@ -318,7 +318,7 @@ export const progressService = {
       makeFeature(
         'ceremony',
         'Ceremony',
-        '/ceremony',
+        '/events',
         ceremonyAutoProgress,
         ceremonyCount,
         ceremonyCount > 0 ? `${ceremonyCount} outline item(s)` : 'No ceremony outline yet',
@@ -342,7 +342,7 @@ export const progressService = {
       makeFeature(
         'communication',
         'Communication',
-        '/communication',
+        '/inbox',
         emailAutoProgress,
         emailCount,
         emailCount > 0 ? `${emailCount} campaign(s)` : 'No email campaigns yet',

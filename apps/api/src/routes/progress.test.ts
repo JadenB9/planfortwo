@@ -140,7 +140,7 @@ const mockProgressData = {
     {
       key: 'ceremony',
       label: 'Ceremony',
-      href: '/dashboard/ceremony',
+      href: '/dashboard/events',
       status: 'not_started' as const,
       progress: 0,
       itemCount: 0,
@@ -167,7 +167,7 @@ const mockProgressData = {
     {
       key: 'communication',
       label: 'Communication',
-      href: '/dashboard/communication',
+      href: '/dashboard/inbox',
       status: 'not_started' as const,
       progress: 0,
       itemCount: 0,

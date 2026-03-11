@@ -14,7 +14,7 @@ const CATEGORY_PAGE_MAP: Record<string, string> = {
   guests: '/guests',
   invitations: '/guests',
   website: '/website',
-  ceremony: '/ceremony',
+  ceremony: '/events',
   music: '/music',
   entertainment: '/music',
   photography: '/photos',
