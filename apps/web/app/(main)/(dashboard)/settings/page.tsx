@@ -157,25 +157,32 @@ export default function SettingsPage() {
       } catch {
         /* silent */
       }
+
+      try {
+        const { data: dbUser } = await api.users.me(token)
+        setAccountName({
+          firstName: dbUser.firstName ?? '',
+          lastName: dbUser.lastName ?? '',
+        })
+      } catch {
+        // Fallback to Clerk user data
+        if (user) {
+          setAccountName({
+            firstName: user.firstName ?? '',
+            lastName: user.lastName ?? '',
+          })
+        }
+      }
     } catch {
       toast.error('Failed to load settings')
     } finally {
       setLoading(false)
     }
-  }, [getToken])
+  }, [getToken, user])
 
   useEffect(() => {
     void loadData()
   }, [loadData])
-
-  useEffect(() => {
-    if (user) {
-      setAccountName({
-        firstName: user.firstName ?? '',
-        lastName: user.lastName ?? '',
-      })
-    }
-  }, [user])
 
   const handleSaveWedding = useCallback(async () => {
     if (!weddingId) return
