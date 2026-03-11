@@ -8,6 +8,23 @@ import { AnalyticsTracker } from '@/components/website/public/analytics-tracker'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
+/** Sections that use sectionBackground; all others use background */
+const SECTION_BG_TYPES = new Set([
+  'event_details',
+  'registry',
+  'prayers',
+  'guestbook',
+  'rsvp',
+  'song_requests',
+  'travel',
+])
+
+function getSectionBgVar(sectionType: string): string {
+  return SECTION_BG_TYPES.has(sectionType)
+    ? 'var(--template-section-background)'
+    : 'var(--template-background)'
+}
+
 interface PublicSection {
   id: string
   sectionType: WebsiteSectionType
@@ -156,21 +173,37 @@ export function PublicWebsiteClient({
       fontPairId={config.fontPair}
     >
       <AnalyticsTracker slug={slug} />
-      {sortedSections.map((section) => (
-        <SectionRenderer
-          key={section.id}
-          section={section}
-          photos={photos}
-          guestPhotos={guestPhotos}
-          guestbookEntries={guestbookEntries}
-          prayerEntries={prayerEntries}
-          weddingName={weddingName}
-          weddingDate={parsedDate}
-          slug={slug}
-          onGuestbookSubmit={handleGuestbookSubmit}
-          onPrayerSubmit={handlePrayerSubmit}
-        />
-      ))}
+      {sortedSections.map((section, index) => {
+        const prevSection = index > 0 ? sortedSections[index - 1] : null
+        const prevBg = prevSection ? getSectionBgVar(prevSection.sectionType) : null
+        const currentBg = getSectionBgVar(section.sectionType)
+        const needsBlend = prevBg !== null && prevBg !== currentBg
+
+        return (
+          <div key={section.id} className="relative">
+            {needsBlend && (
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16"
+                style={{
+                  background: `linear-gradient(to bottom, ${prevBg}, transparent)`,
+                }}
+              />
+            )}
+            <SectionRenderer
+              section={section}
+              photos={photos}
+              guestPhotos={guestPhotos}
+              guestbookEntries={guestbookEntries}
+              prayerEntries={prayerEntries}
+              weddingName={weddingName}
+              weddingDate={parsedDate}
+              slug={slug}
+              onGuestbookSubmit={handleGuestbookSubmit}
+              onPrayerSubmit={handlePrayerSubmit}
+            />
+          </div>
+        )
+      })}
     </TemplateProvider>
   )
 }
