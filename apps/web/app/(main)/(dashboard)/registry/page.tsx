@@ -42,11 +42,9 @@ import {
   Armchair,
   Share2,
   Copy,
-  Eye,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { LucideIcon } from 'lucide-react'
-import { openRegistryLink } from '@/components/registry/registry-viewer'
 import { useTabParam } from '@/hooks/use-tab-param'
 
 // ── Types ──
@@ -543,7 +541,6 @@ function RegistryPageInner() {
               onAddCustom={openAddLinkCustom}
               onDelete={handleDeleteLink}
               onCopy={handleCopyLink}
-              onView={(link) => openRegistryLink(link.url)}
             />
           </motion.div>
         )}
@@ -776,14 +773,12 @@ function LinksTab({
   onAddCustom,
   onDelete,
   onCopy,
-  onView,
 }: {
   links: RegistryLink[]
   onAddStore: (name: string) => void
   onAddCustom: () => void
   onDelete: (id: string) => void
   onCopy: (url: string) => void
-  onView: (link: RegistryLink) => void
 }) {
   return (
     <div className="space-y-8">
@@ -880,20 +875,13 @@ function LinksTab({
                         <div className="min-w-0 flex-1">
                           <h3 className="truncate font-semibold text-gray-900">{link.storeName}</h3>
                           <div className="mt-0.5 flex items-center gap-3">
-                            <button
-                              onClick={() => onView(link)}
-                              className="text-wedding-600 hover:text-wedding-700 inline-flex items-center gap-1 text-sm font-medium"
-                            >
-                              <Eye className="h-3 w-3" />
-                              View Inline
-                            </button>
                             <a
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"
                             >
-                              New Tab
+                              Open
                               <ExternalLink className="h-3 w-3" />
                             </a>
                           </div>

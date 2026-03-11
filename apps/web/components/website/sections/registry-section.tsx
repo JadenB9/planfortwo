@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ExternalLink, Heart } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import type { RegistryContent } from '@planfortwo/types'
 import {
   useTemplateStyles,
@@ -41,17 +41,14 @@ function CashFundCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
-      className="w-full max-w-sm rounded-2xl bg-white p-6 text-left shadow-sm transition-shadow hover:shadow-md"
+      className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
     >
-      <div className="mb-2 flex items-center gap-2">
-        <Heart className="h-5 w-5" style={{ color: colors.accent }} />
-        <h3
-          className={`text-lg font-semibold ${headingClass}`}
-          style={{ ...headingFont, color: colors.primary }}
-        >
-          {registry.name}
-        </h3>
-      </div>
+      <h3
+        className={`mb-2 text-lg font-semibold ${headingClass}`}
+        style={{ ...headingFont, color: colors.primary }}
+      >
+        {registry.name}
+      </h3>
       {registry.description && (
         <p
           className={`mb-3 text-sm ${bodyClass}`}
@@ -90,7 +87,7 @@ function CashFundCard({
 
   if (hasUrl) {
     return (
-      <a href={registry.url} target="_blank" rel="noopener noreferrer" className="text-left">
+      <a href={registry.url} target="_blank" rel="noopener noreferrer" className="text-center">
         {card}
       </a>
     )
@@ -150,23 +147,29 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="flex cursor-pointer items-center gap-3 rounded-2xl bg-white px-6 py-4 shadow-sm transition-shadow hover:shadow-md"
+                  className="w-full max-w-sm cursor-pointer rounded-2xl bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
                 >
                   {registry.logoUrl && /^https?:\/\//i.test(registry.logoUrl) && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={registry.logoUrl}
                       alt={registry.name}
-                      className="h-8 w-8 object-contain"
+                      className="mx-auto mb-2 h-8 w-8 object-contain"
                     />
                   )}
-                  <span
-                    className={`font-medium ${bodyClass}`}
-                    style={{ ...bodyFont, color: colors.primary }}
+                  <h3
+                    className={`mb-3 text-lg font-semibold ${headingClass}`}
+                    style={{ ...headingFont, color: colors.primary }}
                   >
                     {registry.name}
+                  </h3>
+                  <span
+                    className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: colors.accent }}
+                  >
+                    Visit Registry
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </span>
-                  <ExternalLink className="h-4 w-4" style={{ color: colors.accent }} />
                 </motion.a>
               )
             })}
