@@ -91,14 +91,21 @@ websitePublicRoute.get(
       }
     }
 
-    // Only return matches where query contains BOTH first names (case-insensitive)
+    // Only return matches where query contains BOTH first names (case-insensitive).
+    // When both names are the same, require the name to appear at least twice.
     const matches = Array.from(weddingMap.values())
       .filter((w) => {
         if (!w.slug || !w.ownerName || !w.partnerName) return false
-        return (
-          queryLower.includes(w.ownerName.toLowerCase()) &&
-          queryLower.includes(w.partnerName.toLowerCase())
-        )
+        const ownerLower = w.ownerName.toLowerCase()
+        const partnerLower = w.partnerName.toLowerCase()
+        if (ownerLower === partnerLower) {
+          // Same name: require it appears twice (e.g. "jaden and jaden")
+          const firstIdx = queryLower.indexOf(ownerLower)
+          if (firstIdx === -1) return false
+          const secondIdx = queryLower.indexOf(ownerLower, firstIdx + ownerLower.length)
+          return secondIdx !== -1
+        }
+        return queryLower.includes(ownerLower) && queryLower.includes(partnerLower)
       })
       .slice(0, 10)
       .map((w) => ({

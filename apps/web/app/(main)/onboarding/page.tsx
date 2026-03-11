@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth, useUser } from '@clerk/nextjs'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -31,6 +31,7 @@ export default function OnboardingPage() {
   const { getToken } = useAuth()
   const { user } = useUser()
 
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true)
   const [step, setStep] = useState(0)
   const [direction, setDirection] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -47,6 +48,31 @@ export default function OnboardingPage() {
     style: null,
     timelineTemplate: '12-month',
   })
+
+  // Redirect to dashboard if onboarding is already completed (returning users)
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const token = await getToken()
+        if (!token || cancelled) {
+          setCheckingOnboarding(false)
+          return
+        }
+        const { data: dashData } = await api.weddings.mine(token)
+        if (!cancelled && dashData.wedding.onboardingCompleted) {
+          router.replace('/dashboard')
+          return
+        }
+      } catch {
+        // New user with no wedding yet — stay on onboarding
+      }
+      if (!cancelled) setCheckingOnboarding(false)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [getToken, router])
 
   const updateData = useCallback((fields: Partial<OnboardingData>) => {
     setData((prev) => ({ ...prev, ...fields }))
@@ -127,6 +153,10 @@ export default function OnboardingPage() {
       isSubmitting={isSubmitting}
     />,
   ]
+
+  if (checkingOnboarding) {
+    return null
+  }
 
   return (
     <>
