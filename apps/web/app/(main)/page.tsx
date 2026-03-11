@@ -279,13 +279,13 @@ function CoupleSearch() {
         Looking for someone&apos;s wedding?
       </h2>
       <p className="mt-3 text-sm leading-relaxed text-gray-500">
-        Search by name to find a couple&apos;s wedding website.
+        Search by either partner&apos;s name to find their wedding website.
       </p>
       <div className="relative mt-6">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <Input
           type="text"
-          placeholder="Search by name (e.g. Sarah Johnson)"
+          placeholder="Search by name (e.g. Sarah or Michael)"
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
           className="pl-10 text-center"

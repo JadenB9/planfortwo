@@ -121,6 +121,14 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
             <SelectItem value="unlisted">Unlisted</SelectItem>
           </SelectContent>
         </Select>
+        <p className="text-xs text-gray-500">
+          {config.privacyMode === 'public' &&
+            'Your website is searchable by name on the PlanForTwo homepage and indexed by search engines.'}
+          {config.privacyMode === 'password' &&
+            'Visitors must enter a password to view your website. Hidden from search.'}
+          {config.privacyMode === 'unlisted' &&
+            'Only accessible via direct link. Hidden from search and not indexed by search engines.'}
+        </p>
       </div>
 
       <div className="space-y-2">

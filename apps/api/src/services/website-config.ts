@@ -1,5 +1,11 @@
 import { eq, and, or } from 'drizzle-orm'
-import { db, websiteConfigs, websiteSections, defaultWebsiteSections } from '@planfortwo/db'
+import {
+  db,
+  websiteConfigs,
+  websiteSections,
+  defaultWebsiteSections,
+  weddings,
+} from '@planfortwo/db'
 import type { CreateWebsiteConfigInput, UpdateWebsiteConfigInput } from '@planfortwo/validators'
 import { hash, compare } from 'bcryptjs'
 import { randomBytes } from 'node:crypto'
@@ -127,6 +133,9 @@ export const websiteConfigService = {
       .returning()
 
     if (updated) {
+      // Sync the legacy websitePublished flag on the weddings table (used by search)
+      await db.update(weddings).set({ websitePublished: true }).where(eq(weddings.id, weddingId))
+
       await activityService.log({
         weddingId,
         userId,
@@ -147,6 +156,9 @@ export const websiteConfigService = {
       .returning()
 
     if (updated) {
+      // Sync the legacy websitePublished flag on the weddings table
+      await db.update(weddings).set({ websitePublished: false }).where(eq(weddings.id, weddingId))
+
       await activityService.log({
         weddingId,
         userId,

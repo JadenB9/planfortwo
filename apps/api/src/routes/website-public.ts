@@ -8,10 +8,12 @@ import {
   websiteSections,
   websitePhotos,
   weddings,
+  weddingMembers,
+  users,
   events,
   photos,
 } from '@planfortwo/db'
-import { asc } from 'drizzle-orm'
+import { asc, sql, inArray } from 'drizzle-orm'
 import { websiteAnalyticsService } from '../services/website-analytics.js'
 import { guestbookService } from '../services/guestbook.js'
 import { prayersService } from '../services/prayers.js'
@@ -48,29 +50,48 @@ websitePublicRoute.get(
     // Sanitize SQL wildcards in user input
     const sanitized = query.replace(/%/g, '\\%').replace(/_/g, '\\_')
 
+    // Search by wedding name OR partner first/last names
     const results = await db
       .select({
+        weddingId: weddings.id,
         name: weddings.name,
         slug: websiteConfigs.subdomain,
         date: weddings.date,
       })
       .from(weddings)
       .innerJoin(websiteConfigs, eq(websiteConfigs.weddingId, weddings.id))
-      .where(
+      .leftJoin(
+        weddingMembers,
         and(
-          eq(weddings.websitePublished, true),
-          eq(websiteConfigs.privacyMode, 'public'),
-          isNotNull(websiteConfigs.publishedAt),
-          ilike(weddings.name, `%${sanitized}%`),
+          eq(weddingMembers.weddingId, weddings.id),
+          inArray(weddingMembers.role, ['owner', 'partner']),
         ),
       )
-      .limit(10)
+      .leftJoin(users, eq(users.id, weddingMembers.userId))
+      .where(
+        and(
+          eq(websiteConfigs.privacyMode, 'public'),
+          isNotNull(websiteConfigs.publishedAt),
+          or(
+            ilike(weddings.name, `%${sanitized}%`),
+            ilike(users.firstName, `%${sanitized}%`),
+            ilike(users.lastName, `%${sanitized}%`),
+            ilike(sql`${users.firstName} || ' ' || ${users.lastName}`, `%${sanitized}%`),
+          ),
+        ),
+      )
+      .limit(20)
 
-    // Only return results that actually have a published site and a slug
-    const filtered = results.filter((r) => r.slug)
+    // Deduplicate by weddingId (a wedding may match via both partners)
+    const seen = new Set<string>()
+    const filtered = results.filter((r) => {
+      if (!r.slug || seen.has(r.weddingId)) return false
+      seen.add(r.weddingId)
+      return true
+    })
 
     return c.json({
-      data: filtered.map((r) => ({
+      data: filtered.slice(0, 10).map((r) => ({
         name: r.name,
         slug: r.slug,
         date: r.date,
