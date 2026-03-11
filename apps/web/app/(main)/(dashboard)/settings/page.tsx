@@ -83,6 +83,8 @@ export default function SettingsPage() {
   const [cancelTeamDialogId, setCancelTeamDialogId] = useState<string | null>(null)
   const [resendingInviteId, setResendingInviteId] = useState<string | null>(null)
   const [removePartnerDialogOpen, setRemovePartnerDialogOpen] = useState(false)
+  const [accountName, setAccountName] = useState({ firstName: '', lastName: '' })
+  const [savingName, setSavingName] = useState(false)
 
   // My Weddings state
   const [allWeddings, setAllWeddings] = useState<
@@ -165,6 +167,15 @@ export default function SettingsPage() {
   useEffect(() => {
     void loadData()
   }, [loadData])
+
+  useEffect(() => {
+    if (user) {
+      setAccountName({
+        firstName: user.firstName ?? '',
+        lastName: user.lastName ?? '',
+      })
+    }
+  }, [user])
 
   const handleSaveWedding = useCallback(async () => {
     if (!weddingId) return
@@ -1331,16 +1342,60 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs text-gray-500">Name</Label>
-                  <p className="font-medium text-gray-900">{user?.fullName ?? 'Unknown'}</p>
+                  <Label>First Name</Label>
+                  <Input
+                    value={accountName.firstName}
+                    onChange={(e) =>
+                      setAccountName((prev) => ({ ...prev, firstName: e.target.value }))
+                    }
+                  />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-500">Email</Label>
-                  <p className="font-medium text-gray-900">
-                    {user?.primaryEmailAddress?.emailAddress ?? 'Unknown'}
-                  </p>
+                  <Label>Last Name</Label>
+                  <Input
+                    value={accountName.lastName}
+                    onChange={(e) =>
+                      setAccountName((prev) => ({ ...prev, lastName: e.target.value }))
+                    }
+                  />
                 </div>
               </div>
+              <div>
+                <Label className="text-xs text-gray-500">Email</Label>
+                <p className="font-medium text-gray-900">
+                  {user?.primaryEmailAddress?.emailAddress ?? 'Unknown'}
+                </p>
+              </div>
+              <Button
+                disabled={
+                  savingName || !accountName.firstName.trim() || !accountName.lastName.trim()
+                }
+                onClick={async () => {
+                  setSavingName(true)
+                  try {
+                    const token = await getToken()
+                    if (!token || !user) return
+                    await user.update({
+                      firstName: accountName.firstName.trim(),
+                      lastName: accountName.lastName.trim(),
+                    })
+                    await api.users.updateName(
+                      {
+                        firstName: accountName.firstName.trim(),
+                        lastName: accountName.lastName.trim(),
+                      },
+                      token,
+                    )
+                    toast.success('Name updated')
+                  } catch {
+                    toast.error('Failed to update name')
+                  } finally {
+                    setSavingName(false)
+                  }
+                }}
+              >
+                {savingName ? 'Saving...' : 'Save Name'}
+              </Button>
 
               <Separator />
 

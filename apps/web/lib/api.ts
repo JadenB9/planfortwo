@@ -127,6 +127,12 @@ async function fetchApi<T>(
 export const api = {
   users: {
     me: (token: string) => fetchApi<{ data: User }>('/users/me', { token }),
+    updateName: (data: { firstName: string; lastName: string }, token: string) =>
+      fetchApi<{ data: User }>('/users/me', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        token,
+      }),
   },
   weddings: {
     mine: (token: string) => fetchApi<{ data: DashboardData }>('/weddings/mine', { token }),
