@@ -63,14 +63,16 @@ export const seatingChartService = {
       .returning()
 
     if (chart) {
-      await activityService.log({
-        weddingId: data.weddingId,
-        userId,
-        action: 'seating_chart_created',
-        entityType: 'seating_chart',
-        entityId: chart.id,
-        metadata: { type: 'seating_chart', name: data.name },
-      })
+      activityService
+        .log({
+          weddingId: data.weddingId,
+          userId,
+          action: 'seating_chart_created',
+          entityType: 'seating_chart',
+          entityId: chart.id,
+          metadata: { type: 'seating_chart', name: data.name },
+        })
+        .catch(() => {})
     }
 
     return chart!
