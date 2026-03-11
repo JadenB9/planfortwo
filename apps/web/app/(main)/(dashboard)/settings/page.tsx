@@ -1375,10 +1375,6 @@ export default function SettingsPage() {
                   try {
                     const token = await getToken()
                     if (!token || !user) return
-                    await user.update({
-                      firstName: accountName.firstName.trim(),
-                      lastName: accountName.lastName.trim(),
-                    })
                     await api.users.updateName(
                       {
                         firstName: accountName.firstName.trim(),
@@ -1386,6 +1382,13 @@ export default function SettingsPage() {
                       },
                       token,
                     )
+                    // Best-effort sync to Clerk (non-blocking)
+                    user
+                      .update({
+                        firstName: accountName.firstName.trim(),
+                        lastName: accountName.lastName.trim(),
+                      })
+                      .catch(() => {})
                     toast.success('Name updated')
                   } catch {
                     toast.error('Failed to update name')
