@@ -4,12 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
-import { Settings, ExternalLink } from 'lucide-react'
+import { Settings, ExternalLink, Moon, Sun } from 'lucide-react'
 import { NAV_GROUPS } from '@/lib/navigation'
+import { useTheme } from '@/components/theme-provider'
 
 export function TopBar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { isDark, toggleDark } = useTheme()
 
   const closeMenu = useCallback(() => setMenuOpen(false), [])
 
@@ -28,12 +30,12 @@ export function TopBar() {
 
   return (
     <>
-      <header className="border-b border-gray-200 bg-white">
+      <header className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden"
+              className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
               aria-label="Toggle menu"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -48,7 +50,7 @@ export function TopBar() {
 
             <Link
               href="/dashboard"
-              className="font-serif text-lg font-bold text-gray-900 lg:hidden"
+              className="font-serif text-lg font-bold text-gray-900 lg:hidden dark:text-gray-100"
             >
               Plan<span className="text-wedding-600">For</span>Two
             </Link>
@@ -72,13 +74,13 @@ export function TopBar() {
           <div className="absolute inset-0 bg-black/20" onClick={closeMenu} />
 
           {/* Menu panel */}
-          <div className="absolute bottom-0 left-0 top-0 flex w-72 flex-col overflow-y-auto bg-white shadow-xl sm:w-80">
+          <div className="absolute bottom-0 left-0 top-0 flex w-72 flex-col overflow-y-auto bg-white shadow-xl sm:w-80 dark:bg-gray-950">
             {/* Header with close button */}
-            <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 sm:px-6">
+            <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4 sm:px-6 dark:border-gray-800">
               <div className="flex items-center gap-3">
                 <button
                   onClick={closeMenu}
-                  className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+                  className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                   aria-label="Close menu"
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +96,7 @@ export function TopBar() {
                 <Link
                   href="/dashboard"
                   onClick={closeMenu}
-                  className="font-serif text-lg font-bold text-gray-900"
+                  className="font-serif text-lg font-bold text-gray-900 dark:text-gray-100"
                 >
                   Plan<span className="text-wedding-600">For</span>Two
                 </Link>
@@ -116,7 +118,7 @@ export function TopBar() {
               <div className="space-y-4">
                 {NAV_GROUPS.map((group) => (
                   <div key={group.label}>
-                    <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                       {group.label}
                     </p>
                     <div className="space-y-0.5">
@@ -134,14 +136,14 @@ export function TopBar() {
                             }}
                             className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                               isActive
-                                ? 'bg-wedding-50 text-wedding-700'
+                                ? 'bg-wedding-50 text-wedding-700 dark:bg-wedding-950 dark:text-wedding-300'
                                 : item.comingSoon
-                                  ? 'text-gray-400'
-                                  : 'text-gray-700 hover:bg-gray-100'
+                                  ? 'text-gray-400 dark:text-gray-600'
+                                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                             }`}
                           >
                             <Icon
-                              className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-wedding-600' : 'text-gray-400'}`}
+                              className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-wedding-600' : 'text-gray-400 dark:text-gray-500'}`}
                             />
                             <span>{item.label}</span>
                             {item.comingSoon && (
@@ -159,29 +161,38 @@ export function TopBar() {
             </nav>
 
             {/* Bottom section */}
-            <div className="space-y-2 border-t border-gray-200 p-4">
+            <div className="space-y-2 border-t border-gray-200 p-4 dark:border-gray-800">
               <Link
                 href="/settings"
                 onClick={closeMenu}
                 className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                   pathname === '/settings'
-                    ? 'bg-wedding-50 text-wedding-700'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-wedding-50 text-wedding-700 dark:bg-wedding-950 dark:text-wedding-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                 }`}
               >
                 <Settings
-                  className={`h-4 w-4 flex-shrink-0 ${pathname === '/settings' ? 'text-wedding-600' : 'text-gray-400'}`}
+                  className={`h-4 w-4 flex-shrink-0 ${pathname === '/settings' ? 'text-wedding-600' : 'text-gray-400 dark:text-gray-500'}`}
                 />
                 Wedding Settings
               </Link>
-              <Link
-                href="/"
-                onClick={closeMenu}
-                className="flex items-center gap-2 px-3 py-2 text-xs text-gray-400 transition-colors hover:text-gray-600"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                Visit Home Page
-              </Link>
+              <div className="flex items-center justify-between px-3 py-1.5">
+                <Link
+                  href="/"
+                  onClick={closeMenu}
+                  className="flex items-center gap-2 text-xs text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Visit Home Page
+                </Link>
+                <button
+                  onClick={toggleDark}
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                  title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                  {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                </button>
+              </div>
             </div>
           </div>
         </div>

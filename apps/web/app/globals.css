@@ -45,7 +45,79 @@
     --w-950: 10 42% 16%;
   }
 
+  .dark {
+    --background: 220 15% 10%;
+    --foreground: 220 10% 90%;
+    --card: 220 15% 13%;
+    --card-foreground: 220 10% 90%;
+    --popover: 220 15% 13%;
+    --popover-foreground: 220 10% 90%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 10% 20%;
+    --secondary-foreground: 220 10% 85%;
+    --muted: 220 12% 16%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 220 12% 18%;
+    --accent-foreground: 220 10% 85%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 12% 20%;
+    --input: 220 12% 20%;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Dark mode overrides for hardcoded utility classes */
+@layer utilities {
+  .dark .bg-white {
+    background-color: hsl(220 15% 13%);
+  }
+  .dark .bg-gray-50 {
+    background-color: hsl(220 15% 10%);
+  }
+  .dark .bg-gray-100 {
+    background-color: hsl(220 12% 16%);
+  }
+  .dark .text-gray-900 {
+    color: hsl(220 10% 90%);
+  }
+  .dark .text-gray-800 {
+    color: hsl(220 10% 85%);
+  }
+  .dark .text-gray-700 {
+    color: hsl(220 10% 75%);
+  }
+  .dark .text-gray-600 {
+    color: hsl(220 10% 65%);
+  }
+  .dark .text-gray-500 {
+    color: hsl(220 10% 55%);
+  }
+  .dark .border-gray-200 {
+    border-color: hsl(220 12% 20%);
+  }
+  .dark .border-gray-100 {
+    border-color: hsl(220 12% 18%);
+  }
+  .dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: hsl(220 12% 20%);
+  }
+  .dark .hover\:bg-gray-50:hover {
+    background-color: hsl(220 12% 14%);
+  }
+  .dark .hover\:bg-gray-100:hover {
+    background-color: hsl(220 12% 18%);
+  }
+  .dark .ring-gray-200 {
+    --tw-ring-color: hsl(220 12% 20%);
+  }
+  .dark .shadow {
+    --tw-shadow-color: rgba(0, 0, 0, 0.3);
+  }
+  .dark .placeholder\:text-gray-400::placeholder {
+    color: hsl(220 10% 40%);
   }
 }

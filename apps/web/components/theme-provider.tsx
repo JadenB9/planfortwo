@@ -8,11 +8,15 @@ import type { ThemeColors } from '@planfortwo/types'
 interface ThemeContextValue {
   themeColors: ThemeColors | null
   setThemeColors: (colors: ThemeColors | null) => void
+  isDark: boolean
+  toggleDark: () => void
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   themeColors: null,
   setThemeColors: () => {},
+  isDark: false,
+  toggleDark: () => {},
 })
 
 export function useTheme() {
@@ -125,10 +129,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { getToken } = useAuth()
   const [themeColors, setThemeColorsState] = useState<ThemeColors | null>(null)
   const [loaded, setLoaded] = useState(false)
+  const [isDark, setIsDark] = useState(false)
 
   const setThemeColors = useCallback((colors: ThemeColors | null) => {
     setThemeColorsState(colors)
     applyThemeToDocument(colors)
+  }, [])
+
+  const toggleDark = useCallback(() => {
+    setIsDark((prev) => {
+      const next = !prev
+      document.documentElement.classList.toggle('dark', next)
+      try {
+        localStorage.setItem('planfortwo-dark', next ? '1' : '0')
+      } catch {}
+      return next
+    })
+  }, [])
+
+  // Restore dark mode preference on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('planfortwo-dark')
+      if (saved === '1') {
+        setIsDark(true)
+        document.documentElement.classList.add('dark')
+      }
+    } catch {}
   }, [])
 
   useEffect(() => {
@@ -160,7 +187,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [themeColors, loaded])
 
   return (
-    <ThemeContext.Provider value={{ themeColors, setThemeColors }}>
+    <ThemeContext.Provider value={{ themeColors, setThemeColors, isDark, toggleDark }}>
       {children}
     </ThemeContext.Provider>
   )
