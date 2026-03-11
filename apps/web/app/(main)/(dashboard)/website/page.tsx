@@ -16,6 +16,7 @@ import { SectionManager } from '@/components/website/editor/section-manager'
 import { SettingsPanel } from '@/components/website/editor/settings-panel'
 import { PublishToggle } from '@/components/website/editor/publish-toggle'
 import { AnalyticsDashboard } from '@/components/website/analytics/analytics-dashboard'
+import { QrCodeDashboard } from '@/components/website/qr/qr-code-dashboard'
 import { SectionEditorModal } from '@/components/website/editor/section-editor-modal'
 import dynamic from 'next/dynamic'
 import { HeroEditor } from '@/components/website/editor/hero-editor'
@@ -58,16 +59,17 @@ const WebsitePreview = dynamic(
   { ssr: false },
 )
 
-const VALID_TABS = ['design', 'sections', 'settings', 'analytics']
+const VALID_TABS = ['design', 'sections', 'settings', 'qr-code', 'analytics']
 
 export default function WebsitePage() {
   const { data, features, loading: weddingLoading } = useWedding()
   const { getToken } = useAuth()
   const wedding = data?.wedding ?? null
   const weddingId = wedding?.id ?? null
-  const { config, sections, setSections, photos, loading, refetch, analytics } = useWebsite({
-    weddingId,
-  })
+  const { config, sections, setSections, photos, loading, refetch, analytics, qrScanCount } =
+    useWebsite({
+      weddingId,
+    })
   const [creating, setCreating] = useState(false)
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null)
   const [editorContent, setEditorContent] = useState<Record<string, unknown>>({})
@@ -470,6 +472,7 @@ export default function WebsitePage() {
               <TabsTrigger value="design">Design</TabsTrigger>
               <TabsTrigger value="sections">Sections</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
+              <TabsTrigger value="qr-code">QR Code</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
@@ -518,6 +521,14 @@ export default function WebsitePage() {
                 config={config}
                 onUpdate={handleConfigUpdate}
                 onCheckSubdomain={handleCheckSubdomain}
+              />
+            </TabsContent>
+
+            <TabsContent value="qr-code" className="mt-6">
+              <QrCodeDashboard
+                subdomain={config.subdomain}
+                canAccess={features?.canWebsiteAnalytics ?? false}
+                qrScanCount={qrScanCount}
               />
             </TabsContent>
 

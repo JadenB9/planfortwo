@@ -23,6 +23,28 @@ export const websiteAnalyticsService = {
     })
   },
 
+  async getQrScanCount(weddingId: string): Promise<{ total: number; unique: number }> {
+    const baseWhere = and(
+      eq(websitePageViews.weddingId, weddingId),
+      eq(websitePageViews.path, 'qr-scan'),
+    )
+
+    const [totalResult] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(websitePageViews)
+      .where(baseWhere)
+
+    const [uniqueResult] = await db
+      .select({ count: sql<number>`count(distinct ${websitePageViews.visitorId})::int` })
+      .from(websitePageViews)
+      .where(baseWhere)
+
+    return {
+      total: totalResult?.count ?? 0,
+      unique: uniqueResult?.count ?? 0,
+    }
+  },
+
   async getSummary(weddingId: string): Promise<WebsiteAnalyticsSummary> {
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)

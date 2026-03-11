@@ -30,3 +30,15 @@ websiteAnalyticsRoute.get(
     return c.json({ data: summary })
   },
 )
+
+// GET /website-analytics/qr-scans?weddingId=X
+websiteAnalyticsRoute.get(
+  '/qr-scans',
+  resolveWeddingMiddleware,
+  requireFeature('canWebsiteAnalytics'),
+  async (c) => {
+    const weddingId = c.get('weddingId')
+    const counts = await websiteAnalyticsService.getQrScanCount(weddingId)
+    return c.json({ data: counts })
+  },
+)

@@ -628,6 +628,11 @@ export const api = {
       fetchApi<{ data: WebsiteAnalyticsSummary }>(`/website-analytics?weddingId=${weddingId}`, {
         token,
       }),
+    getQrScanCount: (weddingId: string, token: string) =>
+      fetchApi<{ data: { total: number; unique: number } }>(
+        `/website-analytics/qr-scans?weddingId=${weddingId}`,
+        { token },
+      ),
   },
   websitePublic: {
     getBySlug: (slug: string) =>

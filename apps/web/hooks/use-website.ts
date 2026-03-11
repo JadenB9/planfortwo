@@ -56,6 +56,7 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
   const [photos, setPhotos] = useState<WebsitePhoto[]>([])
   const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
   const [analytics, setAnalytics] = useState<WebsiteAnalyticsSummary | null>(null)
+  const [qrScanCount, setQrScanCount] = useState<{ total: number; unique: number } | null>(null)
   const [loading, setLoading] = useState(() => {
     if (!weddingId) return true
     return readCache(weddingId)?.config == null
@@ -102,6 +103,14 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
             /* analytics not available on free tier */
           }),
       )
+      optionalPromises.push(
+        api.websiteAnalytics
+          .getQrScanCount(weddingId, token)
+          .then(({ data }) => setQrScanCount(data))
+          .catch(() => {
+            /* QR scan count not available on free tier */
+          }),
+      )
       await Promise.all(optionalPromises)
     } catch {
       /* silent */
@@ -122,6 +131,7 @@ export function useWebsite({ weddingId }: UseWebsiteOptions) {
     photos,
     guestbookEntries,
     analytics,
+    qrScanCount,
     loading,
     refetch: loadData,
   }
