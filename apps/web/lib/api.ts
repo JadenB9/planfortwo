@@ -806,6 +806,21 @@ export const api = {
           token,
         },
       ),
+    searchSpotify: (playlistId: string, weddingId: string, query: string, token: string) =>
+      fetchApi<{
+        data: Array<{
+          spotifyTrackId: string
+          title: string
+          artist: string
+          album: string
+          albumArt: string | null
+          durationMs: number
+        }>
+      }>(`/playlists/${playlistId}/search-spotify?weddingId=${weddingId}`, {
+        method: 'POST',
+        body: JSON.stringify({ query }),
+        token,
+      }),
     listRequests: (weddingId: string, token: string) =>
       fetchApi<{
         data: Array<{

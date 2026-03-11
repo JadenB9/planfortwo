@@ -44,9 +44,9 @@ import {
   Loader2,
   Download,
   RefreshCw,
-  Link,
   Clock,
   Upload,
+  Search,
 } from 'lucide-react'
 import { useTabParam } from '@/hooks/use-tab-param'
 
@@ -161,9 +161,20 @@ function MusicPageInner() {
   const [showSpotifyImport, setShowSpotifyImport] = useState<string | null>(null)
   const [spotifyImportUrl, setSpotifyImportUrl] = useState('')
   const [importingSpotify, setImportingSpotify] = useState(false)
-  const [showAddSpotifyTrack, setShowAddSpotifyTrack] = useState<string | null>(null)
-  const [spotifyTrackUrl, setSpotifyTrackUrl] = useState('')
-  const [addingSpotifyTrack, setAddingSpotifyTrack] = useState(false)
+  const [showSpotifySearch, setShowSpotifySearch] = useState<string | null>(null)
+  const [spotifySearchQuery, setSpotifySearchQuery] = useState('')
+  const [spotifySearchResults, setSpotifySearchResults] = useState<
+    Array<{
+      spotifyTrackId: string
+      title: string
+      artist: string
+      album: string
+      albumArt: string | null
+      durationMs: number
+    }>
+  >([])
+  const [searchingSpotify, setSearchingSpotify] = useState(false)
+  const [addingSearchResult, setAddingSearchResult] = useState<string | null>(null)
   const [refreshingSpotify, setRefreshingSpotify] = useState<string | null>(null)
 
   // Spotify OAuth state
@@ -381,25 +392,64 @@ function MusicPageInner() {
     [weddingId, getToken, spotifyImportUrl, loadPlaylistSongs, loadData],
   )
 
-  const handleAddSpotifyTrack = useCallback(
+  const handleSpotifySearch = useCallback(
     async (playlistId: string) => {
-      if (!weddingId || !spotifyTrackUrl.trim()) return
-      setAddingSpotifyTrack(true)
+      if (!weddingId || !spotifySearchQuery.trim()) return
+      setSearchingSpotify(true)
       try {
         const token = await getToken()
         if (!token) return
-        await api.playlists.addSpotifyTrack(playlistId, weddingId, spotifyTrackUrl.trim(), token)
-        toast.success('Song added from Spotify')
-        setSpotifyTrackUrl('')
-        setShowAddSpotifyTrack(null)
-        void loadPlaylistSongs(playlistId)
+        const { data } = await api.playlists.searchSpotify(
+          playlistId,
+          weddingId,
+          spotifySearchQuery.trim(),
+          token,
+        )
+        setSpotifySearchResults(data)
       } catch {
-        toast.error("Failed to add track. Make sure it's a valid Spotify track URL.")
+        toast.error('Failed to search Spotify')
       } finally {
-        setAddingSpotifyTrack(false)
+        setSearchingSpotify(false)
       }
     },
-    [weddingId, getToken, spotifyTrackUrl, loadPlaylistSongs],
+    [weddingId, getToken, spotifySearchQuery],
+  )
+
+  const handleAddSearchResult = useCallback(
+    async (
+      playlistId: string,
+      track: {
+        spotifyTrackId: string
+        title: string
+        artist: string
+        album: string
+        albumArt: string | null
+        durationMs: number
+      },
+    ) => {
+      if (!weddingId) return
+      setAddingSearchResult(track.spotifyTrackId)
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.playlists.addSpotifyTrack(
+          playlistId,
+          weddingId,
+          `https://open.spotify.com/track/${track.spotifyTrackId}`,
+          token,
+        )
+        toast.success(`Added "${track.title}" to playlist`)
+        setSpotifySearchResults((prev) =>
+          prev.filter((t) => t.spotifyTrackId !== track.spotifyTrackId),
+        )
+        void loadPlaylistSongs(playlistId)
+      } catch {
+        toast.error('Failed to add song')
+      } finally {
+        setAddingSearchResult(null)
+      }
+    },
+    [weddingId, getToken, loadPlaylistSongs],
   )
 
   const handleRefreshSpotify = useCallback(
@@ -961,18 +1011,19 @@ function MusicPageInner() {
                                           Import from Spotify
                                         </Button>
                                       )}
-                                      {showAddSpotifyTrack !== pl.id && (
+                                      {showSpotifySearch !== pl.id && (
                                         <Button
                                           variant="outline"
                                           size="sm"
                                           className="h-8 gap-1.5 border-[#1DB954]/30 text-xs text-[#1DB954] hover:bg-[#1DB954]/5"
                                           onClick={() => {
-                                            setShowAddSpotifyTrack(pl.id)
-                                            setSpotifyTrackUrl('')
+                                            setShowSpotifySearch(pl.id)
+                                            setSpotifySearchQuery('')
+                                            setSpotifySearchResults([])
                                           }}
                                         >
-                                          <Link className="h-3.5 w-3.5" />
-                                          Add Song via Spotify URL
+                                          <Search className="h-3.5 w-3.5" />
+                                          Search Spotify
                                         </Button>
                                       )}
                                       <Button
@@ -1044,9 +1095,9 @@ function MusicPageInner() {
                                       )}
                                     </AnimatePresence>
 
-                                    {/* Add Spotify track form */}
+                                    {/* Spotify search */}
                                     <AnimatePresence>
-                                      {showAddSpotifyTrack === pl.id && (
+                                      {showSpotifySearch === pl.id && (
                                         <motion.div
                                           initial={{ height: 0, opacity: 0 }}
                                           animate={{ height: 'auto', opacity: 1 }}
@@ -1056,39 +1107,98 @@ function MusicPageInner() {
                                         >
                                           <div className="rounded-lg border border-[#1DB954]/20 bg-[#1DB954]/5 p-4">
                                             <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
-                                              <Link className="h-4 w-4 text-[#1DB954]" />
-                                              Add Song from Spotify
+                                              <Search className="h-4 w-4 text-[#1DB954]" />
+                                              Search Spotify
                                             </h4>
                                             <div className="flex gap-2">
                                               <Input
-                                                value={spotifyTrackUrl}
-                                                onChange={(e) => setSpotifyTrackUrl(e.target.value)}
-                                                placeholder="https://open.spotify.com/track/..."
+                                                value={spotifySearchQuery}
+                                                onChange={(e) =>
+                                                  setSpotifySearchQuery(e.target.value)
+                                                }
+                                                placeholder="Search for a song..."
                                                 className="flex-1 bg-white"
+                                                onKeyDown={(e) => {
+                                                  if (e.key === 'Enter')
+                                                    void handleSpotifySearch(pl.id)
+                                                }}
                                               />
                                               <Button
                                                 size="sm"
                                                 className="bg-[#1DB954] hover:bg-[#1aa34a]"
                                                 disabled={
-                                                  !spotifyTrackUrl.trim() || addingSpotifyTrack
+                                                  !spotifySearchQuery.trim() || searchingSpotify
                                                 }
-                                                onClick={() => handleAddSpotifyTrack(pl.id)}
+                                                onClick={() => handleSpotifySearch(pl.id)}
                                               >
-                                                {addingSpotifyTrack ? (
+                                                {searchingSpotify ? (
                                                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                                                 ) : (
-                                                  <Plus className="mr-1.5 h-3.5 w-3.5" />
+                                                  <Search className="mr-1.5 h-3.5 w-3.5" />
                                                 )}
-                                                Add
+                                                Search
                                               </Button>
                                               <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => setShowAddSpotifyTrack(null)}
+                                                onClick={() => {
+                                                  setShowSpotifySearch(null)
+                                                  setSpotifySearchResults([])
+                                                }}
                                               >
                                                 Cancel
                                               </Button>
                                             </div>
+                                            {spotifySearchResults.length > 0 && (
+                                              <div className="mt-3 max-h-64 space-y-1.5 overflow-y-auto">
+                                                {spotifySearchResults.map((track) => (
+                                                  <div
+                                                    key={track.spotifyTrackId}
+                                                    className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white px-3 py-2 transition-colors hover:bg-gray-50"
+                                                  >
+                                                    {track.albumArt ? (
+                                                      <Image
+                                                        src={track.albumArt}
+                                                        alt={track.album}
+                                                        width={36}
+                                                        height={36}
+                                                        className="h-9 w-9 shrink-0 rounded object-cover"
+                                                        unoptimized
+                                                      />
+                                                    ) : (
+                                                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-gray-100 text-xs text-gray-400">
+                                                        <Music className="h-4 w-4" />
+                                                      </div>
+                                                    )}
+                                                    <div className="min-w-0 flex-1">
+                                                      <p className="truncate text-sm font-medium text-gray-900">
+                                                        {track.title}
+                                                      </p>
+                                                      <p className="truncate text-xs text-gray-500">
+                                                        {track.artist} &middot; {track.album}
+                                                      </p>
+                                                    </div>
+                                                    <Button
+                                                      size="sm"
+                                                      className="h-7 shrink-0 bg-[#1DB954] px-2.5 text-xs hover:bg-[#1aa34a]"
+                                                      disabled={
+                                                        addingSearchResult === track.spotifyTrackId
+                                                      }
+                                                      onClick={() =>
+                                                        handleAddSearchResult(pl.id, track)
+                                                      }
+                                                    >
+                                                      {addingSearchResult ===
+                                                      track.spotifyTrackId ? (
+                                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                                      ) : (
+                                                        <Plus className="h-3 w-3" />
+                                                      )}
+                                                    </Button>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            )}
                                           </div>
                                         </motion.div>
                                       )}
@@ -1443,6 +1553,28 @@ function MusicPageInner() {
                                     >
                                       <X className="mr-1.5 h-3.5 w-3.5" />
                                       Reject
+                                    </Button>
+                                  </div>
+                                )}
+                                {req.status === 'approved' && spotifyConnected && (
+                                  <div className="mt-3">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-8 gap-1.5 border-[#1DB954]/30 text-xs text-[#1DB954] hover:bg-[#1DB954]/5"
+                                      onClick={() => {
+                                        const acceptedPlaylist = playlists.find(
+                                          (p) => p.isAcceptedSongs,
+                                        )
+                                        if (acceptedPlaylist) {
+                                          void handleExportToSpotify(acceptedPlaylist.id)
+                                        } else {
+                                          toast.info('No accepted songs playlist found')
+                                        }
+                                      }}
+                                    >
+                                      <Upload className="h-3.5 w-3.5" />
+                                      Export Approved Songs to Spotify
                                     </Button>
                                   </div>
                                 )}

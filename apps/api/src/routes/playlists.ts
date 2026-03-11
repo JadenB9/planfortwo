@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
 import {
   createPlaylistSchema,
@@ -261,6 +262,32 @@ playlistsRoute.post(
       return c.json({ data: { imported: songs.length, songs } })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to refresh from Spotify'
+      console.error('Spotify refresh error:', message)
+      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+    }
+  },
+)
+
+playlistsRoute.post(
+  '/:id/search-spotify',
+  resolveWeddingMiddleware,
+  requireFeature('canMusicIntegration'),
+  zValidator('json', z.object({ query: z.string().min(1).max(200) }), (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const playlistId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+    const playlist = await playlistService.getPlaylist(playlistId, weddingId)
+    if (!playlist)
+      return c.json({ error: 'Playlist not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    const { query } = c.req.valid('json')
+    try {
+      const tracks = await spotifyService.searchTracks(query, 10)
+      return c.json({ data: tracks })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Spotify search failed'
       return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
     }
   },

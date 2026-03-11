@@ -1,5 +1,6 @@
 import { eq, and, asc, sql } from 'drizzle-orm'
 import { db, playlists, playlistSongs, songRequests } from '@planfortwo/db'
+import { spotifyService } from './spotify.js'
 import type {
   CreatePlaylistInput,
   UpdatePlaylistInput,
@@ -181,10 +182,36 @@ export const playlistService = {
       .where(eq(playlistSongs.playlistId, acceptedPlaylist.id))
     const sortOrder = countResult?.count ?? 0
 
+    // Try to enrich with Spotify metadata
+    let spotifyData: {
+      spotifyTrackId?: string
+      album?: string
+      albumArt?: string | null
+      durationMs?: number
+    } = {}
+    try {
+      const results = await spotifyService.searchTracks(`${req.title} ${req.artist}`, 1)
+      if (results.length > 0) {
+        const match = results[0]!
+        spotifyData = {
+          spotifyTrackId: match.spotifyTrackId,
+          album: match.album,
+          albumArt: match.albumArt,
+          durationMs: match.durationMs,
+        }
+      }
+    } catch {
+      // Spotify lookup failed — proceed with basic data
+    }
+
     await db.insert(playlistSongs).values({
       playlistId: acceptedPlaylist.id,
       title: req.title,
       artist: req.artist,
+      album: spotifyData.album ?? null,
+      albumArt: spotifyData.albumArt ?? null,
+      durationMs: spotifyData.durationMs ?? null,
+      spotifyTrackId: spotifyData.spotifyTrackId ?? null,
       sortOrder,
     })
 
