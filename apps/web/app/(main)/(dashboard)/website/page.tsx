@@ -91,11 +91,8 @@ export default function WebsitePage() {
     window.history.replaceState(null, '', url.toString())
   }, [])
 
-  useEffect(() => {
-    if (editingSection) {
-      setEditorContent((editingSection.content ?? {}) as Record<string, unknown>)
-    }
-  }, [editingSection])
+  // editorContent is set synchronously in handleSectionEdit and onClose
+  // to avoid a one-render stale-content flash that crashes section renderers
 
   const handleCreate = useCallback(async () => {
     if (!weddingId) {
@@ -200,6 +197,7 @@ export default function WebsitePage() {
   )
 
   const handleSectionEdit = useCallback((section: WebsiteSection) => {
+    setEditorContent((section.content ?? {}) as Record<string, unknown>)
     setEditingSection(section)
   }, [])
 
@@ -496,7 +494,10 @@ export default function WebsitePage() {
               />
               <SectionEditorModal
                 open={!!editingSection}
-                onClose={() => setEditingSection(null)}
+                onClose={() => {
+                  setEditingSection(null)
+                  setEditorContent({})
+                }}
                 onSaved={() => {
                   void refetch()
                 }}

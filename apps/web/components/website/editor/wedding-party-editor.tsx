@@ -18,7 +18,8 @@ type MemberDraft = {
 
 const emptyDraft: MemberDraft = { name: '', role: '', description: '', imageUrl: '' }
 
-export function WeddingPartyEditor({ content, onChange }: WeddingPartyEditorProps) {
+export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPartyEditorProps) {
+  const content = { ...rawContent, members: rawContent.members ?? [] }
   const [showAddForm, setShowAddForm] = useState(false)
   const [draft, setDraft] = useState<MemberDraft>({ ...emptyDraft })
   const [editingIndex, setEditingIndex] = useState<number | null>(null)

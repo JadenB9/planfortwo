@@ -9,10 +9,10 @@ interface EventDetailsEditorProps {
 }
 
 export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProps) {
+  const events = content.events ?? []
+
   const updateEvent = (index: number, fields: Partial<EventDetailsContent['events'][number]>) => {
-    const updated = content.events.map((event, i) =>
-      i === index ? { ...event, ...fields } : event,
-    )
+    const updated = events.map((event, i) => (i === index ? { ...event, ...fields } : event))
     onChange({ ...content, events: updated })
   }
 
@@ -20,7 +20,7 @@ export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProp
     onChange({
       ...content,
       events: [
-        ...content.events,
+        ...events,
         { name: '', date: null, time: null, venue: '', address: '', description: '' },
       ],
     })
@@ -29,7 +29,7 @@ export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProp
   const removeEvent = (index: number) => {
     onChange({
       ...content,
-      events: content.events.filter((_, i) => i !== index),
+      events: events.filter((_, i) => i !== index),
     })
   }
 
@@ -47,7 +47,7 @@ export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProp
         </button>
       </div>
 
-      {content.events.length === 0 && (
+      {events.length === 0 && (
         <p className="mt-3 text-sm text-gray-500">
           No events yet. Add your ceremony, reception, rehearsal dinner, or any other events your
           guests should know about.
@@ -55,7 +55,7 @@ export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProp
       )}
 
       <div className="mt-3 space-y-4">
-        {content.events.map((event, index) => (
+        {events.map((event, index) => (
           <div
             key={index}
             className={`rounded-lg border border-gray-200 p-4 ${

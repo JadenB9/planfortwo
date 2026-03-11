@@ -9,6 +9,8 @@ interface OurStoryEditorProps {
 }
 
 export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
+  const timelineEvents = content.timelineEvents ?? []
+
   const updateBody = (body: string) => {
     onChange({ ...content, body })
   }
@@ -17,7 +19,7 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
     index: number,
     fields: Partial<OurStoryContent['timelineEvents'][number]>,
   ) => {
-    const updated = content.timelineEvents.map((event, i) =>
+    const updated = timelineEvents.map((event, i) =>
       i === index ? { ...event, ...fields } : event,
     )
     onChange({ ...content, timelineEvents: updated })
@@ -26,17 +28,14 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
   const addEvent = () => {
     onChange({
       ...content,
-      timelineEvents: [
-        ...content.timelineEvents,
-        { date: '', title: '', description: '', imageUrl: '' },
-      ],
+      timelineEvents: [...timelineEvents, { date: '', title: '', description: '', imageUrl: '' }],
     })
   }
 
   const removeEvent = (index: number) => {
     onChange({
       ...content,
-      timelineEvents: content.timelineEvents.filter((_, i) => i !== index),
+      timelineEvents: timelineEvents.filter((_, i) => i !== index),
     })
   }
 
@@ -69,7 +68,7 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
           </button>
         </div>
 
-        {content.timelineEvents.length === 0 && (
+        {timelineEvents.length === 0 && (
           <p className="mt-3 text-sm text-gray-500">
             No timeline events yet. Add milestones like when you met, your first date, or the
             proposal.
@@ -77,7 +76,7 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
         )}
 
         <div className="mt-3 space-y-4">
-          {content.timelineEvents.map((event, index) => (
+          {timelineEvents.map((event, index) => (
             <div
               key={index}
               className={`rounded-lg border border-gray-200 p-4 ${
