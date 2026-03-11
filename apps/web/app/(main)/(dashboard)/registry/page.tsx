@@ -794,7 +794,7 @@ function LinksTab({
           Quick-add a registry from a popular store, or add a custom one.
         </p>
         <motion.div
-          className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-5 lg:grid-cols-5"
+          className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5"
           variants={staggerGrid}
           initial="hidden"
           animate="visible"

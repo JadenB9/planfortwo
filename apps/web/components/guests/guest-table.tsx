@@ -66,8 +66,12 @@ export function GuestTable({
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">Name</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">RSVP</th>
               <th className="px-4 py-3 font-serif font-semibold text-gray-900">Invite</th>
-              <th className="px-4 py-3 font-serif font-semibold text-gray-900">Tags</th>
-              <th className="px-4 py-3 font-serif font-semibold text-gray-900">+1</th>
+              <th className="hidden px-4 py-3 font-serif font-semibold text-gray-900 sm:table-cell">
+                Tags
+              </th>
+              <th className="hidden px-4 py-3 font-serif font-semibold text-gray-900 sm:table-cell">
+                +1
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -161,14 +165,17 @@ export function GuestTable({
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3" onClick={() => onSelectGuest(guest)}>
+                <td className="hidden px-4 py-3 sm:table-cell" onClick={() => onSelectGuest(guest)}>
                   <div className="flex flex-wrap gap-1">
                     {guest.tags.map((tag) => (
                       <GuestTagBadge key={tag.id} tag={tag} />
                     ))}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-gray-600" onClick={() => onSelectGuest(guest)}>
+                <td
+                  className="hidden px-4 py-3 text-gray-600 sm:table-cell"
+                  onClick={() => onSelectGuest(guest)}
+                >
                   {guest.hasPlusOne ? (
                     <span className="text-green-600">{guest.plusOneName ?? 'Yes'}</span>
                   ) : (

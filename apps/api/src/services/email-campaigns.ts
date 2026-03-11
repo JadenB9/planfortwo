@@ -6,65 +6,8 @@ import type {
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
 } from '@planfortwo/validators'
-import { JSDOM } from 'jsdom'
-import DOMPurify from 'dompurify'
 import { activityService } from './activity.js'
-
-function sanitizeHtml(html: string): string {
-  const window = new JSDOM('').window
-  const purify = DOMPurify(window)
-  return purify.sanitize(html, {
-    ALLOWED_TAGS: [
-      'p',
-      'br',
-      'b',
-      'i',
-      'u',
-      'em',
-      'strong',
-      'a',
-      'ul',
-      'ol',
-      'li',
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      'blockquote',
-      'pre',
-      'code',
-      'div',
-      'span',
-      'img',
-      'table',
-      'thead',
-      'tbody',
-      'tr',
-      'td',
-      'th',
-      'hr',
-      'sub',
-      'sup',
-      'small',
-    ],
-    ALLOWED_ATTR: [
-      'href',
-      'target',
-      'rel',
-      'src',
-      'alt',
-      'width',
-      'height',
-      'style',
-      'class',
-      'id',
-      'colspan',
-      'rowspan',
-    ],
-  })
-}
+import { sanitizeHtml } from '../utils/sanitize.js'
 
 export const emailCampaignService = {
   async list(weddingId: string) {

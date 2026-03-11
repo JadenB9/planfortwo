@@ -112,7 +112,7 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
             >
               Vendor / Description <SortIcon field="vendorName" />
             </th>
-            <th className="px-4 py-3 font-medium text-gray-600">Category</th>
+            <th className="hidden px-4 py-3 font-medium text-gray-600 sm:table-cell">Category</th>
             <th
               className="cursor-pointer px-4 py-3 text-right font-medium text-gray-600"
               onClick={() => handleSort('amount')}
@@ -120,7 +120,7 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
               Amount <SortIcon field="amount" />
             </th>
             <th
-              className="cursor-pointer px-4 py-3 text-right font-medium text-gray-600"
+              className="hidden cursor-pointer px-4 py-3 text-right font-medium text-gray-600 sm:table-cell"
               onClick={() => handleSort('paidAmount')}
             >
               Paid <SortIcon field="paidAmount" />
@@ -132,13 +132,13 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
               Status <SortIcon field="paymentStatus" />
             </th>
             <th
-              className="cursor-pointer px-4 py-3 font-medium text-gray-600"
+              className="hidden cursor-pointer px-4 py-3 font-medium text-gray-600 md:table-cell"
               onClick={() => handleSort('payer')}
             >
               Payer <SortIcon field="payer" />
             </th>
             <th
-              className="cursor-pointer px-4 py-3 font-medium text-gray-600"
+              className="hidden cursor-pointer px-4 py-3 font-medium text-gray-600 md:table-cell"
               onClick={() => handleSort('dueDate')}
             >
               Due Date <SortIcon field="dueDate" />
@@ -153,7 +153,7 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
                 <p className="font-medium text-gray-900">{item.vendorName ?? item.description}</p>
                 {item.vendorName && <p className="text-xs text-gray-500">{item.description}</p>}
               </td>
-              <td className="px-4 py-3">
+              <td className="hidden px-4 py-3 sm:table-cell">
                 <span className="inline-flex items-center gap-1 text-xs">
                   <span>{item.category.icon}</span>
                   <span className="text-gray-600">{item.category.name}</span>
@@ -162,7 +162,7 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
               <td className="px-4 py-3 text-right font-medium text-gray-900">
                 {formatCurrency(item.amount)}
               </td>
-              <td className="px-4 py-3 text-right text-gray-600">
+              <td className="hidden px-4 py-3 text-right text-gray-600 sm:table-cell">
                 {formatCurrency(item.paidAmount)}
               </td>
               <td className="px-4 py-3">
@@ -172,8 +172,12 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
                   {STATUS_LABELS[item.paymentStatus]}
                 </span>
               </td>
-              <td className="px-4 py-3 text-gray-600">{PAYER_LABELS[item.payer]}</td>
-              <td className="px-4 py-3 text-gray-600">{formatDate(item.dueDate)}</td>
+              <td className="hidden px-4 py-3 text-gray-600 md:table-cell">
+                {PAYER_LABELS[item.payer]}
+              </td>
+              <td className="hidden px-4 py-3 text-gray-600 md:table-cell">
+                {formatDate(item.dueDate)}
+              </td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
                   <button
