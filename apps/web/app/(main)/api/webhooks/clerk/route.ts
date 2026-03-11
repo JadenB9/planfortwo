@@ -119,17 +119,32 @@ export async function POST(req: Request) {
           const [user] = await tx.select().from(users).where(eq(users.clerkId, event.data.id))
           if (!user) return
 
-          // Find all weddings this user belongs to
+          // Find all weddings this user belongs to, with their role
           const memberships = await tx
-            .select({ weddingId: weddingMembers.weddingId })
+            .select({ weddingId: weddingMembers.weddingId, role: weddingMembers.role })
             .from(weddingMembers)
             .where(eq(weddingMembers.userId, user.id))
 
-          // Delete the user first (cascades to wedding_members, activity_log, etc.)
+          // Separate owner-weddings from non-owner memberships
+          const ownedWeddingIds = memberships
+            .filter((m) => m.role === 'owner')
+            .map((m) => m.weddingId)
+          const nonOwnedWeddingIds = memberships
+            .filter((m) => m.role !== 'owner')
+            .map((m) => m.weddingId)
+
+          // Delete all weddings the user owns — cascades to wedding_members,
+          // website_configs, guests, budget, everything. Other members'
+          // activeWeddingId is set to null via FK onDelete: 'set null'.
+          for (const weddingId of ownedWeddingIds) {
+            await tx.delete(weddings).where(eq(weddings.id, weddingId))
+          }
+
+          // Delete the user (cascades to remaining wedding_members, activity_log, etc.)
           await tx.delete(users).where(eq(users.id, user.id))
 
-          // For each wedding, check if any members remain — delete orphaned weddings
-          for (const { weddingId } of memberships) {
+          // For non-owned weddings, check if any members remain — delete orphaned ones
+          for (const weddingId of nonOwnedWeddingIds) {
             const remainingMembers = await tx
               .select({ id: weddingMembers.id })
               .from(weddingMembers)
@@ -137,7 +152,6 @@ export async function POST(req: Request) {
               .limit(1)
 
             if (remainingMembers.length === 0) {
-              // No members left — delete wedding (cascades to all related data)
               await tx.delete(weddings).where(eq(weddings.id, weddingId))
             }
           }
