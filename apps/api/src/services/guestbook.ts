@@ -1,4 +1,4 @@
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, and, desc, sql } from 'drizzle-orm'
 import { db, guestbookEntries } from '@planfortwo/db'
 import type { CreateGuestbookEntryInput } from '@planfortwo/validators'
 
@@ -26,6 +26,14 @@ export const guestbookService = {
   },
 
   async create(data: CreateGuestbookEntryInput) {
+    const rows = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(guestbookEntries)
+      .where(eq(guestbookEntries.weddingId, data.weddingId))
+    if ((rows[0]?.count ?? 0) >= 5000) {
+      throw new Error('Guestbook has reached maximum capacity')
+    }
+
     const [entry] = await db
       .insert(guestbookEntries)
       .values({

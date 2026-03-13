@@ -66,7 +66,7 @@ export function OurStorySection({ title, content }: OurStorySectionProps) {
                   'div',
                   'img',
                 ],
-                ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class', 'style'],
+                ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class'],
                 ALLOW_DATA_ATTR: false,
               }),
             }}

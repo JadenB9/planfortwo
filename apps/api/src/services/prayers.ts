@@ -1,4 +1,4 @@
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, and, desc, sql } from 'drizzle-orm'
 import { db, prayers } from '@planfortwo/db'
 import type { CreatePrayerInput } from '@planfortwo/validators'
 
@@ -26,6 +26,14 @@ export const prayersService = {
   },
 
   async create(data: CreatePrayerInput) {
+    const rows = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(prayers)
+      .where(eq(prayers.weddingId, data.weddingId))
+    if ((rows[0]?.count ?? 0) >= 5000) {
+      throw new Error('Prayers have reached maximum capacity')
+    }
+
     const [entry] = await db
       .insert(prayers)
       .values({

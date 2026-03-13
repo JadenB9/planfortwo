@@ -107,7 +107,7 @@ spotifyRoute.post(
     'json',
     z.object({
       spotifyPlaylistId: z.string().min(1),
-      trackIds: z.array(z.string().min(1)).min(1).max(500),
+      trackIds: z.array(z.string().min(1)).min(1).max(100),
     }),
     (result, c) => {
       if (!result.success)

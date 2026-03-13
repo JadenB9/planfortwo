@@ -71,7 +71,8 @@ purchasesRoute.post(
   }),
   async (c) => {
     const userId = c.get('dbUserId')
-    const { weddingId, promoCode } = c.req.valid('json')
+    const weddingId = c.get('weddingId')
+    const { promoCode } = c.req.valid('json')
     try {
       const result = await purchaseService.redeemPromoCode(weddingId, userId, promoCode)
       if (!result.success) {
@@ -143,6 +144,10 @@ contactRoute.post(
   }),
   async (c) => {
     const data = c.req.valid('json')
+    // Honeypot check — bots fill hidden "website" field
+    if (data.website) {
+      return c.json({ data: { success: true } })
+    }
     const submission = await contactService.create(data)
     return c.json({ data: { success: true, id: submission.id } }, 201)
   },

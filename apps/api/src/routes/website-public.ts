@@ -69,6 +69,7 @@ websitePublicRoute.get(
       )
       .innerJoin(users, eq(users.id, weddingMembers.userId))
       .where(and(eq(websiteConfigs.privacyMode, 'public'), isNotNull(websiteConfigs.publishedAt)))
+      .limit(200)
 
     // Group by wedding to collect owner + partner first names
     const weddingMap = new Map<
@@ -543,6 +544,32 @@ websitePublicRoute.post('/:slug/photos/upload', async (c) => {
     )
   }
 
+  // Read file bytes once for both magic-byte validation and R2 upload
+  const fileBuffer = Buffer.from(await file.arrayBuffer())
+
+  // Validate file content matches declared MIME type via magic bytes
+  const magicBytes: Record<string, number[][]> = {
+    'image/jpeg': [[0xff, 0xd8, 0xff]],
+    'image/png': [[0x89, 0x50, 0x4e, 0x47]],
+    'image/gif': [[0x47, 0x49, 0x46, 0x38]],
+    'image/webp': [[0x52, 0x49, 0x46, 0x46]],
+  }
+  const expectedMagic = magicBytes[file.type]
+  if (expectedMagic) {
+    const headerSlice = Array.from(fileBuffer.subarray(0, 4))
+    const valid = expectedMagic.some((magic) => magic.every((b, i) => headerSlice[i] === b))
+    if (!valid) {
+      return c.json(
+        {
+          error: 'File content does not match declared type',
+          code: 'INVALID_FILE',
+          statusCode: 400,
+        },
+        400,
+      )
+    }
+  }
+
   if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
     return c.json({ error: 'Invalid image type', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
   }
@@ -561,7 +588,7 @@ websitePublicRoute.post('/:slug/photos/upload', async (c) => {
   try {
     const photoId = randomUUID()
     const r2Key = storageClient.buildGalleryPhotoKey(config.weddingId, photoId, file.name)
-    const buffer = Buffer.from(await file.arrayBuffer())
+    const buffer = fileBuffer
     await storageClient.uploadBuffer(r2Key, buffer, file.type)
     const publicUrl = await storageClient.getDownloadUrl(r2Key)
 

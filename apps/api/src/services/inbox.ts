@@ -197,7 +197,14 @@ export const inboxService = {
 
     if (result.length === 0) return null
 
-    const [updated] = await db.update(emails).set(data).where(eq(emails.id, emailId)).returning()
+    const updateData: Record<string, unknown> = {}
+    if (data.isRead !== undefined) updateData.isRead = data.isRead
+    if (data.isStarred !== undefined) updateData.isStarred = data.isStarred
+    const [updated] = await db
+      .update(emails)
+      .set(updateData)
+      .where(eq(emails.id, emailId))
+      .returning()
 
     return updated
   },

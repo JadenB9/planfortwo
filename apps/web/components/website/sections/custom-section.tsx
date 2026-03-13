@@ -66,7 +66,7 @@ export function CustomSection({ title, content }: CustomSectionProps) {
                   'div',
                   'img',
                 ],
-                ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class', 'style'],
+                ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class'],
                 ALLOW_DATA_ATTR: false,
               }),
             }}
