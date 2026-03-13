@@ -258,6 +258,7 @@ describe('Honeymoon Routes', () => {
 
   describe('POST /honeymoon/:id/activities', () => {
     it('should add an activity', async () => {
+      mockedService.getPlan.mockResolvedValue({ id: PLAN_ID, weddingId: WEDDING_ID } as never)
       mockedService.addActivity.mockResolvedValue({
         id: ACTIVITY_ID,
         planId: PLAN_ID,

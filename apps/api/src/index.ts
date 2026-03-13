@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { secureHeaders } from 'hono/secure-headers'
+import { bodyLimit } from 'hono/body-limit'
 import { serve as inngestServe } from 'inngest/hono'
 
 import { healthRoute } from './routes/health.js'
@@ -85,6 +86,8 @@ app.use(
       // Exact match for known origins
       if (allowedOrigins.includes(origin)) return origin
       // Allow any *.planfortwo.com subdomain (public wedding websites)
+      // SECURITY NOTE: Subdomain origins get credentials: true, but Clerk JWTs
+      // are stored only on the main app domain. Subdomains only access public endpoints.
       if (/^https:\/\/[a-z0-9-]+\.planfortwo\.com$/.test(origin)) return origin
       return undefined
     },
@@ -94,6 +97,11 @@ app.use(
   }),
 )
 
+// ── Body Size Limits (must be registered BEFORE routes) ──
+app.use('/website-public/*/photos/upload', bodyLimit({ maxSize: 25 * 1024 * 1024 }))
+app.use('/webhooks/*', bodyLimit({ maxSize: 5 * 1024 * 1024 }))
+app.use('*', bodyLimit({ maxSize: 1024 * 1024 })) // 1MB default
+
 // ── Rate Limiting (must be registered BEFORE routes) ──
 const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30, prefix: 'pub' })
 const strictRateLimit = rateLimit({ windowMs: 60_000, max: 10, prefix: 'strict' })
@@ -102,6 +110,8 @@ const rsvpSubmitRateLimit = rateLimit({ windowMs: 60_000, max: 10, prefix: 'rsvp
 const rsvpBatchRateLimit = rateLimit({ windowMs: 60_000, max: 5, prefix: 'rsvp-batch' })
 const inviteSendRateLimit = rateLimit({ windowMs: 60_000, max: 5, prefix: 'invite-send' })
 const inviteBulkRateLimit = rateLimit({ windowMs: 60_000, max: 2, prefix: 'invite-bulk' })
+const photoUploadRateLimit = rateLimit({ windowMs: 60_000, max: 5, prefix: 'photo-upload' })
+app.use('/website-public/*/photos/upload', photoUploadRateLimit)
 app.use('/website-public/*', publicRateLimit)
 app.use('/guestbook/*', publicRateLimit)
 app.use('/prayers/*', publicRateLimit)

@@ -23,8 +23,11 @@ spotifyRoute.get('/auth-url', async (c) => {
     const url = spotifyService.getAuthUrl()
     return c.json({ data: { url } })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to generate auth URL'
-    return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 500 }, 500)
+    console.error('Spotify auth URL error:', err)
+    return c.json(
+      { error: 'Failed to generate Spotify auth URL', code: 'SPOTIFY_ERROR', statusCode: 500 },
+      500,
+    )
   }
 })
 
@@ -49,8 +52,11 @@ spotifyRoute.post(
         },
       })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to connect Spotify'
-      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+      console.error('Spotify exchange error:', err)
+      return c.json(
+        { error: 'Spotify authentication failed', code: 'SPOTIFY_ERROR', statusCode: 502 },
+        502,
+      )
     }
   },
 )
@@ -82,11 +88,15 @@ spotifyRoute.get('/user-playlists', async (c) => {
     const playlists = await spotifyService.getUserPlaylists(userId)
     return c.json({ data: playlists })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch playlists'
+    const message = err instanceof Error ? err.message : ''
     if (message === 'Spotify not connected') {
-      return c.json({ error: message, code: 'NOT_CONNECTED', statusCode: 401 }, 401)
+      return c.json({ error: 'Spotify not connected', code: 'NOT_CONNECTED', statusCode: 401 }, 401)
     }
-    return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+    console.error('Spotify playlists error:', err)
+    return c.json(
+      { error: 'Failed to fetch Spotify playlists', code: 'SPOTIFY_ERROR', statusCode: 502 },
+      502,
+    )
   }
 })
 
@@ -119,11 +129,22 @@ spotifyRoute.post(
       )
       return c.json({ data: result })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to add tracks'
+      const message = err instanceof Error ? err.message : ''
       if (message === 'Spotify not connected') {
-        return c.json({ error: message, code: 'NOT_CONNECTED', statusCode: 401 }, 401)
+        return c.json(
+          { error: 'Spotify not connected', code: 'NOT_CONNECTED', statusCode: 401 },
+          401,
+        )
       }
-      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+      console.error('Spotify add tracks error:', err)
+      return c.json(
+        {
+          error: 'Failed to add tracks to Spotify playlist',
+          code: 'SPOTIFY_ERROR',
+          statusCode: 502,
+        },
+        502,
+      )
     }
   },
 )

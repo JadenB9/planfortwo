@@ -43,7 +43,33 @@ export function CustomSection({ title, content }: CustomSectionProps) {
             transition={{ delay: 0.2 }}
             className={`prose mx-auto max-w-none ${bodyClass}`}
             style={{ ...bodyFont, color: colors.primary }}
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.body) }}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(content.body, {
+                ALLOWED_TAGS: [
+                  'p',
+                  'br',
+                  'strong',
+                  'em',
+                  'u',
+                  'a',
+                  'ul',
+                  'ol',
+                  'li',
+                  'h1',
+                  'h2',
+                  'h3',
+                  'h4',
+                  'h5',
+                  'h6',
+                  'blockquote',
+                  'span',
+                  'div',
+                  'img',
+                ],
+                ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class', 'style'],
+                ALLOW_DATA_ATTR: false,
+              }),
+            }}
           />
         )}
       </div>

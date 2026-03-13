@@ -251,7 +251,10 @@ seatingChartsRoute.post(
       return c.json({ data: relationship }, 201)
     } catch (err) {
       if (err instanceof Error && err.message.includes('do not belong to this wedding')) {
-        return c.json({ error: err.message, code: 'FORBIDDEN', statusCode: 403 }, 403)
+        return c.json(
+          { error: 'Guests do not belong to this wedding', code: 'FORBIDDEN', statusCode: 403 },
+          403,
+        )
       }
       throw err
     }

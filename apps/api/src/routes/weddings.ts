@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
 import {
   onboardingSchema,
@@ -33,29 +34,28 @@ weddingsRoute.get('/all', async (c) => {
 })
 
 // PUT /weddings/set-active -- switch to a different wedding
-weddingsRoute.put('/set-active', async (c) => {
-  const dbUserId = c.get('dbUserId')
-  const body = await c.req.json()
-  const weddingId = body?.weddingId
+weddingsRoute.put(
+  '/set-active',
+  zValidator('json', z.object({ weddingId: z.string().uuid() }), (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const dbUserId = c.get('dbUserId')
+    const { weddingId } = c.req.valid('json')
 
-  if (!weddingId || typeof weddingId !== 'string') {
-    return c.json(
-      { error: 'weddingId is required', code: 'VALIDATION_ERROR', statusCode: 400 },
-      400,
-    )
-  }
+    const result = await weddingService.setActiveWedding(dbUserId, weddingId)
 
-  const result = await weddingService.setActiveWedding(dbUserId, weddingId)
+    if (!result) {
+      return c.json(
+        { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+        403,
+      )
+    }
 
-  if (!result) {
-    return c.json(
-      { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
-      403,
-    )
-  }
-
-  return c.json({ data: result })
-})
+    return c.json({ data: result })
+  },
+)
 
 // GET /weddings/mine -- fetch the current user's wedding + members + countdown
 weddingsRoute.get('/mine', async (c) => {
@@ -267,30 +267,9 @@ weddingsRoute.post('/accept-invite/:token', async (c) => {
 
     return c.json({ data: wedding ?? { id: weddingId } })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to accept invitation'
     console.error('Accept invite failed:', err)
-
-    if (message.includes('not found')) {
-      return c.json(
-        { error: 'Invitation not found', code: 'INVITATION_NOT_FOUND', statusCode: 404 },
-        404,
-      )
-    }
-    if (message.includes('expired')) {
-      return c.json(
-        { error: 'Invitation has expired', code: 'INVITATION_EXPIRED', statusCode: 410 },
-        410,
-      )
-    }
-    if (message.includes('already been')) {
-      return c.json(
-        { error: 'Invitation has already been used', code: 'INVITATION_USED', statusCode: 409 },
-        409,
-      )
-    }
-
     return c.json(
-      { error: 'Failed to accept invitation', code: 'INVITATION_FAILED', statusCode: 400 },
+      { error: 'Invalid or expired invitation', code: 'INVITATION_FAILED', statusCode: 400 },
       400,
     )
   }
@@ -367,8 +346,10 @@ weddingsRoute.post('/:id/invitations/:invitationId/resend', async (c) => {
     return c.json({ data: { resent: true } })
   } catch (err) {
     console.error('Resend invitation failed:', err)
-    const message = err instanceof Error ? err.message : 'Failed to resend invitation'
-    return c.json({ error: message, code: 'EMAIL_SEND_FAILED', statusCode: 500 }, 500)
+    return c.json(
+      { error: 'Failed to resend invitation', code: 'EMAIL_SEND_FAILED', statusCode: 500 },
+      500,
+    )
   }
 })
 

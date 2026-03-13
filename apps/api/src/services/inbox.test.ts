@@ -20,9 +20,13 @@ vi.mock('@planfortwo/db', () => {
   const mockFrom = vi.fn(() => ({ where: mockWhere }))
   const mockSelect = vi.fn(() => ({ from: mockFrom }))
 
+  const mockTransaction = vi.fn(async (fn: (tx: unknown) => Promise<unknown>) =>
+    fn({ select: mockSelect, insert: mockInsert }),
+  )
   return {
     db: {
       select: mockSelect,
+      transaction: mockTransaction,
       insert: mockInsert,
       _mocks: {
         mockSelect,
@@ -32,6 +36,7 @@ vi.mock('@planfortwo/db', () => {
         mockInsert,
         mockValues,
         mockReturning,
+        mockTransaction,
       },
     },
     emailAddresses: {

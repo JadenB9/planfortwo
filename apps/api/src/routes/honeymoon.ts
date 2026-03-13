@@ -89,6 +89,13 @@ honeymoonRoute.post(
   async (c) => {
     const data = c.req.valid('json')
     const planId = c.req.param('id')
+    const weddingId = c.get('weddingId')
+
+    const plan = await honeymoonService.getPlan(planId, weddingId)
+    if (!plan) {
+      return c.json({ error: 'Plan not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
     const activity = await honeymoonService.addActivity({ ...data, planId })
     return c.json({ data: activity }, 201)
   },

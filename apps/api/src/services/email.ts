@@ -7,6 +7,12 @@ import {
   RsvpInviteEmail,
 } from '@planfortwo/email'
 
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@')
+  if (!local || !domain) return '***'
+  return `${local[0]}***@${domain}`
+}
+
 function getResendClient(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
@@ -61,11 +67,11 @@ export const emailService = {
     })
 
     if (error) {
-      console.error('[email] Failed to send partner invite:', { to: email, error })
+      console.error('[email] Failed to send partner invite:', { to: maskEmail(email), error })
       throw new Error(`Failed to send invitation email: ${error.message}`)
     }
 
-    console.log('[email] Partner invite sent:', { to: email, emailId: data?.id })
+    console.log('[email] Partner invite sent:', { to: maskEmail(email), emailId: data?.id })
   },
 
   async sendTeamMemberInvite(
@@ -93,11 +99,11 @@ export const emailService = {
     })
 
     if (error) {
-      console.error('[email] Failed to send team member invite:', { to: email, error })
+      console.error('[email] Failed to send team member invite:', { to: maskEmail(email), error })
       throw new Error(`Failed to send invitation email: ${error.message}`)
     }
 
-    console.log('[email] Team member invite sent:', { to: email, emailId: data?.id })
+    console.log('[email] Team member invite sent:', { to: maskEmail(email), emailId: data?.id })
   },
 
   async sendRsvpInvite(

@@ -269,7 +269,8 @@ export const spotifyService = {
 
     if (!resp.ok) {
       const text = await resp.text()
-      throw new Error(`Spotify token exchange failed: ${resp.status} ${text}`)
+      console.error('Spotify token exchange failed:', { status: resp.status, body: text })
+      throw new Error('Spotify authentication failed')
     }
 
     const tokenData = (await resp.json()) as {
@@ -481,7 +482,8 @@ export const spotifyService = {
 
       if (!resp.ok) {
         const text = await resp.text()
-        throw new Error(`Failed to add tracks to Spotify: ${resp.status} ${text}`)
+        console.error('Failed to add tracks to Spotify:', { status: resp.status, body: text })
+        throw new Error('Failed to add tracks to Spotify playlist')
       }
 
       totalAdded += batch.length

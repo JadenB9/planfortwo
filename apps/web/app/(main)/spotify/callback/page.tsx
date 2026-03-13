@@ -32,10 +32,13 @@ function SpotifyCallbackInner() {
     const error = searchParams.get('error')
 
     if (error) {
+      const knownErrors: Record<string, string> = {
+        access_denied: 'Spotify access was denied.',
+        invalid_scope: 'Invalid permissions requested.',
+      }
+      const errorMessage = knownErrors[error] || 'An error occurred connecting to Spotify.'
       setStatus('error')
-      setMessage(
-        error === 'access_denied' ? 'Spotify access was denied.' : `Spotify error: ${error}`,
-      )
+      setMessage(errorMessage)
       setTimeout(() => router.push('/music'), 3000)
       return
     }

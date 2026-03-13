@@ -42,5 +42,11 @@
   },
   "dependencies": {
     "qr-code-styling": "^1.9.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "flatted": "^3.4.0",
+      "prismjs": "^1.30.0"
+    }
   }
 }

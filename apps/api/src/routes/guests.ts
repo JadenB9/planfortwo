@@ -8,6 +8,7 @@ import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
 import { requireFeature } from '../middleware/require-feature.js'
 import { requireGuestLimit } from '../middleware/require-guest-limit.js'
 import { guestService } from '../services/guests.js'
+import { guestTagService } from '../services/guest-tags.js'
 import { emailService } from '../services/email.js'
 import { db, weddings } from '@planfortwo/db'
 import { eq } from 'drizzle-orm'
@@ -354,6 +355,12 @@ guestsRoute.delete('/:id/tags/:tagId', resolveWeddingMiddleware, async (c) => {
   }
 
   const { guestTagService } = await import('../services/guest-tags.js')
+
+  const tag = await guestTagService.getTag(tagId)
+  if (!tag || tag.weddingId !== weddingId) {
+    return c.json({ error: 'Tag not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
+
   await guestTagService.removeTag(guestId, tagId)
   return c.json({ data: { success: true } })
 })
