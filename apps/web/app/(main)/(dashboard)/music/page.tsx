@@ -969,6 +969,7 @@ function MusicPageInner() {
                                           height="352"
                                           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                                           loading="lazy"
+                                          sandbox="allow-scripts allow-same-origin allow-popups"
                                           className="rounded-xl"
                                           title="Spotify playlist"
                                         />

@@ -14,14 +14,18 @@ setInterval(
 ).unref()
 
 function getClientIp(c: Context): string {
-  // Use the LAST IP in X-Forwarded-For (set by the trusted proxy/load balancer),
-  // not the first (which is client-controlled and spoofable)
+  // Prefer x-real-ip (set reliably by Railway's proxy)
+  const realIp = c.req.header('x-real-ip')
+  if (realIp) return realIp.trim()
+
+  // Fallback: first IP in X-Forwarded-For (client IP — Railway appends to the chain)
   const xff = c.req.header('x-forwarded-for')
   if (xff) {
     const ips = xff.split(',').map((ip) => ip.trim())
-    return ips[ips.length - 1] ?? 'unknown'
+    return ips[0] ?? 'unknown'
   }
-  return c.req.header('x-real-ip') ?? 'unknown'
+
+  return 'unknown'
 }
 
 export function rateLimit(options: { windowMs: number; max: number; prefix?: string }) {

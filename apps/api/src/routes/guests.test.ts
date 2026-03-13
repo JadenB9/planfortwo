@@ -58,6 +58,7 @@ vi.mock('../services/guests.js', () => ({
 vi.mock('../services/guest-tags.js', () => ({
   guestTagService: {
     removeTag: vi.fn(),
+    getTag: vi.fn(),
     listTags: vi.fn(),
     createTag: vi.fn(),
     deleteTag: vi.fn(),
@@ -123,6 +124,8 @@ import { userService } from '../services/users.js'
 import { weddingService } from '../services/weddings.js'
 
 const mockedGuestService = vi.mocked(guestService)
+import { guestTagService } from '../services/guest-tags.js'
+const mockedTagService = vi.mocked(guestTagService)
 const mockedFeatureService = vi.mocked(featureService)
 
 const WEDDING_ID = 'a0000000-0000-0000-0000-000000000001'
@@ -514,6 +517,13 @@ describe('Guest Routes', () => {
 
   describe('DELETE /guests/:id/tags/:tagId', () => {
     it('should remove a tag from a guest', async () => {
+      mockedGuestService.getGuest.mockResolvedValue({
+        id: GUEST_ID,
+        weddingId: WEDDING_ID,
+        firstName: 'Test',
+        lastName: 'Guest',
+      } as never)
+      mockedTagService.getTag.mockResolvedValue({ id: TAG_ID, weddingId: WEDDING_ID } as never)
       const app = createApp()
       const res = await app.request(`/guests/${GUEST_ID}/tags/${TAG_ID}?weddingId=${WEDDING_ID}`, {
         method: 'DELETE',

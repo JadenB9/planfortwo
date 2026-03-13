@@ -1160,7 +1160,7 @@ export default function InboxPage() {
                 {selectedEmail.htmlBody ? (
                   <iframe
                     ref={iframeRef}
-                    sandbox="allow-same-origin allow-popups"
+                    sandbox="allow-popups"
                     srcDoc={buildEmailSrcDoc(selectedEmail.htmlBody)}
                     className="w-full border-0"
                     title="Email content"

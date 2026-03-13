@@ -15,12 +15,12 @@ function safeCompare(a: string, b: string): boolean {
 }
 
 export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
-  // Check for MCP API key authentication
+  // Check for MCP API key authentication — disabled in production for security
   const apiKey = c.req.header('X-API-Key')
   const configuredApiKey = process.env.PLANFORTWO_API_KEY
   const mcpClerkUserId = process.env.MCP_CLERK_USER_ID
 
-  if (apiKey && configuredApiKey && mcpClerkUserId) {
+  if (process.env.NODE_ENV !== 'production' && apiKey && configuredApiKey && mcpClerkUserId) {
     if (safeCompare(apiKey, configuredApiKey)) {
       c.set('clerkUserId', mcpClerkUserId)
       await next()

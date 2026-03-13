@@ -172,8 +172,11 @@ playlistsRoute.post(
 
       return c.json({ data: { imported: songs.length, songs } })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to import from Spotify'
-      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+      console.error('Spotify import error:', err)
+      return c.json(
+        { error: 'Failed to import from Spotify', code: 'SPOTIFY_ERROR', statusCode: 502 },
+        502,
+      )
     }
   },
 )
@@ -218,8 +221,11 @@ playlistsRoute.post(
       })
       return c.json({ data: song }, 201)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch track from Spotify'
-      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+      console.error('Spotify track fetch error:', err)
+      return c.json(
+        { error: 'Failed to fetch track from Spotify', code: 'SPOTIFY_ERROR', statusCode: 502 },
+        502,
+      )
     }
   },
 )
@@ -261,9 +267,11 @@ playlistsRoute.post(
       const songs = await playlistService.bulkAddSongs(playlistId, tracks)
       return c.json({ data: { imported: songs.length, songs } })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to refresh from Spotify'
-      console.error('Spotify refresh error:', message)
-      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+      console.error('Spotify refresh error:', err)
+      return c.json(
+        { error: 'Failed to refresh from Spotify', code: 'SPOTIFY_ERROR', statusCode: 502 },
+        502,
+      )
     }
   },
 )
@@ -282,9 +290,11 @@ playlistsRoute.post(
       const tracks = await spotifyService.searchTracks(query, 10)
       return c.json({ data: tracks })
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Spotify search failed'
-      console.error('Spotify search error:', message)
-      return c.json({ error: message, code: 'SPOTIFY_ERROR', statusCode: 502 }, 502)
+      console.error('Spotify search error:', err)
+      return c.json(
+        { error: 'Failed to search Spotify', code: 'SPOTIFY_ERROR', statusCode: 502 },
+        502,
+      )
     }
   },
 )

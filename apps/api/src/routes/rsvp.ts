@@ -72,6 +72,8 @@ rsvpRoute.get(
       result = await rsvpService.lookupByCode(code)
     }
 
+    await randomDelay()
+
     if (!result) {
       return c.json({ error: 'Guest not found', code: 'GUEST_NOT_FOUND', statusCode: 404 }, 404)
     }

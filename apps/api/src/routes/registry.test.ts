@@ -42,6 +42,7 @@ vi.mock('../services/registry.js', () => ({
     deleteLink: vi.fn(),
     trackClick: vi.fn(),
     listFunds: vi.fn(),
+    getFund: vi.fn(),
     createFund: vi.fn(),
     updateFund: vi.fn(),
     deleteFund: vi.fn(),
@@ -143,6 +144,9 @@ describe('Registry Routes', () => {
       canWebsiteBuilder: true,
       canWebsiteAnalytics: true,
       canWebsiteCustomSections: true,
+      canInbox: true,
+      canMusicIntegration: true,
+      canPhotoGallery: true,
     })
   })
 
@@ -237,6 +241,10 @@ describe('Registry Routes', () => {
 
   describe('POST /registry/funds/:id/contribute', () => {
     it('should add a contribution with wedding ownership check', async () => {
+      mockedService.getFund.mockResolvedValue({
+        id: 'c0000000-0000-0000-0000-000000000001',
+        weddingId: WEDDING_ID,
+      } as never)
       const fundId = 'c0000000-0000-0000-0000-000000000001'
       mockedService.addContribution.mockResolvedValue({
         id: 'd0000000-0000-0000-0000-000000000001',
