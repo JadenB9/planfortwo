@@ -185,7 +185,7 @@ export function GallerySection({
 
     if (content.layout === 'masonry') {
       return (
-        <div className={`columns-1 gap-4 sm:columns-2 lg:columns-${columns}`}>
+        <div className="columns-1 gap-4 sm:columns-2" style={{ columnCount: columns }}>
           {photoList.map((photo, i) => (
             <motion.div
               key={photo.id}

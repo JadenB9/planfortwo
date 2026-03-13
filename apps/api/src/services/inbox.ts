@@ -41,34 +41,38 @@ export const inboxService = {
       throw new Error('This address is reserved')
     }
 
-    const existing = await db
-      .select()
-      .from(emailAddresses)
-      .where(eq(emailAddresses.userId, userId))
-      .limit(1)
+    const address = await db.transaction(async (tx) => {
+      const existing = await tx
+        .select()
+        .from(emailAddresses)
+        .where(eq(emailAddresses.userId, userId))
+        .limit(1)
 
-    if (existing.length > 0) {
-      throw new Error('You already have a claimed email address')
-    }
+      if (existing.length > 0) {
+        throw new Error('You already have a claimed email address')
+      }
 
-    const taken = await db
-      .select()
-      .from(emailAddresses)
-      .where(eq(emailAddresses.address, localPart))
-      .limit(1)
+      const taken = await tx
+        .select()
+        .from(emailAddresses)
+        .where(eq(emailAddresses.address, localPart))
+        .limit(1)
 
-    if (taken.length > 0) {
-      throw new Error('This address is already taken')
-    }
+      if (taken.length > 0) {
+        throw new Error('This address is already taken')
+      }
 
-    const [address] = await db
-      .insert(emailAddresses)
-      .values({
-        userId,
-        address: localPart,
-        displayName: sanitizeDisplayName(data.displayName),
-      })
-      .returning()
+      const [claimed] = await tx
+        .insert(emailAddresses)
+        .values({
+          userId,
+          address: localPart,
+          displayName: sanitizeDisplayName(data.displayName),
+        })
+        .returning()
+
+      return claimed
+    })
 
     return address
   },

@@ -150,6 +150,15 @@ budgetItemsRoute.post(
   async (c) => {
     const itemId = c.req.param('id')
     const weddingId = c.get('weddingId')
+
+    const item = await budgetItemService.get(itemId, weddingId)
+    if (!item) {
+      return c.json(
+        { error: 'Budget item not found', code: 'ITEM_NOT_FOUND', statusCode: 404 },
+        404,
+      )
+    }
+
     const { fileName, contentType } = c.req.valid('json')
 
     const result = await budgetItemService.getUploadUrl(weddingId, itemId, fileName, contentType)

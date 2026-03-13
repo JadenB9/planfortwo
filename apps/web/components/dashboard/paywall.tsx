@@ -18,7 +18,6 @@ const ALLOWED_FREE_PATHS = [
   '/vendors',
   '/events',
   '/registry',
-  '/events',
   '/honeymoon',
   '/roadmap',
 ]

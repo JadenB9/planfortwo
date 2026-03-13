@@ -124,6 +124,10 @@ registryRoute.post(
     try {
       const fundId = c.req.param('id')
       const weddingId = c.get('weddingId')
+      const fund = await registryService.getFund(fundId, weddingId)
+      if (!fund) {
+        return c.json({ error: 'Fund not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+      }
       const data = c.req.valid('json')
       const contribution = await registryService.addContribution({ ...data, fundId }, weddingId)
       return c.json({ data: contribution }, 201)
@@ -251,6 +255,10 @@ registryRoute.post(
 registryRoute.delete('/mood-boards/items/:itemId', resolveWeddingMiddleware, async (c) => {
   const itemId = c.req.param('itemId')
   const weddingId = c.get('weddingId')
+  const item = await registryService.getBoardItem(itemId)
+  if (!item) {
+    return c.json({ error: 'Item not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+  }
   await registryService.deleteBoardItem(itemId, weddingId)
   return c.json({ data: { success: true } })
 })

@@ -1007,8 +1007,11 @@ export interface VendorCommunication {
   vendorId: string
   type: string
   subject: string | null
-  body: string | null
-  date: Date
+  content: string
+  contactDate: Date
+  followUpDate: Date | null
+  attachmentUrl: string | null
+  attachmentName: string | null
   createdAt: Date
 }
 
@@ -1043,6 +1046,7 @@ export interface WeddingEvent {
 
 export interface TimelineEntry {
   id: string
+  weddingId: string
   eventId: string
   time: string
   title: string
