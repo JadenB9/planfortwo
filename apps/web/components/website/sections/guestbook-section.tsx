@@ -131,29 +131,32 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
         </motion.form>
         {visibleEntries.length > 0 && (
           <div className="space-y-4">
-            {visibleEntries.map((entry, i) => (
-              <motion.div
-                key={entry.id}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="rounded-2xl bg-white p-5 shadow-sm"
-              >
-                <p
-                  className={`text-sm ${bodyClass}`}
-                  style={{ ...bodyFont, color: colors.primary }}
+            {visibleEntries.map((entry, i) => {
+              if (!entry.message) return null
+              return (
+                <motion.div
+                  key={entry.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="rounded-2xl bg-white p-5 shadow-sm"
                 >
-                  {entry.message}
-                </p>
-                <p
-                  className={`mt-2 text-xs font-medium ${bodyClass}`}
-                  style={{ ...bodyFont, color: colors.accent }}
-                >
-                  — {entry.authorName}
-                </p>
-              </motion.div>
-            ))}
+                  <p
+                    className={`text-sm ${bodyClass}`}
+                    style={{ ...bodyFont, color: colors.primary }}
+                  >
+                    {entry.message}
+                  </p>
+                  <p
+                    className={`mt-2 text-xs font-medium ${bodyClass}`}
+                    style={{ ...bodyFont, color: colors.accent }}
+                  >
+                    — {entry.authorName || 'Anonymous'}
+                  </p>
+                </motion.div>
+              )
+            })}
           </div>
         )}
       </div>

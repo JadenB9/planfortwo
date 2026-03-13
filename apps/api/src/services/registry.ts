@@ -54,6 +54,14 @@ export const registryService = {
       .where(and(eq(registryLinks.id, linkId), eq(registryLinks.weddingId, weddingId)))
   },
 
+  async getFund(fundId: string, weddingId: string) {
+    const [fund] = await db
+      .select()
+      .from(cashFunds)
+      .where(and(eq(cashFunds.id, fundId), eq(cashFunds.weddingId, weddingId)))
+    return fund ?? null
+  },
+
   async listFunds(weddingId: string) {
     const rows = await db
       .select()
@@ -120,24 +128,28 @@ export const registryService = {
       throw new Error('Fund not found')
     }
 
-    const [contribution] = await db
-      .insert(cashFundContributions)
-      .values({
-        fundId: data.fundId,
-        guestName: data.guestName,
-        guestEmail: data.guestEmail,
-        amount: data.amount.toString(),
-        message: data.message,
-        stripePaymentId: data.stripePaymentId,
-      })
-      .returning()
+    const result = await db.transaction(async (tx) => {
+      const [contribution] = await tx
+        .insert(cashFundContributions)
+        .values({
+          fundId: data.fundId,
+          guestName: data.guestName,
+          guestEmail: data.guestEmail,
+          amount: data.amount.toString(),
+          message: data.message,
+          stripePaymentId: data.stripePaymentId,
+        })
+        .returning()
 
-    await db
-      .update(cashFunds)
-      .set({ currentAmount: sql`${cashFunds.currentAmount}::numeric + ${data.amount}` })
-      .where(eq(cashFunds.id, data.fundId))
+      await tx
+        .update(cashFunds)
+        .set({ currentAmount: sql`${cashFunds.currentAmount}::numeric + ${data.amount}` })
+        .where(eq(cashFunds.id, data.fundId))
 
-    return contribution!
+      return contribution!
+    })
+
+    return result
   },
 
   async listGifts(weddingId: string) {
@@ -223,6 +235,11 @@ export const registryService = {
     await db
       .delete(moodBoards)
       .where(and(eq(moodBoards.id, boardId), eq(moodBoards.weddingId, weddingId)))
+  },
+
+  async getBoardItem(itemId: string) {
+    const [item] = await db.select().from(moodBoardItems).where(eq(moodBoardItems.id, itemId))
+    return item ?? null
   },
 
   async listBoardItems(boardId: string) {

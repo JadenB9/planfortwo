@@ -1144,7 +1144,13 @@ export const api = {
     addCommunication: (
       vendorId: string,
       weddingId: string,
-      data: { vendorId: string; type: string; subject?: string; body?: string; date: string },
+      data: {
+        vendorId: string
+        type: string
+        subject?: string
+        content?: string
+        contactDate: string
+      },
       token: string,
     ) =>
       fetchApi<{ data: VendorCommunication }>(

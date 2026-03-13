@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { trackPageViewSchema } from '@planfortwo/validators'
-import { eq, and, or, isNotNull } from 'drizzle-orm'
+import { eq, and, or, isNotNull, asc, inArray } from 'drizzle-orm'
 import {
   db,
   websiteConfigs,
@@ -13,7 +13,6 @@ import {
   events,
   photos,
 } from '@planfortwo/db'
-import { asc, inArray } from 'drizzle-orm'
 import { websiteAnalyticsService } from '../services/website-analytics.js'
 import { guestbookService } from '../services/guestbook.js'
 import { prayersService } from '../services/prayers.js'
@@ -462,6 +461,7 @@ const publicSongRequestSchema = z.object({
   title: z.string().trim().min(1).max(300),
   artist: z.string().trim().min(1).max(300),
   notes: z.string().trim().max(500).nullable().optional(),
+  website: z.string().optional(),
 })
 
 websitePublicRoute.post(
@@ -484,6 +484,11 @@ websitePublicRoute.post(
     }
 
     const data = c.req.valid('json')
+
+    // Honeypot check — bots fill hidden "website" field
+    if (data.website) {
+      return c.json({ data: { success: true } })
+    }
 
     const request = await playlistService.createSongRequest({
       weddingId: config.weddingId,
@@ -525,10 +530,11 @@ websitePublicRoute.post('/:slug/photos/upload', async (c) => {
   const body = await c.req.parseBody()
   const file = body['file']
   const uploaderName = typeof body['uploaderName'] === 'string' ? body['uploaderName'].trim() : ''
-  const uploaderEmail =
+  const rawEmail =
     typeof body['uploaderEmail'] === 'string' && body['uploaderEmail'].trim()
       ? body['uploaderEmail'].trim()
       : null
+  const uploaderEmail = rawEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail) ? rawEmail : null
 
   if (!(file instanceof File) || !uploaderName) {
     return c.json(

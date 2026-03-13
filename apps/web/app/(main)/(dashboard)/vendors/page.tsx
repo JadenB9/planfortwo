@@ -75,8 +75,8 @@ export default function VendorsPage() {
   const [commForm, setCommForm] = useState({
     type: 'email',
     subject: '',
-    body: '',
-    date: new Date().toISOString().split('T')[0] ?? '',
+    content: '',
+    contactDate: new Date().toISOString().split('T')[0] ?? '',
   })
 
   const loadVendors = useCallback(async () => {
@@ -184,8 +184,8 @@ export default function VendorsPage() {
           vendorId: editingVendor.id,
           type: commForm.type,
           subject: commForm.subject || undefined,
-          body: commForm.body || undefined,
-          date: commForm.date,
+          content: commForm.content || undefined,
+          contactDate: commForm.contactDate,
         },
         token,
       )
@@ -194,8 +194,8 @@ export default function VendorsPage() {
       setCommForm({
         type: 'email',
         subject: '',
-        body: '',
-        date: new Date().toISOString().split('T')[0] ?? '',
+        content: '',
+        contactDate: new Date().toISOString().split('T')[0] ?? '',
       })
       void loadCommunications(editingVendor.id)
     } catch {
@@ -519,7 +519,10 @@ export default function VendorsPage() {
                 ) : (
                   <div className="max-h-48 space-y-2 overflow-y-auto">
                     {[...communications]
-                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                      .sort(
+                        (a, b) =>
+                          new Date(b.contactDate).getTime() - new Date(a.contactDate).getTime(),
+                      )
                       .map((comm) => (
                         <div
                           key={comm.id}
@@ -530,7 +533,7 @@ export default function VendorsPage() {
                               {comm.type}
                             </span>
                             <span className="text-xs text-gray-400">
-                              {new Date(comm.date).toLocaleDateString('en-US', {
+                              {new Date(comm.contactDate).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
                                 year: 'numeric',
@@ -540,8 +543,10 @@ export default function VendorsPage() {
                           {comm.subject && (
                             <p className="mt-1 text-sm font-medium text-gray-800">{comm.subject}</p>
                           )}
-                          {comm.body && (
-                            <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">{comm.body}</p>
+                          {comm.content && (
+                            <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">
+                              {comm.content}
+                            </p>
                           )}
                         </div>
                       ))}
@@ -584,22 +589,22 @@ export default function VendorsPage() {
               />
             </div>
             <div>
-              <Label htmlFor="comm-body">Notes</Label>
+              <Label htmlFor="comm-content">Notes</Label>
               <Textarea
-                id="comm-body"
-                value={commForm.body}
-                onChange={(e) => setCommForm({ ...commForm, body: e.target.value })}
+                id="comm-content"
+                value={commForm.content}
+                onChange={(e) => setCommForm({ ...commForm, content: e.target.value })}
                 placeholder="Details about this communication..."
                 rows={4}
               />
             </div>
             <div>
-              <Label htmlFor="comm-date">Date</Label>
+              <Label htmlFor="comm-contactDate">Date</Label>
               <Input
-                id="comm-date"
+                id="comm-contactDate"
                 type="date"
-                value={commForm.date}
-                onChange={(e) => setCommForm({ ...commForm, date: e.target.value })}
+                value={commForm.contactDate}
+                onChange={(e) => setCommForm({ ...commForm, contactDate: e.target.value })}
               />
             </div>
           </div>
@@ -607,7 +612,7 @@ export default function VendorsPage() {
             <Button variant="outline" onClick={() => setShowCommForm(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddCommunication} disabled={!commForm.date}>
+            <Button onClick={handleAddCommunication} disabled={!commForm.contactDate}>
               Save
             </Button>
           </DialogFooter>

@@ -159,24 +159,30 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
+    let mounted = true
     async function loadTheme() {
       try {
         const token = await getToken()
+        if (!mounted) return
         if (!token) {
           setLoaded(true)
           return
         }
         const { data } = await api.weddings.mine(token)
+        if (!mounted) return
         if (data.wedding.themeColors) {
           setThemeColors(data.wedding.themeColors)
         }
       } catch {
         // No wedding or failed to load — use defaults
       } finally {
-        setLoaded(true)
+        if (mounted) setLoaded(true)
       }
     }
     void loadTheme()
+    return () => {
+      mounted = false
+    }
   }, [getToken, setThemeColors])
 
   // Apply theme when state changes

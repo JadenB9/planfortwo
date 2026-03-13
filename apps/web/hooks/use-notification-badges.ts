@@ -48,10 +48,11 @@ export function useNotificationBadges() {
 
   useEffect(() => {
     void fetchBadges()
-    intervalRef.current = setInterval(() => {
+    const id = setInterval(() => {
       void fetchBadges()
     }, POLL_INTERVAL)
-    return () => clearInterval(intervalRef.current)
+    intervalRef.current = id
+    return () => clearInterval(id)
   }, [fetchBadges])
 
   // Listen for manual refresh events from approval pages
