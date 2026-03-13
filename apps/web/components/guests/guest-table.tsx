@@ -137,26 +137,27 @@ export function GuestTable({
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  {guest.inviteSentAt ? (
-                    <span className="flex items-center gap-1 text-xs text-green-600">
-                      <MailCheck className="h-3.5 w-3.5" />
-                      Sent
-                    </span>
-                  ) : guest.email ? (
+                  {guest.email ? (
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         onSendInvite?.(guest)
                       }}
                       disabled={sendingInviteId === guest.id}
-                      className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50"
+                      className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                        guest.inviteSentAt
+                          ? 'text-green-600 hover:bg-green-50 hover:text-green-700'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
                     >
                       {sendingInviteId === guest.id ? (
                         <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                      ) : guest.inviteSentAt ? (
+                        <MailCheck className="h-3.5 w-3.5" />
                       ) : (
                         <Send className="h-3.5 w-3.5" />
                       )}
-                      Send
+                      {guest.inviteSentAt ? 'Resend' : 'Send'}
                     </button>
                   ) : (
                     <span className="flex items-center gap-1 text-xs text-gray-400">

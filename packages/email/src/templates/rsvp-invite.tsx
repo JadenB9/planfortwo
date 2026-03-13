@@ -17,7 +17,7 @@ interface RsvpInviteEmailProps {
   coupleName: string
   weddingDate: string | null
   venue: string | null
-  rsvpUrl: string
+  websiteUrl: string
   rsvpDeadline: string | null
 }
 
@@ -26,7 +26,7 @@ export function RsvpInviteEmail({
   coupleName,
   weddingDate,
   venue,
-  rsvpUrl,
+  websiteUrl,
   rsvpDeadline,
 }: RsvpInviteEmailProps) {
   return (
@@ -47,8 +47,8 @@ export function RsvpInviteEmail({
             able to note any dietary restrictions and let us know about your plus-one.
           </Text>
           <Section style={buttonContainer}>
-            <Button style={button} href={rsvpUrl}>
-              Respond to Invitation
+            <Button style={button} href={websiteUrl}>
+              View Our Wedding Website
             </Button>
           </Section>
           {rsvpDeadline && <Text style={deadlineText}>Please respond by {rsvpDeadline}</Text>}

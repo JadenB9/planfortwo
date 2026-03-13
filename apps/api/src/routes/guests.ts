@@ -9,7 +9,7 @@ import { requireFeature } from '../middleware/require-feature.js'
 import { requireGuestLimit } from '../middleware/require-guest-limit.js'
 import { guestService } from '../services/guests.js'
 import { emailService } from '../services/email.js'
-import { db, weddings } from '@planfortwo/db'
+import { db, weddings, websiteConfigs } from '@planfortwo/db'
 import { eq } from 'drizzle-orm'
 
 type Env = {
@@ -191,7 +191,15 @@ guestsRoute.post('/:id/send-invite', resolveWeddingMiddleware, async (c) => {
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const rsvpUrl = `${appUrl}/rsvp/${guest.rsvpToken}`
+
+  // Look up wedding website subdomain for the invite link
+  const [websiteConfig] = await db
+    .select({ subdomain: websiteConfigs.subdomain })
+    .from(websiteConfigs)
+    .where(eq(websiteConfigs.weddingId, weddingId))
+  const websiteUrl = websiteConfig?.subdomain
+    ? `${appUrl}/s/${websiteConfig.subdomain}`
+    : `${appUrl}/dashboard`
 
   const weddingDateStr = wedding.date
     ? new Date(wedding.date).toLocaleDateString('en-US', {
@@ -217,7 +225,7 @@ guestsRoute.post('/:id/send-invite', resolveWeddingMiddleware, async (c) => {
       wedding.name,
       weddingDateStr,
       wedding.venue,
-      rsvpUrl,
+      websiteUrl,
       rsvpDeadlineStr,
     )
 
@@ -265,6 +273,15 @@ guestsRoute.post(
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
+    // Look up wedding website subdomain for the invite link
+    const [websiteConfig] = await db
+      .select({ subdomain: websiteConfigs.subdomain })
+      .from(websiteConfigs)
+      .where(eq(websiteConfigs.weddingId, weddingId))
+    const websiteUrl = websiteConfig?.subdomain
+      ? `${appUrl}/s/${websiteConfig.subdomain}`
+      : `${appUrl}/dashboard`
+
     const weddingDateStr = wedding.date
       ? new Date(wedding.date).toLocaleDateString('en-US', {
           weekday: 'long',
@@ -287,7 +304,6 @@ guestsRoute.post(
 
     for (const guest of toSend) {
       if (!guest.email) continue
-      const rsvpUrl = `${appUrl}/rsvp/${guest.rsvpToken}`
       try {
         await emailService.sendRsvpInvite(
           guest.email,
@@ -295,7 +311,7 @@ guestsRoute.post(
           wedding.name,
           weddingDateStr,
           wedding.venue,
-          rsvpUrl,
+          websiteUrl,
           rsvpDeadlineStr,
         )
         await guestService.markInviteSent(guest.id)

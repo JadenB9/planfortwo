@@ -112,7 +112,7 @@ export const emailService = {
     coupleName: string,
     weddingDate: string | null,
     venue: string | null,
-    rsvpUrl: string,
+    websiteUrl: string,
     rsvpDeadline: string | null,
   ) {
     const resend = getResendClient()
@@ -125,7 +125,7 @@ export const emailService = {
     }
 
     const html = await render(
-      RsvpInviteEmail({ guestName, coupleName, weddingDate, venue, rsvpUrl, rsvpDeadline }),
+      RsvpInviteEmail({ guestName, coupleName, weddingDate, venue, websiteUrl, rsvpDeadline }),
     )
 
     const { error } = await resend.emails.send({
