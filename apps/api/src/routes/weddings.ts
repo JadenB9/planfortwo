@@ -57,6 +57,13 @@ weddingsRoute.put(
   },
 )
 
+// GET /weddings/my-invitations -- list pending invitations for the current user's email
+weddingsRoute.get('/my-invitations', async (c) => {
+  const dbUser = c.get('dbUser')
+  const invitations = await invitationService.getPendingByEmail(dbUser.email)
+  return c.json({ data: invitations })
+})
+
 // GET /weddings/mine -- fetch the current user's wedding + members + countdown
 weddingsRoute.get('/mine', async (c) => {
   const dbUserId = c.get('dbUserId')

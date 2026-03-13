@@ -49,7 +49,8 @@ export default function OnboardingPage() {
     timelineTemplate: '12-month',
   })
 
-  // Redirect to dashboard if onboarding is already completed (returning users)
+  // Redirect to dashboard if onboarding is already completed,
+  // or redirect to invite page if user has pending invitations
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -59,6 +60,18 @@ export default function OnboardingPage() {
           setCheckingOnboarding(false)
           return
         }
+
+        // Check for pending invitations first — invited users skip onboarding
+        try {
+          const { data: invitations } = await api.weddings.myPendingInvitations(token)
+          if (!cancelled && invitations.length > 0) {
+            router.replace(`/invite/${invitations[0]!.token}`)
+            return
+          }
+        } catch {
+          // No pending invitations — continue
+        }
+
         const { data: dashData } = await api.weddings.mine(token)
         if (!cancelled && dashData.wedding.onboardingCompleted) {
           router.replace('/dashboard')

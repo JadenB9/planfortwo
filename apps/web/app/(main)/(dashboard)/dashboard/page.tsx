@@ -53,11 +53,42 @@ export default function DashboardPage() {
     try {
       const token = await getToken()
       if (!token) return
-      const { data } = await api.weddings.mine(token)
+
+      let data: DashboardData
+      try {
+        const res = await api.weddings.mine(token)
+        data = res.data
+      } catch {
+        // No wedding found — check for pending invitations (invited user who hasn't accepted yet)
+        try {
+          const { data: invitations } = await api.weddings.myPendingInvitations(token)
+          if (invitations.length > 0) {
+            router.push(`/invite/${invitations[0]!.token}`)
+            return
+          }
+        } catch {
+          // No pending invitations either
+        }
+        // No wedding and no invitations — send to onboarding to create one
+        router.push('/onboarding')
+        return
+      }
+
       setDashboardData(data)
 
       // Redirect new owners to onboarding (invited users skip this)
       if (!data.wedding.onboardingCompleted && data.myRole === 'owner') {
+        // But first check if they have a pending invitation — they might have signed up
+        // independently while someone was inviting them
+        try {
+          const { data: invitations } = await api.weddings.myPendingInvitations(token)
+          if (invitations.length > 0) {
+            router.push(`/invite/${invitations[0]!.token}`)
+            return
+          }
+        } catch {
+          // No pending invitations — proceed to onboarding
+        }
         router.push('/onboarding')
         return
       }

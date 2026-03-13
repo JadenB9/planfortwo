@@ -127,12 +127,8 @@ export const invitationService = {
         .set({ status: 'accepted' })
         .where(eq(partnerInvitations.id, invitation.id))
 
-      // Delete any auto-created empty weddings the user owns (only for partner invites)
+      // Delete any auto-created empty weddings the user owns
       // Only delete weddings where the user is the sole member and onboarding was never completed
-      if (memberRole !== 'partner') {
-        return invitation.weddingId
-      }
-
       const ownedMemberships = await tx
         .select({ weddingId: weddingMembers.weddingId })
         .from(weddingMembers)
@@ -189,6 +185,15 @@ export const invitationService = {
       .where(
         and(eq(partnerInvitations.weddingId, weddingId), eq(partnerInvitations.status, 'pending')),
       )
+
+    return results
+  },
+
+  async getPendingByEmail(email: string) {
+    const results = await db
+      .select()
+      .from(partnerInvitations)
+      .where(and(eq(partnerInvitations.email, email), eq(partnerInvitations.status, 'pending')))
 
     return results
   },

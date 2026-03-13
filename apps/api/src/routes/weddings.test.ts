@@ -37,6 +37,7 @@ vi.mock('../services/invitations.js', () => ({
     accept: vi.fn(),
     cancel: vi.fn(),
     getPendingByWedding: vi.fn(),
+    getPendingByEmail: vi.fn(),
   },
 }))
 
@@ -330,6 +331,51 @@ describe('Wedding Routes', () => {
       expect(res.status).toBe(409)
       const body = await res.json()
       expect(body.code).toBe('INVITATION_USED')
+    })
+  })
+
+  describe('GET /weddings/my-invitations', () => {
+    it('should return pending invitations for the current user email', async () => {
+      mockedInvitationService.getPendingByEmail.mockResolvedValue([
+        {
+          id: 'invite-1',
+          weddingId: 'wedding-1',
+          invitedByUserId: 'other-user',
+          email: 'test@example.com',
+          token: 'token-abc',
+          role: 'planner',
+          status: 'pending',
+          createdAt: new Date(),
+          expiresAt: new Date(),
+        },
+      ] as never)
+
+      const app = createApp()
+      const res = await app.request('/weddings/my-invitations', {
+        method: 'GET',
+        headers: authHeaders(),
+      })
+
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      expect(body.data).toHaveLength(1)
+      expect(body.data[0].token).toBe('token-abc')
+      expect(body.data[0].role).toBe('planner')
+      expect(mockedInvitationService.getPendingByEmail).toHaveBeenCalledWith('test@example.com')
+    })
+
+    it('should return empty array when no pending invitations exist', async () => {
+      mockedInvitationService.getPendingByEmail.mockResolvedValue([])
+
+      const app = createApp()
+      const res = await app.request('/weddings/my-invitations', {
+        method: 'GET',
+        headers: authHeaders(),
+      })
+
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      expect(body.data).toEqual([])
     })
   })
 
