@@ -462,6 +462,7 @@ describe('Budget Item Routes', () => {
 
   describe('POST /budget-items/:id/upload-url', () => {
     it('should return presigned upload URL', async () => {
+      mockedService.get.mockResolvedValue({ id: ITEM_ID, weddingId: WEDDING_ID } as never)
       mockedService.getUploadUrl.mockResolvedValue({
         uploadUrl: 'https://r2.example.com/upload',
         receiptUrl: 'https://r2.example.com/download',

@@ -267,7 +267,14 @@ weddingsRoute.post('/accept-invite/:token', async (c) => {
 
     return c.json({ data: wedding ?? { id: weddingId } })
   } catch (err) {
+    const msg = err instanceof Error ? err.message : ''
     console.error('Accept invite failed:', err)
+    if (msg.includes('not found'))
+      return c.json({ error: msg, code: 'INVITATION_NOT_FOUND', statusCode: 404 }, 404)
+    if (msg.includes('expired'))
+      return c.json({ error: msg, code: 'INVITATION_EXPIRED', statusCode: 410 }, 410)
+    if (msg.includes('already'))
+      return c.json({ error: msg, code: 'INVITATION_USED', statusCode: 409 }, 409)
     return c.json(
       { error: 'Invalid or expired invitation', code: 'INVITATION_FAILED', statusCode: 400 },
       400,

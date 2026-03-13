@@ -91,9 +91,6 @@ vi.mock('../services/features.js', () => ({
       canInbox: true,
       canMusicIntegration: true,
       canPhotoGallery: true,
-      canInbox: true,
-      canMusicIntegration: true,
-      canPhotoGallery: true,
     }),
   },
 }))
