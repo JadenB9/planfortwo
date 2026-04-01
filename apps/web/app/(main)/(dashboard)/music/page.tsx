@@ -206,18 +206,19 @@ function MusicPageInner() {
       const [playlistRes, requestsRes] = await Promise.all([
         api.playlists.list(wId, token),
         api.playlists.listRequests(wId, token),
+        // Check Spotify connection status in parallel (non-critical)
+        api.spotify
+          .getStatus(token)
+          .then((spotifyStatus) => {
+            setSpotifyConnected(spotifyStatus.data.connected)
+            setSpotifyDisplayName(spotifyStatus.data.spotifyDisplayName)
+          })
+          .catch(() => {
+            // Spotify status check is non-critical
+          }),
       ])
       setPlaylists(playlistRes.data)
       setRequests(requestsRes.data)
-
-      // Check Spotify connection status
-      try {
-        const spotifyStatus = await api.spotify.getStatus(token)
-        setSpotifyConnected(spotifyStatus.data.connected)
-        setSpotifyDisplayName(spotifyStatus.data.spotifyDisplayName)
-      } catch {
-        // Spotify status check is non-critical
-      }
     } catch {
       toast.error('Failed to load music data')
     } finally {

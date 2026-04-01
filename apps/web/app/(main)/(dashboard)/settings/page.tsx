@@ -160,49 +160,50 @@ function SettingsPageInner() {
         setSelectedAccent(w.themeColors.accent)
       }
 
-      try {
-        const { data: prefs } = await api.notificationPrefs.get(w.id, token)
-        setNotifPrefs(prefs)
-      } catch {
-        /* first time - no prefs */
-      }
-
-      try {
-        const { data: memberList } = await api.weddings.getMembers(w.id, token)
-        setMembers(memberList)
-      } catch {
-        /* members will show empty */
-      }
-
-      try {
-        const { data: invites } = await api.weddings.getPendingInvitations(w.id, token)
-        setPendingInvitations(invites)
-      } catch {
-        /* no pending invitations */
-      }
-
-      try {
-        const { data: allW } = await api.weddings.all(token)
-        setAllWeddings(allW)
-      } catch {
-        /* silent */
-      }
-
-      try {
-        const { data: dbUser } = await api.users.me(token)
-        setAccountName({
-          firstName: dbUser.firstName ?? '',
-          lastName: dbUser.lastName ?? '',
-        })
-      } catch {
-        // Fallback to Clerk user data
-        if (user) {
-          setAccountName({
-            firstName: user.firstName ?? '',
-            lastName: user.lastName ?? '',
+      // Load all secondary data in parallel (each is independent and non-critical)
+      await Promise.all([
+        api.notificationPrefs
+          .get(w.id, token)
+          .then(({ data: prefs }) => setNotifPrefs(prefs))
+          .catch(() => {
+            /* first time - no prefs */
+          }),
+        api.weddings
+          .getMembers(w.id, token)
+          .then(({ data: memberList }) => setMembers(memberList))
+          .catch(() => {
+            /* members will show empty */
+          }),
+        api.weddings
+          .getPendingInvitations(w.id, token)
+          .then(({ data: invites }) => setPendingInvitations(invites))
+          .catch(() => {
+            /* no pending invitations */
+          }),
+        api.weddings
+          .all(token)
+          .then(({ data: allW }) => setAllWeddings(allW))
+          .catch(() => {
+            /* silent */
+          }),
+        api.users
+          .me(token)
+          .then(({ data: dbUser }) => {
+            setAccountName({
+              firstName: dbUser.firstName ?? '',
+              lastName: dbUser.lastName ?? '',
+            })
           })
-        }
-      }
+          .catch(() => {
+            // Fallback to Clerk user data
+            if (user) {
+              setAccountName({
+                firstName: user.firstName ?? '',
+                lastName: user.lastName ?? '',
+              })
+            }
+          }),
+      ])
     } catch {
       toast.error('Failed to load settings')
     } finally {
@@ -280,15 +281,15 @@ function SettingsPageInner() {
         toast.success('Team member added')
       }
       setNewMemberEmail('')
-      const { data: memberList } = await api.weddings.getMembers(weddingId, token)
-      setMembers(memberList)
-      // Re-fetch pending invitations so new team invites appear
-      try {
-        const { data: invites } = await api.weddings.getPendingInvitations(weddingId, token)
-        setPendingInvitations(invites)
-      } catch {
-        /* ignore */
-      }
+      // Re-fetch members and pending invitations in parallel
+      const [membersRes, invitesRes] = await Promise.all([
+        api.weddings.getMembers(weddingId, token),
+        api.weddings
+          .getPendingInvitations(weddingId, token)
+          .catch(() => ({ data: [] as PartnerInvitation[] })),
+      ])
+      setMembers(membersRes.data)
+      setPendingInvitations(invitesRes.data)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to add member')
     } finally {

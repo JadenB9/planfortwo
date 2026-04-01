@@ -488,6 +488,24 @@ export default function SeatingPage() {
   const [deleteChartConfirm, setDeleteChartConfirm] = useState<string | null>(null)
   const [deleteTableConfirm, setDeleteTableConfirm] = useState<string | null>(null)
 
+  const loadInitialData = useCallback(async () => {
+    if (!weddingId) return
+    try {
+      const token = await getToken()
+      if (!token) return
+      const [chartsRes, guestsRes] = await Promise.all([
+        api.seatingCharts.list(weddingId, token),
+        api.guests.list(weddingId, token, { pageSize: 200 }),
+      ])
+      setCharts(chartsRes.data)
+      setGuests(guestsRes.data)
+    } catch {
+      toast.error('Failed to load seating data')
+    } finally {
+      setLoading(false)
+    }
+  }, [weddingId, getToken])
+
   const loadCharts = useCallback(async () => {
     if (!weddingId) return
     try {
@@ -497,8 +515,6 @@ export default function SeatingPage() {
       setCharts(data)
     } catch {
       toast.error('Failed to load seating charts')
-    } finally {
-      setLoading(false)
     }
   }, [weddingId, getToken])
 
@@ -531,22 +547,9 @@ export default function SeatingPage() {
     [weddingId, getToken],
   )
 
-  const loadGuests = useCallback(async () => {
-    if (!weddingId) return
-    try {
-      const token = await getToken()
-      if (!token) return
-      const { data } = await api.guests.list(weddingId, token, { pageSize: 200 })
-      setGuests(data)
-    } catch {
-      toast.error('Failed to load guests')
-    }
-  }, [weddingId, getToken])
-
   useEffect(() => {
-    void loadCharts()
-    void loadGuests()
-  }, [loadCharts, loadGuests])
+    void loadInitialData()
+  }, [loadInitialData])
 
   const handleCreateChart = async () => {
     if (!weddingId || !chartName.trim()) return
