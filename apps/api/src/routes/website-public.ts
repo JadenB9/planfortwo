@@ -264,13 +264,9 @@ websitePublicRoute.post(
     }
 
     const data = c.req.valid('json')
+    const realIp = c.req.header('x-real-ip')
     const xff = c.req.header('x-forwarded-for')
-    const ip = xff
-      ? (xff
-          .split(',')
-          .map((s) => s.trim())
-          .pop() ?? 'unknown')
-      : (c.req.header('x-real-ip') ?? 'unknown')
+    const ip = realIp ? realIp : xff ? (xff.split(',')[0]?.trim() ?? 'unknown') : 'unknown'
     const ua = c.req.header('user-agent') ?? ''
     const country = c.req.header('cf-ipcountry') ?? null
     const visitorId = createHash('sha256').update(`${ip}:${ua}`).digest('hex').slice(0, 16)

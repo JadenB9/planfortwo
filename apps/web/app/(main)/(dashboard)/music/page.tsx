@@ -868,7 +868,7 @@ function MusicPageInner() {
                                   </Badge>
 
                                   {/* Streaming buttons */}
-                                  {pl.spotifyUrl && (
+                                  {pl.spotifyUrl && /^https?:\/\//i.test(pl.spotifyUrl) && (
                                     <a
                                       href={pl.spotifyUrl}
                                       target="_blank"
@@ -880,7 +880,7 @@ function MusicPageInner() {
                                       <ExternalLink className="h-3.5 w-3.5" />
                                     </a>
                                   )}
-                                  {pl.appleMusicUrl && (
+                                  {pl.appleMusicUrl && /^https?:\/\//i.test(pl.appleMusicUrl) && (
                                     <a
                                       href={pl.appleMusicUrl}
                                       target="_blank"
@@ -892,18 +892,19 @@ function MusicPageInner() {
                                       <ExternalLink className="h-3.5 w-3.5" />
                                     </a>
                                   )}
-                                  {pl.youtubeMusicUrl && (
-                                    <a
-                                      href={pl.youtubeMusicUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#FF0000] text-white transition-opacity hover:opacity-80"
-                                      title="Open in YouTube Music"
-                                    >
-                                      <ExternalLink className="h-3.5 w-3.5" />
-                                    </a>
-                                  )}
+                                  {pl.youtubeMusicUrl &&
+                                    /^https?:\/\//i.test(pl.youtubeMusicUrl) && (
+                                      <a
+                                        href={pl.youtubeMusicUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#FF0000] text-white transition-opacity hover:opacity-80"
+                                        title="Open in YouTube Music"
+                                      >
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                      </a>
+                                    )}
 
                                   {/* Edit / Delete */}
                                   <Button

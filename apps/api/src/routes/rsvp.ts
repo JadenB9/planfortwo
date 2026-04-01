@@ -263,7 +263,7 @@ rsvpRoute.post(
 // GET /rsvp/spotify-search?q=... — public Spotify track search for RSVP song requests
 rsvpRoute.get('/spotify-search', async (c) => {
   const q = c.req.query('q')?.trim()
-  if (!q || q.length < 2) {
+  if (!q || q.length < 2 || q.length > 200) {
     return c.json({ data: [] })
   }
 

@@ -876,7 +876,7 @@ function LinksTab({
                           <h3 className="truncate font-semibold text-gray-900">{link.storeName}</h3>
                           <div className="mt-0.5 flex items-center gap-3">
                             <a
-                              href={link.url}
+                              href={/^https?:\/\//i.test(link.url) ? link.url : '#'}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"

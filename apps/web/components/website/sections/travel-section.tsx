@@ -45,7 +45,13 @@ export function TravelSection({ title, content }: TravelSectionProps) {
             viewport={{ once: true }}
             className={`mb-10 text-center ${bodyClass}`}
             style={{ ...bodyFont, color: `${colors.primary}CC` }}
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.directions) }}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(content.directions, {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'span'],
+                ALLOWED_ATTR: ['href', 'target', 'rel'],
+                ALLOW_DATA_ATTR: false,
+              }),
+            }}
           />
         )}
         {content.accommodations.length > 0 && (

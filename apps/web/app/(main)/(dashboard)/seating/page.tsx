@@ -1106,20 +1106,6 @@ export default function SeatingPage() {
     setRectPopover(null)
   }
 
-  const handleRectTableClick = (e: React.MouseEvent, tableId: string) => {
-    e.stopPropagation()
-    if (hasDraggedRef.current) return
-    const container = canvasContainerRef.current
-    if (!container) return
-    const rect = container.getBoundingClientRect()
-    setRectPopover({
-      tableId,
-      screenX: e.clientX - rect.left + 10,
-      screenY: e.clientY - rect.top + 10,
-    })
-    setSeatPopover(null)
-  }
-
   const resetView = () => {
     setPanX(0)
     setPanY(0)

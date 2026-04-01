@@ -4,6 +4,7 @@ import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { weddingService } from '../services/weddings.js'
 import { progressService } from '../services/progress.js'
 import { updateRoadmapPreferencesSchema } from '@planfortwo/validators'
+import { z } from 'zod'
 
 type Env = {
   Variables: {
@@ -18,9 +19,9 @@ progressRoute.use('*', authMiddleware, resolveUserMiddleware)
 
 progressRoute.get('/', async (c) => {
   const weddingId = c.req.query('weddingId')
-  if (!weddingId) {
+  if (!weddingId || !z.string().uuid().safeParse(weddingId).success) {
     return c.json(
-      { error: 'weddingId is required', code: 'VALIDATION_ERROR', statusCode: 400 },
+      { error: 'Valid weddingId is required', code: 'VALIDATION_ERROR', statusCode: 400 },
       400,
     )
   }

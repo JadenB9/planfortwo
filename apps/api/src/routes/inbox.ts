@@ -77,6 +77,12 @@ inboxRoute.get('/unread-count', async (c) => {
 inboxRoute.get('/attachments/:attachmentId/url', async (c) => {
   const userId = c.get('dbUserId')
   const attachmentId = c.req.param('attachmentId')
+  if (!z.string().uuid().safeParse(attachmentId).success) {
+    return c.json(
+      { error: 'Invalid attachment ID', code: 'VALIDATION_ERROR', statusCode: 400 },
+      400,
+    )
+  }
 
   const result = await inboxService.getAttachmentDownloadUrl(userId, attachmentId)
   if (!result) {
@@ -90,6 +96,12 @@ inboxRoute.get('/attachments/:attachmentId/url', async (c) => {
 inboxRoute.get('/attachments/:attachmentId', async (c) => {
   const userId = c.get('dbUserId')
   const attachmentId = c.req.param('attachmentId')
+  if (!z.string().uuid().safeParse(attachmentId).success) {
+    return c.json(
+      { error: 'Invalid attachment ID', code: 'VALIDATION_ERROR', statusCode: 400 },
+      400,
+    )
+  }
 
   const result = await inboxService.getAttachmentDownloadUrl(userId, attachmentId)
   if (!result) {
