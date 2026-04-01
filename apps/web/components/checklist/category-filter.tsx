@@ -17,11 +17,11 @@ export function CategoryFilter({ categories, selectedId, onSelect }: CategoryFil
       <button
         onClick={() => onSelect(null)}
         className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-          selectedId === null ? 'bg-wedding-50 text-wedding-700' : 'text-gray-700 hover:bg-gray-100'
+          selectedId === null ? 'bg-wedding-50 text-wedding-700' : 'text-foreground hover:bg-muted'
         }`}
       >
         <span>All Tasks</span>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-muted-foreground">
           {totalCompleted}/{totalTasks}
         </span>
       </button>
@@ -33,7 +33,7 @@ export function CategoryFilter({ categories, selectedId, onSelect }: CategoryFil
           className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors ${
             selectedId === category.id
               ? 'bg-wedding-50 text-wedding-700'
-              : 'text-gray-700 hover:bg-gray-100'
+              : 'text-foreground hover:bg-muted'
           }`}
         >
           <span
@@ -41,7 +41,7 @@ export function CategoryFilter({ categories, selectedId, onSelect }: CategoryFil
             style={{ backgroundColor: category.color }}
           />
           <span className="flex-1 truncate">{category.name}</span>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-muted-foreground">
             {category.completedCount}/{category.taskCount}
           </span>
         </button>

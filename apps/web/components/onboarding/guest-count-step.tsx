@@ -20,8 +20,8 @@ export function GuestCountStep({ data, onUpdate, onNext, onBack }: GuestCountSte
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-gray-900">How many guests?</h2>
-        <p className="mt-2 text-gray-600">A rough estimate helps us tailor your planning tools.</p>
+        <h2 className="font-serif text-3xl font-bold text-foreground">How many guests?</h2>
+        <p className="mt-2 text-muted-foreground">A rough estimate helps us tailor your planning tools.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -32,11 +32,11 @@ export function GuestCountStep({ data, onUpdate, onNext, onBack }: GuestCountSte
             className={`rounded-2xl border-2 px-4 py-5 text-center transition-all ${
               data.guestCountEstimate === option.value
                 ? 'border-wedding-600 bg-wedding-50 shadow-md'
-                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-gray-200'
+                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-border'
             }`}
           >
-            <span className="block text-lg font-semibold text-gray-900">{option.label}</span>
-            <span className="mt-1 block text-sm text-gray-500">{option.range}</span>
+            <span className="block text-lg font-semibold text-foreground">{option.label}</span>
+            <span className="mt-1 block text-sm text-muted-foreground">{option.range}</span>
           </button>
         ))}
       </div>
@@ -44,7 +44,7 @@ export function GuestCountStep({ data, onUpdate, onNext, onBack }: GuestCountSte
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 rounded-xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
         >
           Back
         </button>

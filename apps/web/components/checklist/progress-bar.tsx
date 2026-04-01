@@ -15,7 +15,7 @@ export function ProgressBar({ completed, total, className = '' }: ProgressBarPro
   return (
     <div className={className}>
       <div className="mb-1 flex items-center justify-between text-sm">
-        <span className="font-medium text-gray-700">
+        <span className="font-medium text-foreground">
           {completed} of {total} tasks complete
         </span>
         <motion.span
@@ -28,7 +28,7 @@ export function ProgressBar({ completed, total, className = '' }: ProgressBarPro
           {percentage}%
         </motion.span>
       </div>
-      <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
         <motion.div
           className="bg-wedding-600 h-full rounded-full"
           initial={{ width: 0 }}

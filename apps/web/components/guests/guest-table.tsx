@@ -36,9 +36,9 @@ export function GuestTable({
 
   if (guests.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+      <div className="rounded-2xl border border-border bg-white p-8 text-center">
         <svg
-          className="mx-auto h-12 w-12 text-gray-300"
+          className="mx-auto h-12 w-12 text-muted-foreground/50"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -50,7 +50,7 @@ export function GuestTable({
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
           />
         </svg>
-        <p className="mt-3 text-sm text-gray-500">
+        <p className="mt-3 text-sm text-muted-foreground">
           No guests yet. Add your first guest to get started.
         </p>
       </div>
@@ -58,23 +58,23 @@ export function GuestTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50/50">
-              <th className="px-4 py-3 font-serif font-semibold text-gray-900">Name</th>
-              <th className="px-4 py-3 font-serif font-semibold text-gray-900">RSVP</th>
-              <th className="px-4 py-3 font-serif font-semibold text-gray-900">Invite</th>
-              <th className="hidden px-4 py-3 font-serif font-semibold text-gray-900 sm:table-cell">
+            <tr className="border-b border-border bg-muted/50">
+              <th className="px-4 py-3 font-serif font-semibold text-foreground">Name</th>
+              <th className="px-4 py-3 font-serif font-semibold text-foreground">RSVP</th>
+              <th className="px-4 py-3 font-serif font-semibold text-foreground">Invite</th>
+              <th className="hidden px-4 py-3 font-serif font-semibold text-foreground sm:table-cell">
                 Tags
               </th>
-              <th className="hidden px-4 py-3 font-serif font-semibold text-gray-900 sm:table-cell">
+              <th className="hidden px-4 py-3 font-serif font-semibold text-foreground sm:table-cell">
                 +1
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {guests.map((guest) => (
               <tr
                 key={guest.id}
@@ -87,7 +87,7 @@ export function GuestTable({
                         e.stopPropagation()
                         onEditGuest(guest)
                       }}
-                      className="shrink-0 rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                      className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
                       title="Edit guest"
                     >
                       <Pencil className="h-3.5 w-3.5" />
@@ -99,11 +99,11 @@ export function GuestTable({
                           setDeleteConfirmGuest(guest)
                         }}
                         disabled={deletingGuestId === guest.id}
-                        className="shrink-0 rounded-md p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                        className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                         title="Remove guest"
                       >
                         {deletingGuestId === guest.id ? (
-                          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-red-600" />
+                          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-border border-t-red-600" />
                         ) : (
                           <Trash2 className="h-3.5 w-3.5" />
                         )}
@@ -111,7 +111,7 @@ export function GuestTable({
                     )}
                     <div onClick={() => onSelectGuest(guest)} className="cursor-pointer">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-foreground">
                           {guest.firstName} {guest.lastName}
                         </span>
                         {guest.isVip && (
@@ -125,7 +125,7 @@ export function GuestTable({
                           </span>
                         )}
                       </div>
-                      {guest.email && <p className="text-xs text-gray-500">{guest.email}</p>}
+                      {guest.email && <p className="text-xs text-muted-foreground">{guest.email}</p>}
                     </div>
                   </div>
                 </td>
@@ -147,11 +147,11 @@ export function GuestTable({
                       className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
                         guest.inviteSentAt
                           ? 'text-green-600 hover:bg-green-50 hover:text-green-700'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                       }`}
                     >
                       {sendingInviteId === guest.id ? (
-                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-border border-t-gray-600" />
                       ) : guest.inviteSentAt ? (
                         <MailCheck className="h-3.5 w-3.5" />
                       ) : (
@@ -160,7 +160,7 @@ export function GuestTable({
                       {guest.inviteSentAt ? 'Resend' : 'Send'}
                     </button>
                   ) : (
-                    <span className="flex items-center gap-1 text-xs text-gray-400">
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Mail className="h-3.5 w-3.5" />
                       No email
                     </span>
@@ -174,13 +174,13 @@ export function GuestTable({
                   </div>
                 </td>
                 <td
-                  className="hidden px-4 py-3 text-gray-600 sm:table-cell"
+                  className="hidden px-4 py-3 text-muted-foreground sm:table-cell"
                   onClick={() => onSelectGuest(guest)}
                 >
                   {guest.hasPlusOne ? (
                     <span className="text-green-600">{guest.plusOneName ?? 'Yes'}</span>
                   ) : (
-                    <span className="text-gray-400">No</span>
+                    <span className="text-muted-foreground">No</span>
                   )}
                 </td>
               </tr>

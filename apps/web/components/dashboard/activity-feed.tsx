@@ -109,9 +109,9 @@ function formatTimestamp(date: Date): string {
 export function ActivityFeed({ activities }: ActivityFeedProps) {
   if (activities.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h3 className="font-serif text-lg font-semibold text-gray-900">Recent Activity</h3>
-        <p className="mt-2 text-sm text-gray-500">
+      <div className="rounded-2xl border border-border bg-white p-6">
+        <h3 className="font-serif text-lg font-semibold text-foreground">Recent Activity</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
           No activity yet. Actions will appear here as you plan.
         </p>
       </div>
@@ -119,8 +119,8 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6">
-      <h3 className="mb-4 font-serif text-lg font-semibold text-gray-900">Recent Activity</h3>
+    <div className="rounded-2xl border border-border bg-white p-6">
+      <h3 className="mb-4 font-serif text-lg font-semibold text-foreground">Recent Activity</h3>
 
       <motion.div
         className="space-y-3"
@@ -137,7 +137,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
           return (
             <Link key={entry.id} href={href}>
               <motion.div
-                className="flex items-start gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-gray-50"
+                className="flex items-start gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-muted"
                 variants={listItem}
                 transition={{ duration: 0.3, ...springSmooth }}
               >
@@ -148,11 +148,11 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
                   transition={{ duration: 0.3, delay: 0.1 }}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-foreground">
                     <span className="font-medium">{ACTION_LABELS[entry.action]}</span>
-                    {taskName && <span className="text-gray-500">{` - ${taskName}`}</span>}
+                    {taskName && <span className="text-muted-foreground">{` - ${taskName}`}</span>}
                   </p>
-                  <p className="mt-0.5 text-xs text-gray-400">{formatTimestamp(entry.createdAt)}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{formatTimestamp(entry.createdAt)}</p>
                 </div>
               </motion.div>
             </Link>

@@ -24,15 +24,15 @@ export function SplitCosts({ splits }: SplitCostsProps) {
     splits.couple.total + splits.brideFamily.total + splits.groomFamily.total + splits.other.total
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6">
-      <h3 className="mb-4 text-sm font-semibold text-gray-900">Cost Split Summary</h3>
+    <div className="rounded-2xl border border-border bg-white p-6">
+      <h3 className="mb-4 text-sm font-semibold text-foreground">Cost Split Summary</h3>
 
       {grandTotal === 0 ? (
-        <p className="text-sm text-gray-500">No expenses recorded yet.</p>
+        <p className="text-sm text-muted-foreground">No expenses recorded yet.</p>
       ) : (
         <div className="space-y-4">
           {/* Stacked bar */}
-          <div className="flex h-4 w-full overflow-hidden rounded-full bg-gray-200">
+          <div className="flex h-4 w-full overflow-hidden rounded-full bg-muted">
             {PAYER_GROUPS.map((group) => {
               const pct = splits[group.key].percentage
               if (pct === 0) return null
@@ -53,13 +53,13 @@ export function SplitCosts({ splits }: SplitCostsProps) {
               <div key={group.key} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className={`h-3 w-3 rounded-full ${group.color}`} />
-                  <span className="text-sm text-gray-700">{group.label}</span>
+                  <span className="text-sm text-foreground">{group.label}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     {formatCurrency(splits[group.key].total)}
                   </span>
-                  <span className="w-12 text-right text-xs text-gray-500">
+                  <span className="w-12 text-right text-xs text-muted-foreground">
                     {splits[group.key].percentage}%
                   </span>
                 </div>
@@ -67,10 +67,10 @@ export function SplitCosts({ splits }: SplitCostsProps) {
             ))}
           </div>
 
-          <div className="border-t border-gray-200 pt-2">
+          <div className="border-t border-border pt-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-900">Total</span>
-              <span className="text-sm font-semibold text-gray-900">
+              <span className="text-sm font-semibold text-foreground">Total</span>
+              <span className="text-sm font-semibold text-foreground">
                 {formatCurrency(grandTotal)}
               </span>
             </div>

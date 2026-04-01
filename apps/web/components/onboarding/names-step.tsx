@@ -18,14 +18,14 @@ export function NamesStep({ data, onUpdate, onNext }: NamesStepProps) {
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-gray-900">Let&apos;s get started</h2>
-        <p className="mt-2 text-gray-600">
+        <h2 className="font-serif text-3xl font-bold text-foreground">Let&apos;s get started</h2>
+        <p className="mt-2 text-muted-foreground">
           Tell us a little about you and your partner. You can always update this later.
         </p>
       </div>
 
       <div className="space-y-4">
-        <p className="text-sm font-medium uppercase tracking-wide text-gray-500">Your Name</p>
+        <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Your Name</p>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <input
@@ -33,7 +33,7 @@ export function NamesStep({ data, onUpdate, onNext }: NamesStepProps) {
               type="text"
               value={data.yourFirstName ?? ''}
               onChange={(e) => onUpdate({ yourFirstName: e.target.value })}
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-3 text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
               placeholder="First name"
             />
           </div>
@@ -43,13 +43,13 @@ export function NamesStep({ data, onUpdate, onNext }: NamesStepProps) {
               type="text"
               value={data.yourLastName ?? ''}
               onChange={(e) => onUpdate({ yourLastName: e.target.value })}
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-3 text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
               placeholder="Last name"
             />
           </div>
         </div>
 
-        <p className="pt-2 text-sm font-medium uppercase tracking-wide text-gray-500">
+        <p className="pt-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">
           Partner&apos;s Name
         </p>
         <div className="grid grid-cols-2 gap-3">
@@ -59,7 +59,7 @@ export function NamesStep({ data, onUpdate, onNext }: NamesStepProps) {
               type="text"
               value={data.partnerFirstName ?? ''}
               onChange={(e) => onUpdate({ partnerFirstName: e.target.value })}
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-3 text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
               placeholder="First name"
             />
           </div>
@@ -69,7 +69,7 @@ export function NamesStep({ data, onUpdate, onNext }: NamesStepProps) {
               type="text"
               value={data.partnerLastName ?? ''}
               onChange={(e) => onUpdate({ partnerLastName: e.target.value })}
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-3 text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
               placeholder="Last name"
             />
           </div>

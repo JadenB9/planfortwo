@@ -61,14 +61,14 @@ export function GuestDetail({
   }
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md border-l border-gray-200 bg-white shadow-xl">
+    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md border-l border-border bg-white shadow-xl">
       <div className="flex h-full flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="font-serif text-lg font-semibold text-gray-900">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="font-serif text-lg font-semibold text-foreground">
             {guest.firstName} {guest.lastName}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -85,7 +85,7 @@ export function GuestDetail({
           <div className="space-y-5">
             {/* RSVP Status */}
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 RSVP Status
               </p>
               <div className="flex flex-wrap gap-2">
@@ -94,16 +94,16 @@ export function GuestDetail({
                   const baseStyles: Record<string, string> = {
                     accepted: active
                       ? 'bg-green-600 text-white border-green-600'
-                      : 'border-gray-200 text-gray-500 hover:border-green-400 hover:text-green-600',
+                      : 'border-border text-muted-foreground hover:border-green-400 hover:text-green-600',
                     maybe: active
                       ? 'bg-amber-500 text-white border-amber-500'
-                      : 'border-gray-200 text-gray-500 hover:border-amber-400 hover:text-amber-600',
+                      : 'border-border text-muted-foreground hover:border-amber-400 hover:text-amber-600',
                     declined: active
                       ? 'bg-red-600 text-white border-red-600'
-                      : 'border-gray-200 text-gray-500 hover:border-red-400 hover:text-red-600',
+                      : 'border-border text-muted-foreground hover:border-red-400 hover:text-red-600',
                     pending: active
                       ? 'bg-gray-700 text-white border-gray-700'
-                      : 'border-gray-200 text-gray-500 hover:border-gray-500 hover:text-gray-700',
+                      : 'border-border text-muted-foreground hover:border-border hover:text-foreground',
                   }
                   return (
                     <button
@@ -126,7 +126,7 @@ export function GuestDetail({
                 })}
               </div>
               {guest.rsvpRespondedAt && (
-                <p className="mt-2 text-xs text-gray-400">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Responded {new Date(guest.rsvpRespondedAt).toLocaleDateString()}
                 </p>
               )}
@@ -134,46 +134,46 @@ export function GuestDetail({
 
             {/* Contact */}
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Contact
               </h3>
-              <div className="mt-2 space-y-1 text-sm text-gray-700">
+              <div className="mt-2 space-y-1 text-sm text-foreground">
                 {guest.email && <p>{guest.email}</p>}
                 {guest.phone && <p>{guest.phone}</p>}
-                {!guest.email && !guest.phone && <p className="text-gray-400">No contact info</p>}
+                {!guest.email && !guest.phone && <p className="text-muted-foreground">No contact info</p>}
               </div>
             </div>
 
             {/* Details */}
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Details
               </h3>
               <div className="mt-2 space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Household</span>
-                  <span className="text-gray-900">{guest.household?.name ?? '--'}</span>
+                  <span className="text-muted-foreground">Household</span>
+                  <span className="text-foreground">{guest.household?.name ?? '--'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Side</span>
-                  <span className="capitalize text-gray-900">{guest.side ?? '--'}</span>
+                  <span className="text-muted-foreground">Side</span>
+                  <span className="capitalize text-foreground">{guest.side ?? '--'}</span>
                 </div>
                 {guest.dietary?.notes && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Dietary</span>
-                    <span className="text-gray-900">{guest.dietary.notes}</span>
+                    <span className="text-muted-foreground">Dietary</span>
+                    <span className="text-foreground">{guest.dietary.notes}</span>
                   </div>
                 )}
                 {guest.songRequest && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Song Request</span>
-                    <span className="text-gray-900">{guest.songRequest}</span>
+                    <span className="text-muted-foreground">Song Request</span>
+                    <span className="text-foreground">{guest.songRequest}</span>
                   </div>
                 )}
                 {guest.rsvpNotes && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Notes</span>
-                    <span className="text-gray-900">{guest.rsvpNotes}</span>
+                    <span className="text-muted-foreground">Notes</span>
+                    <span className="text-foreground">{guest.rsvpNotes}</span>
                   </div>
                 )}
               </div>
@@ -202,7 +202,7 @@ export function GuestDetail({
             {/* Tags */}
             {guest.tags.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Tags
                 </h3>
                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -217,7 +217,7 @@ export function GuestDetail({
 
         {/* Actions */}
         {(canEdit || canDelete) && (
-          <div className="flex gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex gap-3 border-t border-border px-6 py-4">
             {canEdit && (
               <button
                 onClick={() => setEditing(true)}

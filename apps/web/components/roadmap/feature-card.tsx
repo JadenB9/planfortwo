@@ -40,7 +40,7 @@ const FEATURE_ICONS: Record<string, LucideIcon> = {
   communication: Mail,
 }
 
-const DEFAULT_STATUS_STYLE = { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Not Started' }
+const DEFAULT_STATUS_STYLE = { bg: 'bg-muted', text: 'text-muted-foreground', label: 'Not Started' }
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; label: string }> = {
   not_started: DEFAULT_STATUS_STYLE,
@@ -71,7 +71,7 @@ export function FeatureCard({
           <div className="bg-wedding-50 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg">
             <Icon className="text-wedding-600 h-5 w-5" />
           </div>
-          <h3 className="truncate text-sm font-semibold text-gray-900">{feature.label}</h3>
+          <h3 className="truncate text-sm font-semibold text-foreground">{feature.label}</h3>
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
           {isSettingsMode && (
@@ -82,7 +82,7 @@ export function FeatureCard({
                 e.stopPropagation()
                 onHiddenToggle?.(feature.key)
               }}
-              className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+              className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
               title={feature.isHidden ? 'Show feature' : 'Hide feature'}
             >
               {feature.isHidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -96,7 +96,7 @@ export function FeatureCard({
         </div>
       </div>
 
-      <p className="mb-3 text-xs text-gray-500">{feature.description}</p>
+      <p className="mb-3 text-xs text-muted-foreground">{feature.description}</p>
 
       {isSettingsMode ? (
         <div className="mb-1">
@@ -107,19 +107,19 @@ export function FeatureCard({
             step={5}
             value={feature.progress}
             onChange={(e) => onProgressChange?.(feature.key, Number(e.target.value))}
-            className="accent-wedding-600 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200"
+            className="accent-wedding-600 h-2 w-full cursor-pointer appearance-none rounded-full bg-muted"
           />
-          <div className="mt-1 flex items-center justify-between text-xs text-gray-400">
+          <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
             <span>Auto: {feature.autoProgress}%</span>
-            <span className="font-medium text-gray-600">{Math.round(feature.progress)}%</span>
+            <span className="font-medium text-muted-foreground">{Math.round(feature.progress)}%</span>
           </div>
         </div>
       ) : (
         <>
           <ProgressBar progress={feature.progress} />
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-gray-400">{feature.itemCount} items</span>
-            <span className="text-xs font-medium text-gray-600">
+            <span className="text-xs text-muted-foreground">{feature.itemCount} items</span>
+            <span className="text-xs font-medium text-muted-foreground">
               {Math.round(feature.progress)}%
             </span>
           </div>
@@ -133,7 +133,7 @@ export function FeatureCard({
       <motion.div
         variants={scaleIn}
         transition={springSmooth}
-        className={`rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-opacity ${
+        className={`rounded-2xl border border-border bg-white p-5 shadow-sm transition-opacity ${
           feature.isHidden ? 'opacity-50' : ''
         }`}
       >
@@ -150,7 +150,7 @@ export function FeatureCard({
     >
       <Link
         href={feature.href}
-        className="hover:border-wedding-200 block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-colors"
+        className="hover:border-wedding-200 block rounded-2xl border border-border bg-white p-5 shadow-sm transition-colors"
       >
         {cardContent}
       </Link>

@@ -60,8 +60,8 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="font-serif text-xl font-semibold text-gray-900">Add Task</h2>
-          <button onClick={onClose} className="text-gray-400 transition-colors hover:text-gray-600">
+          <h2 className="font-serif text-xl font-semibold text-foreground">Add Task</h2>
+          <button onClick={onClose} className="text-muted-foreground transition-colors hover:text-muted-foreground">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -75,7 +75,7 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="title" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="mb-1 block text-sm font-medium text-foreground">
               Title
             </label>
             <input
@@ -85,12 +85,12 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Book photographer"
               required
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="mb-1 block text-sm font-medium text-foreground">
               Description
             </label>
             <textarea
@@ -99,13 +99,13 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="Optional details..."
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="dueDate" className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="dueDate" className="mb-1 block text-sm font-medium text-foreground">
                 Due Date
               </label>
               <input
@@ -113,19 +113,19 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
               />
             </div>
 
             <div>
-              <label htmlFor="category" className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="category" className="mb-1 block text-sm font-medium text-foreground">
                 Category
               </label>
               <select
                 id="category"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -137,14 +137,14 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
           </div>
 
           <div>
-            <label htmlFor="priority" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="priority" className="mb-1 block text-sm font-medium text-foreground">
               Priority
             </label>
             <select
               id="priority"
               value={priority}
               onChange={(e) => setPriority(e.target.value as typeof priority)}
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
             >
               <option value="must_do">Must Do</option>
               <option value="nice_to_have">Nice to Have</option>
@@ -158,7 +158,7 @@ export function AddTaskForm({ weddingId, categories, onClose, onCreated }: AddTa
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
             >
               Cancel
             </button>

@@ -43,10 +43,10 @@ export function PublishToggle({
           {isPublished ? (
             <Globe className="h-5 w-5 text-green-600" />
           ) : (
-            <GlobeLock className="h-5 w-5 text-gray-400" />
+            <GlobeLock className="h-5 w-5 text-muted-foreground" />
           )}
           <div>
-            <p className="text-sm font-semibold text-gray-900">
+            <p className="text-sm font-semibold text-foreground">
               {isPublished ? 'Published' : 'Unpublished'}
             </p>
             {isPublished && siteUrl && (
@@ -61,7 +61,7 @@ export function PublishToggle({
                 </a>
                 <button
                   onClick={handleCopy}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-muted-foreground hover:text-muted-foreground"
                   title="Copy link"
                 >
                   {copied ? (
@@ -74,7 +74,7 @@ export function PublishToggle({
                   href={siteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-muted-foreground hover:text-muted-foreground"
                   title="Open in new tab"
                 >
                   <ExternalLink className="h-3 w-3" />
@@ -94,7 +94,7 @@ export function PublishToggle({
         )}
       </div>
       {!subdomain && !isPublished && (
-        <p className="mt-2 text-xs text-gray-500">Set a subdomain in Settings before publishing.</p>
+        <p className="mt-2 text-xs text-muted-foreground">Set a subdomain in Settings before publishing.</p>
       )}
     </div>
   )

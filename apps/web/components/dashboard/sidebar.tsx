@@ -90,8 +90,8 @@ function SortableNavItem({
               : isActive
                 ? 'bg-wedding-50 text-wedding-700 dark:bg-wedding-950 dark:text-wedding-300'
                 : item.comingSoon
-                  ? 'cursor-default text-gray-400 dark:text-gray-600'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                  ? 'cursor-default text-muted-foreground dark:text-gray-600'
+                  : 'text-foreground hover:bg-muted hover:text-foreground dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
           }`}
           onClick={(e) => {
             if (item.comingSoon) {
@@ -114,11 +114,11 @@ function SortableNavItem({
             className="flex shrink-0 cursor-grab items-center opacity-0 transition-opacity active:cursor-grabbing group-hover:opacity-100"
             aria-label={`Drag to reorder ${item.label}`}
           >
-            <GripVertical className="h-3.5 w-3.5 text-gray-300" />
+            <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50" />
           </span>
           <div className="relative flex-shrink-0">
             <Icon
-              className={`h-4 w-4 ${isActive ? 'text-wedding-600' : 'text-gray-400 dark:text-gray-500'}`}
+              className={`h-4 w-4 ${isActive ? 'text-wedding-600' : 'text-muted-foreground dark:text-gray-500'}`}
             />
             {badgeCount > 0 && (
               <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500" />
@@ -127,13 +127,13 @@ function SortableNavItem({
           <div className="min-w-0 flex-1">
             <span>{item.label}</span>
             {item.href === '/website' && websiteSubdomain && (
-              <p className={`truncate text-xs ${isActive ? 'text-wedding-500' : 'text-gray-400'}`}>
+              <p className={`truncate text-xs ${isActive ? 'text-wedding-500' : 'text-muted-foreground'}`}>
                 {websiteSubdomain}.planfortwo.com
               </p>
             )}
           </div>
           {item.comingSoon && (
-            <span className="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+            <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
               Soon
             </span>
           )}
@@ -268,11 +268,11 @@ export function Sidebar() {
   )
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-gray-200 bg-white lg:flex dark:border-gray-800 dark:bg-gray-950">
-      <div className="flex h-16 items-center border-b border-gray-200 px-6 dark:border-gray-800">
+    <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-border bg-white lg:flex dark:border-gray-800 dark:bg-gray-950">
+      <div className="flex h-16 items-center border-b border-border px-6 dark:border-gray-800">
         <Link
           href="/dashboard"
-          className="font-serif text-xl font-bold text-gray-900 dark:text-gray-100"
+          className="font-serif text-xl font-bold text-foreground dark:text-gray-100"
         >
           Plan<span className="text-wedding-600">For</span>Two
         </Link>
@@ -281,29 +281,29 @@ export function Sidebar() {
       {/* Wedding Switcher — shows role, switch between weddings if multiple */}
       {allWeddings.length >= 1 && (
         <div
-          className="relative border-b border-gray-100 px-3 py-2 dark:border-gray-800"
+          className="relative border-b border-border px-3 py-2 dark:border-gray-800"
           ref={switcherRef}
         >
           <button
             onClick={() => allWeddings.length > 1 && setSwitcherOpen((prev) => !prev)}
-            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${allWeddings.length > 1 ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800' : 'cursor-default'}`}
+            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${allWeddings.length > 1 ? 'cursor-pointer hover:bg-muted dark:hover:bg-gray-800' : 'cursor-default'}`}
           >
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+              <p className="truncate text-sm font-medium text-foreground dark:text-gray-100">
                 {weddingData?.wedding.name ?? 'Loading...'}
               </p>
-              <p className="truncate text-xs capitalize text-gray-400">
+              <p className="truncate text-xs capitalize text-muted-foreground">
                 {allWeddings.find((w) => w.id === weddingId)?.role ?? ''}
               </p>
             </div>
             {allWeddings.length > 1 && (
-              <ChevronsUpDown className="h-4 w-4 shrink-0 text-gray-400" />
+              <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
             )}
           </button>
 
           {switcherOpen && (
-            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
-              <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-lg border border-border bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
+              <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-gray-500">
                 Your Weddings
               </p>
               {allWeddings.map((w) => {
@@ -315,15 +315,15 @@ export function Sidebar() {
                     onClick={() => void handleSwitchWedding(w.id)}
                     disabled={isActive || switching}
                     className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
-                      isActive ? 'bg-wedding-50 text-wedding-700' : 'text-gray-700 hover:bg-gray-50'
+                      isActive ? 'bg-wedding-50 text-wedding-700' : 'text-foreground hover:bg-muted'
                     } ${switching ? 'opacity-50' : ''}`}
                   >
                     <RoleIcon
-                      className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-wedding-500' : 'text-gray-400'}`}
+                      className={`h-3.5 w-3.5 shrink-0 ${isActive ? 'text-wedding-500' : 'text-muted-foreground'}`}
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{w.name}</p>
-                      <p className="text-xs text-gray-400">{w.role}</p>
+                      <p className="text-xs text-muted-foreground">{w.role}</p>
                     </div>
                     {w.tier === 'full' && (
                       <span className="bg-sage-100 text-sage-700 rounded-full px-1.5 py-0.5 text-[10px] font-medium">
@@ -354,7 +354,7 @@ export function Sidebar() {
               {isCollapsible ? (
                 <button
                   onClick={() => toggleGroup(group.label)}
-                  className="mb-1 flex w-full items-center justify-between px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
+                  className="mb-1 flex w-full items-center justify-between px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-gray-500"
                 >
                   <span>{group.label}</span>
                   <ChevronDown
@@ -362,7 +362,7 @@ export function Sidebar() {
                   />
                 </button>
               ) : (
-                <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-gray-500">
                   {group.label}
                 </p>
               )}
@@ -409,17 +409,17 @@ export function Sidebar() {
       </motion.nav>
 
       {/* Bottom section */}
-      <div className="mt-auto space-y-2 border-t border-gray-200 p-3 dark:border-gray-800">
+      <div className="mt-auto space-y-2 border-t border-border p-3 dark:border-gray-800">
         <Link
           href="/settings"
           className={`flex items-center justify-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
             pathname === '/settings'
               ? 'bg-wedding-50 text-wedding-700 dark:bg-wedding-950 dark:text-wedding-300'
-              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+              : 'text-foreground hover:bg-muted hover:text-foreground dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
           }`}
         >
           <Settings
-            className={`h-4 w-4 flex-shrink-0 ${pathname === '/settings' ? 'text-wedding-600' : 'text-gray-400 dark:text-gray-500'}`}
+            className={`h-4 w-4 flex-shrink-0 ${pathname === '/settings' ? 'text-wedding-600' : 'text-muted-foreground dark:text-gray-500'}`}
           />
           Wedding Settings
         </Link>
@@ -440,14 +440,14 @@ export function Sidebar() {
         <div className="flex items-center justify-between px-3 py-1.5">
           <Link
             href="/"
-            className="flex items-center gap-2 text-xs text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+            className="flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-muted-foreground dark:text-gray-500 dark:hover:text-gray-300"
           >
             <ExternalLink className="h-3.5 w-3.5" />
             Visit Home Page
           </Link>
           <button
             onClick={toggleDark}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}

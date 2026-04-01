@@ -38,12 +38,12 @@ export function ThingsToDoEditor({ content, onChange }: ThingsToDoEditorProps) {
 
   return (
     <div className="space-y-4">
-      <label className="text-sm font-medium text-gray-700">Activities & Attractions</label>
+      <label className="text-sm font-medium text-foreground">Activities & Attractions</label>
 
       {activities.map((item, i) => (
-        <div key={i} className="space-y-3 rounded-lg border border-gray-200 p-4">
+        <div key={i} className="space-y-3 rounded-lg border border-border p-4">
           <div className="flex items-start justify-between gap-2">
-            <span className="mt-1 text-xs font-medium text-gray-400">Activity {i + 1}</span>
+            <span className="mt-1 text-xs font-medium text-muted-foreground">Activity {i + 1}</span>
             <button
               type="button"
               onClick={() => removeActivity(i)}
@@ -53,44 +53,44 @@ export function ThingsToDoEditor({ content, onChange }: ThingsToDoEditorProps) {
             </button>
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-500">Name</label>
+            <label className="text-xs font-medium text-muted-foreground">Name</label>
             <input
               type="text"
               value={item.name}
               onChange={(e) => updateActivity(i, 'name', e.target.value)}
               placeholder="e.g., Wine Tasting Tour"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-500">Description</label>
+            <label className="text-xs font-medium text-muted-foreground">Description</label>
             <textarea
               value={item.description ?? ''}
               onChange={(e) => updateActivity(i, 'description', e.target.value)}
               placeholder="Brief description..."
               rows={2}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium text-gray-500">URL</label>
+              <label className="text-xs font-medium text-muted-foreground">URL</label>
               <input
                 type="text"
                 value={item.url ?? ''}
                 onChange={(e) => updateActivity(i, 'url', e.target.value)}
                 placeholder="https://..."
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-500">Category</label>
+              <label className="text-xs font-medium text-muted-foreground">Category</label>
               <input
                 type="text"
                 value={item.category ?? ''}
                 onChange={(e) => updateActivity(i, 'category', e.target.value)}
                 placeholder="e.g., Food, Entertainment"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>

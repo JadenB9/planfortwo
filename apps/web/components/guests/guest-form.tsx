@@ -103,16 +103,16 @@ export function GuestForm({
   }
 
   const inputClass =
-    'focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2'
+    'focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="font-serif text-lg font-semibold text-gray-900">
+      <div className="w-full max-w-lg rounded-2xl border border-border bg-white shadow-xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 className="font-serif text-lg font-semibold text-foreground">
             {guest ? 'Edit Guest' : 'Add Guest'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
             &times;
           </button>
         </div>
@@ -122,7 +122,7 @@ export function GuestForm({
             {/* Name */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">First Name *</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">First Name *</label>
                 <input
                   type="text"
                   value={formData.firstName}
@@ -132,7 +132,7 @@ export function GuestForm({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Last Name *</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">Last Name *</label>
                 <input
                   type="text"
                   value={formData.lastName}
@@ -146,7 +146,7 @@ export function GuestForm({
             {/* Email / Phone */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">Email</label>
                 <input
                   type="email"
                   value={formData.email ?? ''}
@@ -155,7 +155,7 @@ export function GuestForm({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Phone</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">Phone</label>
                 <input
                   type="tel"
                   value={formData.phone ?? ''}
@@ -169,7 +169,7 @@ export function GuestForm({
             <div className="grid grid-cols-2 gap-4">
               {!formData.isChild ? (
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Household</label>
+                  <label className="mb-1 block text-sm font-medium text-foreground">Household</label>
                   {creatingNewHousehold ? (
                     <div className="space-y-2">
                       <input
@@ -185,7 +185,7 @@ export function GuestForm({
                           setCreatingNewHousehold(false)
                           setNewHouseholdName('')
                         }}
-                        className="text-xs text-gray-500 hover:text-gray-700"
+                        className="text-xs text-muted-foreground hover:text-foreground"
                       >
                         Cancel
                       </button>
@@ -218,7 +218,7 @@ export function GuestForm({
                           const members = getHouseholdMembers(formData.householdId)
                           if (members.length === 0) return null
                           return (
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-muted-foreground">
                               Members:{' '}
                               {members.map((g) => `${g.firstName} ${g.lastName}`).join(', ')}
                             </p>
@@ -231,7 +231,7 @@ export function GuestForm({
                 <div />
               )}
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Side</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">Side</label>
                 <select
                   value={formData.side ?? ''}
                   onChange={(e) => update('side', (e.target.value as GuestSide) || null)}
@@ -248,23 +248,23 @@ export function GuestForm({
             {/* RSVP Status (edit only) */}
             {guest && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">RSVP Status</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">RSVP Status</label>
                 <div className="flex flex-wrap gap-2">
                   {(['pending', 'accepted', 'maybe', 'declined'] as const).map((status) => {
                     const active = formData.rsvpStatus === status
                     const styles: Record<string, string> = {
                       accepted: active
                         ? 'bg-green-600 text-white'
-                        : 'border-gray-300 text-gray-600 hover:border-green-400',
+                        : 'border-border text-muted-foreground hover:border-green-400',
                       maybe: active
                         ? 'bg-amber-500 text-white'
-                        : 'border-gray-300 text-gray-600 hover:border-amber-400',
+                        : 'border-border text-muted-foreground hover:border-amber-400',
                       declined: active
                         ? 'bg-red-600 text-white'
-                        : 'border-gray-300 text-gray-600 hover:border-red-400',
+                        : 'border-border text-muted-foreground hover:border-red-400',
                       pending: active
                         ? 'bg-gray-700 text-white'
-                        : 'border-gray-300 text-gray-600 hover:border-gray-500',
+                        : 'border-border text-muted-foreground hover:border-border',
                     }
                     return (
                       <button
@@ -283,7 +283,7 @@ export function GuestForm({
 
             {/* Checkboxes */}
             <div className="flex flex-wrap gap-4">
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-2 text-sm text-foreground">
                 <input
                   type="checkbox"
                   checked={formData.isChild ?? false}
@@ -294,25 +294,25 @@ export function GuestForm({
                       setNewHouseholdName('')
                     }
                   }}
-                  className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
+                  className="text-wedding-600 focus:ring-wedding-600 rounded border-border"
                 />
                 Child
               </label>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-2 text-sm text-foreground">
                 <input
                   type="checkbox"
                   checked={formData.isVip ?? false}
                   onChange={(e) => update('isVip', e.target.checked)}
-                  className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
+                  className="text-wedding-600 focus:ring-wedding-600 rounded border-border"
                 />
                 VIP
               </label>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
+              <label className="flex items-center gap-2 text-sm text-foreground">
                 <input
                   type="checkbox"
                   checked={formData.hasPlusOne ?? false}
                   onChange={(e) => update('hasPlusOne', e.target.checked)}
-                  className="text-wedding-600 focus:ring-wedding-600 rounded border-gray-300"
+                  className="text-wedding-600 focus:ring-wedding-600 rounded border-border"
                 />
                 Has Plus-One
               </label>
@@ -321,8 +321,8 @@ export function GuestForm({
             {/* Family selector (children only) */}
             {formData.isChild && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Family</label>
-                <p className="mb-1.5 text-xs text-gray-500">
+                <label className="mb-1 block text-sm font-medium text-foreground">Family</label>
+                <p className="mb-1.5 text-xs text-muted-foreground">
                   Select the household this child belongs to.
                 </p>
                 {households.length === 0 ? (
@@ -356,22 +356,22 @@ export function GuestForm({
                     const members = getHouseholdMembers(formData.householdId)
                     if (members.length === 0) return null
                     return (
-                      <div className="mt-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
-                        <p className="mb-2 text-xs font-medium text-gray-700">Family members:</p>
+                      <div className="mt-2 rounded-lg border border-border bg-muted p-3">
+                        <p className="mb-2 text-xs font-medium text-foreground">Family members:</p>
                         <div className="space-y-1">
                           {members.map((m) => (
                             <div key={m.id} className="flex items-center justify-between text-xs">
-                              <span className="text-gray-900">
+                              <span className="text-foreground">
                                 {m.firstName} {m.lastName}
                                 {m.isChild && m.age != null && (
-                                  <span className="ml-1 text-gray-400">(age {m.age})</span>
+                                  <span className="ml-1 text-muted-foreground">(age {m.age})</span>
                                 )}
                               </span>
                               <span
                                 className={`rounded-full px-2 py-0.5 text-xs ${
                                   m.isChild
                                     ? 'bg-blue-100 text-blue-700'
-                                    : 'bg-gray-100 text-gray-600'
+                                    : 'bg-muted text-muted-foreground'
                                 }`}
                               >
                                 {m.isChild ? 'Child' : 'Adult'}
@@ -388,7 +388,7 @@ export function GuestForm({
             {/* Plus-One Name */}
             {formData.hasPlusOne && (
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label className="mb-1 block text-sm font-medium text-foreground">
                   Plus-One Name
                 </label>
                 <input
@@ -402,7 +402,7 @@ export function GuestForm({
 
             {/* Dietary Notes */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Dietary Notes</label>
+              <label className="mb-1 block text-sm font-medium text-foreground">Dietary Notes</label>
               <input
                 type="text"
                 value={formData.dietary?.notes ?? ''}
@@ -417,7 +417,7 @@ export function GuestForm({
             {/* Tags */}
             {tags.length > 0 && (
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Tags</label>
+                <label className="mb-2 block text-sm font-medium text-foreground">Tags</label>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => {
                     const selected = formData.tagIds?.includes(tag.id)
@@ -450,7 +450,7 @@ export function GuestForm({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
             >
               Cancel
             </button>

@@ -12,7 +12,7 @@ interface UpcomingTasksProps {
 const PRIORITY_STYLES: Record<string, string> = {
   must_do: 'bg-red-100 text-red-700',
   nice_to_have: 'bg-amber-100 text-amber-700',
-  optional: 'bg-gray-100 text-gray-600',
+  optional: 'bg-muted text-muted-foreground',
 }
 
 const PRIORITY_LABELS: Record<string, string> = {
@@ -26,9 +26,9 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
 
   if (upcoming.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h3 className="font-serif text-lg font-semibold text-gray-900">Upcoming Tasks</h3>
-        <p className="mt-2 text-sm text-gray-500">
+      <div className="rounded-2xl border border-border bg-white p-6">
+        <h3 className="font-serif text-lg font-semibold text-foreground">Upcoming Tasks</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
           No upcoming tasks. Your checklist will appear here.
         </p>
       </div>
@@ -36,9 +36,9 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6">
+    <div className="rounded-2xl border border-border bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-serif text-lg font-semibold text-gray-900">Upcoming Tasks</h3>
+        <h3 className="font-serif text-lg font-semibold text-foreground">Upcoming Tasks</h3>
         <Link
           href="/checklist"
           className="text-wedding-600 hover:text-wedding-700 text-sm font-medium transition-colors"
@@ -56,15 +56,15 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
         {upcoming.map((task) => (
           <Link key={task.id} href="/checklist">
             <motion.div
-              className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3"
+              className="flex items-center justify-between rounded-xl border border-border px-4 py-3"
               variants={listItem}
               transition={{ duration: 0.3, ...springSmooth }}
               whileHover={{ x: 3, borderColor: 'rgb(var(--wedding-200))' }}
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-gray-900">{task.title}</p>
+                <p className="truncate text-sm font-medium text-foreground">{task.title}</p>
                 {task.dueDate && (
-                  <p className="mt-0.5 text-xs text-gray-500">
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     Due{' '}
                     {new Date(task.dueDate).toLocaleDateString('en-US', {
                       month: 'short',

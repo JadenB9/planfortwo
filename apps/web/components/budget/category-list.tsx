@@ -31,11 +31,11 @@ export function CategoryList({
         className={`rounded-2xl border p-4 text-left transition-colors ${
           selectedCategoryId === null
             ? 'border-wedding-300 bg-wedding-50'
-            : 'border-gray-200 bg-white hover:border-gray-300'
+            : 'border-border bg-white hover:border-border'
         }`}
       >
-        <p className="text-sm font-medium text-gray-900">All Categories</p>
-        <p className="mt-1 text-xs text-gray-500">{categories.length} categories</p>
+        <p className="text-sm font-medium text-foreground">All Categories</p>
+        <p className="mt-1 text-xs text-muted-foreground">{categories.length} categories</p>
       </button>
 
       {categories.map((cat) => {
@@ -52,24 +52,24 @@ export function CategoryList({
             className={`rounded-2xl border p-4 text-left transition-colors ${
               isActive
                 ? 'border-wedding-300 bg-wedding-50'
-                : 'border-gray-200 bg-white hover:border-gray-300'
+                : 'border-border bg-white hover:border-border'
             }`}
           >
             <div className="flex items-center gap-2">
               <span className="text-lg">{cat.icon}</span>
-              <p className="text-sm font-medium text-gray-900">{cat.name}</p>
+              <p className="text-sm font-medium text-foreground">{cat.name}</p>
             </div>
             <div className="mt-3 flex items-baseline justify-between">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {formatCurrency(spent)} / {formatCurrency(allocated)}
               </p>
               <p
-                className={`text-xs font-medium ${percent > 100 ? 'text-red-600' : percent > 80 ? 'text-amber-600' : 'text-gray-600'}`}
+                className={`text-xs font-medium ${percent > 100 ? 'text-red-600' : percent > 80 ? 'text-amber-600' : 'text-muted-foreground'}`}
               >
                 {percent}%
               </p>
             </div>
-            <div className="mt-1.5 h-1.5 w-full rounded-full bg-gray-200">
+            <div className="mt-1.5 h-1.5 w-full rounded-full bg-muted">
               <div
                 className="h-1.5 rounded-full transition-all"
                 style={{

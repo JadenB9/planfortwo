@@ -16,7 +16,7 @@ export function RsvpExpired({ weddingName, deadline }: RsvpExpiredProps) {
     : null
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+    <div className="rounded-2xl border border-border bg-white p-8 text-center shadow-sm">
       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
         <svg
           className="h-8 w-8 text-amber-600"
@@ -33,15 +33,15 @@ export function RsvpExpired({ weddingName, deadline }: RsvpExpiredProps) {
         </svg>
       </div>
 
-      <h2 className="font-serif text-2xl font-bold text-gray-900">RSVP Deadline Has Passed</h2>
+      <h2 className="font-serif text-2xl font-bold text-foreground">RSVP Deadline Has Passed</h2>
 
-      <p className="mt-3 text-gray-600">
+      <p className="mt-3 text-muted-foreground">
         The RSVP deadline for <span className="text-wedding-600 font-semibold">{weddingName}</span>{' '}
         has passed.
       </p>
 
       {formattedDeadline && (
-        <p className="mt-2 text-sm text-gray-500">The deadline was {formattedDeadline}</p>
+        <p className="mt-2 text-sm text-muted-foreground">The deadline was {formattedDeadline}</p>
       )}
 
       <div className="mt-8 rounded-xl bg-amber-50 px-6 py-4">

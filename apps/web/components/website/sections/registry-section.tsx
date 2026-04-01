@@ -59,7 +59,7 @@ function CashFundCard({
       )}
       {progress !== null && (
         <div className="mb-3">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full transition-all"
               style={{ width: `${progress}%`, backgroundColor: colors.accent }}

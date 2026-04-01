@@ -43,8 +43,8 @@ export function Paywall({ children }: { children: React.ReactNode }) {
         <Lock className="h-8 w-8 text-amber-600" />
       </div>
 
-      <h2 className="mt-6 font-serif text-2xl font-bold text-gray-900">Full Plan Required</h2>
-      <p className="mt-3 max-w-sm text-gray-600">
+      <h2 className="mt-6 font-serif text-2xl font-bold text-foreground">Full Plan Required</h2>
+      <p className="mt-3 max-w-sm text-muted-foreground">
         This feature is part of the Premium plan. Upgrade for a one-time payment of $10 to unlock
         website customization, seating charts, inbox, music integration, photo gallery, and more.
       </p>
@@ -59,7 +59,7 @@ export function Paywall({ children }: { children: React.ReactNode }) {
         </Link>
         <Link
           href="/dashboard"
-          className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+          className="flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
         >
           Back to Dashboard
           <ArrowRight className="h-4 w-4" />

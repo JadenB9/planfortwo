@@ -100,7 +100,7 @@ export function GalleryEditor({
   return (
     <div className="space-y-5">
       <div>
-        <label htmlFor="gallery-layout" className="text-sm font-medium text-gray-700">
+        <label htmlFor="gallery-layout" className="text-sm font-medium text-foreground">
           Layout
         </label>
         <select
@@ -112,7 +112,7 @@ export function GalleryEditor({
               layout: e.target.value as GalleryContent['layout'],
             })
           }
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           <option value="grid">Grid</option>
           <option value="masonry">Masonry</option>
@@ -122,7 +122,7 @@ export function GalleryEditor({
 
       {content.layout === 'grid' && (
         <div>
-          <label htmlFor="gallery-columns" className="text-sm font-medium text-gray-700">
+          <label htmlFor="gallery-columns" className="text-sm font-medium text-foreground">
             Columns
           </label>
           <input
@@ -135,31 +135,31 @@ export function GalleryEditor({
               const value = Math.min(6, Math.max(2, Number(e.target.value) || 2))
               onChange({ ...content, columns: value })
             }}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <p className="mt-1 text-xs text-gray-500">Between 2 and 6 columns.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Between 2 and 6 columns.</p>
         </div>
       )}
 
-      <div className="border-t border-gray-100 pt-4">
+      <div className="border-t border-border pt-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-700">Photos</h3>
+          <h3 className="text-sm font-medium text-foreground">Photos</h3>
           {websitePhotos.length > 0 && (
-            <span className="text-xs text-gray-500">{websitePhotos.length} selected</span>
+            <span className="text-xs text-muted-foreground">{websitePhotos.length} selected</span>
           )}
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-            <span className="ml-2 text-sm text-gray-500">Loading photos...</span>
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-sm text-muted-foreground">Loading photos...</span>
           </div>
         ) : galleryPhotos.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-            <Image className="h-8 w-8 text-gray-400" />
+          <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-muted p-8 text-center">
+            <Image className="h-8 w-8 text-muted-foreground" />
             <div>
-              <p className="text-sm font-medium text-gray-700">No photos uploaded yet</p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="text-sm font-medium text-foreground">No photos uploaded yet</p>
+              <p className="mt-1 text-xs text-muted-foreground">
                 Upload photos in the{' '}
                 <a
                   href="/photos"
@@ -186,7 +186,7 @@ export function GalleryEditor({
                   className={`group relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
                     isSelected
                       ? 'border-blue-500 ring-2 ring-blue-200'
-                      : 'border-transparent hover:border-gray-300'
+                      : 'border-transparent hover:border-border'
                   } ${isToggling ? 'opacity-60' : ''}`}
                 >
                   <img

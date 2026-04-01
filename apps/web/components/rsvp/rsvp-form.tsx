@@ -177,15 +177,15 @@ export function RsvpForm({
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Household status banner */}
       {isBatch && (
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <p className="text-sm font-medium text-gray-700">
+        <div className="rounded-xl border border-border bg-muted p-4">
+          <p className="text-sm font-medium text-foreground">
             RSVPing for the {lookupResult.household?.name || 'Family'} household
           </p>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {guestsToRsvp.length} family member{guestsToRsvp.length !== 1 ? 's' : ''}
           </p>
           {alreadyResponded.length > 0 && (
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               {alreadyResponded.length} of {guestsToRsvp.length} member
               {alreadyResponded.length !== 1 ? 's have' : ' has'} previously responded. You can
               update any responses below.
@@ -202,20 +202,20 @@ export function RsvpForm({
         return (
           <div
             key={form.guestId}
-            className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+            className="rounded-2xl border border-border bg-white p-6 shadow-sm"
           >
-            <h3 className="font-serif text-xl font-semibold text-gray-900">
+            <h3 className="font-serif text-xl font-semibold text-foreground">
               {guest.firstName} {guest.lastName}
-              {isChild && <span className="ml-2 text-xs font-normal text-gray-400">(child)</span>}
+              {isChild && <span className="ml-2 text-xs font-normal text-muted-foreground">(child)</span>}
             </h3>
             {guest.rsvpRespondedAt && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Previously responded: {formatRsvpStatus(guest.rsvpStatus ?? 'pending')}
               </p>
             )}
 
             <div className="mt-6">
-              <p className="mb-3 text-sm font-medium text-gray-700">
+              <p className="mb-3 text-sm font-medium text-foreground">
                 {isChild ? 'Will they be attending?' : 'Your Response'}
               </p>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -231,7 +231,7 @@ export function RsvpForm({
                           : opt.value === 'declined'
                             ? 'border-red-300 bg-red-50 text-red-700'
                             : 'border-amber-300 bg-amber-50 text-amber-700'
-                        : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300'
+                        : 'border-border bg-muted text-muted-foreground hover:border-border'
                     }`}
                   >
                     <span className="mr-2">{opt.icon}</span>
@@ -245,7 +245,7 @@ export function RsvpForm({
               <div className="mt-6 space-y-5">
                 {showEmailField && !isChild && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-foreground">
                       Email Address (preferred)
                     </label>
                     <input
@@ -253,9 +253,9 @@ export function RsvpForm({
                       value={form.rsvpEmail}
                       onChange={(e) => updateForm(index, { rsvpEmail: e.target.value })}
                       placeholder="your@email.com"
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
                     />
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       So the couple can keep in touch with updates.
                     </p>
                   </div>
@@ -263,23 +263,23 @@ export function RsvpForm({
 
                 {showDietary && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-foreground">
                       {isChild ? 'Allergies' : 'Allergies'}{' '}
-                      <span className="font-normal text-gray-400">(leave blank for none)</span>
+                      <span className="font-normal text-muted-foreground">(leave blank for none)</span>
                     </label>
                     <input
                       type="text"
                       value={form.dietary.notes ?? ''}
                       onChange={(e) => updateDietary(index, 'notes', e.target.value)}
                       placeholder="e.g. peanuts, shellfish, dairy..."
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
                     />
                   </div>
                 )}
 
                 {!isChild && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-foreground">
                       Additional Notes
                     </label>
                     <textarea
@@ -287,14 +287,14 @@ export function RsvpForm({
                       onChange={(e) => updateForm(index, { rsvpNotes: e.target.value })}
                       placeholder="Anything else the couple should know?"
                       rows={3}
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
                     />
                   </div>
                 )}
 
                 {showPlusOne && (
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <h4 className="font-serif text-lg font-semibold text-gray-900">Plus One</h4>
+                  <div className="rounded-xl border border-border bg-muted p-5">
+                    <h4 className="font-serif text-lg font-semibold text-foreground">Plus One</h4>
 
                     <div className="mt-3 space-y-4">
                       <label className="flex items-center gap-2">
@@ -304,15 +304,15 @@ export function RsvpForm({
                           onChange={(e) =>
                             updateForm(index, { plusOneConfirmed: e.target.checked })
                           }
-                          className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-gray-300"
+                          className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-border"
                         />
-                        <span className="text-sm text-gray-700">I&apos;m bringing a guest</span>
+                        <span className="text-sm text-foreground">I&apos;m bringing a guest</span>
                       </label>
 
                       {form.plusOneConfirmed && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">
+                            <label className="block text-sm font-medium text-foreground">
                               Guest Name
                             </label>
                             <input
@@ -320,15 +320,15 @@ export function RsvpForm({
                               value={form.plusOneName}
                               onChange={(e) => updateForm(index, { plusOneName: e.target.value })}
                               placeholder="Full name"
-                              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
                             />
                           </div>
 
                           {showDietary && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">
+                              <label className="block text-sm font-medium text-foreground">
                                 Their Allergies{' '}
-                                <span className="font-normal text-gray-400">
+                                <span className="font-normal text-muted-foreground">
                                   (leave blank for none)
                                 </span>
                               </label>
@@ -339,7 +339,7 @@ export function RsvpForm({
                                   updatePlusOneDietary(index, 'notes', e.target.value)
                                 }
                                 placeholder="e.g. peanuts, shellfish, dairy..."
-                                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+                                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
                               />
                             </div>
                           )}

@@ -39,13 +39,13 @@ export default function GuestImportPage() {
   if (!features?.canBulkImport) {
     return (
       <div className="mx-auto max-w-lg py-20 text-center">
-        <h2 className="font-serif text-2xl font-bold text-gray-900">Bulk Import</h2>
-        <p className="mt-2 text-sm text-gray-600">
+        <h2 className="font-serif text-2xl font-bold text-foreground">Bulk Import</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
           CSV import is available on the full plan. Upgrade to import your guest list in bulk.
         </p>
         <Link
           href="/guests"
-          className="mt-4 inline-block rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="mt-4 inline-block rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
           Back to Guest List
         </Link>
@@ -59,8 +59,8 @@ export default function GuestImportPage() {
         <Link href="/guests" className="text-wedding-600 hover:text-wedding-700 text-sm">
           &larr; Back to Guest List
         </Link>
-        <h1 className="mt-2 font-serif text-3xl font-bold text-gray-900">Import Guests</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <h1 className="mt-2 font-serif text-3xl font-bold text-foreground">Import Guests</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Upload a CSV file to bulk import your guest list.
         </p>
       </div>

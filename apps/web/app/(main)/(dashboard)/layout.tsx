@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen bg-muted dark:bg-gray-900">
         <Sidebar />
         <div className="flex h-screen min-w-0 flex-1 flex-col">
           <TopBar />

@@ -103,7 +103,7 @@ function FontPreviewPicker({
           className={`group relative rounded-lg border-2 p-3 text-left transition-all ${
             selected === fp.id
               ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-200 bg-white hover:border-gray-300'
+              : 'border-border bg-white hover:border-border'
           }`}
         >
           {selected === fp.id && (
@@ -407,7 +407,7 @@ export function TemplateSelector({
 
   return (
     <div>
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">Choose a Template</h3>
+      <h3 className="mb-4 text-lg font-semibold text-foreground">Choose a Template</h3>
       <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {templates.map((t) => (
           <TemplatePreview
@@ -422,7 +422,7 @@ export function TemplateSelector({
       {/* Saved custom palettes */}
       {palettes.length > 0 && (
         <div className="mt-6">
-          <h4 className="mb-3 text-sm font-semibold text-gray-900">Your Saved Palettes</h4>
+          <h4 className="mb-3 text-sm font-semibold text-foreground">Your Saved Palettes</h4>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {palettes.map((palette) => (
               <div
@@ -430,19 +430,19 @@ export function TemplateSelector({
                 className={`group relative cursor-pointer rounded-lg border-2 p-3 transition-all ${
                   activePaletteId === palette.id
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 bg-white hover:border-gray-300'
+                    : 'border-border bg-white hover:border-border'
                 }`}
                 onClick={() => handleLoadPalette(palette)}
               >
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-900">{palette.name}</span>
+                  <span className="text-sm font-medium text-foreground">{palette.name}</span>
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleDeletePalette(palette.id)
                     }}
-                    className="rounded p-1 text-gray-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                    className="rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -451,14 +451,14 @@ export function TemplateSelector({
                   {(['primary', 'secondary', 'accent', 'background'] as const).map((key) => (
                     <div
                       key={key}
-                      className="h-6 w-6 rounded-full border border-gray-200"
+                      className="h-6 w-6 rounded-full border border-border"
                       style={{ backgroundColor: palette.colors[key] }}
                       title={key}
                     />
                   ))}
                   {palette.colors.sectionBackground && (
                     <div
-                      className="h-6 w-6 rounded-full border border-gray-200"
+                      className="h-6 w-6 rounded-full border border-border"
                       style={{ backgroundColor: palette.colors.sectionBackground }}
                       title="Section tint"
                     />
@@ -474,7 +474,7 @@ export function TemplateSelector({
       <button
         type="button"
         onClick={() => setShowCustomizer((v) => !v)}
-        className="mt-4 flex items-center gap-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+        className="mt-4 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
         <Palette className="h-4 w-4" />
         Customize Colors & Font
@@ -483,15 +483,15 @@ export function TemplateSelector({
 
       {/* Color customization panel */}
       {showCustomizer && (
-        <div className="relative mt-4 rounded-lg border border-gray-200 bg-gray-50 p-5">
-          <h4 className="mb-4 text-sm font-semibold text-gray-900">Customize Colors</h4>
+        <div className="relative mt-4 rounded-lg border border-border bg-muted p-5">
+          <h4 className="mb-4 text-sm font-semibold text-foreground">Customize Colors</h4>
 
           <div className="grid gap-4 sm:grid-cols-2">
             {COLOR_FIELDS.map(({ key, label }) => {
               const colorValue = localColors[key] ?? ''
               return (
                 <div key={key} className="flex items-center gap-3">
-                  <Label htmlFor={`color-${key}`} className="w-24 shrink-0 text-sm text-gray-700">
+                  <Label htmlFor={`color-${key}`} className="w-24 shrink-0 text-sm text-foreground">
                     {label}
                   </Label>
                   <div className="relative">
@@ -500,7 +500,7 @@ export function TemplateSelector({
                       id={`color-picker-${key}`}
                       value={HEX_REGEX.test(colorValue) ? colorValue : '#000000'}
                       onChange={(e) => handleColorChange(key, e.target.value)}
-                      className="h-9 w-9 cursor-pointer rounded border border-gray-300 bg-transparent p-0.5"
+                      className="h-9 w-9 cursor-pointer rounded border border-border bg-transparent p-0.5"
                     />
                   </div>
                   <Input
@@ -516,15 +516,15 @@ export function TemplateSelector({
             })}
           </div>
 
-          <div className="mt-5 border-t border-gray-200 pt-4">
-            <h4 className="mb-3 text-sm font-semibold text-gray-900">Font Style</h4>
+          <div className="mt-5 border-t border-border pt-4">
+            <h4 className="mb-3 text-sm font-semibold text-foreground">Font Style</h4>
             <FontPreviewPicker selected={localFontPair} onSelect={handleFontChange} />
 
             <div className="mt-4 space-y-3">
-              <h4 className="text-sm font-semibold text-gray-900">Typography Options</h4>
+              <h4 className="text-sm font-semibold text-foreground">Typography Options</h4>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="mb-1.5 text-xs font-medium text-gray-600">Headings</p>
+                  <p className="mb-1.5 text-xs font-medium text-muted-foreground">Headings</p>
                   <div className="flex gap-1.5">
                     <button
                       type="button"
@@ -539,7 +539,7 @@ export function TemplateSelector({
                       className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
                         (localColors.headingBold ?? true)
                           ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          : 'border-border text-muted-foreground hover:border-border'
                       }`}
                     >
                       B
@@ -557,14 +557,14 @@ export function TemplateSelector({
                       className={`rounded-md border px-3 py-1.5 text-xs italic transition-colors ${
                         (localColors.headingItalic ?? false)
                           ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          : 'border-border text-muted-foreground hover:border-border'
                       }`}
                     >
                       I
                     </button>
                   </div>
                   <div className="mt-2">
-                    <p className="mb-1 text-[10px] text-gray-500">Size</p>
+                    <p className="mb-1 text-[10px] text-muted-foreground">Size</p>
                     <div className="flex gap-1">
                       {SIZE_OPTIONS.map((opt) => (
                         <button
@@ -578,7 +578,7 @@ export function TemplateSelector({
                           className={`rounded-md border px-2.5 py-1 text-[10px] font-medium transition-colors ${
                             (localColors.headingSize ?? 'md') === opt.value
                               ? 'border-blue-500 bg-blue-50 text-blue-700'
-                              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                              : 'border-border text-muted-foreground hover:border-border'
                           }`}
                         >
                           {opt.label}
@@ -588,7 +588,7 @@ export function TemplateSelector({
                   </div>
                 </div>
                 <div>
-                  <p className="mb-1.5 text-xs font-medium text-gray-600">Body Text</p>
+                  <p className="mb-1.5 text-xs font-medium text-muted-foreground">Body Text</p>
                   <div className="flex gap-1.5">
                     <button
                       type="button"
@@ -603,7 +603,7 @@ export function TemplateSelector({
                       className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
                         (localColors.bodyBold ?? false)
                           ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          : 'border-border text-muted-foreground hover:border-border'
                       }`}
                     >
                       B
@@ -621,14 +621,14 @@ export function TemplateSelector({
                       className={`rounded-md border px-3 py-1.5 text-xs italic transition-colors ${
                         (localColors.bodyItalic ?? false)
                           ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          : 'border-border text-muted-foreground hover:border-border'
                       }`}
                     >
                       I
                     </button>
                   </div>
                   <div className="mt-2">
-                    <p className="mb-1 text-[10px] text-gray-500">Size</p>
+                    <p className="mb-1 text-[10px] text-muted-foreground">Size</p>
                     <div className="flex gap-1">
                       {SIZE_OPTIONS.map((opt) => (
                         <button
@@ -642,7 +642,7 @@ export function TemplateSelector({
                           className={`rounded-md border px-2.5 py-1 text-[10px] font-medium transition-colors ${
                             (localColors.bodySize ?? 'md') === opt.value
                               ? 'border-blue-500 bg-blue-50 text-blue-700'
-                              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                              : 'border-border text-muted-foreground hover:border-border'
                           }`}
                         >
                           {opt.label}
@@ -656,7 +656,7 @@ export function TemplateSelector({
           </div>
 
           {/* Save / Update palette actions */}
-          <div className="mt-4 border-t border-gray-200 pt-4">
+          <div className="mt-4 border-t border-border pt-4">
             {showSaveDialog ? (
               <div className="flex items-center gap-2">
                 <Input
@@ -712,8 +712,8 @@ export function TemplateSelector({
             )}
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
-            <p className="text-xs text-gray-500">
+          <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+            <p className="text-xs text-muted-foreground">
               {isCustomTemplate
                 ? 'Pick any combination to make this template yours.'
                 : 'Custom colors override the template defaults.'}

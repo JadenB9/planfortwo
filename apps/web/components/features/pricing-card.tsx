@@ -56,12 +56,12 @@ export function PricingCard({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">{title}</CardTitle>
           <div className="mt-4">
-            <span className="font-serif text-4xl font-bold tracking-tight text-gray-900">
+            <span className="font-serif text-4xl font-bold tracking-tight text-foreground">
               {price}
             </span>
-            {price !== 'Free' && <span className="ml-1 text-sm text-gray-500">one-time</span>}
+            {price !== 'Free' && <span className="ml-1 text-sm text-muted-foreground">one-time</span>}
           </div>
-          <p className="mt-2 text-sm text-gray-500">{description}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{description}</p>
         </CardHeader>
         <CardContent className="flex flex-1 flex-col">
           <ul className="flex-1 space-y-3">
@@ -75,10 +75,10 @@ export function PricingCard({
                     )}
                   />
                 ) : (
-                  <X className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
+                  <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/50" />
                 )}
                 <span
-                  className={cn('text-sm', feature.included ? 'text-gray-700' : 'text-gray-400')}
+                  className={cn('text-sm', feature.included ? 'text-foreground' : 'text-muted-foreground')}
                 >
                   {feature.label}
                 </span>
@@ -102,7 +102,7 @@ export function PricingCard({
             ) : (
               <Button
                 asChild
-                className="w-full rounded-xl bg-gray-100 text-gray-900 hover:bg-gray-200"
+                className="w-full rounded-xl bg-muted text-foreground hover:bg-muted"
                 size="lg"
               >
                 <Link href={href}>{cta}</Link>

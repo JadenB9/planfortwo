@@ -23,14 +23,14 @@ export function DateStep({ data, onUpdate, onNext, onBack }: DateStepProps) {
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-gray-900">When&apos;s the big day?</h2>
-        <p className="mt-2 text-gray-600">
+        <h2 className="font-serif text-3xl font-bold text-foreground">When&apos;s the big day?</h2>
+        <p className="mt-2 text-muted-foreground">
           Don&apos;t worry if you haven&apos;t decided yet — you can always set this later.
         </p>
       </div>
 
       <div>
-        <label htmlFor="weddingDate" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="weddingDate" className="block text-sm font-medium text-foreground">
           Wedding Date
         </label>
         <input
@@ -39,14 +39,14 @@ export function DateStep({ data, onUpdate, onNext, onBack }: DateStepProps) {
           value={dateValue}
           onChange={(e) => handleDateChange(e.target.value)}
           min={new Date().toISOString().split('T')[0]}
-          className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+          className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-border px-4 py-3 text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
         />
       </div>
 
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 rounded-xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
         >
           Back
         </button>

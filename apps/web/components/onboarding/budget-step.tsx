@@ -33,8 +33,8 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-gray-900">What&apos;s your budget?</h2>
-        <p className="mt-2 text-gray-600">
+        <h2 className="font-serif text-3xl font-bold text-foreground">What&apos;s your budget?</h2>
+        <p className="mt-2 text-muted-foreground">
           This helps us set up your budget tracker with realistic categories.
         </p>
       </div>
@@ -50,10 +50,10 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
             className={`rounded-2xl border-2 px-4 py-5 text-center transition-all ${
               data.budgetTotal === option.value && !showCustom
                 ? 'border-wedding-600 bg-wedding-50 shadow-md'
-                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-gray-200'
+                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-border'
             }`}
           >
-            <span className="block text-lg font-semibold text-gray-900">{option.label}</span>
+            <span className="block text-lg font-semibold text-foreground">{option.label}</span>
           </button>
         ))}
       </div>
@@ -72,11 +72,11 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
 
       {showCustom && (
         <div>
-          <label htmlFor="customBudget" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="customBudget" className="block text-sm font-medium text-foreground">
             Custom Budget
           </label>
           <div className="relative mt-1">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
             <input
               id="customBudget"
               type="number"
@@ -84,7 +84,7 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
               step={1000}
               value={data.budgetTotal && !isPreset ? data.budgetTotal : ''}
               onChange={(e) => handleCustomChange(e.target.value)}
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-gray-300 py-3 pl-8 pr-4 text-gray-900 shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border py-3 pl-8 pr-4 text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
               placeholder="30000"
             />
           </div>
@@ -94,7 +94,7 @@ export function BudgetStep({ data, onUpdate, onNext, onBack }: BudgetStepProps) 
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 rounded-xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
         >
           Back
         </button>

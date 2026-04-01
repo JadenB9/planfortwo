@@ -59,14 +59,14 @@ function getDueDateStyle(dueDate: Date | null): { label: string; className: stri
     }
   return {
     label: due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    className: 'border border-gray-200 text-gray-500 bg-transparent',
+    className: 'border border-border text-muted-foreground bg-transparent',
   }
 }
 
 const PRIORITY_STYLES: Record<string, string> = {
   must_do: 'border border-red-200 text-red-600 bg-transparent',
   nice_to_have: 'border border-amber-200 text-amber-600 bg-transparent',
-  optional: 'border border-gray-200 text-gray-500 bg-transparent',
+  optional: 'border border-border text-muted-foreground bg-transparent',
 }
 
 const PRIORITY_LABELS: Record<string, string> = {
@@ -90,8 +90,8 @@ export function TaskCard({
 
   return (
     <motion.div
-      className={`hover:border-wedding-200 group flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-gray-900 transition-colors ${
-        isCompleted ? 'border-gray-100' : 'border-gray-200'
+      className={`hover:border-wedding-200 group flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-foreground transition-colors ${
+        isCompleted ? 'border-border' : 'border-border'
       }`}
       layout
       initial={false}
@@ -101,7 +101,7 @@ export function TaskCard({
     >
       {features.canReorderTasks && dragHandleProps && (
         <button
-          className="cursor-grab touch-none text-gray-400 hover:text-gray-600 active:cursor-grabbing"
+          className="cursor-grab touch-none text-muted-foreground hover:text-muted-foreground active:cursor-grabbing"
           {...dragHandleProps}
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,7 +124,7 @@ export function TaskCard({
         className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
           isCompleted
             ? 'border-wedding-600 bg-wedding-600 text-white'
-            : 'hover:border-wedding-400 border-gray-300'
+            : 'hover:border-wedding-400 border-border'
         } ${!features.canEditChecklist ? 'cursor-not-allowed opacity-50' : ''}`}
       >
         {isCompleted && (
@@ -147,7 +147,7 @@ export function TaskCard({
         <div className="flex w-full items-center gap-3">
           <span
             className={`flex-1 truncate text-sm font-medium ${
-              isCompleted ? 'text-gray-400 line-through' : 'text-gray-900'
+              isCompleted ? 'text-muted-foreground line-through' : 'text-foreground'
             }`}
           >
             {task.title}
@@ -170,7 +170,7 @@ export function TaskCard({
           </div>
         </div>
         {task.description && !isCompleted && (
-          <span className="truncate text-xs text-gray-400">{task.description}</span>
+          <span className="truncate text-xs text-muted-foreground">{task.description}</span>
         )}
       </button>
 

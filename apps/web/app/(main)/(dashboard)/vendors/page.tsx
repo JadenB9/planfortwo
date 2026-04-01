@@ -41,7 +41,7 @@ const VENDOR_CATEGORIES: { value: VendorCategory; label: string }[] = [
 ]
 
 const STATUS_COLORS: Record<VendorStatus, string> = {
-  researching: 'bg-gray-100 text-gray-700',
+  researching: 'bg-muted text-foreground',
   contacted: 'bg-blue-100 text-blue-700',
   booked: 'bg-wedding-100 text-wedding-700',
   confirmed: 'bg-green-100 text-green-700',
@@ -246,8 +246,8 @@ export default function VendorsPage() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-gray-900">Vendors</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="font-serif text-3xl font-bold text-foreground">Vendors</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Manage your wedding vendors and track costs.
             {vendors.length > 0 && (
               <span className="text-wedding-600 ml-2 font-medium">
@@ -273,7 +273,7 @@ export default function VendorsPage() {
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               !filterCategory
                 ? 'bg-wedding-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-muted text-foreground hover:bg-muted'
             }`}
           >
             All ({vendors.length})
@@ -286,7 +286,7 @@ export default function VendorsPage() {
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                   filterCategory === cat.value
                     ? 'bg-wedding-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-muted text-foreground hover:bg-muted'
                 }`}
               >
                 {cat.label} ({vendors.filter((v) => v.category === cat.value).length})
@@ -314,8 +314,8 @@ export default function VendorsPage() {
                 />
               </svg>
             </div>
-            <h2 className="font-serif text-xl font-semibold text-gray-900">No Vendors Yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+            <h2 className="font-serif text-xl font-semibold text-foreground">No Vendors Yet</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               Start adding your wedding vendors to keep track of contacts, costs, and booking
               status.
             </p>
@@ -347,7 +347,7 @@ export default function VendorsPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-base">{vendor.name}</CardTitle>
-                      <p className="mt-0.5 text-xs capitalize text-gray-500">
+                      <p className="mt-0.5 text-xs capitalize text-muted-foreground">
                         {VENDOR_CATEGORIES.find((c) => c.value === vendor.category)?.label ??
                           vendor.category}
                       </p>
@@ -361,12 +361,12 @@ export default function VendorsPage() {
                 </CardHeader>
                 <CardContent>
                   {vendor.contactName && (
-                    <p className="text-sm text-gray-600">{vendor.contactName}</p>
+                    <p className="text-sm text-muted-foreground">{vendor.contactName}</p>
                   )}
-                  {vendor.email && <p className="text-xs text-gray-500">{vendor.email}</p>}
-                  {vendor.phone && <p className="text-xs text-gray-500">{vendor.phone}</p>}
+                  {vendor.email && <p className="text-xs text-muted-foreground">{vendor.email}</p>}
+                  {vendor.phone && <p className="text-xs text-muted-foreground">{vendor.phone}</p>}
                   {vendor.cost != null && vendor.cost > 0 && (
-                    <p className="mt-2 text-sm font-semibold text-gray-900">
+                    <p className="mt-2 text-sm font-semibold text-foreground">
                       ${vendor.cost.toLocaleString()}
                     </p>
                   )}
@@ -416,7 +416,7 @@ export default function VendorsPage() {
                   id="v-category"
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value as VendorCategory })}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-border px-3 py-2 text-sm"
                 >
                   {VENDOR_CATEGORIES.map((c) => (
                     <option key={c.value} value={c.value}>
@@ -431,7 +431,7 @@ export default function VendorsPage() {
                   id="v-status"
                   value={form.status}
                   onChange={(e) => setForm({ ...form, status: e.target.value as VendorStatus })}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-border px-3 py-2 text-sm"
                 >
                   <option value="researching">Researching</option>
                   <option value="contacted">Contacted</option>
@@ -507,13 +507,13 @@ export default function VendorsPage() {
             {editingVendor && (
               <div className="border-t pt-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-gray-900">Communication Log</h3>
+                  <h3 className="text-sm font-semibold text-foreground">Communication Log</h3>
                   <Button variant="outline" size="sm" onClick={() => setShowCommForm(true)}>
                     Log Communication
                   </Button>
                 </div>
                 {communications.length === 0 ? (
-                  <p className="py-4 text-center text-xs text-gray-400">
+                  <p className="py-4 text-center text-xs text-muted-foreground">
                     No communications logged yet.
                   </p>
                 ) : (
@@ -526,13 +526,13 @@ export default function VendorsPage() {
                       .map((comm) => (
                         <div
                           key={comm.id}
-                          className="rounded-lg border border-gray-100 bg-gray-50 p-3"
+                          className="rounded-lg border border-border bg-muted p-3"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="rounded-full border bg-white px-2 py-0.5 text-xs font-medium capitalize text-gray-700">
+                            <span className="rounded-full border bg-white px-2 py-0.5 text-xs font-medium capitalize text-foreground">
                               {comm.type}
                             </span>
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-muted-foreground">
                               {new Date(comm.contactDate).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
@@ -541,10 +541,10 @@ export default function VendorsPage() {
                             </span>
                           </div>
                           {comm.subject && (
-                            <p className="mt-1 text-sm font-medium text-gray-800">{comm.subject}</p>
+                            <p className="mt-1 text-sm font-medium text-foreground">{comm.subject}</p>
                           )}
                           {comm.content && (
-                            <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">
+                            <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
                               {comm.content}
                             </p>
                           )}
@@ -571,7 +571,7 @@ export default function VendorsPage() {
                 id="comm-type"
                 value={commForm.type}
                 onChange={(e) => setCommForm({ ...commForm, type: e.target.value })}
-                className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-border px-3 py-2 text-sm"
               >
                 <option value="email">Email</option>
                 <option value="phone">Phone</option>

@@ -103,10 +103,10 @@ export function WebsitePreview({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b bg-gray-50/80 px-4 py-2">
+      <div className="flex items-center justify-between border-b bg-muted/80 px-4 py-2">
         <div className="flex items-center gap-2">
-          <Monitor className="h-3.5 w-3.5 text-gray-400" />
-          <span className="text-xs font-medium text-gray-500">Live Preview</span>
+          <Monitor className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="text-xs font-medium text-muted-foreground">Live Preview</span>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -115,7 +115,7 @@ export function WebsitePreview({
             className={`rounded p-1 transition-colors ${
               previewMode === 'phone'
                 ? 'bg-blue-100 text-blue-600'
-                : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+                : 'text-muted-foreground hover:bg-muted hover:text-muted-foreground'
             }`}
             title="Phone view"
           >
@@ -127,17 +127,17 @@ export function WebsitePreview({
             className={`rounded p-1 transition-colors ${
               previewMode === 'desktop'
                 ? 'bg-blue-100 text-blue-600'
-                : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+                : 'text-muted-foreground hover:bg-muted hover:text-muted-foreground'
             }`}
             title="Desktop view"
           >
             <Monitor className="h-3.5 w-3.5" />
           </button>
-          <span className="ml-1 text-[10px] text-gray-400">{Math.round(scale * 100)}%</span>
+          <span className="ml-1 text-[10px] text-muted-foreground">{Math.round(scale * 100)}%</span>
         </div>
       </div>
 
-      <div ref={containerRef} className="flex-1 overflow-y-auto bg-gray-100">
+      <div ref={containerRef} className="flex-1 overflow-y-auto bg-muted">
         {previewSections.length > 0 ? (
           <div style={{ height: `${scaledHeight}px`, position: 'relative', overflow: 'hidden' }}>
             <div
@@ -175,9 +175,9 @@ export function WebsitePreview({
         ) : (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
-              <Monitor className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-              <p className="text-sm text-gray-400">No visible sections</p>
-              <p className="mt-1 text-xs text-gray-300">Enable sections to see your preview</p>
+              <Monitor className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
+              <p className="text-sm text-muted-foreground">No visible sections</p>
+              <p className="mt-1 text-xs text-muted-foreground/50">Enable sections to see your preview</p>
             </div>
           </div>
         )}

@@ -36,7 +36,7 @@ export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProp
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-gray-700">Events</h4>
+        <h4 className="text-sm font-medium text-foreground">Events</h4>
         <button
           type="button"
           onClick={addEvent}
@@ -48,7 +48,7 @@ export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProp
       </div>
 
       {events.length === 0 && (
-        <p className="mt-3 text-sm text-gray-500">
+        <p className="mt-3 text-sm text-muted-foreground">
           No events yet. Add your ceremony, reception, rehearsal dinner, or any other events your
           guests should know about.
         </p>
@@ -58,12 +58,12 @@ export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProp
         {events.map((event, index) => (
           <div
             key={index}
-            className={`rounded-lg border border-gray-200 p-4 ${
-              index > 0 ? 'border-t border-gray-100' : ''
+            className={`rounded-lg border border-border p-4 ${
+              index > 0 ? 'border-t border-border' : ''
             }`}
           >
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Event {index + 1}
               </span>
               <button
@@ -77,69 +77,69 @@ export function EventDetailsEditor({ content, onChange }: EventDetailsEditorProp
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Event Name</label>
+              <label className="text-sm font-medium text-foreground">Event Name</label>
               <input
                 type="text"
                 value={event.name}
                 onChange={(e) => updateEvent(index, { name: e.target.value })}
                 placeholder="Ceremony"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-medium text-gray-700">Date</label>
+                <label className="text-sm font-medium text-foreground">Date</label>
                 <input
                   type="text"
                   value={event.date ?? ''}
                   onChange={(e) => updateEvent(index, { date: e.target.value || null })}
                   placeholder="September 14, 2026"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Time</label>
+                <label className="text-sm font-medium text-foreground">Time</label>
                 <input
                   type="text"
                   value={event.time ?? ''}
                   onChange={(e) => updateEvent(index, { time: e.target.value || null })}
                   placeholder="4:00 PM"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             <div className="mt-3">
-              <label className="text-sm font-medium text-gray-700">Venue</label>
+              <label className="text-sm font-medium text-foreground">Venue</label>
               <input
                 type="text"
                 value={event.venue}
                 onChange={(e) => updateEvent(index, { venue: e.target.value })}
                 placeholder="The Grand Ballroom"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
             <div className="mt-3">
-              <label className="text-sm font-medium text-gray-700">Address</label>
+              <label className="text-sm font-medium text-foreground">Address</label>
               <input
                 type="text"
                 value={event.address}
                 onChange={(e) => updateEvent(index, { address: e.target.value })}
                 placeholder="123 Main Street, City, State 12345"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
             <div className="mt-3">
-              <label className="text-sm font-medium text-gray-700">Description</label>
+              <label className="text-sm font-medium text-foreground">Description</label>
               <textarea
                 value={event.description}
                 onChange={(e) => updateEvent(index, { description: e.target.value })}
                 placeholder="Additional details about this event..."
                 rows={2}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>

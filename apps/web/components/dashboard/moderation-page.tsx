@@ -180,8 +180,8 @@ function ModerationPageInner<T extends ModeratableEntry>({
       transition={{ duration: 0.5, ...springSmooth }}
     >
       <div className="mb-8">
-        <h1 className="font-serif text-3xl font-bold text-gray-900">{config.title}</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <h1 className="font-serif text-3xl font-bold text-foreground">{config.title}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Review and manage {config.entityNamePlural} from your wedding website
           {pendingCount > 0 && (
             <span className="ml-2 font-medium text-amber-600">{pendingCount} pending review</span>
@@ -205,8 +205,8 @@ function ModerationPageInner<T extends ModeratableEntry>({
                   <stat.icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                  <p className="truncate text-xs text-gray-500">{stat.label}</p>
+                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                  <p className="truncate text-xs text-muted-foreground">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -223,7 +223,7 @@ function ModerationPageInner<T extends ModeratableEntry>({
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 filter === tab.key
                   ? 'bg-wedding-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-muted text-foreground hover:bg-muted'
               }`}
             >
               {tab.label} ({tab.count})
@@ -236,21 +236,21 @@ function ModerationPageInner<T extends ModeratableEntry>({
         <Card>
           <CardContent className="py-16 text-center">
             <div
-              className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${config.iconColor.split(' ')[1] ?? 'bg-gray-50'}`}
+              className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${config.iconColor.split(' ')[1] ?? 'bg-muted'}`}
             >
               <config.icon
-                className={`h-8 w-8 ${config.iconColor.split(' ')[0] ?? 'text-gray-400'}`}
+                className={`h-8 w-8 ${config.iconColor.split(' ')[0] ?? 'text-muted-foreground'}`}
               />
             </div>
-            <h2 className="font-serif text-xl font-semibold text-gray-900">{config.emptyTitle}</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">{config.emptyDescription}</p>
+            <h2 className="font-serif text-xl font-semibold text-foreground">{config.emptyTitle}</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{config.emptyDescription}</p>
             {config.emptyExtra}
           </CardContent>
         </Card>
       ) : filteredEntries.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               No {filter === 'pending' ? 'pending' : 'approved'} {config.entityNamePlural}.
             </p>
           </CardContent>
@@ -285,7 +285,7 @@ function ModerationPageInner<T extends ModeratableEntry>({
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="truncate font-medium text-gray-900">
+                              <span className="truncate font-medium text-foreground">
                                 {entry.authorName}
                               </span>
                               <Badge
@@ -295,11 +295,11 @@ function ModerationPageInner<T extends ModeratableEntry>({
                                 {entry.isApproved ? 'Approved' : 'Pending'}
                               </Badge>
                             </div>
-                            <p className="text-xs text-gray-500">{formatDate(entry.createdAt)}</p>
+                            <p className="text-xs text-muted-foreground">{formatDate(entry.createdAt)}</p>
                           </div>
                         </div>
                         <p
-                          className={`ml-12 whitespace-pre-wrap text-sm leading-relaxed text-gray-700 ${config.textClassName ?? ''}`}
+                          className={`ml-12 whitespace-pre-wrap text-sm leading-relaxed text-foreground ${config.textClassName ?? ''}`}
                         >
                           {config.getText(entry)}
                         </p>
@@ -365,7 +365,7 @@ function ModerationPageInner<T extends ModeratableEntry>({
           <DialogHeader>
             <DialogTitle>Delete {config.entityName}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Are you sure you want to delete this {config.entityName.toLowerCase()}? This action
             cannot be undone.
           </p>

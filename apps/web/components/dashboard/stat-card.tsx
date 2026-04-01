@@ -16,14 +16,14 @@ export function StatCard({ label, value, icon, trend, href }: StatCardProps) {
   const valueStr = String(value)
   const textClass =
     valueStr.length > 12
-      ? 'text-lg font-bold text-gray-900'
+      ? 'text-lg font-bold text-foreground'
       : valueStr.length > 8
-        ? 'text-xl font-bold text-gray-900'
-        : 'text-2xl font-bold text-gray-900'
+        ? 'text-xl font-bold text-foreground'
+        : 'text-2xl font-bold text-foreground'
 
   const card = (
     <motion.div
-      className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      className="flex h-full flex-col rounded-2xl border border-border bg-white p-6 shadow-sm"
       whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
       transition={{ duration: 0.2 }}
     >
@@ -46,7 +46,7 @@ export function StatCard({ label, value, icon, trend, href }: StatCardProps) {
         >
           {value}
         </motion.p>
-        <p className="mt-1 text-sm text-gray-600">{label}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{label}</p>
       </div>
     </motion.div>
   )

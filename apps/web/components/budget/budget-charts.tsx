@@ -58,8 +58,8 @@ export function BudgetCharts({ categoryBreakdown, monthlySpending, splits }: Bud
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {barData.length > 0 && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-sm font-semibold text-gray-900">Allocated vs Spent</h3>
+        <div className="rounded-2xl border border-border bg-white p-6">
+          <h3 className="mb-4 text-sm font-semibold text-foreground">Allocated vs Spent</h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={barData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -78,8 +78,8 @@ export function BudgetCharts({ categoryBreakdown, monthlySpending, splits }: Bud
       )}
 
       {lineData.length > 0 && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-sm font-semibold text-gray-900">Monthly Spending</h3>
+        <div className="rounded-2xl border border-border bg-white p-6">
+          <h3 className="mb-4 text-sm font-semibold text-foreground">Monthly Spending</h3>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={lineData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -102,8 +102,8 @@ export function BudgetCharts({ categoryBreakdown, monthlySpending, splits }: Bud
       )}
 
       {pieData.length > 0 && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-sm font-semibold text-gray-900">Split by Payer</h3>
+        <div className="rounded-2xl border border-border bg-white p-6">
+          <h3 className="mb-4 text-sm font-semibold text-foreground">Split by Payer</h3>
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
               <Pie

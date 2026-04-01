@@ -249,9 +249,9 @@ function SeatPopover({
         ref={ref}
         style={{ left: x, top: y }}
         onMouseDown={(e) => e.stopPropagation()}
-        className="absolute z-50 w-52 rounded-lg border border-gray-200 bg-white p-3 shadow-lg"
+        className="absolute z-50 w-52 rounded-lg border border-border bg-white p-3 shadow-lg"
       >
-        <p className="text-sm font-medium text-gray-900">{fullName}</p>
+        <p className="text-sm font-medium text-foreground">{fullName}</p>
         <button
           onClick={onUnassign}
           className="mt-2 text-xs font-medium text-red-600 hover:text-red-700"
@@ -267,7 +267,7 @@ function SeatPopover({
       ref={ref}
       style={{ left: x, top: y }}
       onMouseDown={(e) => e.stopPropagation()}
-      className="absolute z-50 w-56 rounded-lg border border-gray-200 bg-white p-2 shadow-lg"
+      className="absolute z-50 w-56 rounded-lg border border-border bg-white p-2 shadow-lg"
     >
       <Input
         placeholder="Search guests or type a name..."
@@ -286,7 +286,7 @@ function SeatPopover({
           <button
             key={g.id}
             onClick={() => onAssign(g.id)}
-            className="flex w-full items-center rounded px-2 py-1.5 text-left text-xs hover:bg-gray-50"
+            className="flex w-full items-center rounded px-2 py-1.5 text-left text-xs hover:bg-muted"
           >
             {g.firstName} {g.lastName ?? ''}
           </button>
@@ -351,9 +351,9 @@ function RectAssignPopover({
       ref={ref}
       style={{ left: x, top: y }}
       onMouseDown={(e) => e.stopPropagation()}
-      className="absolute z-50 w-64 rounded-lg border border-gray-200 bg-white p-3 shadow-lg"
+      className="absolute z-50 w-64 rounded-lg border border-border bg-white p-3 shadow-lg"
     >
-      <p className="mb-2 text-xs font-semibold text-gray-700">
+      <p className="mb-2 text-xs font-semibold text-foreground">
         {table.label} — {table.assignments.length}/{table.capacity} seated
       </p>
       {table.assignments.length > 0 && (
@@ -363,9 +363,9 @@ function RectAssignPopover({
             return (
               <div
                 key={a.id}
-                className="flex items-center justify-between rounded bg-gray-50 px-2 py-1"
+                className="flex items-center justify-between rounded bg-muted px-2 py-1"
               >
-                <span className="text-xs text-gray-700">{name}</span>
+                <span className="text-xs text-foreground">{name}</span>
                 <button
                   onClick={() => onUnassign(a.id)}
                   className="text-xs text-red-500 hover:text-red-700"
@@ -400,7 +400,7 @@ function RectAssignPopover({
                   onAssign(g.id)
                   setSearch('')
                 }}
-                className="flex w-full items-center rounded px-2 py-1 text-left text-xs hover:bg-gray-50"
+                className="flex w-full items-center rounded px-2 py-1 text-left text-xs hover:bg-muted"
               >
                 {g.firstName} {g.lastName ?? ''}
               </button>
@@ -1188,7 +1188,7 @@ export default function SeatingPage() {
         transition={{ duration: 0.3 }}
       >
         {/* Top bar */}
-        <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-2">
+        <div className="flex flex-shrink-0 items-center justify-between border-b border-border bg-white px-4 py-2">
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
@@ -1200,7 +1200,7 @@ export default function SeatingPage() {
               <ArrowLeft className="h-4 w-4" />
               Charts
             </button>
-            <h2 className="font-serif text-lg font-semibold text-gray-900">{selectedChart.name}</h2>
+            <h2 className="font-serif text-lg font-semibold text-foreground">{selectedChart.name}</h2>
             <Badge
               variant={selectedChart.status === 'final' ? 'default' : 'secondary'}
               className="text-xs"
@@ -1209,7 +1209,7 @@ export default function SeatingPage() {
             </Badge>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-muted-foreground">
               {totalAssigned}/{totalSeats} seated
             </span>
             <Button size="sm" variant="outline" onClick={() => setShowAddTable(true)}>
@@ -1220,7 +1220,7 @@ export default function SeatingPage() {
         </div>
 
         {/* Zoom toolbar */}
-        <div className="flex flex-shrink-0 items-center gap-2 border-b border-gray-100 bg-gray-50/80 px-4 py-1.5">
+        <div className="flex flex-shrink-0 items-center gap-2 border-b border-border bg-muted/80 px-4 py-1.5">
           <Button
             size="sm"
             variant="ghost"
@@ -1229,7 +1229,7 @@ export default function SeatingPage() {
           >
             <Minus className="h-3 w-3" />
           </Button>
-          <span className="w-12 text-center text-xs text-gray-600">{Math.round(zoom * 100)}%</span>
+          <span className="w-12 text-center text-xs text-muted-foreground">{Math.round(zoom * 100)}%</span>
           <Button
             size="sm"
             variant="ghost"
@@ -1246,16 +1246,16 @@ export default function SeatingPage() {
             <Maximize2 className="mr-1 h-3 w-3" />
             Fit
           </Button>
-          <span className="text-xs text-gray-400">Scroll to zoom · Drag to pan</span>
+          <span className="text-xs text-muted-foreground">Scroll to zoom · Drag to pan</span>
 
           {/* Selected table controls */}
           {selectedTable && (
-            <div className="ml-auto flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1">
-              <span className="text-xs font-medium text-gray-700">{selectedTable.label}</span>
-              <div className="mx-1 h-4 w-px bg-gray-200" />
+            <div className="ml-auto flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-1">
+              <span className="text-xs font-medium text-foreground">{selectedTable.label}</span>
+              <div className="mx-1 h-4 w-px bg-muted" />
 
               {/* Seats control */}
-              <span className="text-xs text-gray-500">Seats:</span>
+              <span className="text-xs text-muted-foreground">Seats:</span>
               <Button
                 size="sm"
                 variant="ghost"
@@ -1277,8 +1277,8 @@ export default function SeatingPage() {
               {/* Size control for round tables */}
               {!isRectType(selectedTable.tableType) && (
                 <>
-                  <div className="mx-1 h-4 w-px bg-gray-200" />
-                  <span className="text-xs text-gray-500">Size:</span>
+                  <div className="mx-1 h-4 w-px bg-muted" />
+                  <span className="text-xs text-muted-foreground">Size:</span>
                   <Button
                     size="sm"
                     variant="ghost"
@@ -1298,7 +1298,7 @@ export default function SeatingPage() {
                 </>
               )}
 
-              <div className="mx-1 h-4 w-px bg-gray-200" />
+              <div className="mx-1 h-4 w-px bg-muted" />
 
               {/* Copy / Cut / Paste */}
               <Button
@@ -1320,7 +1320,7 @@ export default function SeatingPage() {
                 <Scissors className="h-3 w-3" />
               </Button>
 
-              <div className="mx-1 h-4 w-px bg-gray-200" />
+              <div className="mx-1 h-4 w-px bg-muted" />
               <Button
                 size="sm"
                 variant="ghost"
@@ -1349,7 +1349,7 @@ export default function SeatingPage() {
         {/* Canvas */}
         <div
           ref={canvasContainerRef}
-          className="relative flex-1 overflow-hidden bg-gray-50"
+          className="relative flex-1 overflow-hidden bg-muted"
           style={{ cursor: isPanningRef.current ? 'grabbing' : 'grab' }}
           onMouseDown={handleCanvasMouseDown}
           onMouseMove={handleCanvasMouseMove}
@@ -1832,7 +1832,7 @@ export default function SeatingPage() {
                   id="table-shape"
                   value={tableShape}
                   onChange={(e) => setTableShape(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                 >
                   <option value="round">Round</option>
                   <option value="rectangular">Rectangular</option>
@@ -1856,7 +1856,7 @@ export default function SeatingPage() {
               {/* Quick presets from existing tables */}
               {selectedChart.tables.length > 0 && (
                 <div>
-                  <Label className="text-xs text-gray-500">Quick copy from existing</Label>
+                  <Label className="text-xs text-muted-foreground">Quick copy from existing</Label>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {Array.from(
                       new Map(
@@ -1874,7 +1874,7 @@ export default function SeatingPage() {
                             setTableShape(t.tableType)
                             setTableCapacity(String(t.capacity))
                           }}
-                          className="rounded border border-gray-200 px-2 py-1 text-xs hover:bg-gray-50"
+                          className="rounded border border-border px-2 py-1 text-xs hover:bg-muted"
                         >
                           {t.tableType} ({t.capacity})
                         </button>
@@ -1903,8 +1903,8 @@ export default function SeatingPage() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-gray-900">Seating Charts</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="font-serif text-3xl font-bold text-foreground">Seating Charts</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Plan your table arrangements and guest seating.
           </p>
         </div>
@@ -1920,8 +1920,8 @@ export default function SeatingPage() {
             <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
               <GripVertical className="text-wedding-600 h-8 w-8" />
             </div>
-            <h2 className="font-serif text-xl font-semibold text-gray-900">No Seating Charts</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+            <h2 className="font-serif text-xl font-semibold text-foreground">No Seating Charts</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               Create a seating chart to start planning table arrangements for your guests.
             </p>
             <Button className="mt-6" onClick={() => setShowNewChart(true)}>
@@ -1949,7 +1949,7 @@ export default function SeatingPage() {
                   </Badge>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-500">Click to manage tables and assignments</p>
+                  <p className="text-sm text-muted-foreground">Click to manage tables and assignments</p>
                   <button
                     onClick={(e) => {
                       e.stopPropagation()

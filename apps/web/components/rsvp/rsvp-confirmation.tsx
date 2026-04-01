@@ -17,7 +17,7 @@ export function RsvpConfirmation({ lookupResult }: RsvpConfirmationProps) {
     : null
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+    <div className="rounded-2xl border border-border bg-white p-8 text-center shadow-sm">
       <div className="bg-sage-100 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full">
         <svg
           className="text-sage-600 h-8 w-8"
@@ -29,22 +29,22 @@ export function RsvpConfirmation({ lookupResult }: RsvpConfirmationProps) {
         </svg>
       </div>
 
-      <h2 className="font-serif text-3xl font-bold text-gray-900">Thank You!</h2>
+      <h2 className="font-serif text-3xl font-bold text-foreground">Thank You!</h2>
 
-      <p className="mt-3 text-lg text-gray-600">
+      <p className="mt-3 text-lg text-muted-foreground">
         Your RSVP for{' '}
         <span className="text-wedding-600 font-semibold">{lookupResult.weddingName}</span> has been
         received.
       </p>
 
       {weddingDate && (
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-muted-foreground">
           We look forward to celebrating on {weddingDate}
         </p>
       )}
 
       <div className="bg-cream-50 mt-8 rounded-xl px-6 py-4">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           Need to make changes? You can come back to this page anytime before the deadline to update
           your response.
         </p>

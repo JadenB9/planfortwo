@@ -27,7 +27,7 @@ const STATUS_LABELS: Record<PaymentStatus, string> = {
 }
 
 const STATUS_COLORS: Record<PaymentStatus, string> = {
-  unpaid: 'bg-gray-100 text-gray-700',
+  unpaid: 'bg-muted text-foreground',
   deposit: 'bg-amber-100 text-amber-700',
   partial: 'bg-blue-100 text-blue-700',
   paid: 'bg-sage-100 text-sage-700',
@@ -87,14 +87,14 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
   })
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <span className="ml-1 text-gray-300">&#8597;</span>
+    if (sortField !== field) return <span className="ml-1 text-muted-foreground/50">&#8597;</span>
     return <span className="ml-1">{sortDir === 'asc' ? '&#8593;' : '&#8595;'}</span>
   }
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-        <p className="text-sm text-gray-500">
+      <div className="rounded-2xl border border-border bg-white p-8 text-center">
+        <p className="text-sm text-muted-foreground">
           No expenses yet. Add your first expense to get started.
         </p>
       </div>
@@ -102,67 +102,67 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+    <div className="overflow-x-auto rounded-2xl border border-border bg-white">
       <table className="w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
+          <tr className="border-b border-border bg-muted">
             <th
-              className="cursor-pointer px-4 py-3 font-medium text-gray-600"
+              className="cursor-pointer px-4 py-3 font-medium text-muted-foreground"
               onClick={() => handleSort('vendorName')}
             >
               Vendor / Description <SortIcon field="vendorName" />
             </th>
-            <th className="hidden px-4 py-3 font-medium text-gray-600 sm:table-cell">Category</th>
+            <th className="hidden px-4 py-3 font-medium text-muted-foreground sm:table-cell">Category</th>
             <th
-              className="cursor-pointer px-4 py-3 text-right font-medium text-gray-600"
+              className="cursor-pointer px-4 py-3 text-right font-medium text-muted-foreground"
               onClick={() => handleSort('amount')}
             >
               Amount <SortIcon field="amount" />
             </th>
             <th
-              className="hidden cursor-pointer px-4 py-3 text-right font-medium text-gray-600 sm:table-cell"
+              className="hidden cursor-pointer px-4 py-3 text-right font-medium text-muted-foreground sm:table-cell"
               onClick={() => handleSort('paidAmount')}
             >
               Paid <SortIcon field="paidAmount" />
             </th>
             <th
-              className="cursor-pointer px-4 py-3 font-medium text-gray-600"
+              className="cursor-pointer px-4 py-3 font-medium text-muted-foreground"
               onClick={() => handleSort('paymentStatus')}
             >
               Status <SortIcon field="paymentStatus" />
             </th>
             <th
-              className="hidden cursor-pointer px-4 py-3 font-medium text-gray-600 md:table-cell"
+              className="hidden cursor-pointer px-4 py-3 font-medium text-muted-foreground md:table-cell"
               onClick={() => handleSort('payer')}
             >
               Payer <SortIcon field="payer" />
             </th>
             <th
-              className="hidden cursor-pointer px-4 py-3 font-medium text-gray-600 md:table-cell"
+              className="hidden cursor-pointer px-4 py-3 font-medium text-muted-foreground md:table-cell"
               onClick={() => handleSort('dueDate')}
             >
               Due Date <SortIcon field="dueDate" />
             </th>
-            <th className="px-4 py-3 font-medium text-gray-600">Actions</th>
+            <th className="px-4 py-3 font-medium text-muted-foreground">Actions</th>
           </tr>
         </thead>
         <tbody>
           {sorted.map((item) => (
-            <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+            <tr key={item.id} className="border-b border-border hover:bg-muted">
               <td className="px-4 py-3">
-                <p className="font-medium text-gray-900">{item.vendorName ?? item.description}</p>
-                {item.vendorName && <p className="text-xs text-gray-500">{item.description}</p>}
+                <p className="font-medium text-foreground">{item.vendorName ?? item.description}</p>
+                {item.vendorName && <p className="text-xs text-muted-foreground">{item.description}</p>}
               </td>
               <td className="hidden px-4 py-3 sm:table-cell">
                 <span className="inline-flex items-center gap-1 text-xs">
                   <span>{item.category.icon}</span>
-                  <span className="text-gray-600">{item.category.name}</span>
+                  <span className="text-muted-foreground">{item.category.name}</span>
                 </span>
               </td>
-              <td className="px-4 py-3 text-right font-medium text-gray-900">
+              <td className="px-4 py-3 text-right font-medium text-foreground">
                 {formatCurrency(item.amount)}
               </td>
-              <td className="hidden px-4 py-3 text-right text-gray-600 sm:table-cell">
+              <td className="hidden px-4 py-3 text-right text-muted-foreground sm:table-cell">
                 {formatCurrency(item.paidAmount)}
               </td>
               <td className="px-4 py-3">
@@ -172,10 +172,10 @@ export function ExpenseTable({ items, onEdit, onDelete }: ExpenseTableProps) {
                   {STATUS_LABELS[item.paymentStatus]}
                 </span>
               </td>
-              <td className="hidden px-4 py-3 text-gray-600 md:table-cell">
+              <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
                 {PAYER_LABELS[item.payer]}
               </td>
-              <td className="hidden px-4 py-3 text-gray-600 md:table-cell">
+              <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
                 {formatDate(item.dueDate)}
               </td>
               <td className="px-4 py-3">

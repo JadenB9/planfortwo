@@ -366,8 +366,8 @@ export default function PhotosPage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-gray-900">Photos</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="font-serif text-3xl font-bold text-foreground">Photos</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Manage your wedding photo gallery.
             {pendingCount > 0 && (
               <span className="ml-2 font-medium text-amber-600">{pendingCount} pending review</span>
@@ -426,7 +426,7 @@ export default function PhotosPage() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="relative aspect-square overflow-hidden rounded-lg border bg-gray-100"
+                  className="relative aspect-square overflow-hidden rounded-lg border bg-muted"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -481,7 +481,7 @@ export default function PhotosPage() {
               className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
                 filter === f
                   ? 'bg-wedding-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-muted text-foreground hover:bg-muted'
               }`}
             >
               {f} ({filterCounts[f]})
@@ -497,8 +497,8 @@ export default function PhotosPage() {
             <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
               <Camera className="text-wedding-600 h-8 w-8" />
             </div>
-            <h2 className="font-serif text-xl font-semibold text-gray-900">No Photos Yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+            <h2 className="font-serif text-xl font-semibold text-foreground">No Photos Yet</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               Upload your first photos to build your wedding gallery.
             </p>
             <Button className="mt-6" onClick={() => fileInputRef.current?.click()}>
@@ -511,16 +511,16 @@ export default function PhotosPage() {
               onClick={() => fileInputRef.current?.click()}
               className="border-wedding-200 hover:border-wedding-400 hover:bg-wedding-50 mx-auto mt-6 flex max-w-sm cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-8 transition-colors"
             >
-              <Upload className="h-8 w-8 text-gray-400" />
-              <p className="text-sm text-gray-500">Drag photos here or click to browse</p>
-              <p className="text-xs text-gray-400">Supports JPG, PNG, WebP, and more</p>
+              <Upload className="h-8 w-8 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">Drag photos here or click to browse</p>
+              <p className="text-xs text-muted-foreground">Supports JPG, PNG, WebP, and more</p>
             </div>
           </CardContent>
         </Card>
       ) : filteredPhotos.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center">
-            <p className="text-sm text-gray-500">No photos match this filter.</p>
+            <p className="text-sm text-muted-foreground">No photos match this filter.</p>
           </CardContent>
         </Card>
       ) : (
@@ -538,14 +538,14 @@ export default function PhotosPage() {
             >
               <Upload className="text-wedding-400 h-8 w-8" />
               <p className="text-wedding-600 text-sm font-medium">Add Photos</p>
-              <p className="text-xs text-gray-400">Drag or click</p>
+              <p className="text-xs text-muted-foreground">Drag or click</p>
             </div>
           </motion.div>
 
           {filteredPhotos.map((photo, index) => (
             <motion.div key={photo.id} variants={fadeInUp} className="mb-4 break-inside-avoid">
               <Card className="group cursor-pointer overflow-hidden">
-                <div className="relative bg-gray-100" onClick={() => openLightbox(index)}>
+                <div className="relative bg-muted" onClick={() => openLightbox(index)}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photo.url}
@@ -573,7 +573,7 @@ export default function PhotosPage() {
                       className={`rounded-full p-1.5 transition-colors ${
                         photo.isFavorite
                           ? 'bg-yellow-400 text-white'
-                          : 'bg-white/90 text-gray-700 hover:bg-yellow-100'
+                          : 'bg-white/90 text-foreground hover:bg-yellow-100'
                       }`}
                       title={photo.isFavorite ? 'Unfavorite' : 'Favorite'}
                     >
@@ -813,7 +813,7 @@ export default function PhotosPage() {
           <DialogHeader>
             <DialogTitle>Delete Photo</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Are you sure you want to delete this photo? This action cannot be undone.
           </p>
           <DialogFooter>

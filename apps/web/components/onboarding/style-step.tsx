@@ -26,8 +26,8 @@ export function StyleStep({ data, onUpdate, onNext, onBack }: StyleStepProps) {
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-gray-900">What&apos;s your style?</h2>
-        <p className="mt-2 text-gray-600">Pick the vibe that feels most like you two.</p>
+        <h2 className="font-serif text-3xl font-bold text-foreground">What&apos;s your style?</h2>
+        <p className="mt-2 text-muted-foreground">Pick the vibe that feels most like you two.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -38,11 +38,11 @@ export function StyleStep({ data, onUpdate, onNext, onBack }: StyleStepProps) {
             className={`rounded-2xl border-2 px-3 py-4 text-center transition-all ${
               data.style === option.value
                 ? 'border-wedding-600 bg-wedding-50 shadow-md'
-                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-gray-200'
+                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-border'
             }`}
           >
             <span className="block text-2xl">{option.emoji}</span>
-            <span className="mt-1 block text-sm font-semibold text-gray-900">{option.label}</span>
+            <span className="mt-1 block text-sm font-semibold text-foreground">{option.label}</span>
           </button>
         ))}
       </div>
@@ -50,7 +50,7 @@ export function StyleStep({ data, onUpdate, onNext, onBack }: StyleStepProps) {
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 rounded-xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
         >
           Back
         </button>

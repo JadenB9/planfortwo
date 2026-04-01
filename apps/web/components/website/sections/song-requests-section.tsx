@@ -279,7 +279,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
                         key={track.spotifyTrackId}
                         type="button"
                         onClick={() => selectTrack(track)}
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-gray-50"
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-muted"
                       >
                         {track.albumArt ? (
                           <img

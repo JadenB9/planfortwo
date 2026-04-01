@@ -18,13 +18,13 @@ export function TemplatePreview({ templateId, selected = false, onClick }: Templ
       onClick={onClick}
       className={cn(
         'group relative w-full overflow-hidden rounded-xl border-2 text-left transition-all hover:shadow-md',
-        selected ? 'border-wedding-600 shadow-md' : 'border-gray-200 hover:border-gray-300',
+        selected ? 'border-wedding-600 shadow-md' : 'border-border hover:border-border',
       )}
     >
       <TemplatePreviewContent template={template} />
       <div className="px-2.5 py-2">
-        <p className="text-xs font-semibold text-gray-900">{template.name}</p>
-        <p className="mt-0.5 line-clamp-1 text-[10px] leading-tight text-gray-500">
+        <p className="text-xs font-semibold text-foreground">{template.name}</p>
+        <p className="mt-0.5 line-clamp-1 text-[10px] leading-tight text-muted-foreground">
           {template.description}
         </p>
       </div>

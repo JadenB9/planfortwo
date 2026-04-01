@@ -77,7 +77,7 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-900">Website Settings</h3>
+      <h3 className="text-lg font-semibold text-foreground">Website Settings</h3>
 
       <div className="space-y-2">
         <Label>Subdomain</Label>
@@ -121,7 +121,7 @@ export function SettingsPanel({ config, onUpdate, onCheckSubdomain }: SettingsPa
             <SelectItem value="unlisted">Unlisted</SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           {config.privacyMode === 'public' &&
             'Your website is searchable by name on the PlanForTwo homepage and indexed by search engines.'}
           {config.privacyMode === 'password' &&

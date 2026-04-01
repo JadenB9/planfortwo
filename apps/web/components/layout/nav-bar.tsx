@@ -15,7 +15,7 @@ export function NavBar() {
     <nav className="fixed top-0 z-50 w-full">
       <div className="mx-auto max-w-6xl px-5 py-4 sm:px-8">
         <div className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-lg">
-          <Link href="/" className="font-serif text-lg font-bold tracking-tight text-gray-900">
+          <Link href="/" className="font-serif text-lg font-bold tracking-tight text-foreground">
             PlanForTwo
           </Link>
 
@@ -23,13 +23,13 @@ export function NavBar() {
           <div className="hidden items-center gap-8 sm:flex">
             <Link
               href="/features"
-              className="text-[13px] font-medium tracking-wide text-gray-500 transition-colors hover:text-gray-900"
+              className="text-[13px] font-medium tracking-wide text-muted-foreground transition-colors hover:text-foreground"
             >
               Features
             </Link>
             <Link
               href="/features#pricing"
-              className="text-[13px] font-medium tracking-wide text-gray-500 transition-colors hover:text-gray-900"
+              className="text-[13px] font-medium tracking-wide text-muted-foreground transition-colors hover:text-foreground"
             >
               Pricing
             </Link>
@@ -45,7 +45,7 @@ export function NavBar() {
               <>
                 <Link
                   href="/sign-in"
-                  className="text-[13px] font-medium tracking-wide text-gray-500 transition-colors hover:text-gray-900"
+                  className="text-[13px] font-medium tracking-wide text-muted-foreground transition-colors hover:text-foreground"
                 >
                   Sign in
                 </Link>
@@ -63,7 +63,7 @@ export function NavBar() {
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg p-1.5 text-gray-600 transition-colors hover:bg-gray-100 sm:hidden"
+            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted sm:hidden"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -83,14 +83,14 @@ export function NavBar() {
               <Link
                 href="/features"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
               >
                 Features
               </Link>
               <Link
                 href="/features#pricing"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
               >
                 Pricing
               </Link>
@@ -108,7 +108,7 @@ export function NavBar() {
                   <Link
                     href="/sign-in"
                     onClick={() => setMobileOpen(false)}
-                    className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
                   >
                     Sign in
                   </Link>

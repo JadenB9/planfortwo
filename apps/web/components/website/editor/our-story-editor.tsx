@@ -42,7 +42,7 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
   return (
     <div className="space-y-6">
       <div>
-        <label htmlFor="story-body" className="text-sm font-medium text-gray-700">
+        <label htmlFor="story-body" className="text-sm font-medium text-foreground">
           Your Story
         </label>
         <textarea
@@ -51,13 +51,13 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
           onChange={(e) => updateBody(e.target.value)}
           placeholder="Tell your guests how you met, your journey together, and what makes your love story special..."
           rows={5}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
 
       <div>
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-medium text-gray-700">Timeline Events</h4>
+          <h4 className="text-sm font-medium text-foreground">Timeline Events</h4>
           <button
             type="button"
             onClick={addEvent}
@@ -69,7 +69,7 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
         </div>
 
         {timelineEvents.length === 0 && (
-          <p className="mt-3 text-sm text-gray-500">
+          <p className="mt-3 text-sm text-muted-foreground">
             No timeline events yet. Add milestones like when you met, your first date, or the
             proposal.
           </p>
@@ -79,12 +79,12 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
           {timelineEvents.map((event, index) => (
             <div
               key={index}
-              className={`rounded-lg border border-gray-200 p-4 ${
-                index > 0 ? 'border-t border-gray-100' : ''
+              className={`rounded-lg border border-border p-4 ${
+                index > 0 ? 'border-t border-border' : ''
               }`}
             >
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Event {index + 1}
                 </span>
                 <button
@@ -99,40 +99,40 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Date</label>
+                  <label className="text-sm font-medium text-foreground">Date</label>
                   <input
                     type="text"
                     value={event.date}
                     onChange={(e) => updateEvent(index, { date: e.target.value })}
                     placeholder="June 2022"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Title</label>
+                  <label className="text-sm font-medium text-foreground">Title</label>
                   <input
                     type="text"
                     value={event.title}
                     onChange={(e) => updateEvent(index, { title: e.target.value })}
                     placeholder="First Date"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               <div className="mt-3">
-                <label className="text-sm font-medium text-gray-700">Description</label>
+                <label className="text-sm font-medium text-foreground">Description</label>
                 <textarea
                   value={event.description}
                   onChange={(e) => updateEvent(index, { description: e.target.value })}
                   placeholder="A short description of this milestone..."
                   rows={2}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <div className="mt-3">
-                <label className="text-sm font-medium text-gray-700">Image URL (optional)</label>
+                <label className="text-sm font-medium text-foreground">Image URL (optional)</label>
                 <input
                   type="text"
                   value={event.imageUrl ?? ''}
@@ -142,7 +142,7 @@ export function OurStoryEditor({ content, onChange }: OurStoryEditorProps) {
                     })
                   }
                   placeholder="https://example.com/photo.jpg"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>

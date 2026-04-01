@@ -138,10 +138,10 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
 
   if (!canAccess) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-        <QrCode className="mx-auto h-8 w-8 text-gray-400" />
-        <p className="mt-2 text-sm font-medium text-gray-900">QR Code Generator</p>
-        <p className="mt-1 text-xs text-gray-500">
+      <div className="rounded-xl border border-dashed border-border bg-muted p-8 text-center">
+        <QrCode className="mx-auto h-8 w-8 text-muted-foreground" />
+        <p className="mt-2 text-sm font-medium text-foreground">QR Code Generator</p>
+        <p className="mt-1 text-xs text-muted-foreground">
           Upgrade to Full Access to generate QR codes with scan tracking.
         </p>
       </div>
@@ -150,10 +150,10 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
 
   if (!subdomain) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-        <QrCode className="mx-auto h-8 w-8 text-gray-400" />
-        <p className="mt-2 text-sm font-medium text-gray-900">QR Code Generator</p>
-        <p className="mt-1 text-xs text-gray-500">
+      <div className="rounded-xl border border-dashed border-border bg-muted p-8 text-center">
+        <QrCode className="mx-auto h-8 w-8 text-muted-foreground" />
+        <p className="mt-2 text-sm font-medium text-foreground">QR Code Generator</p>
+        <p className="mt-1 text-xs text-muted-foreground">
           Set up your website subdomain in Settings first to generate a QR code.
         </p>
       </div>
@@ -166,8 +166,8 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Total QR Scans</CardTitle>
-            <ScanLine className="h-4 w-4 text-gray-400" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total QR Scans</CardTitle>
+            <ScanLine className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{qrScanCount?.total?.toLocaleString() ?? '0'}</p>
@@ -175,8 +175,8 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Unique Scanners</CardTitle>
-            <Users className="h-4 w-4 text-gray-400" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Unique Scanners</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{qrScanCount?.unique?.toLocaleString() ?? '0'}</p>
@@ -196,7 +196,7 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
               className="flex items-center justify-center rounded-lg border bg-white p-4"
               style={{ minHeight: 308, minWidth: 308 }}
             />
-            <p className="break-all text-center text-xs text-gray-500">Points to: {qrUrl}</p>
+            <p className="break-all text-center text-xs text-muted-foreground">Points to: {qrUrl}</p>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => handleDownload('png')}>
                 <Download className="mr-1.5 h-3.5 w-3.5" />
@@ -257,7 +257,7 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
                     className={`rounded-md border px-2 py-1.5 text-xs transition-colors ${
                       dotType === style.value
                         ? 'border-gray-900 bg-gray-900 text-white'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                        : 'border-border bg-white text-foreground hover:border-border'
                     }`}
                   >
                     {style.label}

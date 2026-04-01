@@ -127,7 +127,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
     <div>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-gray-700">Party Members</h4>
+        <h4 className="text-sm font-medium text-foreground">Party Members</h4>
         {!showAddForm && (
           <button
             type="button"
@@ -153,7 +153,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-muted-foreground hover:text-muted-foreground"
             >
               <X className="h-4 w-4" />
             </button>
@@ -161,7 +161,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-foreground">
                 Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -169,11 +169,11 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                 value={draft.name}
                 onChange={(e) => setDraft({ ...draft, name: e.target.value })}
                 placeholder="Jane Smith"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-foreground">
                 Role <span className="text-red-400">*</span>
               </label>
               <input
@@ -181,30 +181,30 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                 value={draft.role}
                 onChange={(e) => setDraft({ ...draft, role: e.target.value })}
                 placeholder="Maid of Honor"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>
 
           <div className="mt-3">
-            <label className="text-sm font-medium text-gray-700">Bio (optional)</label>
+            <label className="text-sm font-medium text-foreground">Bio (optional)</label>
             <textarea
               value={draft.description}
               onChange={(e) => setDraft({ ...draft, description: e.target.value })}
               placeholder="A short bio or how they know the couple..."
               rows={2}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
           <div className="mt-3">
-            <label className="text-sm font-medium text-gray-700">Photo URL (optional)</label>
+            <label className="text-sm font-medium text-foreground">Photo URL (optional)</label>
             <input
               type="text"
               value={draft.imageUrl}
               onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })}
               placeholder="https://example.com/photo.jpg"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
@@ -212,7 +212,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
             >
               Cancel
             </button>
@@ -231,7 +231,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
 
       {/* Empty state */}
       {content.members.length === 0 && !showAddForm && (
-        <p className="mt-3 text-sm text-gray-500">
+        <p className="mt-3 text-sm text-muted-foreground">
           No members yet. Add your bridesmaids, groomsmen, flower girls, ring bearers, and anyone
           else in the wedding party.
         </p>
@@ -254,7 +254,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                   <button
                     type="button"
                     onClick={cancelEdit}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-muted-foreground hover:text-muted-foreground"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -262,7 +262,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-foreground">
                       Name <span className="text-red-400">*</span>
                     </label>
                     <input
@@ -270,11 +270,11 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                       value={editDraft.name}
                       onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })}
                       placeholder="Jane Smith"
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-foreground">
                       Role <span className="text-red-400">*</span>
                     </label>
                     <input
@@ -282,30 +282,30 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                       value={editDraft.role}
                       onChange={(e) => setEditDraft({ ...editDraft, role: e.target.value })}
                       placeholder="Maid of Honor"
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <label className="text-sm font-medium text-gray-700">Bio (optional)</label>
+                  <label className="text-sm font-medium text-foreground">Bio (optional)</label>
                   <textarea
                     value={editDraft.description}
                     onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })}
                     placeholder="A short bio or how they know the couple..."
                     rows={2}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
 
                 <div className="mt-3">
-                  <label className="text-sm font-medium text-gray-700">Photo URL (optional)</label>
+                  <label className="text-sm font-medium text-foreground">Photo URL (optional)</label>
                   <input
                     type="text"
                     value={editDraft.imageUrl}
                     onChange={(e) => setEditDraft({ ...editDraft, imageUrl: e.target.value })}
                     placeholder="https://example.com/photo.jpg"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
 
@@ -322,7 +322,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                     <button
                       type="button"
                       onClick={cancelEdit}
-                      className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
                     >
                       Cancel
                     </button>
@@ -342,7 +342,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
               /* Compact member card */
               <div
                 key={index}
-                className="group relative flex flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-sm"
+                className="group relative flex flex-col rounded-lg border border-border bg-white p-3 transition-shadow hover:shadow-sm"
               >
                 {/* Reorder buttons */}
                 <div className="absolute right-1.5 top-1.5 flex flex-col opacity-0 transition-opacity group-hover:opacity-100">
@@ -353,7 +353,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                       moveUp(index)
                     }}
                     disabled={index === 0}
-                    className="rounded p-0.5 text-gray-400 hover:text-gray-600 disabled:invisible"
+                    className="rounded p-0.5 text-muted-foreground hover:text-muted-foreground disabled:invisible"
                     title="Move up"
                   >
                     <ChevronUp className="h-3.5 w-3.5" />
@@ -365,7 +365,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                       moveDown(index)
                     }}
                     disabled={index === content.members.length - 1}
-                    className="rounded p-0.5 text-gray-400 hover:text-gray-600 disabled:invisible"
+                    className="rounded p-0.5 text-muted-foreground hover:text-muted-foreground disabled:invisible"
                     title="Move down"
                   >
                     <ChevronDown className="h-3.5 w-3.5" />
@@ -379,7 +379,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                     e.stopPropagation()
                     removeMember(index)
                   }}
-                  className="absolute bottom-1.5 right-1.5 rounded p-0.5 text-gray-300 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  className="absolute bottom-1.5 right-1.5 rounded p-0.5 text-muted-foreground/50 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                   title="Remove member"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -399,7 +399,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                       className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                       {member.name.trim() ? (
                         <span className="text-sm font-semibold">
                           {member.name.trim().charAt(0).toUpperCase()}
@@ -412,8 +412,8 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
 
                   {/* Name + Role */}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-gray-900">{member.name}</p>
-                    <p className="truncate text-xs text-gray-500">{member.role}</p>
+                    <p className="truncate text-sm font-semibold text-foreground">{member.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{member.role}</p>
                   </div>
                 </button>
               </div>

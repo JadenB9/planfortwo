@@ -133,8 +133,8 @@ export default function ChecklistPage() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-gray-900">Checklist</h1>
-          <p className="mt-1 text-sm text-gray-600">Track every detail for your perfect day.</p>
+          <h1 className="font-serif text-3xl font-bold text-foreground">Checklist</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Track every detail for your perfect day.</p>
         </div>
 
         {features?.canAddTasks && (
@@ -152,8 +152,8 @@ export default function ChecklistPage() {
       <div className="flex gap-8">
         {/* Sidebar filters */}
         <div className="hidden w-56 flex-shrink-0 lg:block">
-          <div className="rounded-2xl border border-gray-200 bg-white p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <div className="rounded-2xl border border-border bg-white p-4">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Categories
             </h3>
             <CategoryFilter
@@ -172,7 +172,7 @@ export default function ChecklistPage() {
             <select
               value={selectedCategoryId ?? ''}
               onChange={(e) => setSelectedCategoryId(e.target.value || null)}
-              className="rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-700 lg:hidden"
+              className="rounded-xl border border-border px-3 py-2 text-sm text-foreground lg:hidden"
             >
               <option value="">All Categories</option>
               {categories.map((c) => (
@@ -185,7 +185,7 @@ export default function ChecklistPage() {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-700"
+              className="rounded-xl border border-border px-3 py-2 text-sm text-foreground"
             >
               <option value="">All Priorities</option>
               <option value="must_do">Must Do</option>
@@ -196,7 +196,7 @@ export default function ChecklistPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-700"
+              className="rounded-xl border border-border px-3 py-2 text-sm text-foreground"
             >
               <option value="all">All Status</option>
               <option value="completed">Completed</option>

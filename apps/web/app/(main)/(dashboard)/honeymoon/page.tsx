@@ -397,8 +397,8 @@ export default function HoneymoonPage() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-gray-900">Honeymoon</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="font-serif text-3xl font-bold text-foreground">Honeymoon</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Plan your dream getaway with itineraries and packing lists.
           </p>
         </div>
@@ -431,8 +431,8 @@ export default function HoneymoonPage() {
                 />
               </svg>
             </div>
-            <h2 className="font-serif text-xl font-semibold text-gray-900">Plan Your Honeymoon</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+            <h2 className="font-serif text-xl font-semibold text-foreground">Plan Your Honeymoon</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               Add your first destination to start building your honeymoon itinerary.
             </p>
           </CardContent>
@@ -449,14 +449,14 @@ export default function HoneymoonPage() {
                 <CardContent className="py-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-gray-900">{plan.destination}</p>
+                      <p className="font-medium text-foreground">{plan.destination}</p>
                       {plan.budget && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           Budget: ${plan.budget.toLocaleString()}
                         </p>
                       )}
                       {plan.startDate && (
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-muted-foreground">
                           {new Date(plan.startDate).toLocaleDateString()}
                           {plan.endDate ? ` - ${new Date(plan.endDate).toLocaleDateString()}` : ''}
                         </p>
@@ -498,13 +498,13 @@ export default function HoneymoonPage() {
                   <Card>
                     <CardContent className="py-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Budget Tracking</span>
+                        <span className="text-sm text-muted-foreground">Budget Tracking</span>
                         <span className="text-sm font-medium">
                           ${totalActivityCost.toLocaleString()} / $
                           {selectedPlanData.budget.toLocaleString()}
                         </span>
                       </div>
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
                         <div
                           className="bg-wedding-500 h-full rounded-full transition-all"
                           style={{
@@ -540,7 +540,7 @@ export default function HoneymoonPage() {
                   </CardHeader>
                   <CardContent>
                     {activities.length === 0 ? (
-                      <p className="py-6 text-center text-sm text-gray-500">
+                      <p className="py-6 text-center text-sm text-muted-foreground">
                         No activities planned yet.
                       </p>
                     ) : (
@@ -556,16 +556,16 @@ export default function HoneymoonPage() {
                             <motion.div
                               key={act.id}
                               variants={fadeInUp}
-                              className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2"
+                              className="flex items-center justify-between rounded-lg border border-border px-3 py-2"
                             >
                               <div>
                                 <div className="flex items-center gap-2">
                                   <Badge variant="secondary" className="text-xs">
                                     Day {act.dayNumber}
                                   </Badge>
-                                  <p className="text-sm font-medium text-gray-900">{act.title}</p>
+                                  <p className="text-sm font-medium text-foreground">{act.title}</p>
                                 </div>
-                                <div className="mt-0.5 flex items-center gap-3 text-xs text-gray-500">
+                                <div className="mt-0.5 flex items-center gap-3 text-xs text-muted-foreground">
                                   {act.location && <span>{act.location}</span>}
                                   {act.startTime && (
                                     <span>
@@ -623,24 +623,24 @@ export default function HoneymoonPage() {
                       </Button>
                     </div>
                     {packingList.length === 0 ? (
-                      <p className="text-sm text-gray-500">No packing items yet.</p>
+                      <p className="text-sm text-muted-foreground">No packing items yet.</p>
                     ) : (
                       <ul className="space-y-1">
                         {packingList.map((item, idx) => (
                           <li
                             key={idx}
-                            className="flex items-center justify-between rounded px-2 py-1 text-sm hover:bg-gray-50"
+                            className="flex items-center justify-between rounded px-2 py-1 text-sm hover:bg-muted"
                           >
                             <label className="flex cursor-pointer items-center gap-2">
                               <input
                                 type="checkbox"
                                 checked={checkedItems.has(item)}
                                 onChange={() => togglePackingCheck(item)}
-                                className="h-4 w-4 rounded border-gray-300 text-rose-500 focus:ring-rose-500"
+                                className="h-4 w-4 rounded border-border text-rose-500 focus:ring-rose-500"
                               />
                               <span
                                 className={
-                                  checkedItems.has(item) ? 'text-gray-400 line-through' : ''
+                                  checkedItems.has(item) ? 'text-muted-foreground line-through' : ''
                                 }
                               >
                                 {item}
@@ -662,7 +662,7 @@ export default function HoneymoonPage() {
             ) : (
               <Card>
                 <CardContent className="py-16 text-center">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     Select a destination to view its itinerary and packing list.
                   </p>
                 </CardContent>

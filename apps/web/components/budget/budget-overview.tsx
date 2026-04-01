@@ -48,13 +48,13 @@ export function BudgetOverview({ analytics, budgetTotal, onEditBudget }: BudgetO
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
+      <div className="rounded-2xl border border-border bg-white p-6">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">Total Budget</p>
+          <p className="text-sm text-muted-foreground">Total Budget</p>
           {onEditBudget && !editing && (
             <button
               onClick={startEdit}
-              className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-muted-foreground"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -62,12 +62,12 @@ export function BudgetOverview({ analytics, budgetTotal, onEditBudget }: BudgetO
         </div>
         {editing ? (
           <div className="mt-2 flex items-center gap-2">
-            <span className="text-lg font-bold text-gray-900">$</span>
+            <span className="text-lg font-bold text-foreground">$</span>
             <input
               type="number"
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
-              className="focus:border-wedding-600 focus:ring-wedding-600 w-full rounded-lg border border-gray-300 px-2 py-1 text-lg font-bold text-gray-900 focus:outline-none focus:ring-1"
+              className="focus:border-wedding-600 focus:ring-wedding-600 w-full rounded-lg border border-border px-2 py-1 text-lg font-bold text-foreground focus:outline-none focus:ring-1"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') void saveEdit()
@@ -83,39 +83,39 @@ export function BudgetOverview({ analytics, budgetTotal, onEditBudget }: BudgetO
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="rounded-lg p-1 text-gray-400 hover:bg-gray-100"
+              className="rounded-lg p-1 text-muted-foreground hover:bg-muted"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         ) : (
-          <p className="mt-2 text-2xl font-bold text-gray-900">{formatCurrency(total)}</p>
+          <p className="mt-2 text-2xl font-bold text-foreground">{formatCurrency(total)}</p>
         )}
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <p className="text-sm text-gray-600">Spent</p>
-        <p className="mt-2 text-2xl font-bold text-gray-900">{formatCurrency(spent)}</p>
+      <div className="rounded-2xl border border-border bg-white p-6">
+        <p className="text-sm text-muted-foreground">Spent</p>
+        <p className="mt-2 text-2xl font-bold text-foreground">{formatCurrency(spent)}</p>
         {analytics && (
-          <p className="mt-1 text-xs text-gray-500">{formatCurrency(analytics.totalPaid)} paid</p>
+          <p className="mt-1 text-xs text-muted-foreground">{formatCurrency(analytics.totalPaid)} paid</p>
         )}
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <p className="text-sm text-gray-600">Remaining</p>
+      <div className="rounded-2xl border border-border bg-white p-6">
+        <p className="text-sm text-muted-foreground">Remaining</p>
         <p className={`mt-2 text-2xl font-bold ${isOverBudget ? 'text-red-600' : 'text-sage-700'}`}>
           {formatCurrency(remaining)}
         </p>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <p className="text-sm text-gray-600">Budget Used</p>
+      <div className="rounded-2xl border border-border bg-white p-6">
+        <p className="text-sm text-muted-foreground">Budget Used</p>
         <p
           className={`mt-2 text-2xl font-bold ${percentUsed > 100 ? 'text-red-600' : percentUsed > 80 ? 'text-amber-600' : 'text-sage-700'}`}
         >
           {percentUsed}%
         </p>
-        <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
+        <div className="mt-2 h-2 w-full rounded-full bg-muted">
           <div
             className={`h-2 rounded-full transition-all ${percentUsed > 100 ? 'bg-red-500' : percentUsed > 80 ? 'bg-amber-500' : 'bg-sage-500'}`}
             style={{ width: `${Math.min(percentUsed, 100)}%` }}

@@ -108,7 +108,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   ceremony: 'bg-blue-100 text-blue-700',
   cocktail_hour: 'bg-teal-100 text-teal-700',
   reception: 'bg-green-100 text-green-700',
-  other: 'bg-gray-100 text-gray-700',
+  other: 'bg-muted text-foreground',
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -647,8 +647,8 @@ function MusicPageInner() {
             <Disc3 className="text-wedding-600 h-5 w-5" />
           </div>
           <div>
-            <h1 className="font-serif text-3xl font-bold text-gray-900">Music</h1>
-            <p className="mt-0.5 text-sm text-gray-600">
+            <h1 className="font-serif text-3xl font-bold text-foreground">Music</h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
               Manage your playlists and guest song requests.
             </p>
           </div>
@@ -663,22 +663,22 @@ function MusicPageInner() {
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1DB954]">
                 <Check className="h-3.5 w-3.5 text-white" />
               </div>
-              <span className="font-medium text-gray-700">Spotify Connected</span>
-              {spotifyDisplayName && <span className="text-gray-500">as {spotifyDisplayName}</span>}
+              <span className="font-medium text-foreground">Spotify Connected</span>
+              {spotifyDisplayName && <span className="text-muted-foreground">as {spotifyDisplayName}</span>}
             </div>
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 text-xs text-gray-500 hover:text-red-600"
+              className="h-7 text-xs text-muted-foreground hover:text-red-600"
               onClick={handleDisconnectSpotify}
             >
               Disconnect
             </Button>
           </div>
         ) : (
-          <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-300">
+          <div className="flex items-center justify-between rounded-lg border border-border bg-muted px-4 py-2.5">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted">
                 <Music className="h-3.5 w-3.5 text-white" />
               </div>
               <span>Connect Spotify to export songs directly to your playlists</span>
@@ -701,7 +701,7 @@ function MusicPageInner() {
       </div>
 
       {/* Tab navigation */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="-mb-px flex gap-6">
           {(
             [
@@ -715,7 +715,7 @@ function MusicPageInner() {
               className={`flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
                   ? 'border-wedding-600 text-wedding-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
               }`}
             >
               <tab.icon className="h-4 w-4" />
@@ -726,7 +726,7 @@ function MusicPageInner() {
                 </span>
               )}
               {tab.key === 'requests' && pendingCount === 0 && (
-                <span className="ml-1 text-xs text-gray-400">({requests.length})</span>
+                <span className="ml-1 text-xs text-muted-foreground">({requests.length})</span>
               )}
             </button>
           ))}
@@ -746,10 +746,10 @@ function MusicPageInner() {
             >
               {/* Create playlist button */}
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="font-serif text-lg font-semibold text-gray-900">
+                <h2 className="font-serif text-lg font-semibold text-foreground">
                   Your Playlists
                   {playlists.length > 0 && (
-                    <span className="ml-2 text-sm font-normal text-gray-400">
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
                       ({playlists.length})
                     </span>
                   )}
@@ -780,10 +780,10 @@ function MusicPageInner() {
                       <div className="bg-wedding-50 mb-4 flex h-14 w-14 items-center justify-center rounded-full">
                         <Music2 className="text-wedding-400 h-7 w-7" />
                       </div>
-                      <h3 className="font-serif text-lg font-semibold text-gray-900">
+                      <h3 className="font-serif text-lg font-semibold text-foreground">
                         No Playlists Yet
                       </h3>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         Create your first playlist for the big day.
                       </p>
                       <Button
@@ -843,7 +843,7 @@ function MusicPageInner() {
                                       <Music className="text-wedding-600 h-4 w-4" />
                                     </div>
                                     <div className="min-w-0">
-                                      <h3 className="flex items-center gap-2 font-serif text-base font-semibold text-gray-900">
+                                      <h3 className="flex items-center gap-2 font-serif text-base font-semibold text-foreground">
                                         {pl.name}
                                         {pl.isAcceptedSongs && (
                                           <Badge className="bg-green-100 px-1.5 py-0 text-[10px] text-green-700">
@@ -853,7 +853,7 @@ function MusicPageInner() {
                                         )}
                                       </h3>
                                       {pl.description && (
-                                        <p className="mt-0.5 truncate text-sm text-gray-500">
+                                        <p className="mt-0.5 truncate text-sm text-muted-foreground">
                                           {pl.description}
                                         </p>
                                       )}
@@ -911,7 +911,7 @@ function MusicPageInner() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 text-gray-400 hover:text-gray-600"
+                                    className="h-8 w-8 text-muted-foreground hover:text-muted-foreground"
                                     onClick={(e) => {
                                       e.stopPropagation()
                                       setEditingPlaylist(pl)
@@ -930,7 +930,7 @@ function MusicPageInner() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 text-gray-400 hover:text-red-500"
+                                    className="h-8 w-8 text-muted-foreground hover:text-red-500"
                                     onClick={(e) => {
                                       e.stopPropagation()
                                       void handleDeletePlaylist(pl.id)
@@ -940,7 +940,7 @@ function MusicPageInner() {
                                   </Button>
 
                                   {/* Expand chevron */}
-                                  <div className="text-gray-400">
+                                  <div className="text-muted-foreground">
                                     {isExpanded ? (
                                       <ChevronUp className="h-5 w-5" />
                                     ) : (
@@ -961,7 +961,7 @@ function MusicPageInner() {
                                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                                   className="overflow-hidden"
                                 >
-                                  <div className="border-t border-gray-100 px-6 pb-4 pt-3">
+                                  <div className="border-t border-border px-6 pb-4 pt-3">
                                     {/* Spotify embed player */}
                                     {pl.spotifyUrl && getSpotifyEmbedUrl(pl.spotifyUrl) && (
                                       <div className="mb-4">
@@ -1049,11 +1049,11 @@ function MusicPageInner() {
                                           className="mb-3 overflow-hidden"
                                         >
                                           <div className="rounded-lg border border-[#1DB954]/20 bg-[#1DB954]/5 p-4">
-                                            <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                            <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                               <Download className="h-4 w-4 text-[#1DB954]" />
                                               Import from Spotify Playlist
                                             </h4>
-                                            <p className="mb-3 text-xs text-gray-500">
+                                            <p className="mb-3 text-xs text-muted-foreground">
                                               Paste a Spotify playlist URL to import all songs. This
                                               will replace any existing songs.
                                             </p>
@@ -1105,7 +1105,7 @@ function MusicPageInner() {
                                           className="mb-3 overflow-hidden"
                                         >
                                           <div className="rounded-lg border border-[#1DB954]/20 bg-[#1DB954]/5 p-4">
-                                            <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                            <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                                               <Search className="h-4 w-4 text-[#1DB954]" />
                                               Search Spotify
                                             </h4>
@@ -1152,7 +1152,7 @@ function MusicPageInner() {
                                                 {spotifySearchResults.map((track) => (
                                                   <div
                                                     key={track.spotifyTrackId}
-                                                    className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white px-3 py-2 transition-colors hover:bg-gray-50"
+                                                    className="flex items-center gap-3 rounded-lg border border-border bg-white px-3 py-2 transition-colors hover:bg-muted"
                                                   >
                                                     {track.albumArt ? (
                                                       <Image
@@ -1164,15 +1164,15 @@ function MusicPageInner() {
                                                         unoptimized
                                                       />
                                                     ) : (
-                                                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-gray-100 text-xs text-gray-400">
+                                                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-muted text-xs text-muted-foreground">
                                                         <Music className="h-4 w-4" />
                                                       </div>
                                                     )}
                                                     <div className="min-w-0 flex-1">
-                                                      <p className="truncate text-sm font-medium text-gray-900">
+                                                      <p className="truncate text-sm font-medium text-foreground">
                                                         {track.title}
                                                       </p>
-                                                      <p className="truncate text-xs text-gray-500">
+                                                      <p className="truncate text-xs text-muted-foreground">
                                                         {track.artist} &middot; {track.album}
                                                       </p>
                                                     </div>
@@ -1206,14 +1206,14 @@ function MusicPageInner() {
                                     {isLoadingSongs ? (
                                       <div className="flex items-center justify-center py-8">
                                         <Loader2 className="text-wedding-500 h-5 w-5 animate-spin" />
-                                        <span className="ml-2 text-sm text-gray-500">
+                                        <span className="ml-2 text-sm text-muted-foreground">
                                           Loading songs...
                                         </span>
                                       </div>
                                     ) : songs.length === 0 ? (
                                       <div className="py-6 text-center">
-                                        <Music2 className="mx-auto h-8 w-8 text-gray-300" />
-                                        <p className="mt-2 text-sm text-gray-500">
+                                        <Music2 className="mx-auto h-8 w-8 text-muted-foreground/50" />
+                                        <p className="mt-2 text-sm text-muted-foreground">
                                           No songs yet. Add your first song below or import from
                                           Spotify.
                                         </p>
@@ -1229,7 +1229,7 @@ function MusicPageInner() {
                                           <motion.div
                                             key={song.id}
                                             variants={fadeInUp}
-                                            className="group flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2 transition-colors hover:bg-gray-50"
+                                            className="group flex items-center gap-3 rounded-lg border border-border bg-muted/50 px-3 py-2 transition-colors hover:bg-muted"
                                           >
                                             {/* Track number or album art */}
                                             {song.albumArt ? (
@@ -1242,13 +1242,13 @@ function MusicPageInner() {
                                                 unoptimized
                                               />
                                             ) : (
-                                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-gray-100 text-xs font-medium text-gray-400">
+                                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-muted text-xs font-medium text-muted-foreground">
                                                 {idx + 1}
                                               </div>
                                             )}
                                             <div className="min-w-0 flex-1">
                                               <div className="flex items-center gap-1.5">
-                                                <p className="truncate text-sm font-medium text-gray-900">
+                                                <p className="truncate text-sm font-medium text-foreground">
                                                   {song.title}
                                                 </p>
                                                 {song.spotifyTrackId && (
@@ -1264,10 +1264,10 @@ function MusicPageInner() {
                                                   </a>
                                                 )}
                                               </div>
-                                              <p className="truncate text-xs text-gray-500">
+                                              <p className="truncate text-xs text-muted-foreground">
                                                 {song.artist}
                                                 {song.album && (
-                                                  <span className="text-gray-400">
+                                                  <span className="text-muted-foreground">
                                                     {' '}
                                                     &middot; {song.album}
                                                   </span>
@@ -1275,14 +1275,14 @@ function MusicPageInner() {
                                               </p>
                                             </div>
                                             {song.durationMs && (
-                                              <span className="flex shrink-0 items-center gap-1 text-xs text-gray-400">
+                                              <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
                                                 <Clock className="h-3 w-3" />
                                                 {formatDuration(song.durationMs)}
                                               </span>
                                             )}
                                             {song.category && song.category !== 'other' && (
                                               <span
-                                                className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium ${CATEGORY_COLORS[song.category] ?? 'bg-gray-100 text-gray-700'}`}
+                                                className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium ${CATEGORY_COLORS[song.category] ?? 'bg-muted text-foreground'}`}
                                               >
                                                 {CATEGORY_LABELS[song.category] ?? song.category}
                                               </span>
@@ -1290,7 +1290,7 @@ function MusicPageInner() {
                                             <Button
                                               variant="ghost"
                                               size="icon"
-                                              className="h-7 w-7 shrink-0 text-gray-300 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                                              className="h-7 w-7 shrink-0 text-muted-foreground/50 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                                               onClick={() => handleDeleteSong(song.id, pl.id)}
                                             >
                                               <Trash2 className="h-3.5 w-3.5" />
@@ -1311,8 +1311,8 @@ function MusicPageInner() {
                                             transition={{ duration: 0.2 }}
                                             className="overflow-hidden"
                                           >
-                                            <div className="rounded-lg border border-gray-200 bg-white p-4">
-                                              <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-gray-700">
+                                            <div className="rounded-lg border border-border bg-white p-4">
+                                              <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
                                                 <Plus className="h-4 w-4" />
                                                 Add a Song Manually
                                               </h4>
@@ -1355,7 +1355,7 @@ function MusicPageInner() {
                                                         category: e.target.value,
                                                       })
                                                     }
-                                                    className="mt-1 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-300"
+                                                    className="mt-1 w-full rounded-md border border-border bg-white px-3 py-2 text-sm focus:border-border focus:outline-none focus:ring-1 focus:ring-border"
                                                   >
                                                     <option value="">None</option>
                                                     {Object.entries(CATEGORY_LABELS).map(
@@ -1452,10 +1452,10 @@ function MusicPageInner() {
               transition={{ duration: 0.2 }}
             >
               <div className="mb-6">
-                <h2 className="font-serif text-lg font-semibold text-gray-900">
+                <h2 className="font-serif text-lg font-semibold text-foreground">
                   Song Requests
                   {requests.length > 0 && (
-                    <span className="ml-2 text-sm font-normal text-gray-400">
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
                       ({requests.length})
                     </span>
                   )}
@@ -1469,10 +1469,10 @@ function MusicPageInner() {
                       <div className="bg-wedding-50 mb-4 flex h-14 w-14 items-center justify-center rounded-full">
                         <ListMusic className="text-wedding-400 h-7 w-7" />
                       </div>
-                      <h3 className="font-serif text-lg font-semibold text-gray-900">
+                      <h3 className="font-serif text-lg font-semibold text-foreground">
                         No Song Requests
                       </h3>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         Guest requests will appear here once they submit them.
                       </p>
                     </CardContent>
@@ -1505,29 +1505,29 @@ function MusicPageInner() {
                                 {/* Song info */}
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="min-w-0">
-                                    <p className="truncate font-medium text-gray-900">
+                                    <p className="truncate font-medium text-foreground">
                                       {req.title}
                                     </p>
-                                    <p className="truncate text-sm text-gray-500">
+                                    <p className="truncate text-sm text-muted-foreground">
                                       by {req.artist}
                                     </p>
                                   </div>
                                   <span
-                                    className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[req.status] ?? 'bg-gray-100 text-gray-700'}`}
+                                    className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[req.status] ?? 'bg-muted text-foreground'}`}
                                   >
                                     {req.status}
                                   </span>
                                 </div>
 
                                 {/* Guest name */}
-                                <p className="mt-1.5 text-xs text-gray-400">
+                                <p className="mt-1.5 text-xs text-muted-foreground">
                                   Requested by{' '}
-                                  <span className="font-medium text-gray-600">{req.guestName}</span>
+                                  <span className="font-medium text-muted-foreground">{req.guestName}</span>
                                 </p>
 
                                 {/* Notes */}
                                 {req.notes && (
-                                  <p className="mt-1 text-xs italic text-gray-500">
+                                  <p className="mt-1 text-xs italic text-muted-foreground">
                                     &ldquo;{req.notes}&rdquo;
                                   </p>
                                 )}
@@ -1634,8 +1634,8 @@ function MusicPageInner() {
               />
             </div>
 
-            <div className="space-y-3 rounded-lg border border-gray-100 bg-gray-50/50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <div className="space-y-3 rounded-lg border border-border bg-muted/50 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Streaming Links
               </p>
               <div>
@@ -1724,17 +1724,17 @@ function MusicPageInner() {
             {loadingSpotifyPlaylists ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-[#1DB954]" />
-                <span className="ml-2 text-sm text-gray-500">
+                <span className="ml-2 text-sm text-muted-foreground">
                   Loading your Spotify playlists...
                 </span>
               </div>
             ) : spotifyUserPlaylists.length === 0 ? (
               <div className="py-6 text-center">
-                <p className="text-sm text-gray-500">No Spotify playlists found.</p>
+                <p className="text-sm text-muted-foreground">No Spotify playlists found.</p>
               </div>
             ) : (
               <div className="max-h-80 space-y-1.5 overflow-y-auto">
-                <p className="mb-2 text-xs text-gray-500">
+                <p className="mb-2 text-xs text-muted-foreground">
                   Select a Spotify playlist to add{' '}
                   {showExportDialog
                     ? (playlistSongs[showExportDialog] ?? []).filter((s) => s.spotifyTrackId).length
@@ -1744,7 +1744,7 @@ function MusicPageInner() {
                 {spotifyUserPlaylists.map((sp) => (
                   <button
                     key={sp.id}
-                    className="flex w-full items-center gap-3 rounded-lg border border-gray-100 px-3 py-2.5 text-left transition-colors hover:border-[#1DB954]/20 hover:bg-[#1DB954]/5"
+                    className="flex w-full items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-left transition-colors hover:border-[#1DB954]/20 hover:bg-[#1DB954]/5"
                     disabled={exportingToSpotify === sp.id}
                     onClick={() => handleAddToSpotifyPlaylist(sp.id)}
                   >
@@ -1758,18 +1758,18 @@ function MusicPageInner() {
                         unoptimized
                       />
                     ) : (
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-gray-100">
-                        <Music className="h-4 w-4 text-gray-400" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-muted">
+                        <Music className="h-4 w-4 text-muted-foreground" />
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-gray-900">{sp.name}</p>
-                      <p className="text-xs text-gray-500">{sp.trackCount} songs</p>
+                      <p className="truncate text-sm font-medium text-foreground">{sp.name}</p>
+                      <p className="text-xs text-muted-foreground">{sp.trackCount} songs</p>
                     </div>
                     {exportingToSpotify === sp.id ? (
                       <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#1DB954]" />
                     ) : (
-                      <Plus className="h-4 w-4 shrink-0 text-gray-400" />
+                      <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
                     )}
                   </button>
                 ))}

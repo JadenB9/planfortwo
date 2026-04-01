@@ -29,8 +29,8 @@ export function TimelineStep({
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-gray-900">Choose your timeline</h2>
-        <p className="mt-2 text-gray-600">We&apos;ll build a checklist tailored to your pace.</p>
+        <h2 className="font-serif text-3xl font-bold text-foreground">Choose your timeline</h2>
+        <p className="mt-2 text-muted-foreground">We&apos;ll build a checklist tailored to your pace.</p>
       </div>
 
       <div className="space-y-3">
@@ -41,11 +41,11 @@ export function TimelineStep({
             className={`w-full rounded-2xl border-2 px-5 py-4 text-left transition-all ${
               selected === option.value
                 ? 'border-wedding-600 bg-wedding-50 shadow-md'
-                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-gray-200'
+                : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-border'
             }`}
           >
-            <span className="block text-base font-semibold text-gray-900">{option.label}</span>
-            <span className="mt-0.5 block text-sm text-gray-500">{option.description}</span>
+            <span className="block text-base font-semibold text-foreground">{option.label}</span>
+            <span className="mt-0.5 block text-sm text-muted-foreground">{option.description}</span>
           </button>
         ))}
       </div>
@@ -54,7 +54,7 @@ export function TimelineStep({
         <button
           onClick={onBack}
           disabled={isSubmitting}
-          className="flex-1 rounded-xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-50"
         >
           Back
         </button>
