@@ -140,6 +140,53 @@ function getEffectiveSeatPositions(
   return seats
 }
 
+function getRectSeatPositions(
+  table: TableData,
+  cx: number,
+  cy: number,
+): { x: number; y: number; angle: number }[] {
+  const hw = table.width / 2
+  const hh = table.height / 2
+  const seatOffset = 16
+  const seats: { x: number; y: number; angle: number }[] = []
+  const cap = table.capacity
+
+  // Distribute seats around the rectangle perimeter: top, right, bottom, left
+  const perimeter = 2 * (table.width + table.height)
+  for (let i = 0; i < cap; i++) {
+    const progress = (i + 0.5) / cap
+    const dist = progress * perimeter
+    let sx: number, sy: number, angle: number
+
+    if (dist < table.width) {
+      // Top edge
+      sx = cx - hw + dist
+      sy = cy - hh - seatOffset
+      angle = -90
+    } else if (dist < table.width + table.height) {
+      // Right edge
+      const d = dist - table.width
+      sx = cx + hw + seatOffset
+      sy = cy - hh + d
+      angle = 0
+    } else if (dist < 2 * table.width + table.height) {
+      // Bottom edge
+      const d = dist - table.width - table.height
+      sx = cx + hw - d
+      sy = cy + hh + seatOffset
+      angle = 90
+    } else {
+      // Left edge
+      const d = dist - 2 * table.width - table.height
+      sx = cx - hw - seatOffset
+      sy = cy + hh - d
+      angle = 180
+    }
+    seats.push({ x: sx, y: sy, angle })
+  }
+  return seats
+}
+
 function getNextCopyName(baseName: string, existingLabels: string[]): string {
   const base = baseName.replace(/\s*\(\d+\)$/, '')
   let maxNum = 0
@@ -1348,21 +1395,16 @@ export default function SeatingPage() {
                 const isRect = isRectType(table.tableType)
 
                 if (isRect) {
-                  // Rectangle/banquet/head table — no seat circles
+                  // Rectangle/banquet/head table — with seat circles around perimeter
                   const hw = table.width / 2
                   const hh = table.height / 2
-                  const nameList = table.assignments
-                    .map((a) => formatGuestName(a, guestMap))
-                    .filter(Boolean)
+                  const rectSeats = getRectSeatPositions(table, cx, cy)
 
                   return (
                     <g
                       key={table.id}
                       onMouseDown={(e) =>
                         handleTableMouseDown(e as unknown as React.MouseEvent, table)
-                      }
-                      onDoubleClick={(e) =>
-                        handleRectTableClick(e as unknown as React.MouseEvent, table.id)
                       }
                       style={{ cursor: 'move' }}
                     >
@@ -1414,7 +1456,7 @@ export default function SeatingPage() {
                       ) : (
                         <text
                           x={cx}
-                          y={cy - hh + 16}
+                          y={cy - 4}
                           textAnchor="middle"
                           fill="#374151"
                           fontSize={10}
@@ -1428,37 +1470,56 @@ export default function SeatingPage() {
                           {table.label}
                         </text>
                       )}
-                      <text x={cx} y={cy - hh + 28} textAnchor="middle" fill="#9ca3af" fontSize={8}>
+                      <text x={cx} y={cy + 9} textAnchor="middle" fill="#9ca3af" fontSize={8}>
                         {table.assignments.length}/{table.capacity}
                       </text>
 
-                      {/* Guest names listed inside */}
-                      {nameList.map((name, i) => (
-                        <text
-                          key={i}
-                          x={cx - hw + 8}
-                          y={cy - hh + 42 + i * 13}
-                          fill="#4b5563"
-                          fontSize={8}
-                          fontWeight={400}
-                        >
-                          {name}
-                        </text>
-                      ))}
+                      {/* Seat circles around perimeter */}
+                      {rectSeats.map((seat, i) => {
+                        const assignment = table.assignments.find((a) => a.seatNumber === i + 1)
+                        const displayName = formatGuestName(assignment, guestMap)
+                        const fullName = getFullGuestName(assignment, guestMap)
+                        const isFilled = !!assignment
 
-                      {/* Double-click hint */}
-                      {table.assignments.length < table.capacity && (
-                        <text
-                          x={cx}
-                          y={cy + hh - 8}
-                          textAnchor="middle"
-                          fill="#c2674a"
-                          fontSize={7}
-                          fontStyle="italic"
-                        >
-                          double-click to assign
-                        </text>
-                      )}
+                        return (
+                          <g
+                            key={i}
+                            onClick={(e) =>
+                              handleSeatClick(e as unknown as React.MouseEvent, table.id, i)
+                            }
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <circle
+                              cx={seat.x}
+                              cy={seat.y}
+                              r={18}
+                              fill="transparent"
+                              stroke="none"
+                            />
+                            <circle
+                              cx={seat.x}
+                              cy={seat.y}
+                              r={isFilled ? 8 : 9}
+                              fill={isFilled ? TABLE_COLOR : SEAT_EMPTY}
+                              stroke={isFilled ? TABLE_COLOR : '#9ca3af'}
+                              strokeWidth={1.5}
+                            />
+                            {isFilled && displayName && (
+                              <text
+                                x={seat.x}
+                                y={seat.y - 13}
+                                textAnchor="middle"
+                                fill="#1f2937"
+                                fontSize={8}
+                                fontWeight={600}
+                              >
+                                {displayName}
+                              </text>
+                            )}
+                            {isFilled && fullName && <title>{fullName}</title>}
+                          </g>
+                        )
+                      })}
 
                       {/* Resize handles for rectangle tables when selected */}
                       {isSelected && (

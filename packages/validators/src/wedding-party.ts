@@ -41,6 +41,11 @@ export const updatePartyMemberSchema = z.object({
 })
 export type UpdatePartyMemberInput = z.infer<typeof updatePartyMemberSchema>
 
+export const bulkReorderPartyMembersSchema = z.object({
+  members: z.array(z.object({ id: z.string().uuid(), sortOrder: z.number().int().min(0) })),
+})
+export type BulkReorderPartyMembersInput = z.infer<typeof bulkReorderPartyMembersSchema>
+
 export const createPartyTaskSchema = z.object({
   memberId: z.string().uuid(),
   weddingId: z.string().uuid(),

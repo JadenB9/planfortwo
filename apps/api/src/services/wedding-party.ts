@@ -75,6 +75,17 @@ export const weddingPartyService = {
     return updated ?? null
   },
 
+  async bulkReorder(weddingId: string, updates: { id: string; sortOrder: number }[]) {
+    await Promise.all(
+      updates.map(({ id, sortOrder }) =>
+        db
+          .update(weddingParty)
+          .set({ sortOrder })
+          .where(and(eq(weddingParty.id, id), eq(weddingParty.weddingId, weddingId))),
+      ),
+    )
+  },
+
   async delete(memberId: string, weddingId: string) {
     const [deleted] = await db
       .delete(weddingParty)

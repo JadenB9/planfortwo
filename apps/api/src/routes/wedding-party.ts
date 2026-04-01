@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import {
   createPartyMemberSchema,
   updatePartyMemberSchema,
+  bulkReorderPartyMembersSchema,
   createPartyTaskSchema,
   updatePartyTaskSchema,
   createPartyGiftSchema,
@@ -82,6 +83,21 @@ weddingPartyRoute.delete('/:id', resolveWeddingMiddleware, async (c) => {
     return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
   return c.json({ data: { success: true } })
 })
+
+weddingPartyRoute.put(
+  '/reorder',
+  resolveWeddingMiddleware,
+  zValidator('json', bulkReorderPartyMembersSchema, (result, c) => {
+    if (!result.success)
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+  }),
+  async (c) => {
+    const weddingId = c.get('weddingId')
+    const { members } = c.req.valid('json')
+    await weddingPartyService.bulkReorder(weddingId, members)
+    return c.json({ data: { success: true } })
+  },
+)
 
 weddingPartyRoute.get('/:id/tasks', resolveWeddingMiddleware, async (c) => {
   const memberId = c.req.param('id')
