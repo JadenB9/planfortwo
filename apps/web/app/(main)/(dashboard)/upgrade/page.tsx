@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
-import { Check, ArrowLeft, Sparkles, Loader2, ChevronDown, Gift } from 'lucide-react'
+import { Check, ArrowLeft, Loader2, ChevronDown, Gift } from 'lucide-react'
 import { toast } from 'sonner'
 import { fadeInUp, staggerContainer, springSmooth } from '@/lib/animations'
 import { useWedding, notifyWeddingUpdated } from '@/hooks/use-wedding'
@@ -170,10 +170,10 @@ function UpgradePageContent() {
         <motion.div
           variants={fadeInUp}
           transition={{ duration: 0.4, ...springSmooth }}
-          className="border-wedding-600 relative rounded-2xl border-2 bg-white p-8 shadow-md"
+          className="border-wedding-600 relative rounded-2xl border-2 bg-white p-8 shadow-sm"
         >
           <div className="bg-wedding-600 absolute -top-3 left-6 rounded-full px-3 py-0.5 text-xs font-semibold text-white">
-            Recommended
+            Best Value
           </div>
 
           <h2 className="font-serif text-xl font-semibold text-gray-900">Full Plan</h2>
@@ -199,10 +199,7 @@ function UpgradePageContent() {
                   Redirecting to Stripe...
                 </>
               ) : (
-                <>
-                  <Sparkles className="h-4 w-4" />
-                  Purchase Full Plan
-                </>
+                <>Purchase Full Plan</>
               )}
             </button>
           )}

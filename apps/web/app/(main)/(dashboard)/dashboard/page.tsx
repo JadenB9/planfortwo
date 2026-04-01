@@ -183,7 +183,7 @@ export default function DashboardPage() {
       if (!token) throw new Error('Not authenticated')
       await api.weddings.update(
         dashboardData.wedding.id,
-        { date: new Date(dateInput).toISOString() },
+        { date: `${dateInput}T12:00:00.000Z` },
         token,
       )
       await loadDashboard()

@@ -42,6 +42,8 @@ export const createSeatingTableSchema = z.object({
   capacity: z.number().int().min(1).max(50).optional(),
   posX: z.number().int().optional(),
   posY: z.number().int().optional(),
+  width: z.number().int().min(20).max(500).optional(),
+  height: z.number().int().min(20).max(500).optional(),
 })
 export type CreateSeatingTableInput = z.infer<typeof createSeatingTableSchema>
 

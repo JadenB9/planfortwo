@@ -278,25 +278,27 @@ export function Sidebar() {
         </Link>
       </div>
 
-      {/* Wedding Switcher — only show if user belongs to multiple weddings */}
-      {allWeddings.length > 1 && (
+      {/* Wedding Switcher — shows role, switch between weddings if multiple */}
+      {allWeddings.length >= 1 && (
         <div
           className="relative border-b border-gray-100 px-3 py-2 dark:border-gray-800"
           ref={switcherRef}
         >
           <button
-            onClick={() => setSwitcherOpen((prev) => !prev)}
-            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+            onClick={() => allWeddings.length > 1 && setSwitcherOpen((prev) => !prev)}
+            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${allWeddings.length > 1 ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800' : 'cursor-default'}`}
           >
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
                 {weddingData?.wedding.name ?? 'Loading...'}
               </p>
-              <p className="truncate text-xs text-gray-400">
+              <p className="truncate text-xs capitalize text-gray-400">
                 {allWeddings.find((w) => w.id === weddingId)?.role ?? ''}
               </p>
             </div>
-            <ChevronsUpDown className="h-4 w-4 shrink-0 text-gray-400" />
+            {allWeddings.length > 1 && (
+              <ChevronsUpDown className="h-4 w-4 shrink-0 text-gray-400" />
+            )}
           </button>
 
           {switcherOpen && (

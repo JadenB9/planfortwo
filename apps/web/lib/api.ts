@@ -1048,6 +1048,8 @@ export const api = {
         capacity?: number
         posX?: number
         posY?: number
+        width?: number
+        height?: number
       },
       token: string,
     ) =>

@@ -31,6 +31,7 @@ import {
   Copy,
   Scissors,
   ClipboardPaste,
+  Maximize2,
 } from 'lucide-react'
 
 const CANVAS_W = 3000
@@ -776,11 +777,20 @@ export default function SeatingPage() {
     const existingLabels = selectedChart.tables.map((t) => t.label)
     const newLabel = isCut ? src.label : getNextCopyName(src.label, existingLabels)
 
-    // Cut: same position (original gets deleted). Copy: offset by 60px per paste.
+    // Cut: paste at center of visible area. Copy: offset by 60px per paste.
     pasteCountRef.current += 1
-    const offset = isCut ? 0 : 60 * pasteCountRef.current
-    const newPosX = Math.round(src.posX + offset)
-    const newPosY = Math.round(src.posY + offset)
+    let newPosX: number
+    let newPosY: number
+    if (isCut && canvasContainerRef.current) {
+      const cw = canvasContainerRef.current.clientWidth
+      const ch = canvasContainerRef.current.clientHeight
+      newPosX = Math.round((cw / 2 - panX) / zoom)
+      newPosY = Math.round((ch / 2 - panY) / zoom)
+    } else {
+      const offset = 60 * pasteCountRef.current
+      newPosX = Math.round(src.posX + offset)
+      newPosY = Math.round(src.posY + offset)
+    }
 
     try {
       const token = await getToken()
@@ -796,6 +806,8 @@ export default function SeatingPage() {
           capacity: src.capacity,
           posX: newPosX,
           posY: newPosY,
+          width: src.width,
+          height: src.height,
         },
         token,
       )
@@ -1064,7 +1076,44 @@ export default function SeatingPage() {
   const resetView = () => {
     setPanX(0)
     setPanY(0)
-    setZoom(0.6)
+    setZoom(1)
+  }
+
+  const zoomToFit = () => {
+    if (!selectedChart || selectedChart.tables.length === 0 || !canvasContainerRef.current) return
+    const container = canvasContainerRef.current
+    const cw = container.clientWidth
+    const ch = container.clientHeight
+
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity
+    for (const table of selectedChart.tables) {
+      const isRect = isRectType(table.tableType)
+      const margin = isRect
+        ? Math.max(table.width, table.height) / 2 + 40
+        : getEffectiveRoundRadius(table) + 60
+      minX = Math.min(minX, table.posX - margin)
+      minY = Math.min(minY, table.posY - margin)
+      maxX = Math.max(maxX, table.posX + margin)
+      maxY = Math.max(maxY, table.posY + margin)
+    }
+
+    const contentW = maxX - minX
+    const contentH = maxY - minY
+    if (contentW <= 0 || contentH <= 0) return
+
+    const padding = 40
+    const scaleX = (cw - padding * 2) / contentW
+    const scaleY = (ch - padding * 2) / contentH
+    const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.min(scaleX, scaleY)))
+
+    const centerX = (minX + maxX) / 2
+    const centerY = (minY + maxY) / 2
+    setPanX(cw / 2 - centerX * newZoom)
+    setPanY(ch / 2 - centerY * newZoom)
+    setZoom(newZoom)
   }
 
   const guestMap = new Map(guests.map((g) => [g.id, g]))
@@ -1156,6 +1205,10 @@ export default function SeatingPage() {
           <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={resetView}>
             <RotateCcw className="mr-1 h-3 w-3" />
             Reset
+          </Button>
+          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={zoomToFit}>
+            <Maximize2 className="mr-1 h-3 w-3" />
+            Fit
           </Button>
           <span className="text-xs text-gray-400">Scroll to zoom · Drag to pan</span>
 
@@ -1590,7 +1643,7 @@ export default function SeatingPage() {
 
                           {/* Name or seat number */}
                           <text
-                            x={seat.x + (anchor === 'start' ? 7 : -7)}
+                            x={seat.x + (anchor === 'start' ? 16 : -16)}
                             y={seat.y + 3.5}
                             textAnchor={anchor}
                             fill={isFilled ? '#1f2937' : '#6b7280'}

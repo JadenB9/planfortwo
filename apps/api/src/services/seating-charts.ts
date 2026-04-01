@@ -113,6 +113,8 @@ export const seatingChartService = {
         capacity: data.capacity,
         posX: data.posX,
         posY: data.posY,
+        width: data.width,
+        height: data.height,
       })
       .returning()
     return table!

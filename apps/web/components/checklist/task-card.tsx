@@ -50,18 +50,23 @@ function getDueDateStyle(dueDate: Date | null): { label: string; className: stri
   const diffMs = due.getTime() - now.getTime()
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
-  if (diffDays < 0) return { label: 'Overdue', className: 'bg-red-100 text-red-700' }
-  if (diffDays <= 7) return { label: `${diffDays}d left`, className: 'bg-amber-100 text-amber-700' }
+  if (diffDays < 0)
+    return { label: 'Overdue', className: 'border border-red-200 text-red-600 bg-transparent' }
+  if (diffDays <= 7)
+    return {
+      label: `${diffDays}d left`,
+      className: 'border border-amber-200 text-amber-600 bg-transparent',
+    }
   return {
     label: due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    className: 'bg-gray-100 text-gray-600',
+    className: 'border border-gray-200 text-gray-500 bg-transparent',
   }
 }
 
 const PRIORITY_STYLES: Record<string, string> = {
-  must_do: 'bg-red-100 text-red-700',
-  nice_to_have: 'bg-amber-100 text-amber-700',
-  optional: 'bg-gray-100 text-gray-600',
+  must_do: 'border border-red-200 text-red-600 bg-transparent',
+  nice_to_have: 'border border-amber-200 text-amber-600 bg-transparent',
+  optional: 'border border-gray-200 text-gray-500 bg-transparent',
 }
 
 const PRIORITY_LABELS: Record<string, string> = {
