@@ -9,13 +9,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0",
-    "zod": "^3.25.0"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@planfortwo/config": "workspace:*",
-    "@types/node": "^22.0.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "@types/node": "^22.19.15",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

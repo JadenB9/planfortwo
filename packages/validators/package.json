@@ -13,13 +13,13 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "zod": "^3.23.0"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@planfortwo/config": "workspace:*",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^9.0.0",
-    "typescript": "^5.7.0"
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^9.39.4",
+    "typescript": "^5.9.3"
   }
 }
