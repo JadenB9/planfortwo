@@ -251,6 +251,20 @@ export const api = {
         method: 'DELETE',
         token,
       }),
+    updateMemberRole: (
+      weddingId: string,
+      memberId: string,
+      role: 'planner' | 'family',
+      token: string,
+    ) =>
+      fetchApi<{ data: { id: string; role: string } }>(
+        `/weddings/${weddingId}/members/${memberId}/role`,
+        {
+          method: 'PUT',
+          body: JSON.stringify({ role }),
+          token,
+        },
+      ),
   },
   tasks: {
     list: (
@@ -557,6 +571,12 @@ export const api = {
       if (!res.ok) throw new Error('Export failed')
       return res.blob()
     },
+    importCsv: (weddingId: string, csvContent: string, token: string) =>
+      fetchApi<{ data: CsvImportResult }>('/budget/import/csv', {
+        method: 'POST',
+        body: JSON.stringify({ weddingId, csvContent }),
+        token,
+      }),
   },
   websiteConfig: {
     get: (weddingId: string, token: string) =>

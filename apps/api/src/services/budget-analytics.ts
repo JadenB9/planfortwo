@@ -7,6 +7,7 @@ import type {
   MonthlySpending,
   TipSuggestion,
   SplitCostSummary,
+  CsvImportResult,
 } from '@planfortwo/types'
 import Papa from 'papaparse'
 import PDFDocument from 'pdfkit'
@@ -243,6 +244,168 @@ export const budgetAnalyticsService = {
     }))
 
     return Papa.unparse(rows)
+  },
+
+  async importCsv(weddingId: string, csvContent: string, userId: string): Promise<CsvImportResult> {
+    const result: CsvImportResult = { imported: 0, skipped: 0, errors: [] }
+
+    const parsed = Papa.parse<Record<string, string>>(csvContent, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: (h: string) => h.trim(),
+    })
+
+    // Surface critical parse errors
+    for (const err of parsed.errors) {
+      if (err.type === 'Delimiter' || err.type === 'Quotes') {
+        result.errors.push(`Row ${err.row}: ${err.message}`)
+      }
+    }
+
+    if (parsed.data.length === 0) {
+      result.errors.push('CSV file is empty or has no data rows.')
+      return result
+    }
+
+    // Load existing categories for this wedding to map Category name -> id
+    const existingCategories = await db
+      .select()
+      .from(budgetCategories)
+      .where(eq(budgetCategories.weddingId, weddingId))
+
+    const categoryMap = new Map<string, string>()
+    for (const cat of existingCategories) {
+      categoryMap.set(cat.name.toLowerCase(), cat.id)
+    }
+
+    // Load existing budget items to skip duplicates (match on description + category + amount)
+    const existingItems = await db
+      .select({
+        description: budgetItems.description,
+        categoryId: budgetItems.categoryId,
+        amount: budgetItems.amount,
+      })
+      .from(budgetItems)
+      .where(eq(budgetItems.weddingId, weddingId))
+
+    const existingSet = new Set(
+      existingItems.map(
+        (item) => `${item.categoryId}|${item.description}|${toNum(item.amount).toFixed(2)}`,
+      ),
+    )
+
+    // Get current max sort order
+    const [maxOrder] = await db
+      .select({ max: sql<number>`coalesce(max(${budgetItems.sortOrder}), -1)` })
+      .from(budgetItems)
+      .where(eq(budgetItems.weddingId, weddingId))
+
+    let nextSortOrder = (maxOrder?.max ?? -1) + 1
+
+    // Track categories we create during import so we don't create duplicates
+    let nextCategorySortOrder = existingCategories.length
+
+    const validPaymentStatuses = ['unpaid', 'deposit', 'partial', 'paid'] as const
+    const validPayers = ['couple', 'bride_family', 'groom_family', 'other'] as const
+
+    for (let i = 0; i < parsed.data.length; i++) {
+      const row = parsed.data[i]!
+
+      const categoryName = (row['Category'] ?? '').trim()
+      const description = (row['Description'] ?? '').trim()
+      const amountStr = (row['Amount'] ?? '').trim()
+
+      // Skip rows without required fields
+      if (!description) {
+        result.skipped++
+        continue
+      }
+
+      const amount = parseFloat(amountStr)
+      if (isNaN(amount)) {
+        result.errors.push(`Row ${i + 1}: Invalid amount "${amountStr}"`)
+        result.skipped++
+        continue
+      }
+
+      // Resolve or create category
+      let categoryId = categoryMap.get(categoryName.toLowerCase())
+      if (!categoryId && categoryName) {
+        // Create a new category for this import
+        const [newCat] = await db
+          .insert(budgetCategories)
+          .values({
+            weddingId,
+            name: categoryName,
+            icon: 'receipt',
+            color: '#6b7280',
+            allocatedAmount: '0',
+            sortOrder: nextCategorySortOrder++,
+            isDefault: false,
+          })
+          .returning()
+
+        if (newCat) {
+          categoryId = newCat.id
+          categoryMap.set(categoryName.toLowerCase(), newCat.id)
+        }
+      }
+
+      if (!categoryId) {
+        result.errors.push(`Row ${i + 1}: No category specified and no default available`)
+        result.skipped++
+        continue
+      }
+
+      // Check for duplicate (idempotent import)
+      const dedupeKey = `${categoryId}|${description}|${amount.toFixed(2)}`
+      if (existingSet.has(dedupeKey)) {
+        result.skipped++
+        continue
+      }
+
+      // Parse optional fields
+      const paidAmount = parseFloat((row['Paid'] ?? '0').trim()) || 0
+      const statusRaw = (row['Status'] ?? 'unpaid').trim().toLowerCase()
+      const paymentStatus = validPaymentStatuses.includes(
+        statusRaw as (typeof validPaymentStatuses)[number],
+      )
+        ? (statusRaw as (typeof validPaymentStatuses)[number])
+        : 'unpaid'
+      const payerRaw = (row['Payer'] ?? 'couple').trim().toLowerCase()
+      const payer = validPayers.includes(payerRaw as (typeof validPayers)[number])
+        ? (payerRaw as (typeof validPayers)[number])
+        : 'couple'
+      const dueDateStr = (row['Due Date'] ?? '').trim()
+      const dueDate = dueDateStr ? new Date(dueDateStr) : null
+      const notes = (row['Notes'] ?? '').trim() || null
+      const vendorName = (row['Vendor'] ?? '').trim() || null
+
+      try {
+        await db.insert(budgetItems).values({
+          weddingId,
+          categoryId,
+          vendorName,
+          description,
+          amount: amount.toString(),
+          paidAmount: paidAmount.toString(),
+          paymentStatus,
+          payer,
+          dueDate: dueDate && !isNaN(dueDate.getTime()) ? dueDate : null,
+          notes,
+          sortOrder: nextSortOrder++,
+        })
+
+        existingSet.add(dedupeKey)
+        result.imported++
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error'
+        result.errors.push(`Row ${i + 1}: ${message}`)
+        result.skipped++
+      }
+    }
+
+    return result
   },
 
   async exportPdf(weddingId: string): Promise<Buffer> {

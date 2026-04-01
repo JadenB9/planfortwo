@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useAuth, useUser } from '@clerk/nextjs'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -28,6 +28,8 @@ import {
   ArrowRight,
   UserCog,
   LogOut,
+  Upload,
+  Download,
 } from 'lucide-react'
 import { notifyWeddingUpdated } from '@/hooks/use-wedding'
 import { useTheme } from '@/components/theme-provider'
@@ -87,6 +89,8 @@ function SettingsPageInner() {
   })
   const [saving, setSaving] = useState(false)
   const [notifSaving, setNotifSaving] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const importFileRef = useRef<HTMLInputElement>(null)
 
   // Team member management state
   const [members, setMembers] = useState<
@@ -105,6 +109,7 @@ function SettingsPageInner() {
   const [newMemberRole, setNewMemberRole] = useState<'planner' | 'family'>('planner')
   const [addingMember, setAddingMember] = useState(false)
   const [removingId, setRemovingId] = useState<string | null>(null)
+  const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null)
   const [pendingInvitations, setPendingInvitations] = useState<PartnerInvitation[]>([])
   const [partnerEmail, setPartnerEmail] = useState('')
   const [invitingPartner, setInvitingPartner] = useState(false)
@@ -312,6 +317,27 @@ function SettingsPageInner() {
         toast.error(err instanceof Error ? err.message : 'Failed to remove member')
       } finally {
         setRemovingId(null)
+      }
+    },
+    [weddingId, getToken],
+  )
+
+  const handleToggleRole = useCallback(
+    async (memberId: string, currentRole: string) => {
+      if (!weddingId) return
+      const newRole = currentRole === 'planner' ? 'family' : 'planner'
+      setUpdatingRoleId(memberId)
+      try {
+        const token = await getToken()
+        if (!token) return
+        await api.weddings.updateMemberRole(weddingId, memberId, newRole, token)
+        toast.success(`Role updated to ${newRole === 'planner' ? 'Planner' : 'Family'}`)
+        const { data: memberList } = await api.weddings.getMembers(weddingId, token)
+        setMembers(memberList)
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to update role')
+      } finally {
+        setUpdatingRoleId(null)
       }
     },
     [weddingId, getToken],
@@ -782,10 +808,26 @@ function SettingsPageInner() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
-                          {roleIcon}
-                          {roleLabel}
-                        </span>
+                        {isOwner && member.role !== 'owner' && member.role !== 'partner' ? (
+                          <button
+                            onClick={() => handleToggleRole(member.id, member.role)}
+                            disabled={updatingRoleId === member.id}
+                            className="flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-blue-100 hover:text-blue-700 disabled:opacity-50"
+                            title="Click to switch role"
+                          >
+                            {updatingRoleId === member.id ? (
+                              <div className="h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                            ) : (
+                              roleIcon
+                            )}
+                            {roleLabel}
+                          </button>
+                        ) : (
+                          <span className="flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                            {roleIcon}
+                            {roleLabel}
+                          </span>
+                        )}
                         {member.role !== 'owner' && member.role !== 'partner' && (
                           <button
                             onClick={() => handleRemoveMember(member.id)}
@@ -1296,14 +1338,20 @@ function SettingsPageInner() {
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                Email Notifications
+              </CardTitle>
+              <p className="text-muted-foreground text-sm">
+                Choose which notifications you&apos;d like to receive via email.
+              </p>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">RSVP Notifications</p>
-                  <p className="text-sm text-gray-500">
-                    Get notified when guests respond to your RSVP.
+                  <p className="text-foreground font-medium">RSVP Notifications</p>
+                  <p className="text-muted-foreground text-sm">
+                    Receive an email when guests respond to your RSVP.
                   </p>
                 </div>
                 <Switch
@@ -1315,9 +1363,9 @@ function SettingsPageInner() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Payment Reminders</p>
-                  <p className="text-sm text-gray-500">
-                    Receive reminders for upcoming vendor payments.
+                  <p className="text-foreground font-medium">Payment Reminders</p>
+                  <p className="text-muted-foreground text-sm">
+                    Receive email reminders for upcoming vendor payments.
                   </p>
                 </div>
                 <Switch
@@ -1329,9 +1377,9 @@ function SettingsPageInner() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Task Due Dates</p>
-                  <p className="text-sm text-gray-500">
-                    Get notified when checklist tasks are approaching due dates.
+                  <p className="text-foreground font-medium">Task Due Dates</p>
+                  <p className="text-muted-foreground text-sm">
+                    Get an email when checklist tasks are approaching their due dates.
                   </p>
                 </div>
                 <Switch
@@ -1343,8 +1391,8 @@ function SettingsPageInner() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">Weekly Summary</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-foreground font-medium">Weekly Summary</p>
+                  <p className="text-muted-foreground text-sm">
                     Receive a weekly email summarizing your planning progress.
                   </p>
                 </div>
@@ -1356,11 +1404,11 @@ function SettingsPageInner() {
               </div>
               <Separator />
               <div>
-                <Label>Digest Frequency</Label>
+                <Label className="text-foreground">Email Digest Frequency</Label>
                 <select
                   value={notifPrefs?.digestFrequency ?? 'weekly'}
                   onChange={(e) => handleUpdateNotif('digestFrequency', e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm"
+                  className="border-input bg-background text-foreground mt-1 w-full rounded-xl border px-3 py-2 text-sm"
                   disabled={notifSaving}
                 >
                   <option value="instant">Instant</option>
@@ -1441,9 +1489,9 @@ function SettingsPageInner() {
               <Separator />
 
               <div>
-                <h3 className="mb-2 font-medium text-gray-900">Data Export</h3>
-                <p className="mb-3 text-sm text-gray-500">
-                  Download all your wedding planning data as a CSV file.
+                <h3 className="text-foreground mb-2 font-medium">Data Export</h3>
+                <p className="text-muted-foreground mb-3 text-sm">
+                  Download all your wedding budget data as a CSV file.
                 </p>
                 <Button
                   variant="outline"
@@ -1465,7 +1513,62 @@ function SettingsPageInner() {
                     }
                   }}
                 >
+                  <Download className="mr-2 h-4 w-4" />
                   Export Data (CSV)
+                </Button>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h3 className="text-foreground mb-2 font-medium">Data Import</h3>
+                <p className="text-muted-foreground mb-3 text-sm">
+                  Import budget data from a CSV file. The file should match the format produced by
+                  the export above (columns: Category, Vendor, Description, Amount, Paid, Status,
+                  Payer, Due Date, Notes). Duplicate entries will be skipped automatically.
+                </p>
+                <input
+                  ref={importFileRef}
+                  type="file"
+                  accept=".csv,text/csv"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file || !weddingId) return
+                    setImporting(true)
+                    try {
+                      const token = await getToken()
+                      if (!token) return
+                      const csvContent = await file.text()
+                      const { data } = await api.budgetAnalytics.importCsv(
+                        weddingId,
+                        csvContent,
+                        token,
+                      )
+                      const parts: string[] = []
+                      if (data.imported > 0) parts.push(`${data.imported} imported`)
+                      if (data.skipped > 0) parts.push(`${data.skipped} skipped`)
+                      if (data.errors.length > 0) parts.push(`${data.errors.length} errors`)
+                      toast.success(`Import complete: ${parts.join(', ')}`)
+                      if (data.errors.length > 0) {
+                        toast.error(data.errors.slice(0, 3).join('\n'), { duration: 8000 })
+                      }
+                    } catch {
+                      toast.error('Failed to import data')
+                    } finally {
+                      setImporting(false)
+                      // Reset file input so the same file can be re-selected
+                      if (importFileRef.current) importFileRef.current.value = ''
+                    }
+                  }}
+                />
+                <Button
+                  variant="outline"
+                  disabled={importing}
+                  onClick={() => importFileRef.current?.click()}
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  {importing ? 'Importing...' : 'Import Data (CSV)'}
                 </Button>
               </div>
             </CardContent>

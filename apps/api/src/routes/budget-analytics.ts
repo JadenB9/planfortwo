@@ -1,4 +1,6 @@
 import { Hono } from 'hono'
+import { z } from 'zod'
+import { zValidator } from '@hono/zod-validator'
 import { authMiddleware } from '../middleware/auth.js'
 import { resolveUserMiddleware } from '../middleware/resolve-user.js'
 import { resolveWeddingMiddleware } from '../middleware/resolve-wedding.js'
@@ -88,5 +90,35 @@ budgetAnalyticsRoute.get(
         'Content-Disposition': 'attachment; filename="budget-report.pdf"',
       },
     })
+  },
+)
+
+// POST /budget/import/csv — CSV import
+budgetAnalyticsRoute.post(
+  '/import/csv',
+  resolveWeddingMiddleware,
+  requireFeature('canBudgetExpenses'),
+  zValidator(
+    'json',
+    z.object({
+      weddingId: z.string().uuid(),
+      csvContent: z.string().min(1).max(500_000),
+    }),
+    (result, c) => {
+      if (!result.success) {
+        return c.json(
+          { error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 },
+          400,
+        )
+      }
+    },
+  ),
+  async (c) => {
+    const { csvContent } = c.req.valid('json')
+    const weddingId = c.get('weddingId')
+    const dbUserId = c.get('dbUserId')
+
+    const result = await budgetAnalyticsService.importCsv(weddingId, csvContent, dbUserId)
+    return c.json({ data: result })
   },
 )

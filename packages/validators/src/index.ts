@@ -96,6 +96,13 @@ export const inviteMemberSchema = z.object({
 
 export type InviteMemberInput = z.infer<typeof inviteMemberSchema>
 
+// ── Update Member Role ──
+export const updateMemberRoleSchema = z.object({
+  role: z.enum(['planner', 'family']),
+})
+
+export type UpdateMemberRoleInput = z.infer<typeof updateMemberRoleSchema>
+
 // ── Pagination ──
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),

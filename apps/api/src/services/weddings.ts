@@ -254,6 +254,28 @@ export const weddingService = {
     }
   },
 
+  async updateMemberRole(weddingId: string, memberId: string, role: 'planner' | 'family') {
+    const [member] = await db
+      .select()
+      .from(weddingMembers)
+      .where(and(eq(weddingMembers.id, memberId), eq(weddingMembers.weddingId, weddingId)))
+
+    if (!member) return null
+
+    // Only planner and family roles can be changed
+    if (member.role === 'owner' || member.role === 'partner') {
+      return { error: 'Cannot change the role of the owner or partner.' }
+    }
+
+    const [updated] = await db
+      .update(weddingMembers)
+      .set({ role })
+      .where(and(eq(weddingMembers.id, memberId), eq(weddingMembers.weddingId, weddingId)))
+      .returning()
+
+    return updated ?? null
+  },
+
   async removeMember(weddingId: string, memberId: string) {
     const [member] = await db
       .select()

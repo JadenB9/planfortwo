@@ -6,6 +6,7 @@ import {
   invitePartnerSchema,
   inviteMemberSchema,
   updateWeddingSchema,
+  updateMemberRoleSchema,
 } from '@planfortwo/validators'
 import type { TimelineTemplate } from '@planfortwo/types'
 import { authMiddleware } from '../middleware/auth.js'
@@ -436,6 +437,49 @@ weddingsRoute.post(
     }
 
     return c.json({ data: result }, 201)
+  },
+)
+
+// PUT /weddings/:id/members/:memberId/role -- update a member's role
+weddingsRoute.put(
+  '/:id/members/:memberId/role',
+  zValidator('json', updateMemberRoleSchema, (result, c) => {
+    if (!result.success) {
+      return c.json({ error: 'Validation failed', code: 'VALIDATION_ERROR', statusCode: 400 }, 400)
+    }
+  }),
+  async (c) => {
+    const weddingId = c.req.param('id')
+    const memberId = c.req.param('memberId')
+    const dbUserId = c.get('dbUserId')
+
+    const membership = await weddingService.verifyMembership(weddingId, dbUserId)
+    if (!membership) {
+      return c.json(
+        { error: 'Not a member of this wedding', code: 'FORBIDDEN', statusCode: 403 },
+        403,
+      )
+    }
+
+    if (membership.role !== 'owner') {
+      return c.json(
+        { error: 'Only the owner can change member roles', code: 'FORBIDDEN', statusCode: 403 },
+        403,
+      )
+    }
+
+    const { role } = c.req.valid('json')
+    const result = await weddingService.updateMemberRole(weddingId, memberId, role)
+
+    if (!result) {
+      return c.json({ error: 'Member not found', code: 'NOT_FOUND', statusCode: 404 }, 404)
+    }
+
+    if ('error' in result) {
+      return c.json({ error: result.error, code: 'UPDATE_FAILED', statusCode: 400 }, 400)
+    }
+
+    return c.json({ data: result })
   },
 )
 
