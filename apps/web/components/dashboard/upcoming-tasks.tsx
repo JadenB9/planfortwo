@@ -10,9 +10,9 @@ interface UpcomingTasksProps {
 }
 
 const PRIORITY_STYLES: Record<string, string> = {
-  must_do: 'bg-red-100 text-red-700',
-  nice_to_have: 'bg-amber-100 text-amber-700',
-  optional: 'bg-muted text-muted-foreground',
+  must_do: 'border border-red-200 text-red-600',
+  nice_to_have: 'border border-amber-200 text-amber-600',
+  optional: 'border border-border text-muted-foreground',
 }
 
 const PRIORITY_LABELS: Record<string, string> = {

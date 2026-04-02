@@ -1,7 +1,23 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { Plus, Trash2, ChevronUp, ChevronDown, X, Check, User } from 'lucide-react'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import { Plus, Trash2, X, Check, User, ChevronDown, ChevronUp, GripVertical } from 'lucide-react'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import type { WeddingPartyContent } from '@planfortwo/types'
 
 interface WeddingPartyEditorProps {
@@ -9,425 +25,430 @@ interface WeddingPartyEditorProps {
   onChange: (content: WeddingPartyContent) => void
 }
 
-type MemberDraft = {
-  name: string
-  role: string
-  description: string
-  imageUrl: string
+type MemberDraft = { name: string; role: string; description: string; imageUrl: string }
+const emptyDraft: MemberDraft = { name: '', role: '', description: '', imageUrl: '' }
+
+type Side = 'groom' | 'bride'
+type MemberWithSide = WeddingPartyContent['members'][number] & { side: Side }
+
+function detectSide(role: string): Side {
+  return /bridesmaid|maid\s*of\s*honor|matron|flower\s*girl|bride/i.test(role) ? 'bride' : 'groom'
 }
 
-const emptyDraft: MemberDraft = { name: '', role: '', description: '', imageUrl: '' }
-const EMPTY_MEMBERS: WeddingPartyContent['members'] = []
+/* ─── Sortable Member Card ─────────────────────────────────── */
+function SortableCard({
+  member,
+  sortId,
+  otherLabel,
+  onEdit,
+  onRemove,
+  onSwitch,
+}: {
+  member: MemberWithSide
+  sortId: string
+  otherLabel: string
+  onEdit: () => void
+  onRemove: () => void
+  onSwitch: () => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: sortId,
+  })
 
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 50 : undefined,
+        opacity: isDragging ? 0.5 : 1,
+        position: 'relative' as const,
+      }}
+      {...attributes}
+      className="border-border bg-background group relative flex flex-col rounded-lg border p-3 transition-shadow hover:shadow-sm"
+    >
+      {/* Drag handle */}
+      <div
+        className="text-muted-foreground absolute left-1 top-1/2 -translate-y-1/2 cursor-grab opacity-0 transition-opacity active:cursor-grabbing group-hover:opacity-100"
+        {...listeners}
+      >
+        <GripVertical className="h-3.5 w-3.5" />
+      </div>
+
+      {/* Move to other side */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          onSwitch()
+        }}
+        className="text-muted-foreground absolute right-1.5 top-1.5 rounded p-0.5 opacity-0 transition-opacity hover:text-blue-500 group-hover:opacity-100"
+        title={`Move to ${otherLabel}`}
+      >
+        {member.side === 'groom' ? (
+          <ChevronDown className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronUp className="h-3.5 w-3.5" />
+        )}
+      </button>
+
+      {/* Remove */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          onRemove()
+        }}
+        className="text-muted-foreground/50 absolute bottom-1.5 right-1.5 rounded p-0.5 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+        title="Remove member"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+
+      {/* Card body */}
+      <button
+        type="button"
+        onClick={onEdit}
+        className="flex min-w-0 items-start gap-3 pl-4 text-left"
+      >
+        {member.imageUrl ? (
+          <img
+            src={member.imageUrl}
+            alt={member.name}
+            className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <div className="bg-muted text-muted-foreground flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+            {member.name.trim() ? (
+              <span className="text-sm font-semibold">
+                {member.name.trim().charAt(0).toUpperCase()}
+              </span>
+            ) : (
+              <User className="h-4 w-4" />
+            )}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-foreground truncate text-sm font-semibold">{member.name}</p>
+          <p className="text-muted-foreground truncate text-xs">{member.role}</p>
+        </div>
+      </button>
+    </div>
+  )
+}
+
+/* ─── Main Editor ──────────────────────────────────────────── */
 export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPartyEditorProps) {
-  const members = rawContent.members ?? EMPTY_MEMBERS
-  const [showAddForm, setShowAddForm] = useState(false)
+  const members: MemberWithSide[] = useMemo(
+    () =>
+      (rawContent.members ?? []).map((m) => ({
+        ...m,
+        side: m.side ?? detectSide(m.role),
+      })),
+    [rawContent.members],
+  )
+
+  // Normalize sides on mount for backward compat
+  const didNormalize = useRef(false)
+  useEffect(() => {
+    if (didNormalize.current) return
+    if (rawContent.members?.some((m) => !m.side)) {
+      didNormalize.current = true
+      onChange({
+        ...rawContent,
+        members: (rawContent.members ?? []).map((m) => ({
+          ...m,
+          side: m.side ?? detectSide(m.role),
+        })),
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const groom = members.filter((m) => m.side === 'groom')
+  const bride = members.filter((m) => m.side === 'bride')
+
+  const [addingSide, setAddingSide] = useState<Side | null>(null)
   const [draft, setDraft] = useState<MemberDraft>({ ...emptyDraft })
-  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [editKey, setEditKey] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<MemberDraft>({ ...emptyDraft })
 
   const canSaveDraft = draft.name.trim() !== '' && draft.role.trim() !== ''
   const canSaveEdit = editDraft.name.trim() !== '' && editDraft.role.trim() !== ''
 
-  const addMember = useCallback(() => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  /* ── Data helpers ── */
+  function emit(g: MemberWithSide[], b: MemberWithSide[]) {
+    onChange({ ...rawContent, members: [...g, ...b] })
+  }
+
+  function addMember(side: Side) {
     if (!canSaveDraft) return
-    const newMember = {
+    const m: MemberWithSide = {
       name: draft.name.trim(),
       role: draft.role.trim(),
       description: draft.description.trim() || undefined,
       imageUrl: draft.imageUrl.trim() || undefined,
+      side,
     }
-    onChange({ ...rawContent, members: [...members, newMember] })
+    emit(side === 'groom' ? [...groom, m] : groom, side === 'bride' ? [...bride, m] : bride)
     setDraft({ ...emptyDraft })
-    setShowAddForm(false)
-  }, [canSaveDraft, draft, members, onChange, rawContent])
+    setAddingSide(null)
+  }
 
-  const removeMember = useCallback(
-    (index: number) => {
-      onChange({
-        ...rawContent,
-        members: members.filter((_, i) => i !== index),
-      })
-      if (editingIndex === index) {
-        setEditingIndex(null)
-      } else if (editingIndex !== null && editingIndex > index) {
-        setEditingIndex(editingIndex - 1)
-      }
-    },
-    [editingIndex, members, onChange, rawContent],
-  )
-
-  const startEdit = useCallback(
-    (index: number) => {
-      const member = members[index]
-      if (!member) return
-      setEditDraft({
-        name: member.name,
-        role: member.role,
-        description: member.description ?? '',
-        imageUrl: member.imageUrl ?? '',
-      })
-      setEditingIndex(index)
-    },
-    [members],
-  )
-
-  const saveEdit = useCallback(() => {
-    if (editingIndex === null || !canSaveEdit) return
-    const updated = members.map((member, i) =>
-      i === editingIndex
-        ? {
-            name: editDraft.name.trim(),
-            role: editDraft.role.trim(),
-            description: editDraft.description.trim() || undefined,
-            imageUrl: editDraft.imageUrl.trim() || undefined,
-          }
-        : member,
+  function removeMember(side: Side, idx: number) {
+    emit(
+      side === 'groom' ? groom.filter((_, i) => i !== idx) : groom,
+      side === 'bride' ? bride.filter((_, i) => i !== idx) : bride,
     )
-    onChange({ ...rawContent, members: updated })
-    setEditingIndex(null)
-  }, [editingIndex, canSaveEdit, editDraft, members, onChange, rawContent])
+    if (editKey === `${side}-${idx}`) setEditKey(null)
+  }
 
-  const cancelEdit = useCallback(() => {
-    setEditingIndex(null)
-  }, [])
+  function startEdit(side: Side, idx: number) {
+    const m = (side === 'groom' ? groom : bride)[idx]
+    if (!m) return
+    setEditDraft({
+      name: m.name,
+      role: m.role,
+      description: m.description ?? '',
+      imageUrl: m.imageUrl ?? '',
+    })
+    setEditKey(`${side}-${idx}`)
+  }
 
-  const moveUp = useCallback(
-    (index: number) => {
-      if (index === 0) return
-      const nextMembers = [...members]
-      const prev = nextMembers[index - 1]
-      const curr = nextMembers[index]
-      if (!prev || !curr) return
-      nextMembers[index - 1] = curr
-      nextMembers[index] = prev
-      onChange({ ...rawContent, members: nextMembers })
-      if (editingIndex === index) setEditingIndex(index - 1)
-      else if (editingIndex === index - 1) setEditingIndex(index)
-    },
-    [editingIndex, members, onChange, rawContent],
-  )
+  function saveEdit() {
+    if (!editKey || !canSaveEdit) return
+    const [side, idxStr] = editKey.split('-') as [Side, string]
+    const idx = Number(idxStr)
+    const updated: MemberWithSide = {
+      name: editDraft.name.trim(),
+      role: editDraft.role.trim(),
+      description: editDraft.description.trim() || undefined,
+      imageUrl: editDraft.imageUrl.trim() || undefined,
+      side,
+    }
+    emit(
+      side === 'groom' ? groom.map((m, i) => (i === idx ? updated : m)) : groom,
+      side === 'bride' ? bride.map((m, i) => (i === idx ? updated : m)) : bride,
+    )
+    setEditKey(null)
+  }
 
-  const moveDown = useCallback(
-    (index: number) => {
-      if (index >= members.length - 1) return
-      const nextMembers = [...members]
-      const next = nextMembers[index + 1]
-      const curr = nextMembers[index]
-      if (!next || !curr) return
-      nextMembers[index + 1] = curr
-      nextMembers[index] = next
-      onChange({ ...rawContent, members: nextMembers })
-      if (editingIndex === index) setEditingIndex(index + 1)
-      else if (editingIndex === index + 1) setEditingIndex(index)
-    },
-    [editingIndex, members, onChange, rawContent],
-  )
+  function switchSide(from: Side, idx: number) {
+    const list = from === 'groom' ? groom : bride
+    const m = list[idx]
+    if (!m) return
+    const to: Side = from === 'groom' ? 'bride' : 'groom'
+    const moved = { ...m, side: to }
+    emit(
+      from === 'groom' ? groom.filter((_, i) => i !== idx) : [...groom, moved],
+      from === 'bride' ? bride.filter((_, i) => i !== idx) : [...bride, moved],
+    )
+    if (editKey === `${from}-${idx}`) setEditKey(null)
+  }
 
-  return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-foreground">Party Members</h4>
-        {!showAddForm && (
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const [aSide, aIdx] = String(active.id).split('-') as [Side, string]
+    const [oSide, oIdx] = String(over.id).split('-') as [Side, string]
+    if (aSide !== oSide) return
+    const list = [...(aSide === 'groom' ? groom : bride)]
+    const [moved] = list.splice(Number(aIdx), 1)
+    if (!moved) return
+    list.splice(Number(oIdx), 0, moved)
+    emit(aSide === 'groom' ? list : groom, aSide === 'bride' ? list : bride)
+  }
+
+  const groomIds = groom.map((_, i) => `groom-${i}`)
+  const brideIds = bride.map((_, i) => `bride-${i}`)
+
+  /* ── Shared form renderer ── */
+  function renderMemberForm(mode: 'add' | 'edit', side: Side, idx?: number) {
+    const d = mode === 'add' ? draft : editDraft
+    const setD = mode === 'add' ? setDraft : setEditDraft
+    const canSave = mode === 'add' ? canSaveDraft : canSaveEdit
+
+    return (
+      <div
+        className={`rounded-lg border border-blue-200 bg-blue-50/50 p-4 ${mode === 'edit' ? 'col-span-2 md:col-span-3' : 'mt-3'}`}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-xs font-medium uppercase tracking-wide text-blue-600">
+            {mode === 'add' ? 'New Member' : 'Editing Member'}
+          </span>
           <button
             type="button"
-            onClick={() => {
-              setDraft({ ...emptyDraft })
-              setShowAddForm(true)
-            }}
-            className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
+            onClick={() => (mode === 'add' ? setAddingSide(null) : setEditKey(null))}
+            className="text-muted-foreground hover:text-foreground"
           >
-            <Plus className="h-4 w-4" />
-            Add Member
+            <X className="h-4 w-4" />
           </button>
-        )}
-      </div>
+        </div>
 
-      {/* Add Member Form (at the top) */}
-      {showAddForm && (
-        <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50/50 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wide text-blue-600">
-              New Member
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowAddForm(false)}
-              className="text-muted-foreground hover:text-muted-foreground"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-medium text-foreground">
-                Name <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                placeholder="Jane Smith"
-                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground">
-                Role <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={draft.role}
-                onChange={(e) => setDraft({ ...draft, role: e.target.value })}
-                placeholder="Maid of Honor"
-                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          <div className="mt-3">
-            <label className="text-sm font-medium text-foreground">Bio (optional)</label>
-            <textarea
-              value={draft.description}
-              onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-              placeholder="A short bio or how they know the couple..."
-              rows={2}
-              className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="mt-3">
-            <label className="text-sm font-medium text-foreground">Photo URL (optional)</label>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-foreground text-sm font-medium">
+              Name <span className="text-red-400">*</span>
+            </label>
             <input
               type="text"
-              value={draft.imageUrl}
-              onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })}
-              placeholder="https://example.com/photo.jpg"
-              className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              value={d.name}
+              onChange={(e) => setD({ ...d, name: e.target.value })}
+              placeholder="Jane Smith"
+              className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
+          <div>
+            <label className="text-foreground text-sm font-medium">
+              Role <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              value={d.role}
+              onChange={(e) => setD({ ...d, role: e.target.value })}
+              placeholder={side === 'groom' ? 'Groomsman' : 'Bridesmaid'}
+              className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+        </div>
 
-          <div className="mt-4 flex items-center justify-end gap-2">
+        <div className="mt-3">
+          <label className="text-foreground text-sm font-medium">Bio (optional)</label>
+          <textarea
+            value={d.description}
+            onChange={(e) => setD({ ...d, description: e.target.value })}
+            placeholder="A short bio or how they know the couple..."
+            rows={2}
+            className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+
+        <div className="mt-3">
+          <label className="text-foreground text-sm font-medium">Photo URL (optional)</label>
+          <input
+            type="text"
+            value={d.imageUrl}
+            onChange={(e) => setD({ ...d, imageUrl: e.target.value })}
+            placeholder="https://example.com/photo.jpg"
+            className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          {mode === 'edit' && idx !== undefined ? (
             <button
               type="button"
-              onClick={() => setShowAddForm(false)}
-              className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
+              onClick={() => removeMember(side, idx)}
+              className="flex items-center gap-1 text-sm text-red-500 hover:text-red-700"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Remove
+            </button>
+          ) : (
+            <span />
+          )}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => (mode === 'add' ? setAddingSide(null) : setEditKey(null))}
+              className="border-border text-foreground hover:bg-muted rounded-md border px-3 py-1.5 text-sm font-medium"
             >
               Cancel
             </button>
             <button
               type="button"
-              onClick={addMember}
-              disabled={!canSaveDraft}
+              onClick={() => (mode === 'add' ? addMember(side) : saveEdit())}
+              disabled={!canSave}
               className="flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Check className="h-3.5 w-3.5" />
-              Save Member
+              {mode === 'add' ? 'Save Member' : 'Save'}
             </button>
           </div>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      {/* Empty state */}
-      {members.length === 0 && !showAddForm && (
-        <p className="mt-3 text-sm text-muted-foreground">
-          No members yet. Add your bridesmaids, groomsmen, flower girls, ring bearers, and anyone
-          else in the wedding party.
-        </p>
-      )}
+  /* ── Group renderer ── */
+  function renderGroup(title: string, side: Side, list: MemberWithSide[], ids: string[]) {
+    const otherLabel = side === 'groom' ? "Bride's Side" : "Groom's Side"
 
-      {/* Members Grid */}
-      {members.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
-          {members.map((member, index) =>
-            editingIndex === index ? (
-              /* Expanded edit form (replaces card) */
-              <div
-                key={index}
-                className="col-span-2 rounded-lg border border-blue-200 bg-blue-50/50 p-4 md:col-span-3"
-              >
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-xs font-medium uppercase tracking-wide text-blue-600">
-                    Editing Member
-                  </span>
-                  <button
-                    type="button"
-                    onClick={cancelEdit}
-                    className="text-muted-foreground hover:text-muted-foreground"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-sm font-medium text-foreground">
-                      Name <span className="text-red-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editDraft.name}
-                      onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })}
-                      placeholder="Jane Smith"
-                      className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-foreground">
-                      Role <span className="text-red-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editDraft.role}
-                      onChange={(e) => setEditDraft({ ...editDraft, role: e.target.value })}
-                      placeholder="Maid of Honor"
-                      className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-3">
-                  <label className="text-sm font-medium text-foreground">Bio (optional)</label>
-                  <textarea
-                    value={editDraft.description}
-                    onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })}
-                    placeholder="A short bio or how they know the couple..."
-                    rows={2}
-                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div className="mt-3">
-                  <label className="text-sm font-medium text-foreground">Photo URL (optional)</label>
-                  <input
-                    type="text"
-                    value={editDraft.imageUrl}
-                    onChange={(e) => setEditDraft({ ...editDraft, imageUrl: e.target.value })}
-                    placeholder="https://example.com/photo.jpg"
-                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div className="mt-4 flex items-center justify-between">
-                  <button
-                    type="button"
-                    onClick={() => removeMember(index)}
-                    className="flex items-center gap-1 text-sm text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Remove
-                  </button>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={cancelEdit}
-                      className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={saveEdit}
-                      disabled={!canSaveEdit}
-                      className="flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <Check className="h-3.5 w-3.5" />
-                      Save
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Compact member card */
-              <div
-                key={index}
-                className="group relative flex flex-col rounded-lg border border-border bg-white p-3 transition-shadow hover:shadow-sm"
-              >
-                {/* Reorder buttons */}
-                <div className="absolute right-1.5 top-1.5 flex flex-col opacity-0 transition-opacity group-hover:opacity-100">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      moveUp(index)
-                    }}
-                    disabled={index === 0}
-                    className="rounded p-0.5 text-muted-foreground hover:text-muted-foreground disabled:invisible"
-                    title="Move up"
-                  >
-                    <ChevronUp className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      moveDown(index)
-                    }}
-                    disabled={index === members.length - 1}
-                    className="rounded p-0.5 text-muted-foreground hover:text-muted-foreground disabled:invisible"
-                    title="Move down"
-                  >
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-
-                {/* Remove button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    removeMember(index)
-                  }}
-                  className="absolute bottom-1.5 right-1.5 rounded p-0.5 text-muted-foreground/50 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
-                  title="Remove member"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-
-                {/* Clickable card body */}
-                <button
-                  type="button"
-                  onClick={() => startEdit(index)}
-                  className="flex min-w-0 items-start gap-3 text-left"
-                >
-                  {/* Avatar */}
-                  {member.imageUrl ? (
-                    // Wedding party photos are user-supplied remote URLs from arbitrary domains.
-                    // Keep native img rendering instead of routing them through Next's image proxy.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={member.imageUrl}
-                      alt={member.name}
-                      loading="lazy"
-                      decoding="async"
-                      referrerPolicy="no-referrer"
-                      className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                      {member.name.trim() ? (
-                        <span className="text-sm font-semibold">
-                          {member.name.trim().charAt(0).toUpperCase()}
-                        </span>
-                      ) : (
-                        <User className="h-4 w-4" />
-                      )}
-                    </div>
-                  )}
-
-                  {/* Name + Role */}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-foreground">{member.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{member.role}</p>
-                  </div>
-                </button>
-              </div>
-            ),
+    return (
+      <div>
+        <div className="flex items-center justify-between">
+          <h4 className="text-foreground text-sm font-medium">{title}</h4>
+          {addingSide !== side && (
+            <button
+              type="button"
+              onClick={() => {
+                setDraft({ ...emptyDraft })
+                setAddingSide(side)
+              }}
+              className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
+            >
+              <Plus className="h-4 w-4" />
+              Add
+            </button>
           )}
         </div>
-      )}
-    </div>
+
+        {addingSide === side && renderMemberForm('add', side)}
+
+        {list.length === 0 && addingSide !== side && (
+          <p className="text-muted-foreground mt-3 text-sm">
+            No members yet. Click &quot;+ Add&quot; to add{' '}
+            {side === 'groom' ? 'groomsmen' : 'bridesmaids'}.
+          </p>
+        )}
+
+        {list.length > 0 && (
+          <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+            <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3">
+              {list.map((member, index) =>
+                editKey === `${side}-${index}` ? (
+                  <div key={`${side}-${index}-edit`} className="col-span-2 md:col-span-3">
+                    {renderMemberForm('edit', side, index)}
+                  </div>
+                ) : (
+                  <SortableCard
+                    key={ids[index]}
+                    member={member}
+                    sortId={ids[index]!}
+                    otherLabel={otherLabel}
+                    onEdit={() => startEdit(side, index)}
+                    onRemove={() => removeMember(side, index)}
+                    onSwitch={() => switchSide(side, index)}
+                  />
+                ),
+              )}
+            </div>
+          </SortableContext>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      {renderGroup("Groom's Side", 'groom', groom, groomIds)}
+
+      {/* Divider */}
+      <div className="my-5 flex items-center gap-4">
+        <div className="border-border flex-1 border-t" />
+        <span className="text-muted-foreground select-none text-xs uppercase tracking-wider">
+          &amp;
+        </span>
+        <div className="border-border flex-1 border-t" />
+      </div>
+
+      {renderGroup("Bride's Side", 'bride', bride, brideIds)}
+    </DndContext>
   )
 }

@@ -558,6 +558,7 @@ export interface WeddingPartyContent {
     role: string
     imageUrl?: string
     description?: string
+    side?: 'groom' | 'bride'
   }[]
 }
 
