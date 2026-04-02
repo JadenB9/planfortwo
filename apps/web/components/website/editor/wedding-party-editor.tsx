@@ -60,17 +60,17 @@ function SortableCard({
       ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),
-        transition,
+        transition: isDragging ? 'none' : transition,
         zIndex: isDragging ? 50 : undefined,
         opacity: isDragging ? 0.5 : 1,
         position: 'relative' as const,
       }}
       {...attributes}
-      className="border-border bg-background group relative flex flex-col rounded-lg border p-3 transition-shadow hover:shadow-sm"
+      className="border-border bg-background group relative flex flex-col rounded-lg border p-3"
     >
       {/* Drag handle */}
       <div
-        className="text-muted-foreground absolute left-1 top-1/2 -translate-y-1/2 cursor-grab opacity-0 transition-opacity active:cursor-grabbing group-hover:opacity-100"
+        className="text-muted-foreground absolute left-1 top-1/2 -translate-y-1/2 cursor-grab opacity-0 active:cursor-grabbing group-hover:opacity-100"
         {...listeners}
       >
         <GripVertical className="h-3.5 w-3.5" />
@@ -83,7 +83,7 @@ function SortableCard({
           e.stopPropagation()
           onSwitch()
         }}
-        className="text-muted-foreground absolute right-1.5 top-1.5 rounded p-0.5 opacity-0 transition-opacity hover:text-blue-500 group-hover:opacity-100"
+        className="text-muted-foreground absolute right-1.5 top-1.5 rounded p-0.5 opacity-0 hover:text-blue-500 group-hover:opacity-100"
         title={`Move to ${otherLabel}`}
       >
         {member.side === 'groom' ? (
@@ -100,7 +100,7 @@ function SortableCard({
           e.stopPropagation()
           onRemove()
         }}
-        className="text-muted-foreground/50 absolute bottom-1.5 right-1.5 rounded p-0.5 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+        className="text-muted-foreground/50 absolute bottom-1.5 right-1.5 rounded p-0.5 opacity-0 hover:text-red-500 group-hover:opacity-100"
         title="Remove member"
       >
         <X className="h-3.5 w-3.5" />
@@ -265,8 +265,8 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
     emit(aSide === 'groom' ? list : groom, aSide === 'bride' ? list : bride)
   }
 
-  const groomIds = groom.map((_, i) => `groom-${i}`)
-  const brideIds = bride.map((_, i) => `bride-${i}`)
+  const groomIds = useMemo(() => groom.map((_, i) => `groom-${i}`), [groom])
+  const brideIds = useMemo(() => bride.map((_, i) => `bride-${i}`), [bride])
 
   /* ── Shared form renderer ── */
   function renderMemberForm(mode: 'add' | 'edit', side: Side, idx?: number) {

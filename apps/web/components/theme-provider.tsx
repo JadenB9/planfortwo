@@ -79,6 +79,7 @@ function generatePaletteHsl(hex: string): Record<string, string> {
 
 function applyThemeToDocument(colors: ThemeColors | null) {
   const root = document.documentElement
+  const isDark = root.classList.contains('dark')
 
   if (colors) {
     // Primary color — shadcn CSS variables
@@ -96,8 +97,11 @@ function applyThemeToDocument(colors: ThemeColors | null) {
     }
 
     // Accent color — foreground/text CSS variables
+    // In dark mode, lighten the accent so text remains readable on dark backgrounds
     const [ah, as, al] = hexToHsl(colors.accent)
-    const accentHsl = `${ah} ${as}% ${al}%`
+    const accentHsl = isDark
+      ? `${ah} ${Math.min(as, 15)}% 90%`
+      : `${ah} ${as}% ${al}%`
     root.style.setProperty('--foreground', accentHsl)
     root.style.setProperty('--card-foreground', accentHsl)
     root.style.setProperty('--popover-foreground', accentHsl)
@@ -142,9 +146,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       try {
         localStorage.setItem('planfortwo-dark', next ? '1' : '0')
       } catch {}
+      // Re-apply theme so foreground adapts to dark/light mode
+      applyThemeToDocument(themeColors)
       return next
     })
-  }, [])
+  }, [themeColors])
 
   // Restore dark mode preference on mount
   useEffect(() => {
@@ -168,7 +174,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (!loaded) return
 
     applyThemeToDocument(themeColors)
-  }, [themeColors, loaded])
+  }, [themeColors, loaded, isDark])
 
   // Apply theme when state changes
   return (
