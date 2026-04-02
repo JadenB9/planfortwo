@@ -253,11 +253,11 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <h1 className="font-serif text-3xl font-bold text-foreground">
+        <h1 className="text-foreground font-serif text-3xl font-bold">
           {displayName ? `Welcome, ${displayName}` : 'Welcome'}
         </h1>
         {daysUntil !== null && daysUntil !== undefined && daysUntil > 0 && (
-          <p className="mt-2 text-lg text-muted-foreground">
+          <p className="text-muted-foreground mt-2 text-lg">
             <motion.span
               className="text-wedding-600 font-semibold"
               initial={{ opacity: 0, scale: 0.8 }}
@@ -270,14 +270,14 @@ export default function DashboardPage() {
           </p>
         )}
         <div className="mt-2 flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <Calendar className="text-muted-foreground h-4 w-4" />
           {editingDate ? (
             <div className="flex items-center gap-2">
               <input
                 type="date"
                 value={dateInput}
                 onChange={(e) => setDateInput(e.target.value)}
-                className="focus:border-wedding-600 focus:ring-wedding-600/20 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground rounded-lg border px-3 py-1.5 text-sm focus:outline-none focus:ring-2"
                 min={new Date().toISOString().split('T')[0]}
               />
               <button
@@ -289,7 +289,7 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={() => setEditingDate(false)}
-                className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-muted-foreground"
+                className="text-muted-foreground hover:text-muted-foreground rounded-lg p-1 transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -302,7 +302,7 @@ export default function DashboardPage() {
                 )
                 setEditingDate(true)
               }}
-              className="group flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground group flex items-center gap-1.5 text-sm transition-colors"
             >
               <span>
                 {wedding?.date
@@ -336,11 +336,13 @@ export default function DashboardPage() {
               <Map className="text-wedding-700 h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Planning Roadmap</p>
-              <p className="text-xs text-muted-foreground">Track your overall wedding planning progress</p>
+              <p className="text-foreground text-sm font-semibold">Planning Roadmap</p>
+              <p className="text-muted-foreground text-xs">
+                Track your overall wedding planning progress
+              </p>
             </div>
           </div>
-          <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="text-muted-foreground h-5 w-5 transition-transform group-hover:translate-x-1" />
         </Link>
       </motion.div>
 
@@ -348,18 +350,20 @@ export default function DashboardPage() {
         {/* Invite Partner Card */}
         {!hasPartner &&
           (pendingPartnerInvite ? (
-            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+            <div className="border-border bg-background rounded-2xl border p-6 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50">
                   <Clock className="h-5 w-5 text-amber-600" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="font-serif text-lg font-semibold text-foreground">
+                  <h2 className="text-foreground font-serif text-lg font-semibold">
                     Partner Invitation Pending
                   </h2>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Invitation sent to{' '}
-                    <span className="font-medium text-foreground">{pendingPartnerInvite.email}</span>{' '}
+                    <span className="text-foreground font-medium">
+                      {pendingPartnerInvite.email}
+                    </span>{' '}
                     &mdash; waiting for them to accept.
                   </p>
                 </div>
@@ -370,7 +374,7 @@ export default function DashboardPage() {
                   </div>
                   <button
                     onClick={() => setCancelDialogOpen(true)}
-                    className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600"
+                    className="text-muted-foreground rounded-lg p-1.5 transition-colors hover:bg-red-50 hover:text-red-600"
                     title="Cancel invitation"
                   >
                     <XCircle className="h-4 w-4" />
@@ -384,7 +388,7 @@ export default function DashboardPage() {
                     <DialogTitle>Cancel Partner Invitation</DialogTitle>
                     <DialogDescription>
                       Are you sure you want to cancel the invitation sent to{' '}
-                      <span className="font-medium text-foreground">
+                      <span className="text-foreground font-medium">
                         {pendingPartnerInvite.email}
                       </span>
                       ? They will no longer be able to accept it, but you can send a new one
@@ -394,7 +398,7 @@ export default function DashboardPage() {
                   <DialogFooter>
                     <button
                       onClick={() => setCancelDialogOpen(false)}
-                      className="rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                      className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
                     >
                       Keep Invitation
                     </button>
@@ -411,11 +415,11 @@ export default function DashboardPage() {
             </div>
           ) : (
             showInvite && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
-                <h2 className="font-serif text-xl font-semibold text-foreground">
+              <div className="border-border bg-background rounded-2xl border p-6 shadow-sm">
+                <h2 className="text-foreground font-serif text-xl font-semibold">
                   Invite Your Partner
                 </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="text-muted-foreground mt-1 text-sm">
                   Send an invitation so you can plan together.
                 </p>
 
@@ -430,7 +434,7 @@ export default function DashboardPage() {
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
                       placeholder="partner@email.com"
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 flex-1 rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground flex-1 rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                     />
                     <button
                       onClick={handleInvitePartner}

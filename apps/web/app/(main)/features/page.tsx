@@ -18,7 +18,6 @@ import {
   Settings,
   type LucideIcon,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NavBar } from '@/components/layout/nav-bar'
@@ -279,20 +278,20 @@ const fullPlanFeatures = [
 
 export default function FeaturesPage() {
   return (
-    <main className="min-h-screen bg-[#FAFAF8]">
+    <main className="bg-background min-h-screen">
       <NavBar />
 
       {/* Hero */}
       <section className="px-5 pb-20 pt-32 sm:px-8 sm:pt-36">
         <div className="mx-auto max-w-4xl text-center">
           <AnimatedSection>
-            <p className="mb-4 text-sm font-medium tracking-wide text-gray-400">
+            <p className="text-muted-foreground mb-4 text-sm font-medium tracking-wide">
               Everything included
             </p>
-            <h1 className="font-serif text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+            <h1 className="text-foreground font-serif text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Tools that actually help you plan
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-gray-500">
+            <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg leading-relaxed">
               From guest lists to budgets, checklists to websites — plan your wedding with tools
               designed for couples, not corporations.
             </p>
@@ -307,10 +306,10 @@ export default function FeaturesPage() {
             <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
               14 feature areas
             </span>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-foreground font-serif text-3xl font-bold tracking-tight sm:text-4xl">
               Built for real couples
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-gray-500">
+            <p className="text-muted-foreground mt-4 text-base leading-relaxed">
               Every feature is designed with couples in mind — no bloat, no complexity, just the
               tools you actually need. Hover to explore.
             </p>
@@ -337,16 +336,16 @@ export default function FeaturesPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="scroll-mt-24 bg-[#FFFCF7] px-5 py-20 sm:px-8">
+      <section id="pricing" className="bg-muted/50 scroll-mt-24 px-5 py-20 sm:px-8">
         <div className="mx-auto max-w-6xl">
           <AnimatedSection className="mb-16 text-center">
             <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
               Pricing
             </span>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-foreground font-serif text-3xl font-bold tracking-tight sm:text-4xl">
               Simple, honest pricing
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-gray-500">
+            <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-base leading-relaxed">
               No subscriptions. No hidden fees. Pay once and plan your wedding with everything you
               need.
             </p>
@@ -377,29 +376,28 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-gray-900 px-5 py-20 sm:px-8">
+      <section className="bg-foreground px-5 py-20 sm:px-8">
         <AnimatedSection className="mx-auto max-w-2xl text-center">
-          <h2 className="font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-background font-serif text-3xl font-bold tracking-tight sm:text-4xl">
             Ready to start planning?
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-gray-400">
+          <p className="text-background/60 mt-4 text-base leading-relaxed">
             Create your free account and start organizing your wedding in one place.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
               asChild
               size="lg"
-              className="rounded-xl bg-white px-8 text-sm font-medium text-gray-900 hover:bg-gray-100"
+              className="bg-background text-foreground hover:bg-background/90 rounded-xl px-8 text-sm font-medium"
             >
               <Link href="/sign-up">Start Free</Link>
             </Button>
             <Button
               asChild
               size="lg"
-              className="rounded-xl border-0 bg-gradient-to-r from-amber-500 to-orange-500 px-8 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 hover:from-amber-400 hover:to-orange-400"
+              className="rounded-xl border-0 bg-orange-500 px-8 text-sm font-semibold text-white shadow-sm hover:bg-orange-600"
             >
               <Link href="/upgrade">
-                <Sparkles className="mr-2 h-4 w-4" />
                 Get Full Access
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

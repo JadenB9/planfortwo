@@ -73,7 +73,7 @@ export function InteractiveFeatureCard({
     >
       <motion.div
         className={cn(
-          'relative h-full overflow-hidden rounded-2xl border border-border bg-white p-6 transition-shadow duration-300',
+          'border-border bg-background relative h-full overflow-hidden rounded-2xl border p-6 transition-shadow duration-300',
           isHovered && 'shadow-xl',
         )}
         whileHover={{ scale: 1.02 }}
@@ -108,16 +108,16 @@ export function InteractiveFeatureCard({
             >
               <Icon className="h-5 w-5" style={{ color: accent }} />
             </motion.div>
-            <h3 className="text-base font-semibold text-foreground">{title}</h3>
+            <h3 className="text-foreground text-base font-semibold">{title}</h3>
           </div>
 
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{description}</p>
+          <p className="text-muted-foreground mt-3 text-sm leading-relaxed">{description}</p>
 
           <ul className="mt-4 space-y-1.5">
             {items.map((item, i) => (
               <motion.li
                 key={item}
-                className="flex items-start gap-2 text-sm text-muted-foreground"
+                className="text-muted-foreground flex items-start gap-2 text-sm"
                 initial={false}
                 animate={
                   isHovered

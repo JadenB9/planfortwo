@@ -26,9 +26,9 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
 
   if (upcoming.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-6">
-        <h3 className="font-serif text-lg font-semibold text-foreground">Upcoming Tasks</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
+      <div className="border-border bg-background rounded-2xl border p-6">
+        <h3 className="text-foreground font-serif text-lg font-semibold">Upcoming Tasks</h3>
+        <p className="text-muted-foreground mt-2 text-sm">
           No upcoming tasks. Your checklist will appear here.
         </p>
       </div>
@@ -36,9 +36,9 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-6">
+    <div className="border-border bg-background rounded-2xl border p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-serif text-lg font-semibold text-foreground">Upcoming Tasks</h3>
+        <h3 className="text-foreground font-serif text-lg font-semibold">Upcoming Tasks</h3>
         <Link
           href="/checklist"
           className="text-wedding-600 hover:text-wedding-700 text-sm font-medium transition-colors"
@@ -56,15 +56,15 @@ export function UpcomingTasks({ tasks }: UpcomingTasksProps) {
         {upcoming.map((task) => (
           <Link key={task.id} href="/checklist">
             <motion.div
-              className="flex items-center justify-between rounded-xl border border-border px-4 py-3"
+              className="border-border flex items-center justify-between rounded-xl border px-4 py-3"
               variants={listItem}
               transition={{ duration: 0.3, ...springSmooth }}
               whileHover={{ x: 3, borderColor: 'rgb(var(--wedding-200))' }}
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">{task.title}</p>
+                <p className="text-foreground truncate text-sm font-medium">{task.title}</p>
                 {task.dueDate && (
-                  <p className="mt-0.5 text-xs text-muted-foreground">
+                  <p className="text-muted-foreground mt-0.5 text-xs">
                     Due{' '}
                     {new Date(task.dueDate).toLocaleDateString('en-US', {
                       month: 'short',

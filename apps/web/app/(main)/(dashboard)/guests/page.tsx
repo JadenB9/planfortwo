@@ -299,12 +299,12 @@ function GuestsPageInner() {
 
   const paginationControls = (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex items-center gap-2 text-sm">
         <span>Show</span>
         <select
           value={currentPageSize}
           onChange={(e) => setPageSize(Number(e.target.value))}
-          className="focus:border-wedding-600 focus:ring-wedding-600/20 rounded-lg border border-border px-2 py-1 text-sm focus:outline-none focus:ring-2"
+          className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border rounded-lg border px-2 py-1 text-sm focus:outline-none focus:ring-2"
         >
           <option value={10}>10</option>
           <option value={25}>25</option>
@@ -314,7 +314,7 @@ function GuestsPageInner() {
         </select>
         <span>per page</span>
         {total > 0 && (
-          <span className="ml-2 text-muted-foreground">
+          <span className="text-muted-foreground ml-2">
             {showingFrom}–{showingTo} of {total}
           </span>
         )}
@@ -324,7 +324,7 @@ function GuestsPageInner() {
           <button
             onClick={() => setPage(currentPage - 1)}
             disabled={currentPage <= 1}
-            className="rounded-lg border border-border p-1.5 text-muted-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+            className="border-border text-muted-foreground hover:bg-muted rounded-lg border p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -337,7 +337,7 @@ function GuestsPageInner() {
             }, [])
             .map((item, idx) =>
               item === 'ellipsis' ? (
-                <span key={`e-${idx}`} className="px-1 text-sm text-muted-foreground">
+                <span key={`e-${idx}`} className="text-muted-foreground px-1 text-sm">
                   ...
                 </span>
               ) : (
@@ -347,7 +347,7 @@ function GuestsPageInner() {
                   className={`min-w-[2rem] rounded-lg px-2 py-1 text-sm font-medium transition-colors ${
                     item === currentPage
                       ? 'bg-wedding-600 text-white'
-                      : 'border border-border text-foreground hover:bg-muted'
+                      : 'border-border text-foreground hover:bg-muted border'
                   }`}
                 >
                   {item}
@@ -357,7 +357,7 @@ function GuestsPageInner() {
           <button
             onClick={() => setPage(currentPage + 1)}
             disabled={currentPage >= totalPages}
-            className="rounded-lg border border-border p-1.5 text-muted-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+            className="border-border text-muted-foreground hover:bg-muted rounded-lg border p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -376,15 +376,17 @@ function GuestsPageInner() {
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-foreground">Guest List</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Manage your guests, households, and RSVPs.</p>
+          <h1 className="text-foreground font-serif text-3xl font-bold">Guest List</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Manage your guests, households, and RSVPs.
+          </p>
         </div>
         <div className="flex gap-3">
           {uninvitedWithEmail.length > 0 && (
             <button
               onClick={() => setShowBulkInviteConfirm(true)}
               disabled={sendingBulk}
-              className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+              className="border-border text-foreground hover:bg-muted flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
               {sendingBulk ? 'Sending...' : `Send All Invites (${uninvitedWithEmail.length})`}
@@ -393,7 +395,7 @@ function GuestsPageInner() {
           {features?.canBulkImport && (
             <Link
               href="/guests/import"
-              className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors"
             >
               Import CSV
             </Link>
@@ -425,7 +427,7 @@ function GuestsPageInner() {
         <GuestStatsBar stats={stats} />
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-border">
+        <div className="border-border flex gap-1 border-b">
           <button
             onClick={() => setActiveTab('guests')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
@@ -489,10 +491,10 @@ function GuestsPageInner() {
         )}
 
         {activeTab === 'allergies' && (
-          <div className="rounded-2xl border border-border bg-white shadow-sm">
-            <div className="border-b border-border px-5 py-3">
-              <h3 className="font-serif text-sm font-semibold text-foreground">Guest Allergies</h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+          <div className="border-border bg-background rounded-2xl border shadow-sm">
+            <div className="border-border border-b px-5 py-3">
+              <h3 className="text-foreground font-serif text-sm font-semibold">Guest Allergies</h3>
+              <p className="text-muted-foreground mt-0.5 text-xs">
                 Guests with reported allergies or dietary notes
               </p>
             </div>
@@ -516,13 +518,13 @@ function GuestsPageInner() {
               if (guestsWithAllergies.length === 0) {
                 return (
                   <div className="px-5 py-8 text-center">
-                    <p className="text-sm text-muted-foreground">No allergies reported yet.</p>
+                    <p className="text-muted-foreground text-sm">No allergies reported yet.</p>
                   </div>
                 )
               }
 
               return (
-                <div className="divide-y divide-border">
+                <div className="divide-border divide-y">
                   {guestsWithAllergies.map((g) => {
                     const d = g.dietary as Record<string, unknown>
                     const notes =
@@ -533,10 +535,10 @@ function GuestsPageInner() {
                         : null
                     return (
                       <div key={g.id} className="flex items-center justify-between px-5 py-3">
-                        <span className="text-sm font-medium text-foreground">
+                        <span className="text-foreground text-sm font-medium">
                           {g.firstName} {g.lastName}
                         </span>
-                        <span className="max-w-[60%] text-right text-sm text-muted-foreground">
+                        <span className="text-muted-foreground max-w-[60%] text-right text-sm">
                           {notes ?? allergies}
                         </span>
                       </div>

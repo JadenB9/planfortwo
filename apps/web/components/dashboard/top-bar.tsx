@@ -30,12 +30,12 @@ export function TopBar() {
 
   return (
     <>
-      <header className="border-b border-border bg-white dark:border-gray-800 dark:bg-gray-950">
+      <header className="border-border bg-background border-b dark:border-gray-800 dark:bg-gray-950">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="rounded-lg p-2 text-muted-foreground hover:bg-muted lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
+              className="text-muted-foreground hover:bg-muted rounded-lg p-2 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800"
               aria-label="Toggle menu"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +50,7 @@ export function TopBar() {
 
             <Link
               href="/dashboard"
-              className="font-serif text-lg font-bold text-foreground lg:hidden dark:text-gray-100"
+              className="text-foreground font-serif text-lg font-bold lg:hidden dark:text-gray-100"
             >
               Plan<span className="text-wedding-600">For</span>Two
             </Link>
@@ -74,13 +74,13 @@ export function TopBar() {
           <div className="absolute inset-0 bg-black/20" onClick={closeMenu} />
 
           {/* Menu panel */}
-          <div className="absolute bottom-0 left-0 top-0 flex w-72 flex-col overflow-y-auto bg-white shadow-xl sm:w-80 dark:bg-gray-950">
+          <div className="bg-background absolute bottom-0 left-0 top-0 flex w-72 flex-col overflow-y-auto shadow-xl sm:w-80 dark:bg-gray-950">
             {/* Header with close button */}
-            <div className="flex h-16 items-center justify-between border-b border-border px-4 sm:px-6 dark:border-gray-800">
+            <div className="border-border flex h-16 items-center justify-between border-b px-4 sm:px-6 dark:border-gray-800">
               <div className="flex items-center gap-3">
                 <button
                   onClick={closeMenu}
-                  className="rounded-lg p-2 text-muted-foreground hover:bg-muted dark:text-gray-400 dark:hover:bg-gray-800"
+                  className="text-muted-foreground hover:bg-muted rounded-lg p-2 dark:text-gray-400 dark:hover:bg-gray-800"
                   aria-label="Close menu"
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -96,7 +96,7 @@ export function TopBar() {
                 <Link
                   href="/dashboard"
                   onClick={closeMenu}
-                  className="font-serif text-lg font-bold text-foreground dark:text-gray-100"
+                  className="text-foreground font-serif text-lg font-bold dark:text-gray-100"
                 >
                   Plan<span className="text-wedding-600">For</span>Two
                 </Link>
@@ -118,7 +118,7 @@ export function TopBar() {
               <div className="space-y-4">
                 {NAV_GROUPS.map((group) => (
                   <div key={group.label}>
-                    <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-gray-500">
+                    <p className="text-muted-foreground mb-1 px-3 text-xs font-semibold uppercase tracking-wider dark:text-gray-500">
                       {group.label}
                     </p>
                     <div className="space-y-0.5">
@@ -147,7 +147,7 @@ export function TopBar() {
                             />
                             <span>{item.label}</span>
                             {item.comingSoon && (
-                              <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                              <span className="bg-muted text-muted-foreground ml-auto rounded-full px-2 py-0.5 text-xs">
                                 Soon
                               </span>
                             )}
@@ -161,7 +161,7 @@ export function TopBar() {
             </nav>
 
             {/* Bottom section */}
-            <div className="space-y-2 border-t border-border p-4 dark:border-gray-800">
+            <div className="border-border space-y-2 border-t p-4 dark:border-gray-800">
               <Link
                 href="/settings"
                 onClick={closeMenu}
@@ -180,14 +180,14 @@ export function TopBar() {
                 <Link
                   href="/"
                   onClick={closeMenu}
-                  className="flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-muted-foreground dark:text-gray-500 dark:hover:text-gray-300"
+                  className="text-muted-foreground hover:text-muted-foreground flex items-center gap-2 text-xs transition-colors dark:text-gray-500 dark:hover:text-gray-300"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   Visit Home Page
                 </Link>
                 <button
                   onClick={toggleDark}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                  className="text-muted-foreground hover:bg-muted hover:text-muted-foreground flex h-7 w-7 items-center justify-center rounded-lg transition-colors dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
                   title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
                 >
                   {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}

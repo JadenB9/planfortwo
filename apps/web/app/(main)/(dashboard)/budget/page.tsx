@@ -173,15 +173,15 @@ function BudgetPageInner() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-foreground">Budget</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Track every dollar for your wedding.</p>
+          <h1 className="text-foreground font-serif text-3xl font-bold">Budget</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Track every dollar for your wedding.</p>
         </div>
 
         <div className="flex items-center gap-3">
           {features?.canBudgetExport && (
             <button
               onClick={handleExportCsv}
-              className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+              className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2.5 text-sm font-medium"
             >
               Export CSV
             </button>
@@ -201,7 +201,7 @@ function BudgetPageInner() {
       </div>
 
       {needsSetup ? (
-        <div className="rounded-2xl border border-border bg-white p-8 text-center">
+        <div className="border-border bg-background rounded-2xl border p-8 text-center">
           <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
             <svg
               className="text-wedding-600 h-8 w-8"
@@ -217,8 +217,8 @@ function BudgetPageInner() {
               />
             </svg>
           </div>
-          <h2 className="font-serif text-xl font-semibold text-foreground">Set Up Your Budget</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          <h2 className="text-foreground font-serif text-xl font-semibold">Set Up Your Budget</h2>
+          <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
             Get started by entering your total budget. We will suggest category allocations based on
             common wedding spending patterns.
           </p>
@@ -239,7 +239,7 @@ function BudgetPageInner() {
           />
 
           {/* Tab navigation */}
-          <div className="mt-6 border-b border-border">
+          <div className="border-border mt-6 border-b">
             <nav className="-mb-px flex gap-6">
               {TABS.map((tab) => (
                 <button
@@ -248,7 +248,7 @@ function BudgetPageInner() {
                   className={`border-b-2 pb-3 text-sm font-medium transition-colors ${
                     activeTab === tab.key
                       ? 'border-wedding-600 text-wedding-600'
-                      : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
+                      : 'text-muted-foreground hover:border-border hover:text-foreground border-transparent'
                   }`}
                 >
                   {tab.label}
@@ -283,7 +283,7 @@ function BudgetPageInner() {
                   <select
                     value={filters.categoryId ?? ''}
                     onChange={(e) => updateFilters({ categoryId: e.target.value || undefined })}
-                    className="rounded-xl border border-border px-3 py-2 text-sm text-foreground"
+                    className="border-border text-foreground rounded-xl border px-3 py-2 text-sm"
                   >
                     <option value="">All Categories</option>
                     {categories.map((c) => (
@@ -296,7 +296,7 @@ function BudgetPageInner() {
                   <select
                     value={filters.paymentStatus ?? ''}
                     onChange={(e) => updateFilters({ paymentStatus: e.target.value || undefined })}
-                    className="rounded-xl border border-border px-3 py-2 text-sm text-foreground"
+                    className="border-border text-foreground rounded-xl border px-3 py-2 text-sm"
                   >
                     <option value="">All Statuses</option>
                     <option value="unpaid">Unpaid</option>
@@ -308,7 +308,7 @@ function BudgetPageInner() {
                   <select
                     value={filters.payer ?? ''}
                     onChange={(e) => updateFilters({ payer: e.target.value || undefined })}
-                    className="rounded-xl border border-border px-3 py-2 text-sm text-foreground"
+                    className="border-border text-foreground rounded-xl border px-3 py-2 text-sm"
                   >
                     <option value="">All Payers</option>
                     <option value="couple">Couple</option>
@@ -342,8 +342,8 @@ function BudgetPageInner() {
             )}
 
             {activeTab === 'analytics' && !analytics && (
-              <div className="rounded-2xl border border-border bg-white p-8 text-center">
-                <p className="text-sm text-muted-foreground">Add some expenses to see analytics.</p>
+              <div className="border-border bg-background rounded-2xl border p-8 text-center">
+                <p className="text-muted-foreground text-sm">Add some expenses to see analytics.</p>
               </div>
             )}
 

@@ -108,15 +108,15 @@ function UpgradePageContent() {
     >
       <Link
         href="/dashboard"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground mb-6 inline-flex items-center gap-1.5 text-sm transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Dashboard
       </Link>
 
       <div className="mb-10 text-center">
-        <h1 className="font-serif text-3xl font-bold text-foreground">Choose Your Plan</h1>
-        <p className="mt-2 text-muted-foreground">
+        <h1 className="text-foreground font-serif text-3xl font-bold">Choose Your Plan</h1>
+        <p className="text-muted-foreground mt-2">
           Unlock every feature and plan your perfect day without limits.
         </p>
       </div>
@@ -143,22 +143,22 @@ function UpgradePageContent() {
         <motion.div
           variants={fadeInUp}
           transition={{ duration: 0.4, ...springSmooth }}
-          className="rounded-2xl border border-border bg-white p-8 shadow-sm"
+          className="border-border bg-background rounded-2xl border p-8 shadow-sm"
         >
-          <h2 className="font-serif text-xl font-semibold text-foreground">Free</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Get started with the basics</p>
+          <h2 className="text-foreground font-serif text-xl font-semibold">Free</h2>
+          <p className="text-muted-foreground mt-1 text-sm">Get started with the basics</p>
           <p className="mt-6">
-            <span className="font-serif text-4xl font-bold text-foreground">$0</span>
-            <span className="ml-1 text-sm text-muted-foreground">forever</span>
+            <span className="text-foreground font-serif text-4xl font-bold">$0</span>
+            <span className="text-muted-foreground ml-1 text-sm">forever</span>
           </p>
 
-          <div className="mt-6 rounded-xl bg-muted px-4 py-2.5 text-center text-sm font-medium text-muted-foreground">
+          <div className="bg-muted text-muted-foreground mt-6 rounded-xl px-4 py-2.5 text-center text-sm font-medium">
             {tier === 'free' ? 'Current Plan' : 'Limited Access'}
           </div>
 
           <ul className="mt-8 space-y-3">
             {FREE_FEATURES.map((feature) => (
-              <li key={feature} className="flex items-start gap-2.5 text-sm text-foreground">
+              <li key={feature} className="text-foreground flex items-start gap-2.5 text-sm">
                 <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
                 {feature}
               </li>
@@ -170,17 +170,17 @@ function UpgradePageContent() {
         <motion.div
           variants={fadeInUp}
           transition={{ duration: 0.4, ...springSmooth }}
-          className="border-wedding-600 relative rounded-2xl border-2 bg-white p-8 shadow-sm"
+          className="border-wedding-600 bg-background relative rounded-2xl border-2 p-8 shadow-sm"
         >
           <div className="bg-wedding-600 absolute -top-3 left-6 rounded-full px-3 py-0.5 text-xs font-semibold text-white">
             Best Value
           </div>
 
-          <h2 className="font-serif text-xl font-semibold text-foreground">Full Plan</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Everything you need, no limits</p>
+          <h2 className="text-foreground font-serif text-xl font-semibold">Full Plan</h2>
+          <p className="text-muted-foreground mt-1 text-sm">Everything you need, no limits</p>
           <p className="mt-6">
-            <span className="font-serif text-4xl font-bold text-foreground">$10</span>
-            <span className="ml-1 text-sm text-muted-foreground">one-time</span>
+            <span className="text-foreground font-serif text-4xl font-bold">$10</span>
+            <span className="text-muted-foreground ml-1 text-sm">one-time</span>
           </p>
 
           {tier === 'full' ? (
@@ -206,7 +206,7 @@ function UpgradePageContent() {
 
           <ul className="mt-8 space-y-3">
             {FULL_FEATURES.map((feature) => (
-              <li key={feature} className="flex items-start gap-2.5 text-sm text-foreground">
+              <li key={feature} className="text-foreground flex items-start gap-2.5 text-sm">
                 <Check className="text-wedding-600 mt-0.5 h-4 w-4 flex-shrink-0" />
                 {feature}
               </li>
@@ -219,7 +219,7 @@ function UpgradePageContent() {
         <div className="mt-8">
           <button
             onClick={() => setPromoOpen(!promoOpen)}
-            className="mx-auto flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground mx-auto flex items-center gap-1.5 text-sm transition-colors"
           >
             <Gift className="h-4 w-4" />
             Have a promo code?
@@ -240,7 +240,7 @@ function UpgradePageContent() {
                 onChange={(e) => setPromoCode(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleRedeemPromo()}
                 placeholder="Enter code"
-                className="focus:border-wedding-300 focus:ring-wedding-100 w-48 rounded-xl border border-border bg-white px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2"
+                className="focus:border-wedding-300 focus:ring-wedding-100 border-border bg-background text-foreground placeholder:text-muted-foreground w-48 rounded-xl border px-4 py-2 text-sm focus:outline-none focus:ring-2"
               />
               <button
                 onClick={handleRedeemPromo}
@@ -254,7 +254,7 @@ function UpgradePageContent() {
         </div>
       )}
 
-      <p className="mt-8 text-center text-xs text-muted-foreground">
+      <p className="text-muted-foreground mt-8 text-center text-xs">
         Payment handled securely through Stripe. One-time purchase, no recurring fees.
       </p>
     </motion.div>

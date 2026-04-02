@@ -46,7 +46,7 @@ export function notifyWeddingUpdated() {
 }
 
 function useWeddingState(enabled: boolean): WeddingState {
-  const { getToken } = useAuth()
+  const { getToken, isLoaded, isSignedIn, userId } = useAuth()
   const [data, setData] = useState<DashboardData | null>(null)
   const [features, setFeatures] = useState<FeatureGates | null>(null)
   const [allWeddings, setAllWeddings] = useState<WeddingSwitcherOption[]>([])
@@ -57,22 +57,49 @@ function useWeddingState(enabled: boolean): WeddingState {
   const mountedRef = useRef(true)
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
+  const resetState = useCallback(() => {
+    retryCountRef.current = 0
+    clearTimeout(timeoutRef.current)
+    setData(null)
+    setFeatures(null)
+    setAllWeddings([])
+    setWebsiteSubdomain(null)
+    setError(null)
+  }, [])
+
   const load = useCallback(async () => {
-    if (!enabled) return
+    if (!enabled || !isLoaded) return
+
+    if (!isSignedIn || !userId) {
+      if (!mountedRef.current) return
+      resetState()
+      setLoading(false)
+      return
+    }
+
+    let scheduledRetry = false
 
     try {
       if (!mountedRef.current) return
+      clearTimeout(timeoutRef.current)
+      setLoading(true)
       setError(null)
 
       const token = await getToken()
       if (!mountedRef.current) return
 
       if (!token) {
-        setData(null)
-        setFeatures(null)
-        setAllWeddings([])
-        setWebsiteSubdomain(null)
-        setLoading(false)
+        if (retryCountRef.current < MAX_RETRIES) {
+          retryCountRef.current += 1
+          scheduledRetry = true
+          timeoutRef.current = setTimeout(() => {
+            void load()
+          }, RETRY_DELAY_MS)
+          return
+        }
+
+        resetState()
+        setError('Unable to authenticate. Please refresh the page.')
         return
       }
 
@@ -83,36 +110,31 @@ function useWeddingState(enabled: boolean): WeddingState {
       setData(dashData)
       retryCountRef.current = 0
 
-      const followUpRequests: Array<Promise<unknown>> = [allWeddingsPromise]
-
-      if (dashData.wedding.id) {
-        followUpRequests.push(api.features.get(dashData.wedding.id, token))
-
-        if (dashData.wedding.websiteSlug) {
-          setWebsiteSubdomain(dashData.wedding.websiteSlug)
-        } else {
-          followUpRequests.push(api.websiteConfig.get(dashData.wedding.id, token).catch(() => null))
-        }
-      } else {
+      if (!dashData.wedding.id) {
         setFeatures(null)
         setWebsiteSubdomain(null)
+        setAllWeddings((await allWeddingsPromise)?.data ?? [])
+        return
       }
 
-      const [allWeddingsRes, featuresRes, websiteConfigRes] = await Promise.all(followUpRequests)
+      const featuresPromise = api.features.get(dashData.wedding.id, token).catch(() => null)
+      const websiteConfigPromise = dashData.wedding.websiteSlug
+        ? Promise.resolve(null)
+        : api.websiteConfig.get(dashData.wedding.id, token).catch(() => null)
+
+      const [allWeddingsRes, featuresRes, websiteConfigRes] = await Promise.all([
+        allWeddingsPromise,
+        featuresPromise,
+        websiteConfigPromise,
+      ])
+
       if (!mountedRef.current) return
 
-      setAllWeddings((allWeddingsRes as { data: WeddingSwitcherOption[] } | null)?.data ?? [])
-
-      if (dashData.wedding.id) {
-        setFeatures((featuresRes as { data: FeatureGates } | undefined)?.data ?? null)
-
-        if (!dashData.wedding.websiteSlug) {
-          setWebsiteSubdomain(
-            (websiteConfigRes as { data: { subdomain: string | null } | null } | null)?.data
-              ?.subdomain ?? null,
-          )
-        }
-      }
+      setAllWeddings(allWeddingsRes?.data ?? [])
+      setFeatures(featuresRes?.data ?? null)
+      setWebsiteSubdomain(
+        dashData.wedding.websiteSlug ?? websiteConfigRes?.data?.subdomain ?? null,
+      )
     } catch (err) {
       if (!mountedRef.current) return
 
@@ -127,6 +149,7 @@ function useWeddingState(enabled: boolean): WeddingState {
 
       if (isSetupPending && retryCountRef.current < MAX_RETRIES) {
         retryCountRef.current += 1
+        scheduledRetry = true
         timeoutRef.current = setTimeout(() => {
           void load()
         }, RETRY_DELAY_MS)
@@ -146,16 +169,34 @@ function useWeddingState(enabled: boolean): WeddingState {
       }
     } finally {
       if (!mountedRef.current) return
-      if (retryCountRef.current === 0 || retryCountRef.current >= MAX_RETRIES) {
+      if (!scheduledRetry) {
         setLoading(false)
       }
     }
-  }, [enabled, getToken])
+  }, [enabled, getToken, isLoaded, isSignedIn, resetState, userId])
 
   useEffect(() => {
     mountedRef.current = true
+    clearTimeout(timeoutRef.current)
+    retryCountRef.current = 0
 
     if (!enabled) {
+      resetState()
+      setLoading(false)
+      return () => {
+        mountedRef.current = false
+      }
+    }
+
+    if (!isLoaded) {
+      setLoading(true)
+      return () => {
+        mountedRef.current = false
+      }
+    }
+
+    if (!isSignedIn || !userId) {
+      resetState()
       setLoading(false)
       return () => {
         mountedRef.current = false
@@ -168,15 +209,15 @@ function useWeddingState(enabled: boolean): WeddingState {
       mountedRef.current = false
       clearTimeout(timeoutRef.current)
     }
-  }, [enabled, load])
+  }, [enabled, isLoaded, isSignedIn, load, resetState, userId])
 
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || !isLoaded || !isSignedIn || !userId) return
 
     const handler = () => void load()
     window.addEventListener(WEDDING_UPDATED_EVENT, handler)
     return () => window.removeEventListener(WEDDING_UPDATED_EVENT, handler)
-  }, [enabled, load])
+  }, [enabled, isLoaded, isSignedIn, load, userId])
 
   return {
     data,

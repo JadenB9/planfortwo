@@ -23,7 +23,6 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import {
   ChevronDown,
-  Sparkles,
   ExternalLink,
   CheckCircle,
   Settings,
@@ -114,7 +113,7 @@ function SortableNavItem({
             className="flex shrink-0 cursor-grab items-center opacity-0 transition-opacity active:cursor-grabbing group-hover:opacity-100"
             aria-label={`Drag to reorder ${item.label}`}
           >
-            <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50" />
+            <GripVertical className="text-muted-foreground/50 h-3.5 w-3.5" />
           </span>
           <div className="relative flex-shrink-0">
             <Icon
@@ -127,13 +126,15 @@ function SortableNavItem({
           <div className="min-w-0 flex-1">
             <span>{item.label}</span>
             {item.href === '/website' && websiteSubdomain && (
-              <p className={`truncate text-xs ${isActive ? 'text-wedding-500' : 'text-muted-foreground'}`}>
+              <p
+                className={`truncate text-xs ${isActive ? 'text-wedding-500' : 'text-muted-foreground'}`}
+              >
                 {websiteSubdomain}.planfortwo.com
               </p>
             )}
           </div>
           {item.comingSoon && (
-            <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+            <span className="bg-muted text-muted-foreground ml-auto rounded-full px-2 py-0.5 text-xs">
               Soon
             </span>
           )}
@@ -225,11 +226,11 @@ export function Sidebar() {
   )
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-border bg-white lg:flex dark:border-gray-800 dark:bg-gray-950">
-      <div className="flex h-16 items-center border-b border-border px-6 dark:border-gray-800">
+    <aside className="border-border bg-background sticky top-0 hidden h-screen w-64 flex-col border-r lg:flex dark:border-gray-800 dark:bg-gray-950">
+      <div className="border-border flex h-16 items-center border-b px-6 dark:border-gray-800">
         <Link
           href="/dashboard"
-          className="font-serif text-xl font-bold text-foreground dark:text-gray-100"
+          className="text-foreground font-serif text-xl font-bold dark:text-gray-100"
         >
           Plan<span className="text-wedding-600">For</span>Two
         </Link>
@@ -238,29 +239,29 @@ export function Sidebar() {
       {/* Wedding Switcher — shows role, switch between weddings if multiple */}
       {allWeddings.length >= 1 && (
         <div
-          className="relative border-b border-border px-3 py-2 dark:border-gray-800"
+          className="border-border relative border-b px-3 py-2 dark:border-gray-800"
           ref={switcherRef}
         >
           <button
             onClick={() => allWeddings.length > 1 && setSwitcherOpen((prev) => !prev)}
-            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${allWeddings.length > 1 ? 'cursor-pointer hover:bg-muted dark:hover:bg-gray-800' : 'cursor-default'}`}
+            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${allWeddings.length > 1 ? 'hover:bg-muted cursor-pointer dark:hover:bg-gray-800' : 'cursor-default'}`}
           >
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-foreground dark:text-gray-100">
+              <p className="text-foreground truncate text-sm font-medium dark:text-gray-100">
                 {weddingData?.wedding.name ?? 'Loading...'}
               </p>
-              <p className="truncate text-xs capitalize text-muted-foreground">
+              <p className="text-muted-foreground truncate text-xs capitalize">
                 {allWeddings.find((w) => w.id === weddingId)?.role ?? ''}
               </p>
             </div>
             {allWeddings.length > 1 && (
-              <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <ChevronsUpDown className="text-muted-foreground h-4 w-4 shrink-0" />
             )}
           </button>
 
           {switcherOpen && (
-            <div className="absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-lg border border-border bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
-              <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-gray-500">
+            <div className="border-border bg-background absolute left-3 right-3 top-full z-50 mt-1 overflow-hidden rounded-lg border shadow-lg dark:border-gray-700 dark:bg-gray-900">
+              <p className="text-muted-foreground px-3 py-2 text-xs font-semibold uppercase tracking-wider dark:text-gray-500">
                 Your Weddings
               </p>
               {allWeddings.map((w) => {
@@ -280,7 +281,7 @@ export function Sidebar() {
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{w.name}</p>
-                      <p className="text-xs text-muted-foreground">{w.role}</p>
+                      <p className="text-muted-foreground text-xs">{w.role}</p>
                     </div>
                     {w.tier === 'full' && (
                       <span className="bg-sage-100 text-sage-700 rounded-full px-1.5 py-0.5 text-[10px] font-medium">
@@ -311,7 +312,7 @@ export function Sidebar() {
               {isCollapsible ? (
                 <button
                   onClick={() => toggleGroup(group.label)}
-                  className="mb-1 flex w-full items-center justify-between px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-gray-500"
+                  className="text-muted-foreground mb-1 flex w-full items-center justify-between px-3 text-xs font-semibold uppercase tracking-wider dark:text-gray-500"
                 >
                   <span>{group.label}</span>
                   <ChevronDown
@@ -319,7 +320,7 @@ export function Sidebar() {
                   />
                 </button>
               ) : (
-                <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground dark:text-gray-500">
+                <p className="text-muted-foreground mb-1 px-3 text-xs font-semibold uppercase tracking-wider dark:text-gray-500">
                   {group.label}
                 </p>
               )}
@@ -366,7 +367,7 @@ export function Sidebar() {
       </motion.nav>
 
       {/* Bottom section */}
-      <div className="mt-auto space-y-2 border-t border-border p-3 dark:border-gray-800">
+      <div className="border-border mt-auto space-y-2 border-t p-3 dark:border-gray-800">
         <Link
           href="/settings"
           className={`flex items-center justify-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
@@ -380,7 +381,7 @@ export function Sidebar() {
           />
           Wedding Settings
         </Link>
-        {weddingLoading ? null : tier === 'full' ? (
+        {weddingLoading || !weddingData ? null : tier === 'full' ? (
           <div className="bg-sage-50 border-sage-200 text-sage-700 dark:bg-sage-950 dark:border-sage-800 dark:text-sage-400 flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium">
             <CheckCircle className="h-4 w-4" />
             Full Plan Active
@@ -388,23 +389,22 @@ export function Sidebar() {
         ) : (
           <Link
             href="/upgrade"
-            className="bg-wedding-600 hover:bg-wedding-700 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
+            className="bg-wedding-600 hover:bg-wedding-700 flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
           >
-            <Sparkles className="h-4 w-4" />
             Upgrade Plan
           </Link>
         )}
         <div className="flex items-center justify-between px-3 py-1.5">
           <Link
             href="/"
-            className="flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-muted-foreground dark:text-gray-500 dark:hover:text-gray-300"
+            className="text-muted-foreground hover:text-muted-foreground flex items-center gap-2 text-xs transition-colors dark:text-gray-500 dark:hover:text-gray-300"
           >
             <ExternalLink className="h-3.5 w-3.5" />
             Visit Home Page
           </Link>
           <button
             onClick={toggleDark}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            className="text-muted-foreground hover:bg-muted hover:text-muted-foreground flex h-7 w-7 items-center justify-center rounded-lg transition-colors dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}

@@ -138,7 +138,7 @@ export default function RoadmapPage() {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
-          <h2 className="font-serif text-xl font-semibold text-foreground">Something went wrong</h2>
+          <h2 className="text-foreground font-serif text-xl font-semibold">Something went wrong</h2>
           <p className="mt-2 text-sm text-red-600">{error}</p>
           <button
             onClick={() => {
@@ -158,9 +158,9 @@ export default function RoadmapPage() {
   if (!progress || !effectiveFeatures) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
-        <div className="rounded-2xl border border-border bg-white p-8 text-center shadow-sm">
-          <h2 className="font-serif text-xl font-semibold text-foreground">Planning Roadmap</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+        <div className="border-border bg-background rounded-2xl border p-8 text-center shadow-sm">
+          <h2 className="text-foreground font-serif text-xl font-semibold">Planning Roadmap</h2>
+          <p className="text-muted-foreground mt-2 text-sm">
             Complete your wedding setup to see your planning progress here.
           </p>
           <a
@@ -186,8 +186,8 @@ export default function RoadmapPage() {
         className="mb-8 flex items-center justify-between"
       >
         <div className="flex-1 text-center">
-          <h1 className="text-2xl font-bold text-foreground">Planning Roadmap</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-foreground text-2xl font-bold">Planning Roadmap</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
             Track your wedding planning progress at a glance
           </p>
         </div>
@@ -197,7 +197,7 @@ export default function RoadmapPage() {
           className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
             settingsMode
               ? 'bg-wedding-600 hover:bg-wedding-700 text-white'
-              : 'border border-border bg-white text-foreground hover:bg-muted'
+              : 'border-border bg-background text-foreground hover:bg-muted border'
           }`}
         >
           {settingsMode ? (

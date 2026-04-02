@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { type ReactNode } from 'react'
-import { Check, X, Sparkles } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -45,23 +45,26 @@ export function PricingCard({
       <Card
         className={cn(
           'flex w-full flex-col',
-          highlighted && 'relative border-2 border-amber-400/60 shadow-xl shadow-amber-100/50',
+          highlighted &&
+            'relative border-2 border-orange-400/60 shadow-xl shadow-orange-100/50 dark:shadow-orange-900/20',
         )}
       >
         {highlighted && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-1 text-xs font-semibold text-white shadow-md">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-orange-500 px-4 py-1 text-xs font-semibold text-white shadow-md">
             Most Popular
           </div>
         )}
         <CardHeader className="text-center">
           <CardTitle className="text-xl">{title}</CardTitle>
           <div className="mt-4">
-            <span className="font-serif text-4xl font-bold tracking-tight text-foreground">
+            <span className="text-foreground font-serif text-4xl font-bold tracking-tight">
               {price}
             </span>
-            {price !== 'Free' && <span className="ml-1 text-sm text-muted-foreground">one-time</span>}
+            {price !== 'Free' && (
+              <span className="text-muted-foreground ml-1 text-sm">one-time</span>
+            )}
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+          <p className="text-muted-foreground mt-2 text-sm">{description}</p>
         </CardHeader>
         <CardContent className="flex flex-1 flex-col">
           <ul className="flex-1 space-y-3">
@@ -71,14 +74,17 @@ export function PricingCard({
                   <Check
                     className={cn(
                       'mt-0.5 h-4 w-4 shrink-0',
-                      highlighted ? 'text-amber-500' : 'text-sage-600',
+                      highlighted ? 'text-orange-500' : 'text-sage-600',
                     )}
                   />
                 ) : (
-                  <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/50" />
+                  <X className="text-muted-foreground/50 mt-0.5 h-4 w-4 shrink-0" />
                 )}
                 <span
-                  className={cn('text-sm', feature.included ? 'text-foreground' : 'text-muted-foreground')}
+                  className={cn(
+                    'text-sm',
+                    feature.included ? 'text-foreground' : 'text-muted-foreground',
+                  )}
                 >
                   {feature.label}
                 </span>
@@ -90,19 +96,16 @@ export function PricingCard({
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   asChild
-                  className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 hover:from-amber-400 hover:to-orange-400"
+                  className="w-full rounded-xl bg-orange-500 text-sm font-semibold text-white shadow-sm hover:bg-orange-600"
                   size="lg"
                 >
-                  <Link href={href}>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    {cta}
-                  </Link>
+                  <Link href={href}>{cta}</Link>
                 </Button>
               </motion.div>
             ) : (
               <Button
                 asChild
-                className="w-full rounded-xl bg-muted text-foreground hover:bg-muted"
+                className="bg-muted text-foreground hover:bg-muted w-full rounded-xl"
                 size="lg"
               >
                 <Link href={href}>{cta}</Link>

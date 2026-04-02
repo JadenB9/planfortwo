@@ -1,12 +1,13 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from 'sonner'
 import { clerkAppearance } from '@/lib/clerk-theme'
-import { WeddingProvider } from '@/hooks/use-wedding'
+import { SignOutCleanup } from '@/components/sign-out-cleanup'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider appearance={clerkAppearance} dynamic>
-      <WeddingProvider>{children}</WeddingProvider>
+      <SignOutCleanup />
+      {children}
       <Toaster richColors position="bottom-right" />
     </ClerkProvider>
   )

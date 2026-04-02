@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Lock, Sparkles, ArrowRight } from 'lucide-react'
+import { Lock, ArrowRight } from 'lucide-react'
 import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
 
@@ -27,7 +27,7 @@ export function Paywall({ children }: { children: React.ReactNode }) {
   const { data, loading } = useWedding()
   const tier = data?.wedding.tier
 
-  if (loading) return <>{children}</>
+  if (loading || !data) return <>{children}</>
 
   const isAllowed = ALLOWED_FREE_PATHS.some((p) => pathname.startsWith(p))
   if (tier === 'full' || isAllowed) return <>{children}</>
@@ -54,12 +54,11 @@ export function Paywall({ children }: { children: React.ReactNode }) {
           href="/upgrade"
           className="bg-wedding-600 hover:bg-wedding-700 flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors"
         >
-          <Sparkles className="h-4 w-4" />
           Upgrade Now
         </Link>
         <Link
           href="/dashboard"
-          className="flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
+          className="border-border bg-background text-foreground hover:bg-muted flex items-center justify-center gap-2 rounded-xl border px-6 py-3 text-sm font-semibold shadow-sm transition-colors"
         >
           Back to Dashboard
           <ArrowRight className="h-4 w-4" />

@@ -28,8 +28,8 @@ export default function UpgradeSuccessPage() {
         <CheckCircle className="text-wedding-600 h-16 w-16" />
       </motion.div>
 
-      <h1 className="mt-6 font-serif text-3xl font-bold text-foreground">You&apos;re all set!</h1>
-      <p className="mt-3 text-muted-foreground">
+      <h1 className="text-foreground mt-6 font-serif text-3xl font-bold">You&apos;re all set!</h1>
+      <p className="text-muted-foreground mt-3">
         Your payment was successful. You now have full access to every PlanForTwo feature. Start
         planning your perfect wedding!
       </p>
@@ -44,7 +44,7 @@ export default function UpgradeSuccessPage() {
         </Link>
         <Link
           href="/checklist"
-          className="flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
+          className="border-border bg-background text-foreground hover:bg-muted flex items-center justify-center gap-2 rounded-xl border px-6 py-3 text-sm font-semibold shadow-sm transition-colors"
         >
           Start Your Checklist
         </Link>

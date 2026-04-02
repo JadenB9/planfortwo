@@ -801,7 +801,7 @@ function LinksTab({
                 key={store.name}
                 variants={fadeInUp}
                 onClick={() => onAddStore(store.name)}
-                className="group flex flex-col items-center gap-2.5 rounded-xl border border-border bg-white p-4 shadow-sm transition-all hover:border-border hover:shadow-md"
+                className="border-border bg-background group flex flex-col items-center gap-2.5 rounded-xl border p-4 shadow-sm transition-all hover:border-border hover:shadow-md"
               >
                 <div
                   className="flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform group-hover:scale-110"
@@ -816,7 +816,7 @@ function LinksTab({
           <motion.button
             variants={fadeInUp}
             onClick={onAddCustom}
-            className="group flex flex-col items-center gap-2.5 rounded-xl border border-dashed border-border bg-white p-4 transition-all hover:border-border hover:shadow-md"
+            className="border-border bg-background group flex flex-col items-center gap-2.5 rounded-xl border border-dashed p-4 transition-all hover:border-border hover:shadow-md"
           >
             <div className="bg-wedding-50 text-wedding-600 flex h-12 w-12 items-center justify-center rounded-full transition-transform group-hover:scale-110">
               <Plus className="h-5 w-5" />
