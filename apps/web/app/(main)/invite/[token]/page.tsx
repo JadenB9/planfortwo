@@ -14,7 +14,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#fdf8f6] px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+        <div className="bg-background rounded-2xl border border-gray-200 p-8 shadow-sm">
           <div className="text-center">
             <h1 className="font-serif text-2xl font-bold text-gray-900">You&apos;re Invited!</h1>
             <p className="mt-2 text-gray-600">

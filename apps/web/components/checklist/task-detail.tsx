@@ -132,10 +132,13 @@ export function TaskDetail({
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative w-full max-w-md overflow-y-auto bg-white shadow-xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-white px-6 py-4">
-          <h2 className="font-serif text-lg font-semibold text-foreground">Task Details</h2>
-          <button onClick={onClose} className="text-muted-foreground transition-colors hover:text-muted-foreground">
+      <div className="bg-background relative w-full max-w-md overflow-y-auto shadow-xl">
+        <div className="border-border bg-background sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4">
+          <h2 className="text-foreground font-serif text-lg font-semibold">Task Details</h2>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-muted-foreground transition-colors"
+          >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -157,7 +160,7 @@ export function TaskDetail({
               <div>
                 <label
                   htmlFor="detail-title"
-                  className="mb-1 block text-sm font-medium text-foreground"
+                  className="text-foreground mb-1 block text-sm font-medium"
                 >
                   Title
                 </label>
@@ -167,14 +170,14 @@ export function TaskDetail({
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   disabled={!features.canEditChecklist}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-muted disabled:text-muted-foreground"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="detail-desc"
-                  className="mb-1 block text-sm font-medium text-foreground"
+                  className="text-foreground mb-1 block text-sm font-medium"
                 >
                   Description
                 </label>
@@ -184,7 +187,7 @@ export function TaskDetail({
                   onChange={(e) => setEditDescription(e.target.value)}
                   disabled={!features.canEditChecklist}
                   rows={3}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-muted disabled:text-muted-foreground"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                 />
               </div>
 
@@ -192,7 +195,7 @@ export function TaskDetail({
                 <div>
                   <label
                     htmlFor="detail-due"
-                    className="mb-1 block text-sm font-medium text-foreground"
+                    className="text-foreground mb-1 block text-sm font-medium"
                   >
                     Due Date
                   </label>
@@ -202,14 +205,14 @@ export function TaskDetail({
                     value={editDueDate}
                     onChange={(e) => setEditDueDate(e.target.value)}
                     disabled={!features.canEditChecklist}
-                    className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-muted disabled:text-muted-foreground"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="detail-cat"
-                    className="mb-1 block text-sm font-medium text-foreground"
+                    className="text-foreground mb-1 block text-sm font-medium"
                   >
                     Category
                   </label>
@@ -218,7 +221,7 @@ export function TaskDetail({
                     value={editCategoryId}
                     onChange={(e) => setEditCategoryId(e.target.value)}
                     disabled={!features.canEditChecklist}
-                    className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-muted disabled:text-muted-foreground"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -232,7 +235,7 @@ export function TaskDetail({
               <div>
                 <label
                   htmlFor="detail-priority"
-                  className="mb-1 block text-sm font-medium text-foreground"
+                  className="text-foreground mb-1 block text-sm font-medium"
                 >
                   Priority
                 </label>
@@ -241,7 +244,7 @@ export function TaskDetail({
                   value={editPriority}
                   onChange={(e) => setEditPriority(e.target.value)}
                   disabled={!features.canEditChecklist}
-                  className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:bg-muted disabled:text-muted-foreground"
+                  className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                 >
                   {PRIORITY_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -267,15 +270,15 @@ export function TaskDetail({
             </div>
 
             {/* Notes */}
-            <div className="border-t border-border pt-6">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Notes</h3>
+            <div className="border-border border-t pt-6">
+              <h3 className="text-foreground mb-3 text-sm font-semibold">Notes</h3>
 
               {task.notes.length > 0 ? (
                 <div className="mb-4 space-y-3">
                   {task.notes.map((note) => (
-                    <div key={note.id} className="rounded-xl bg-muted px-4 py-3">
-                      <p className="text-sm text-foreground">{note.content}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
+                    <div key={note.id} className="bg-muted rounded-xl px-4 py-3">
+                      <p className="text-foreground text-sm">{note.content}</p>
+                      <p className="text-muted-foreground mt-1 text-xs">
                         {new Date(note.createdAt).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
@@ -287,7 +290,7 @@ export function TaskDetail({
                   ))}
                 </div>
               ) : (
-                <p className="mb-4 text-sm text-muted-foreground">No notes yet.</p>
+                <p className="text-muted-foreground mb-4 text-sm">No notes yet.</p>
               )}
 
               {features.canAddNotes && (
@@ -300,7 +303,7 @@ export function TaskDetail({
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') void handleAddNote()
                     }}
-                    className="focus:border-wedding-600 focus:ring-wedding-600/20 flex-1 rounded-xl border border-border px-4 py-2 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground flex-1 rounded-xl border px-4 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                   />
                   <button
                     onClick={handleAddNote}
@@ -315,7 +318,7 @@ export function TaskDetail({
 
             {/* Delete */}
             {features.canDeleteTasks && (
-              <div className="border-t border-border pt-6">
+              <div className="border-border border-t pt-6">
                 {confirmDelete ? (
                   <div className="rounded-xl border border-red-200 bg-red-50 p-4">
                     <p className="mb-3 text-sm text-red-700">
@@ -331,7 +334,7 @@ export function TaskDetail({
                       </button>
                       <button
                         onClick={() => setConfirmDelete(false)}
-                        className="rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                        className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2 text-sm font-medium transition-colors"
                       >
                         Cancel
                       </button>
@@ -349,7 +352,7 @@ export function TaskDetail({
             )}
           </div>
         ) : (
-          <p className="p-6 text-sm text-muted-foreground">Task not found.</p>
+          <p className="text-muted-foreground p-6 text-sm">Task not found.</p>
         )}
       </div>
     </div>

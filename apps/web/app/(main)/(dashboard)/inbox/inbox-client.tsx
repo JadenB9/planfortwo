@@ -758,7 +758,7 @@ export default function InboxPage() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
                 <AtSign className="h-8 w-8 text-rose-500" />
               </div>
-              <h1 className="mb-2 text-2xl font-bold text-foreground">Claim Your Email Address</h1>
+              <h1 className="text-foreground mb-2 text-2xl font-bold">Claim Your Email Address</h1>
               <p className="text-muted-foreground">
                 Get your own <span className="font-medium">@planfortwo.com</span> email address to
                 send and receive messages.
@@ -776,10 +776,12 @@ export default function InboxPage() {
                     onChange={(e) => setClaimAddress(e.target.value.toLowerCase())}
                     className="flex-1"
                   />
-                  <span className="whitespace-nowrap text-sm text-muted-foreground">@planfortwo.com</span>
+                  <span className="text-muted-foreground whitespace-nowrap text-sm">
+                    @planfortwo.com
+                  </span>
                 </div>
                 {checkingAvailability && (
-                  <p className="mt-1 text-sm text-muted-foreground">Checking availability...</p>
+                  <p className="text-muted-foreground mt-1 text-sm">Checking availability...</p>
                 )}
                 {availability && !checkingAvailability && (
                   <p
@@ -808,7 +810,7 @@ export default function InboxPage() {
               </div>
 
               {claimAddress && claimDisplayName && (
-                <div className="rounded-lg bg-muted p-3 text-sm">
+                <div className="bg-muted rounded-lg p-3 text-sm">
                   <span className="text-muted-foreground">Preview: </span>
                   <span className="font-medium">
                     {claimDisplayName} &lt;{claimAddress}@planfortwo.com&gt;
@@ -857,8 +859,8 @@ export default function InboxPage() {
         className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Inbox</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-foreground text-2xl font-bold">Inbox</h1>
+          <p className="text-muted-foreground text-sm">
             {addresses[0]!.address}@planfortwo.com &middot; {totalEmails} message
             {totalEmails !== 1 ? 's' : ''}
             {unreadCount > 0 && ` \u00b7 ${unreadCount} unread`}
@@ -866,7 +868,7 @@ export default function InboxPage() {
         </div>
         <div className="flex items-center gap-2">
           <div className="relative flex-1 sm:w-56 sm:flex-initial">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder="Search emails..."
               value={searchQuery}
@@ -936,7 +938,7 @@ export default function InboxPage() {
         >
           <div className="h-full overflow-y-auto">
             {emailList.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center p-8 text-muted-foreground">
+              <div className="text-muted-foreground flex h-full flex-col items-center justify-center p-8">
                 <Inbox className="mb-3 h-12 w-12" />
                 <p className="text-sm">No emails yet</p>
               </div>
@@ -954,7 +956,7 @@ export default function InboxPage() {
                   >
                     <div className="pt-1">
                       {email.isRead ? (
-                        <MailOpen className="h-4 w-4 text-muted-foreground" />
+                        <MailOpen className="text-muted-foreground h-4 w-4" />
                       ) : (
                         <Mail className="h-4 w-4 text-blue-500" />
                       )}
@@ -962,13 +964,13 @@ export default function InboxPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
                         <p
-                          className={`truncate text-sm ${!email.isRead ? 'font-semibold text-foreground' : 'text-foreground'}`}
+                          className={`truncate text-sm ${!email.isRead ? 'text-foreground font-semibold' : 'text-foreground'}`}
                         >
                           {email.direction === 'inbound'
                             ? (email.fromName ?? email.fromAddress)
                             : `To: ${email.toAddress}`}
                         </p>
-                        <span className="ml-2 flex-shrink-0 text-xs text-muted-foreground">
+                        <span className="text-muted-foreground ml-2 flex-shrink-0 text-xs">
                           {formatDate(email.createdAt)}
                         </span>
                       </div>
@@ -978,11 +980,11 @@ export default function InboxPage() {
                         {email.subject}
                       </p>
                       <div className="mt-0.5 flex items-center gap-1.5">
-                        <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                        <p className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
                           {getSnippet(email)}
                         </p>
                         {email.attachments && email.attachments.length > 0 && (
-                          <Paperclip className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
+                          <Paperclip className="text-muted-foreground h-3 w-3 flex-shrink-0" />
                         )}
                       </div>
                     </div>
@@ -993,7 +995,7 @@ export default function InboxPage() {
                       {email.isStarred ? (
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       ) : (
-                        <StarOff className="h-4 w-4 text-muted-foreground/50 hover:text-yellow-400" />
+                        <StarOff className="text-muted-foreground/50 h-4 w-4 hover:text-yellow-400" />
                       )}
                     </button>
                   </motion.div>
@@ -1012,7 +1014,7 @@ export default function InboxPage() {
                 >
                   Previous
                 </Button>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-muted-foreground text-xs">
                   Page {page} of {Math.max(1, Math.ceil(totalEmails / 20))}
                 </span>
                 <Button
@@ -1036,7 +1038,7 @@ export default function InboxPage() {
               <div className="border-b p-4">
                 <button
                   onClick={() => setSelectedEmail(null)}
-                  className="mb-2 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground md:hidden"
+                  className="text-muted-foreground hover:text-foreground mb-2 flex items-center gap-1 text-sm md:hidden"
                 >
                   <ChevronLeft className="h-4 w-4" /> Back to inbox
                 </button>
@@ -1054,34 +1056,34 @@ export default function InboxPage() {
                         {selectedEmail.direction === 'inbound' ? 'Received' : 'Sent'}
                       </Badge>
                     </div>
-                    <h2 className="text-lg font-semibold text-foreground">
+                    <h2 className="text-foreground text-lg font-semibold">
                       {selectedEmail.subject || '(No subject)'}
                     </h2>
-                    <div className="mt-2 space-y-0.5 text-sm text-muted-foreground">
+                    <div className="text-muted-foreground mt-2 space-y-0.5 text-sm">
                       <p>
-                        <span className="font-medium text-foreground">From:</span>{' '}
+                        <span className="text-foreground font-medium">From:</span>{' '}
                         {selectedEmail.fromName
                           ? `${selectedEmail.fromName} <${selectedEmail.fromAddress}>`
                           : selectedEmail.fromAddress}
                       </p>
                       <p>
-                        <span className="font-medium text-foreground">To:</span>{' '}
+                        <span className="text-foreground font-medium">To:</span>{' '}
                         {selectedEmail.toAddress}
                       </p>
                       {selectedEmail.ccAddresses && (
                         <p>
-                          <span className="font-medium text-foreground">CC:</span>{' '}
+                          <span className="text-foreground font-medium">CC:</span>{' '}
                           {selectedEmail.ccAddresses}
                         </p>
                       )}
                       {selectedEmail.replyTo && (
                         <p>
-                          <span className="font-medium text-foreground">Reply-To:</span>{' '}
+                          <span className="text-foreground font-medium">Reply-To:</span>{' '}
                           {selectedEmail.replyTo}
                         </p>
                       )}
                       <p>
-                        <span className="font-medium text-foreground">Date:</span>{' '}
+                        <span className="text-foreground font-medium">Date:</span>{' '}
                         {new Date(selectedEmail.createdAt).toLocaleString([], {
                           weekday: 'short',
                           year: 'numeric',
@@ -1101,9 +1103,9 @@ export default function InboxPage() {
                       onClick={() => handleToggleRead(selectedEmail)}
                     >
                       {selectedEmail.isRead ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="text-muted-foreground h-4 w-4" />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="text-muted-foreground h-4 w-4" />
                       )}
                     </Button>
                     <Button
@@ -1119,7 +1121,7 @@ export default function InboxPage() {
                       {selectedEmail.isStarred ? (
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       ) : (
-                        <StarOff className="h-4 w-4 text-muted-foreground" />
+                        <StarOff className="text-muted-foreground h-4 w-4" />
                       )}
                     </Button>
                     <Button
@@ -1140,7 +1142,7 @@ export default function InboxPage() {
                         setShowCompose(true)
                       }}
                     >
-                      <Reply className="h-4 w-4 text-muted-foreground" />
+                      <Reply className="text-muted-foreground h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -1168,7 +1170,7 @@ export default function InboxPage() {
                     onLoad={handleIframeLoad}
                   />
                 ) : (
-                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-foreground">
+                  <pre className="text-foreground whitespace-pre-wrap font-sans text-sm leading-relaxed">
                     {selectedEmail.textBody ?? '(No content)'}
                   </pre>
                 )}
@@ -1177,7 +1179,7 @@ export default function InboxPage() {
               {/* Attachments */}
               {selectedEmail.attachments && selectedEmail.attachments.length > 0 && (
                 <div className="border-t p-4">
-                  <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <p className="text-muted-foreground mb-2 flex items-center gap-1.5 text-xs font-medium">
                     <Paperclip className="h-3 w-3" />
                     {selectedEmail.attachments.length} attachment
                     {selectedEmail.attachments.length !== 1 ? 's' : ''}
@@ -1201,14 +1203,16 @@ export default function InboxPage() {
                             toast.error('Failed to open attachment')
                           }
                         }}
-                        className="flex cursor-pointer items-center gap-2 rounded-lg border bg-muted px-3 py-2 transition-colors hover:border-rose-200 hover:bg-rose-50"
+                        className="bg-muted flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition-colors hover:border-rose-200 hover:bg-rose-50"
                       >
                         <span className="text-base">{getFileIcon(att.contentType)}</span>
                         <div className="min-w-0 text-left">
-                          <p className="truncate text-xs font-medium text-foreground">
+                          <p className="text-foreground truncate text-xs font-medium">
                             {att.filename}
                           </p>
-                          <p className="text-[10px] text-muted-foreground">{formatFileSize(att.size)}</p>
+                          <p className="text-muted-foreground text-[10px]">
+                            {formatFileSize(att.size)}
+                          </p>
                         </div>
                         <Download className="ml-1 h-3.5 w-3.5 text-rose-500" />
                       </button>
@@ -1218,7 +1222,7 @@ export default function InboxPage() {
               )}
             </div>
           ) : (
-            <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
+            <div className="text-muted-foreground flex h-full flex-col items-center justify-center">
               <Mail className="mb-3 h-16 w-16 opacity-30" />
               <p className="text-sm font-medium">Select an email to read</p>
               <p className="mt-1 text-xs">Choose a message from the list on the left</p>
@@ -1241,7 +1245,7 @@ export default function InboxPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="text-xs text-muted-foreground">
+              <Label className="text-muted-foreground text-xs">
                 From: {addresses[0]?.displayName} &lt;{addresses[0]?.address}@planfortwo.com&gt;
               </Label>
             </div>
@@ -1296,7 +1300,7 @@ export default function InboxPage() {
                 <Paperclip className="h-4 w-4" />
                 Attach Files
               </Button>
-              <span className="ml-2 text-xs text-muted-foreground">
+              <span className="text-muted-foreground ml-2 text-xs">
                 PDF, JPG, PNG, HEIC up to 25MB each
               </span>
 
@@ -1305,19 +1309,21 @@ export default function InboxPage() {
                   {composeAttachments.map((att) => (
                     <div
                       key={att.id}
-                      className="flex items-center gap-2 rounded-md border border-border bg-muted px-3 py-2 text-sm"
+                      className="border-border bg-muted flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
                     >
                       {att.contentType.startsWith('image/') ? (
                         <FileImage className="h-4 w-4 shrink-0 text-blue-500" />
                       ) : (
                         <FileText className="h-4 w-4 shrink-0 text-red-500" />
                       )}
-                      <span className="min-w-0 flex-1 truncate text-foreground">{att.filename}</span>
-                      <span className="shrink-0 text-xs text-muted-foreground">
+                      <span className="text-foreground min-w-0 flex-1 truncate">
+                        {att.filename}
+                      </span>
+                      <span className="text-muted-foreground shrink-0 text-xs">
                         {formatFileSize(att.size)}
                       </span>
                       {att.status === 'uploading' && (
-                        <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" />
+                        <Loader2 className="text-muted-foreground h-3.5 w-3.5 shrink-0 animate-spin" />
                       )}
                       {att.status === 'done' && (
                         <Check className="h-3.5 w-3.5 shrink-0 text-green-500" />
@@ -1328,7 +1334,7 @@ export default function InboxPage() {
                       <button
                         type="button"
                         onClick={() => removeAttachment(att.id)}
-                        className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-muted-foreground"
+                        className="text-muted-foreground hover:bg-muted hover:text-muted-foreground shrink-0 rounded p-0.5"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -1384,7 +1390,7 @@ export default function InboxPage() {
           ) : (
             <div className="space-y-4">
               <div>
-                <Label className="text-xs text-muted-foreground">
+                <Label className="text-muted-foreground text-xs">
                   From: {addresses[0]?.displayName} &lt;{addresses[0]?.address}@planfortwo.com&gt;
                 </Label>
               </div>
@@ -1407,7 +1413,7 @@ export default function InboxPage() {
                   </button>
                 </div>
                 <div className="relative mb-2">
-                  <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Search className="text-muted-foreground absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
                   <Input
                     placeholder="Search guests..."
                     value={massGuestSearch}
@@ -1415,9 +1421,9 @@ export default function InboxPage() {
                     className="pl-9 text-sm"
                   />
                 </div>
-                <div className="max-h-48 overflow-y-auto rounded-lg border border-border">
+                <div className="border-border max-h-48 overflow-y-auto rounded-lg border">
                   {filteredMassGuests.length === 0 ? (
-                    <p className="p-3 text-center text-sm text-muted-foreground">
+                    <p className="text-muted-foreground p-3 text-center text-sm">
                       {guestsWithEmail.length === 0
                         ? 'No guests have email addresses'
                         : 'No matching guests'}
@@ -1426,19 +1432,19 @@ export default function InboxPage() {
                     filteredMassGuests.map((guest) => (
                       <label
                         key={guest.id}
-                        className="flex cursor-pointer items-center gap-3 border-b border-border px-3 py-2 last:border-b-0 hover:bg-muted"
+                        className="border-border hover:bg-muted flex cursor-pointer items-center gap-3 border-b px-3 py-2 last:border-b-0"
                       >
                         <input
                           type="checkbox"
                           checked={massSelected.has(guest.id)}
                           onChange={() => toggleMassGuest(guest.id)}
-                          className="h-4 w-4 rounded border-border text-rose-600 focus:ring-rose-500"
+                          className="border-border h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
                         />
                         <div className="min-w-0 flex-1">
-                          <span className="text-sm font-medium text-foreground">
+                          <span className="text-foreground text-sm font-medium">
                             {guest.firstName} {guest.lastName}
                           </span>
-                          <span className="ml-2 text-xs text-muted-foreground">{guest.email}</span>
+                          <span className="text-muted-foreground ml-2 text-xs">{guest.email}</span>
                         </div>
                       </label>
                     ))
@@ -1488,7 +1494,7 @@ export default function InboxPage() {
                   <Paperclip className="h-4 w-4" />
                   Attach Files
                 </Button>
-                <span className="ml-2 text-xs text-muted-foreground">
+                <span className="text-muted-foreground ml-2 text-xs">
                   PDF, JPG, PNG, HEIC up to 25MB each
                 </span>
 
@@ -1497,21 +1503,21 @@ export default function InboxPage() {
                     {massAttachments.map((att) => (
                       <div
                         key={att.id}
-                        className="flex items-center gap-2 rounded-md border border-border bg-muted px-3 py-2 text-sm"
+                        className="border-border bg-muted flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
                       >
                         {att.contentType.startsWith('image/') ? (
                           <FileImage className="h-4 w-4 shrink-0 text-blue-500" />
                         ) : (
                           <FileText className="h-4 w-4 shrink-0 text-red-500" />
                         )}
-                        <span className="min-w-0 flex-1 truncate text-foreground">
+                        <span className="text-foreground min-w-0 flex-1 truncate">
                           {att.filename}
                         </span>
-                        <span className="shrink-0 text-xs text-muted-foreground">
+                        <span className="text-muted-foreground shrink-0 text-xs">
                           {formatFileSize(att.size)}
                         </span>
                         {att.status === 'uploading' && (
-                          <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" />
+                          <Loader2 className="text-muted-foreground h-3.5 w-3.5 shrink-0 animate-spin" />
                         )}
                         {att.status === 'done' && (
                           <Check className="h-3.5 w-3.5 shrink-0 text-green-500" />
@@ -1523,7 +1529,7 @@ export default function InboxPage() {
                           type="button"
                           onClick={() => removeMassAttachment(att.id)}
                           disabled={massSending}
-                          className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-muted-foreground"
+                          className="text-muted-foreground hover:bg-muted hover:text-muted-foreground shrink-0 rounded p-0.5"
                         >
                           <X className="h-3.5 w-3.5" />
                         </button>
@@ -1535,7 +1541,7 @@ export default function InboxPage() {
 
               {massSending && (
                 <div className="space-y-1">
-                  <div className="h-2 overflow-hidden rounded-full bg-muted">
+                  <div className="bg-muted h-2 overflow-hidden rounded-full">
                     <div
                       className="h-full rounded-full bg-rose-500 transition-all"
                       style={{
@@ -1543,7 +1549,7 @@ export default function InboxPage() {
                       }}
                     />
                   </div>
-                  <p className="text-center text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-center text-xs">
                     Sending {massSendProgress.sent} of {massSendProgress.total}...
                   </p>
                 </div>

@@ -23,8 +23,8 @@ export function TemplatePreview({ templateId, selected = false, onClick }: Templ
     >
       <TemplatePreviewContent template={template} />
       <div className="px-2.5 py-2">
-        <p className="text-xs font-semibold text-foreground">{template.name}</p>
-        <p className="mt-0.5 line-clamp-1 text-[10px] leading-tight text-muted-foreground">
+        <p className="text-foreground text-xs font-semibold">{template.name}</p>
+        <p className="text-muted-foreground mt-0.5 line-clamp-1 text-[10px] leading-tight">
           {template.description}
         </p>
       </div>

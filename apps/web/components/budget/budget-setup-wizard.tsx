@@ -97,9 +97,9 @@ export function BudgetSetupWizard({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
+      <div className="bg-background w-full max-w-xl rounded-2xl p-6 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="font-serif text-xl font-semibold text-foreground">Set Up Your Budget</h2>
+          <h2 className="text-foreground font-serif text-xl font-semibold">Set Up Your Budget</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -125,21 +125,23 @@ export function BudgetSetupWizard({
         {/* Step 1: Enter total budget */}
         {step === 1 && (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               What is your total wedding budget? We will suggest category allocations based on
               common wedding spending patterns.
             </p>
             <div>
-              <label className="mb-1 block text-sm font-medium text-foreground">Total Budget</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">Total Budget</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <span className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2">
+                  $
+                </span>
                 <input
                   type="number"
                   value={totalBudget}
                   onChange={(e) => setTotalBudget(e.target.value)}
                   placeholder="30,000"
                   min="0"
-                  className="w-full rounded-xl border border-border py-2.5 pl-7 pr-3 text-sm text-foreground"
+                  className="border-border text-foreground w-full rounded-xl border py-2.5 pl-7 pr-3 text-sm"
                 />
               </div>
             </div>
@@ -159,7 +161,9 @@ export function BudgetSetupWizard({
         {step === 2 && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Adjust allocations to fit your priorities.</p>
+              <p className="text-muted-foreground text-sm">
+                Adjust allocations to fit your priorities.
+              </p>
               <p
                 className={`text-sm font-medium ${getAllocatedTotal() > Number(totalBudget) ? 'text-red-600' : 'text-muted-foreground'}`}
               >
@@ -171,9 +175,9 @@ export function BudgetSetupWizard({
               {allocations.map((alloc, i) => (
                 <div key={alloc.name} className="flex items-center gap-3">
                   <span className="w-6 text-center">{alloc.icon}</span>
-                  <span className="w-36 text-sm text-foreground">{alloc.name}</span>
+                  <span className="text-foreground w-36 text-sm">{alloc.name}</span>
                   <div className="relative flex-1">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2 text-xs">
                       $
                     </span>
                     <input
@@ -181,10 +185,10 @@ export function BudgetSetupWizard({
                       value={alloc.amount}
                       onChange={(e) => handleAllocationChange(i, e.target.value)}
                       min="0"
-                      className="w-full rounded-lg border border-border py-1.5 pl-6 pr-2 text-sm text-foreground"
+                      className="border-border text-foreground w-full rounded-lg border py-1.5 pl-6 pr-2 text-sm"
                     />
                   </div>
-                  <span className="w-10 text-right text-xs text-muted-foreground">
+                  <span className="text-muted-foreground w-10 text-right text-xs">
                     {Number(totalBudget) > 0
                       ? Math.round((alloc.amount / Number(totalBudget)) * 100)
                       : 0}
@@ -197,7 +201,7 @@ export function BudgetSetupWizard({
             <div className="flex justify-between pt-2">
               <button
                 onClick={() => setStep(1)}
-                className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2.5 text-sm font-medium"
               >
                 Back
               </button>
@@ -214,12 +218,14 @@ export function BudgetSetupWizard({
         {/* Step 3: Confirm */}
         {step === 3 && (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">Review your budget setup before confirming.</p>
+            <p className="text-muted-foreground text-sm">
+              Review your budget setup before confirming.
+            </p>
 
-            <div className="rounded-xl border border-border bg-muted p-4">
+            <div className="border-border bg-muted rounded-xl border p-4">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">Total Budget</span>
-                <span className="text-lg font-bold text-foreground">
+                <span className="text-foreground text-sm font-medium">Total Budget</span>
+                <span className="text-foreground text-lg font-bold">
                   {formatCurrency(Number(totalBudget))}
                 </span>
               </div>
@@ -229,7 +235,7 @@ export function BudgetSetupWizard({
                     <span className="text-muted-foreground">
                       {alloc.icon} {alloc.name}
                     </span>
-                    <span className="font-medium text-foreground">
+                    <span className="text-foreground font-medium">
                       {formatCurrency(alloc.amount)}
                     </span>
                   </div>
@@ -242,7 +248,7 @@ export function BudgetSetupWizard({
             <div className="flex justify-between pt-2">
               <button
                 onClick={() => setStep(2)}
-                className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2.5 text-sm font-medium"
               >
                 Back
               </button>

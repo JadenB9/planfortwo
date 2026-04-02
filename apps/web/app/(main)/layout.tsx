@@ -5,7 +5,7 @@ import { SignOutCleanup } from '@/components/sign-out-cleanup'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider appearance={clerkAppearance} dynamic>
+    <ClerkProvider appearance={clerkAppearance}>
       <SignOutCleanup />
       {children}
       <Toaster richColors position="bottom-right" />

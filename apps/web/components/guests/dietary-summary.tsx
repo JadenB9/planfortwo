@@ -20,16 +20,16 @@ export function DietarySummaryCard({ summary }: DietarySummaryCardProps) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-4">
-        <h3 className="font-serif text-sm font-semibold text-foreground">Dietary Restrictions</h3>
-        <p className="mt-1 text-sm text-muted-foreground">No dietary restrictions reported yet.</p>
+      <div className="border-border bg-background rounded-2xl border p-4">
+        <h3 className="text-foreground font-serif text-sm font-semibold">Dietary Restrictions</h3>
+        <p className="text-muted-foreground mt-1 text-sm">No dietary restrictions reported yet.</p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-4">
-      <h3 className="font-serif text-sm font-semibold text-foreground">Dietary Restrictions</h3>
+    <div className="border-border bg-background rounded-2xl border p-4">
+      <h3 className="text-foreground font-serif text-sm font-semibold">Dietary Restrictions</h3>
       <div className="mt-3 space-y-2">
         {items.map((item) => (
           <div key={item.label} className="flex items-center justify-between text-sm">

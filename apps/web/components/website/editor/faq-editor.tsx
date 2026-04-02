@@ -39,15 +39,12 @@ export function FaqEditor({ content, onChange }: FaqEditorProps) {
 
   return (
     <div className="space-y-4">
-      <label className="text-sm font-medium text-foreground">Questions & Answers</label>
+      <label className="text-foreground text-sm font-medium">Questions & Answers</label>
 
       {questions.map((item, i) => (
-        <div
-          key={i}
-          className={`space-y-3 rounded-lg border border-border p-4 ${i > 0 ? '' : ''}`}
-        >
+        <div key={i} className={`border-border space-y-3 rounded-lg border p-4 ${i > 0 ? '' : ''}`}>
           <div className="flex items-start justify-between gap-2">
-            <span className="mt-1 text-xs font-medium text-muted-foreground">Q{i + 1}</span>
+            <span className="text-muted-foreground mt-1 text-xs font-medium">Q{i + 1}</span>
             <button
               type="button"
               onClick={() => removeQuestion(i)}
@@ -57,23 +54,23 @@ export function FaqEditor({ content, onChange }: FaqEditorProps) {
             </button>
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Question</label>
+            <label className="text-muted-foreground text-xs font-medium">Question</label>
             <input
               type="text"
               value={item.question}
               onChange={(e) => updateQuestion(i, 'question', e.target.value)}
               placeholder="e.g., What is the dress code?"
-              className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Answer</label>
+            <label className="text-muted-foreground text-xs font-medium">Answer</label>
             <textarea
               value={item.answer}
               onChange={(e) => updateQuestion(i, 'answer', e.target.value)}
               placeholder="Your answer..."
               rows={3}
-              className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
         </div>

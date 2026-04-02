@@ -90,7 +90,7 @@ export function TaskCard({
 
   return (
     <motion.div
-      className={`hover:border-wedding-200 group flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-foreground transition-colors ${
+      className={`hover:border-wedding-200 bg-background text-foreground group flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${
         isCompleted ? 'border-border' : 'border-border'
       }`}
       layout
@@ -101,7 +101,7 @@ export function TaskCard({
     >
       {features.canReorderTasks && dragHandleProps && (
         <button
-          className="cursor-grab touch-none text-muted-foreground hover:text-muted-foreground active:cursor-grabbing"
+          className="text-muted-foreground hover:text-muted-foreground cursor-grab touch-none active:cursor-grabbing"
           {...dragHandleProps}
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,7 +170,7 @@ export function TaskCard({
           </div>
         </div>
         {task.description && !isCompleted && (
-          <span className="truncate text-xs text-muted-foreground">{task.description}</span>
+          <span className="text-muted-foreground truncate text-xs">{task.description}</span>
         )}
       </button>
 

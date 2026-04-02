@@ -42,7 +42,7 @@ export function FaqSection({ title, content }: FaqSectionProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group rounded-2xl bg-white p-6 shadow-sm"
+              className="bg-background group rounded-2xl p-6 shadow-sm"
             >
               <summary
                 className={`cursor-pointer list-none font-semibold ${headingClass}`}

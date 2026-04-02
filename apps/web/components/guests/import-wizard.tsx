@@ -58,9 +58,9 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
   return (
     <div className="space-y-6">
       {step === 'upload' && (
-        <div className="rounded-2xl border-2 border-dashed border-border p-8 text-center">
+        <div className="border-border rounded-2xl border-2 border-dashed p-8 text-center">
           <svg
-            className="mx-auto h-12 w-12 text-muted-foreground"
+            className="text-muted-foreground mx-auto h-12 w-12"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -72,8 +72,10 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
             />
           </svg>
-          <p className="mt-3 text-sm text-muted-foreground">Upload a CSV file with guest information.</p>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-3 text-sm">
+            Upload a CSV file with guest information.
+          </p>
+          <p className="text-muted-foreground mt-1 text-xs">
             Expected columns: firstName, lastName, email, phone, side, isVip, isChild, hasPlusOne,
             plusOneName
           </p>
@@ -95,26 +97,26 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
 
       {step === 'preview' && previewRows.length > 0 && (
         <div>
-          <h3 className="font-serif text-lg font-semibold text-foreground">Preview</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h3 className="text-foreground font-serif text-lg font-semibold">Preview</h3>
+          <p className="text-muted-foreground mt-1 text-sm">
             Showing first {Math.min(previewRows.length - 1, 5)} rows from {file?.name}
           </p>
-          <div className="mt-4 overflow-x-auto rounded-xl border border-border">
+          <div className="border-border mt-4 overflow-x-auto rounded-xl border">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-border bg-muted">
+                <tr className="border-border bg-muted border-b">
                   {previewRows[0]?.map((header, i) => (
-                    <th key={i} className="px-3 py-2 font-semibold text-foreground">
+                    <th key={i} className="text-foreground px-3 py-2 font-semibold">
                       {header}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-border divide-y">
                 {previewRows.slice(1).map((row, ri) => (
                   <tr key={ri}>
                     {row.map((cell, ci) => (
-                      <td key={ci} className="px-3 py-2 text-muted-foreground">
+                      <td key={ci} className="text-muted-foreground px-3 py-2">
                         {cell}
                       </td>
                     ))}
@@ -130,7 +132,7 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
                 setFile(null)
                 setPreviewRows([])
               }}
-              className="rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+              className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2 text-sm font-medium"
             >
               Back
             </button>
@@ -146,8 +148,8 @@ export function ImportWizard({ onImport, onClose }: ImportWizardProps) {
       )}
 
       {step === 'results' && results && (
-        <div className="rounded-2xl border border-border bg-white p-6">
-          <h3 className="font-serif text-lg font-semibold text-foreground">Import Complete</h3>
+        <div className="border-border bg-background rounded-2xl border p-6">
+          <h3 className="text-foreground font-serif text-lg font-semibold">Import Complete</h3>
           <div className="mt-4 grid grid-cols-3 gap-4">
             <div className="rounded-xl bg-green-50 p-3 text-center">
               <p className="text-2xl font-bold text-green-700">{results.imported}</p>

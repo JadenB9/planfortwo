@@ -72,7 +72,7 @@ function SortableSection({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 transition-shadow ${
+      className={`bg-background flex items-center gap-3 rounded-xl border px-4 py-3 transition-shadow ${
         isDragging
           ? 'border-wedding-200 bg-wedding-50 ring-wedding-200 shadow-md ring-1'
           : 'border-border shadow-sm'
@@ -83,10 +83,10 @@ function SortableSection({
         className="flex shrink-0 cursor-grab items-center active:cursor-grabbing"
         aria-label={`Drag to reorder ${section.title || label}`}
       >
-        <GripVertical className="h-4 w-4 text-muted-foreground" />
+        <GripVertical className="text-muted-foreground h-4 w-4" />
       </span>
-      <Icon className="h-4 w-4 text-muted-foreground" />
-      <span className="flex-1 text-sm font-medium text-foreground">{section.title || label}</span>
+      <Icon className="text-muted-foreground h-4 w-4" />
+      <span className="text-foreground flex-1 text-sm font-medium">{section.title || label}</span>
       <Switch
         checked={section.isVisible}
         onCheckedChange={(checked) => onToggleVisibility(section.id, checked)}
@@ -155,7 +155,7 @@ export function SectionManager({
 
   return (
     <div>
-      <h3 className="mb-4 text-lg font-semibold text-foreground">Manage Sections</h3>
+      <h3 className="text-foreground mb-4 text-lg font-semibold">Manage Sections</h3>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={sorted.map((s) => s.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-2">
@@ -178,7 +178,7 @@ export function SectionManager({
           <button
             type="button"
             onClick={() => setShowAddMenu((v) => !v)}
-            className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add Section
@@ -199,9 +199,9 @@ export function SectionManager({
                       onAddBuiltIn(def.sectionType, def.title, def.content)
                       setShowAddMenu(false)
                     }}
-                    className="flex items-center gap-2.5 rounded-lg border border-dashed border-border bg-muted px-3 py-2.5 text-left text-sm text-foreground transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
+                    className="border-border bg-muted text-foreground flex items-center gap-2.5 rounded-lg border border-dashed px-3 py-2.5 text-left text-sm transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
                   >
-                    {Icon && <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />}
+                    {Icon && <Icon className="text-muted-foreground h-4 w-4 shrink-0" />}
                     <span>{label ?? def.title}</span>
                   </button>
                 )

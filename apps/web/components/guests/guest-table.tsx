@@ -36,9 +36,9 @@ export function GuestTable({
 
   if (guests.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-8 text-center">
+      <div className="border-border bg-background rounded-2xl border p-8 text-center">
         <svg
-          className="mx-auto h-12 w-12 text-muted-foreground/50"
+          className="text-muted-foreground/50 mx-auto h-12 w-12"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -50,7 +50,7 @@ export function GuestTable({
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
           />
         </svg>
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-3 text-sm">
           No guests yet. Add your first guest to get started.
         </p>
       </div>
@@ -58,23 +58,23 @@ export function GuestTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+    <div className="border-border bg-background overflow-hidden rounded-2xl border shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
-              <th className="px-4 py-3 font-serif font-semibold text-foreground">Name</th>
-              <th className="px-4 py-3 font-serif font-semibold text-foreground">RSVP</th>
-              <th className="px-4 py-3 font-serif font-semibold text-foreground">Invite</th>
-              <th className="hidden px-4 py-3 font-serif font-semibold text-foreground sm:table-cell">
+            <tr className="border-border bg-muted/50 border-b">
+              <th className="text-foreground px-4 py-3 font-serif font-semibold">Name</th>
+              <th className="text-foreground px-4 py-3 font-serif font-semibold">RSVP</th>
+              <th className="text-foreground px-4 py-3 font-serif font-semibold">Invite</th>
+              <th className="text-foreground hidden px-4 py-3 font-serif font-semibold sm:table-cell">
                 Tags
               </th>
-              <th className="hidden px-4 py-3 font-serif font-semibold text-foreground sm:table-cell">
+              <th className="text-foreground hidden px-4 py-3 font-serif font-semibold sm:table-cell">
                 +1
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-border divide-y">
             {guests.map((guest) => (
               <tr
                 key={guest.id}
@@ -87,7 +87,7 @@ export function GuestTable({
                         e.stopPropagation()
                         onEditGuest(guest)
                       }}
-                      className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
+                      className="text-muted-foreground hover:bg-muted hover:text-muted-foreground shrink-0 rounded-md p-1 transition-colors"
                       title="Edit guest"
                     >
                       <Pencil className="h-3.5 w-3.5" />
@@ -99,11 +99,11 @@ export function GuestTable({
                           setDeleteConfirmGuest(guest)
                         }}
                         disabled={deletingGuestId === guest.id}
-                        className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                        className="text-muted-foreground shrink-0 rounded-md p-1 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                         title="Remove guest"
                       >
                         {deletingGuestId === guest.id ? (
-                          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-border border-t-red-600" />
+                          <div className="border-border h-3.5 w-3.5 animate-spin rounded-full border-2 border-t-red-600" />
                         ) : (
                           <Trash2 className="h-3.5 w-3.5" />
                         )}
@@ -111,7 +111,7 @@ export function GuestTable({
                     )}
                     <div onClick={() => onSelectGuest(guest)} className="cursor-pointer">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-foreground">
+                        <span className="text-foreground font-medium">
                           {guest.firstName} {guest.lastName}
                         </span>
                         {guest.isVip && (
@@ -125,7 +125,9 @@ export function GuestTable({
                           </span>
                         )}
                       </div>
-                      {guest.email && <p className="text-xs text-muted-foreground">{guest.email}</p>}
+                      {guest.email && (
+                        <p className="text-muted-foreground text-xs">{guest.email}</p>
+                      )}
                     </div>
                   </div>
                 </td>
@@ -151,7 +153,7 @@ export function GuestTable({
                       }`}
                     >
                       {sendingInviteId === guest.id ? (
-                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-border border-t-gray-600" />
+                        <div className="border-border h-3.5 w-3.5 animate-spin rounded-full border-2 border-t-gray-600" />
                       ) : guest.inviteSentAt ? (
                         <MailCheck className="h-3.5 w-3.5" />
                       ) : (
@@ -160,7 +162,7 @@ export function GuestTable({
                       {guest.inviteSentAt ? 'Resend' : 'Send'}
                     </button>
                   ) : (
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground flex items-center gap-1 text-xs">
                       <Mail className="h-3.5 w-3.5" />
                       No email
                     </span>
@@ -174,7 +176,7 @@ export function GuestTable({
                   </div>
                 </td>
                 <td
-                  className="hidden px-4 py-3 text-muted-foreground sm:table-cell"
+                  className="text-muted-foreground hidden px-4 py-3 sm:table-cell"
                   onClick={() => onSelectGuest(guest)}
                 >
                   {guest.hasPlusOne ? (

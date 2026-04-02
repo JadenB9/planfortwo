@@ -180,8 +180,8 @@ function ModerationPageInner<T extends ModeratableEntry>({
       transition={{ duration: 0.5, ...springSmooth }}
     >
       <div className="mb-8">
-        <h1 className="font-serif text-3xl font-bold text-foreground">{config.title}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h1 className="text-foreground font-serif text-3xl font-bold">{config.title}</h1>
+        <p className="text-muted-foreground mt-1 text-sm">
           Review and manage {config.entityNamePlural} from your wedding website
           {pendingCount > 0 && (
             <span className="ml-2 font-medium text-amber-600">{pendingCount} pending review</span>
@@ -205,8 +205,8 @@ function ModerationPageInner<T extends ModeratableEntry>({
                   <stat.icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                  <p className="truncate text-xs text-muted-foreground">{stat.label}</p>
+                  <p className="text-foreground text-2xl font-bold">{stat.value}</p>
+                  <p className="text-muted-foreground truncate text-xs">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -242,15 +242,19 @@ function ModerationPageInner<T extends ModeratableEntry>({
                 className={`h-8 w-8 ${config.iconColor.split(' ')[0] ?? 'text-muted-foreground'}`}
               />
             </div>
-            <h2 className="font-serif text-xl font-semibold text-foreground">{config.emptyTitle}</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{config.emptyDescription}</p>
+            <h2 className="text-foreground font-serif text-xl font-semibold">
+              {config.emptyTitle}
+            </h2>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
+              {config.emptyDescription}
+            </p>
             {config.emptyExtra}
           </CardContent>
         </Card>
       ) : filteredEntries.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               No {filter === 'pending' ? 'pending' : 'approved'} {config.entityNamePlural}.
             </p>
           </CardContent>
@@ -285,7 +289,7 @@ function ModerationPageInner<T extends ModeratableEntry>({
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="truncate font-medium text-foreground">
+                              <span className="text-foreground truncate font-medium">
                                 {entry.authorName}
                               </span>
                               <Badge
@@ -295,11 +299,13 @@ function ModerationPageInner<T extends ModeratableEntry>({
                                 {entry.isApproved ? 'Approved' : 'Pending'}
                               </Badge>
                             </div>
-                            <p className="text-xs text-muted-foreground">{formatDate(entry.createdAt)}</p>
+                            <p className="text-muted-foreground text-xs">
+                              {formatDate(entry.createdAt)}
+                            </p>
                           </div>
                         </div>
                         <p
-                          className={`ml-12 whitespace-pre-wrap text-sm leading-relaxed text-foreground ${config.textClassName ?? ''}`}
+                          className={`text-foreground ml-12 whitespace-pre-wrap text-sm leading-relaxed ${config.textClassName ?? ''}`}
                         >
                           {config.getText(entry)}
                         </p>
@@ -365,7 +371,7 @@ function ModerationPageInner<T extends ModeratableEntry>({
           <DialogHeader>
             <DialogTitle>Delete {config.entityName}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Are you sure you want to delete this {config.entityName.toLowerCase()}? This action
             cannot be undone.
           </p>

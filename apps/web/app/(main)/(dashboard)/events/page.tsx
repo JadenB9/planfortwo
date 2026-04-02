@@ -243,8 +243,10 @@ export default function EventsPage() {
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-foreground">Events</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Plan and organize all your wedding events.</p>
+          <h1 className="text-foreground font-serif text-3xl font-bold">Events</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Plan and organize all your wedding events.
+          </p>
         </div>
         <Button
           onClick={() => {
@@ -269,7 +271,7 @@ export default function EventsPage() {
               >
                 &larr; Back
               </button>
-              <h2 className="font-serif text-xl font-semibold text-foreground">
+              <h2 className="text-foreground font-serif text-xl font-semibold">
                 {selectedEvent.name}
               </h2>
               <Badge variant="secondary">
@@ -294,13 +296,13 @@ export default function EventsPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 {selectedEvent.date && (
                   <div>
-                    <span className="text-xs font-medium text-muted-foreground">Date</span>
+                    <span className="text-muted-foreground text-xs font-medium">Date</span>
                     <p className="text-sm">{new Date(selectedEvent.date).toLocaleDateString()}</p>
                   </div>
                 )}
                 {selectedEvent.startTime && (
                   <div>
-                    <span className="text-xs font-medium text-muted-foreground">Time</span>
+                    <span className="text-muted-foreground text-xs font-medium">Time</span>
                     <p className="text-sm">
                       {selectedEvent.startTime}
                       {selectedEvent.endTime ? ` - ${selectedEvent.endTime}` : ''}
@@ -309,34 +311,34 @@ export default function EventsPage() {
                 )}
                 {selectedEvent.venue && (
                   <div>
-                    <span className="text-xs font-medium text-muted-foreground">Venue</span>
+                    <span className="text-muted-foreground text-xs font-medium">Venue</span>
                     <p className="text-sm">{selectedEvent.venue}</p>
                   </div>
                 )}
                 {selectedEvent.address && (
                   <div>
-                    <span className="text-xs font-medium text-muted-foreground">Address</span>
+                    <span className="text-muted-foreground text-xs font-medium">Address</span>
                     <p className="text-sm">{selectedEvent.address}</p>
                   </div>
                 )}
                 {selectedEvent.dressCode && (
                   <div>
-                    <span className="text-xs font-medium text-muted-foreground">Dress Code</span>
+                    <span className="text-muted-foreground text-xs font-medium">Dress Code</span>
                     <p className="text-sm">{selectedEvent.dressCode}</p>
                   </div>
                 )}
               </div>
               {selectedEvent.description && (
-                <p className="mt-4 text-sm text-muted-foreground">{selectedEvent.description}</p>
+                <p className="text-muted-foreground mt-4 text-sm">{selectedEvent.description}</p>
               )}
             </CardContent>
           </Card>
 
-          <h3 className="mb-3 font-serif text-lg font-semibold text-foreground">Timeline</h3>
+          <h3 className="text-foreground mb-3 font-serif text-lg font-semibold">Timeline</h3>
           {timeline.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   No timeline entries yet. Add entries to plan the event flow.
                 </p>
               </CardContent>
@@ -353,9 +355,9 @@ export default function EventsPage() {
                           {entry.time}
                         </span>
                         <div>
-                          <p className="text-sm font-medium text-foreground">{entry.title}</p>
+                          <p className="text-foreground text-sm font-medium">{entry.title}</p>
                           {entry.description && (
-                            <p className="text-xs text-muted-foreground">{entry.description}</p>
+                            <p className="text-muted-foreground text-xs">{entry.description}</p>
                           )}
                         </div>
                         {entry.duration && <Badge variant="secondary">{entry.duration} min</Badge>}
@@ -407,8 +409,8 @@ export default function EventsPage() {
                 />
               </svg>
             </div>
-            <h2 className="font-serif text-xl font-semibold text-foreground">No Events Yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            <h2 className="text-foreground font-serif text-xl font-semibold">No Events Yet</h2>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
               Add your ceremony, reception, rehearsal dinner, and other events.
             </p>
             <Button
@@ -445,17 +447,19 @@ export default function EventsPage() {
                 </CardHeader>
                 <CardContent>
                   {event.date && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       {new Date(event.date).toLocaleDateString()}
                     </p>
                   )}
                   {event.startTime && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {event.startTime}
                       {event.endTime ? ` - ${event.endTime}` : ''}
                     </p>
                   )}
-                  {event.venue && <p className="mt-1 text-sm text-muted-foreground">{event.venue}</p>}
+                  {event.venue && (
+                    <p className="text-muted-foreground mt-1 text-sm">{event.venue}</p>
+                  )}
                   <div className="mt-3 flex gap-2">
                     <button
                       onClick={(e) => {
@@ -512,7 +516,7 @@ export default function EventsPage() {
                 id="e-type"
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value as EventType })}
-                className="w-full rounded-xl border border-border px-3 py-2 text-sm"
+                className="border-border w-full rounded-xl border px-3 py-2 text-sm"
               >
                 {EVENT_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>

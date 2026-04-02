@@ -14,8 +14,10 @@ const USER_STORAGE_KEYS = ['planfortwo-dark', 'sidebar-nav-order'] as const
 function resetThemeFromDocument(): void {
   const root = document.documentElement
 
+  // Remove dark mode class
   root.classList.remove('dark')
 
+  // Remove custom theme CSS variables
   const themeVars = [
     '--primary',
     '--primary-foreground',
@@ -25,10 +27,11 @@ function resetThemeFromDocument(): void {
     '--card-foreground',
     '--popover-foreground',
   ]
-  for (const variable of themeVars) {
-    root.style.removeProperty(variable)
+  for (const v of themeVars) {
+    root.style.removeProperty(v)
   }
 
+  // Remove wedding palette shades
   const shades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']
   for (const shade of shades) {
     root.style.removeProperty(`--w-${shade}`)
@@ -40,9 +43,12 @@ export function useSignOutCleanup(): void {
   const wasSignedIn = useRef<boolean | undefined>(undefined)
 
   useEffect(() => {
+    // Skip the first render where isSignedIn is still loading (undefined)
     if (isSignedIn === undefined) return
 
+    // Detect transition from signed-in to signed-out
     if (wasSignedIn.current === true && isSignedIn === false) {
+      // Clear user-specific localStorage keys
       for (const key of USER_STORAGE_KEYS) {
         try {
           localStorage.removeItem(key)
@@ -51,6 +57,7 @@ export function useSignOutCleanup(): void {
         }
       }
 
+      // Reset theme to defaults
       resetThemeFromDocument()
     }
 

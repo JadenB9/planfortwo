@@ -502,8 +502,8 @@ function SettingsPageInner() {
       transition={{ duration: 0.5, ...springSmooth }}
     >
       <div className="mb-8">
-        <h1 className="font-serif text-3xl font-bold text-foreground">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h1 className="text-foreground font-serif text-3xl font-bold">Settings</h1>
+        <p className="text-muted-foreground mt-1 text-sm">
           Manage your wedding details, notifications, and account.
         </p>
       </div>
@@ -525,7 +525,7 @@ function SettingsPageInner() {
                 <CardTitle>My Weddings</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   You belong to multiple weddings. Switch between them or leave weddings you no
                   longer need access to.
                 </p>
@@ -550,8 +550,8 @@ function SettingsPageInner() {
                         className={`h-5 w-5 shrink-0 ${isActive ? 'text-wedding-600' : 'text-muted-foreground'}`}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-foreground">{w.name}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <p className="text-foreground truncate font-medium">{w.name}</p>
+                        <div className="text-muted-foreground flex items-center gap-2 text-xs">
                           <span className="capitalize">{w.role}</span>
                           <span className="text-muted-foreground/50">|</span>
                           <span>{w.tier === 'full' ? 'Full plan' : 'Free plan'}</span>
@@ -707,7 +707,7 @@ function SettingsPageInner() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Guest Estimate</Label>
+                  <Label className="text-muted-foreground text-xs">Guest Estimate</Label>
                   <Input
                     type="number"
                     value={weddingForm.guestCountEstimate}
@@ -719,11 +719,13 @@ function SettingsPageInner() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Tier</Label>
-                  <p className="font-medium capitalize text-foreground">{wedding?.tier ?? 'free'}</p>
+                  <Label className="text-muted-foreground text-xs">Tier</Label>
+                  <p className="text-foreground font-medium capitalize">
+                    {wedding?.tier ?? 'free'}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Budget</Label>
+                  <Label className="text-muted-foreground text-xs">Budget</Label>
                   <Input
                     type="number"
                     value={weddingForm.budgetTotal}
@@ -735,8 +737,8 @@ function SettingsPageInner() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Style</Label>
-                  <p className="font-medium capitalize text-foreground">
+                  <Label className="text-muted-foreground text-xs">Style</Label>
+                  <p className="text-foreground font-medium capitalize">
                     {wedding?.style ?? 'Not set'}
                   </p>
                 </div>
@@ -760,14 +762,14 @@ function SettingsPageInner() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Everyone on your planning team sees the same dashboard and can manage all wedding
                 details together.
               </p>
 
               {/* Current Members */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-foreground">Current Members</h3>
+                <h3 className="text-foreground text-sm font-medium">Current Members</h3>
                 {members.map(({ member, user: memberUser }) => {
                   const roleIcon =
                     member.role === 'owner' ? (
@@ -790,7 +792,7 @@ function SettingsPageInner() {
                   return (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between rounded-xl border border-border px-4 py-3"
+                      className="border-border flex items-center justify-between rounded-xl border px-4 py-3"
                     >
                       <div className="flex items-center gap-3">
                         {memberUser.avatarUrl ? (
@@ -802,16 +804,16 @@ function SettingsPageInner() {
                             className="h-8 w-8 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium text-muted-foreground">
+                          <div className="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium">
                             {memberUser.firstName?.[0]}
                             {memberUser.lastName?.[0]}
                           </div>
                         )}
                         <div>
-                          <p className="text-sm font-medium text-foreground">
+                          <p className="text-foreground text-sm font-medium">
                             {memberUser.firstName} {memberUser.lastName}
                           </p>
-                          <p className="text-xs text-muted-foreground">{memberUser.email}</p>
+                          <p className="text-muted-foreground text-xs">{memberUser.email}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
@@ -819,18 +821,18 @@ function SettingsPageInner() {
                           <button
                             onClick={() => handleToggleRole(member.id, member.role)}
                             disabled={updatingRoleId === member.id}
-                            className="flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-blue-100 hover:text-blue-700 disabled:opacity-50"
+                            className="bg-muted text-foreground flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-colors hover:bg-blue-100 hover:text-blue-700 disabled:opacity-50"
                             title="Click to switch role"
                           >
                             {updatingRoleId === member.id ? (
-                              <div className="h-3 w-3 animate-spin rounded-full border-2 border-border border-t-gray-600" />
+                              <div className="border-border h-3 w-3 animate-spin rounded-full border-2 border-t-gray-600" />
                             ) : (
                               roleIcon
                             )}
                             {roleLabel}
                           </button>
                         ) : (
-                          <span className="flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
+                          <span className="bg-muted text-foreground flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium">
                             {roleIcon}
                             {roleLabel}
                           </span>
@@ -839,7 +841,7 @@ function SettingsPageInner() {
                           <button
                             onClick={() => handleRemoveMember(member.id)}
                             disabled={removingId === member.id}
-                            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                            className="text-muted-foreground rounded-lg p-1.5 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                             title="Remove member"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -856,7 +858,7 @@ function SettingsPageInner() {
                 <>
                   <Separator />
                   <div className="space-y-3">
-                    <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
+                    <h3 className="text-foreground flex items-center gap-2 text-sm font-medium">
                       <Heart className="h-4 w-4 text-pink-500" />
                       {hasPartner ? 'Your Partner' : 'Invite Your Partner'}
                     </h3>
@@ -886,16 +888,18 @@ function SettingsPageInner() {
                                   </div>
                                 )}
                                 <div>
-                                  <p className="text-sm font-medium text-foreground">
+                                  <p className="text-foreground text-sm font-medium">
                                     {partnerUser.firstName} {partnerUser.lastName}
                                   </p>
-                                  <p className="text-xs text-muted-foreground">{partnerUser.email}</p>
+                                  <p className="text-muted-foreground text-xs">
+                                    {partnerUser.email}
+                                  </p>
                                 </div>
                               </div>
                               <button
                                 onClick={() => setRemovePartnerDialogOpen(true)}
                                 disabled={removingId === partnerMember.id}
-                                className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                                className="text-muted-foreground rounded-lg px-3 py-1.5 text-sm transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -947,10 +951,12 @@ function SettingsPageInner() {
                         <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
                           <Clock className="h-4 w-4 text-amber-600" />
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-foreground">Invitation Pending</p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-foreground text-sm font-medium">
+                              Invitation Pending
+                            </p>
+                            <p className="text-muted-foreground text-xs">
                               Sent to{' '}
-                              <span className="font-medium text-foreground">
+                              <span className="text-foreground font-medium">
                                 {pendingPartnerInvite.email}
                               </span>{' '}
                               &mdash; waiting for them to accept.
@@ -960,14 +966,14 @@ function SettingsPageInner() {
                             <button
                               onClick={() => handleResendInvitation(pendingPartnerInvite.id)}
                               disabled={resendingInviteId === pendingPartnerInvite.id}
-                              className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50"
+                              className="text-muted-foreground rounded-lg p-1.5 transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50"
                               title="Resend invitation email"
                             >
                               <Mail className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => setCancelDialogOpen(true)}
-                              className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600"
+                              className="text-muted-foreground rounded-lg p-1.5 transition-colors hover:bg-red-50 hover:text-red-600"
                               title="Cancel invitation"
                             >
                               <XCircle className="h-4 w-4" />
@@ -981,7 +987,7 @@ function SettingsPageInner() {
                               <DialogTitle>Cancel Partner Invitation</DialogTitle>
                               <DialogDescription>
                                 Are you sure you want to cancel the invitation sent to{' '}
-                                <span className="font-medium text-foreground">
+                                <span className="text-foreground font-medium">
                                   {pendingPartnerInvite.email}
                                 </span>
                                 ? They will no longer be able to accept it, but you can send a new
@@ -1005,7 +1011,7 @@ function SettingsPageInner() {
                       </>
                     ) : (
                       <>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           Invite your partner so you can plan together. They&apos;ll receive an
                           email invitation to join your wedding.
                         </p>
@@ -1035,7 +1041,7 @@ function SettingsPageInner() {
               {/* Pending Team Invitations */}
               {pendingTeamInvites.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <h3 className="text-foreground flex items-center gap-2 text-sm font-medium">
                     <Clock className="h-4 w-4 text-amber-500" />
                     Pending Team Invitations
                   </h3>
@@ -1046,14 +1052,15 @@ function SettingsPageInner() {
                     >
                       <Clock className="h-4 w-4 shrink-0 text-amber-600" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-foreground">Invitation Pending</p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          Sent to <span className="font-medium text-foreground">{invite.email}</span>{' '}
+                        <p className="text-foreground text-sm font-medium">Invitation Pending</p>
+                        <p className="text-muted-foreground truncate text-xs">
+                          Sent to{' '}
+                          <span className="text-foreground font-medium">{invite.email}</span>{' '}
                           &mdash; waiting for them to accept.
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
-                        <span className="flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium capitalize text-foreground">
+                        <span className="bg-muted text-foreground flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium capitalize">
                           {invite.role === 'planner' ? (
                             <Users className="h-3.5 w-3.5 text-blue-500" />
                           ) : (
@@ -1064,14 +1071,14 @@ function SettingsPageInner() {
                         <button
                           onClick={() => handleResendInvitation(invite.id)}
                           disabled={resendingInviteId === invite.id}
-                          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50"
+                          className="text-muted-foreground rounded-lg p-1.5 transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:opacity-50"
                           title="Resend invitation email"
                         >
                           <Mail className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => setCancelTeamDialogId(invite.id)}
-                          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600"
+                          className="text-muted-foreground rounded-lg p-1.5 transition-colors hover:bg-red-50 hover:text-red-600"
                           title="Cancel invitation"
                         >
                           <XCircle className="h-4 w-4" />
@@ -1092,7 +1099,7 @@ function SettingsPageInner() {
                         <DialogTitle>Cancel Team Invitation</DialogTitle>
                         <DialogDescription>
                           Are you sure you want to cancel the invitation sent to{' '}
-                          <span className="font-medium text-foreground">
+                          <span className="text-foreground font-medium">
                             {pendingTeamInvites.find((i) => i.id === cancelTeamDialogId)?.email}
                           </span>
                           ? They will no longer be able to accept it, but you can send a new one
@@ -1118,11 +1125,11 @@ function SettingsPageInner() {
 
               {/* Add New Member */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <h3 className="text-foreground flex items-center gap-2 text-sm font-medium">
                   <UserPlus className="h-4 w-4" />
                   Add Team Member
                 </h3>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Add a wedding planner, coordinator, or family member to help plan. They&apos;ll
                   receive an email invitation to join your planning team.
                 </p>
@@ -1137,7 +1144,7 @@ function SettingsPageInner() {
                   <select
                     value={newMemberRole}
                     onChange={(e) => setNewMemberRole(e.target.value as 'planner' | 'family')}
-                    className="rounded-xl border border-border px-3 py-2 text-sm"
+                    className="border-border rounded-xl border px-3 py-2 text-sm"
                   >
                     <option value="planner">Planner</option>
                     <option value="family">Family</option>
@@ -1180,16 +1187,16 @@ function SettingsPageInner() {
                 </div>
               ) : (
                 <>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Choose your primary and accent colors to personalize your planning dashboard.
                     These colors are shared with your partner and persist across all sessions.
                   </p>
 
                   {/* Primary Color */}
                   <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-foreground">
+                    <h3 className="text-foreground text-sm font-medium">
                       Primary Color{' '}
-                      <span className="font-normal text-muted-foreground">
+                      <span className="text-muted-foreground font-normal">
                         (buttons, links, highlights)
                       </span>
                     </h3>
@@ -1215,14 +1222,14 @@ function SettingsPageInner() {
                               <Check className="h-3 w-3 text-white" />
                             </div>
                           )}
-                          <span className="text-[10px] leading-tight text-muted-foreground">
+                          <span className="text-muted-foreground text-[10px] leading-tight">
                             {preset.name}
                           </span>
                         </button>
                       ))}
                     </div>
                     <div className="flex items-center gap-3">
-                      <Label className="text-xs text-muted-foreground">Custom hex:</Label>
+                      <Label className="text-muted-foreground text-xs">Custom hex:</Label>
                       <Input
                         type="text"
                         value={selectedPrimary ?? '#c2674a'}
@@ -1236,7 +1243,7 @@ function SettingsPageInner() {
                         placeholder="#c2674a"
                       />
                       <div
-                        className="h-6 w-6 rounded-full border border-border"
+                        className="border-border h-6 w-6 rounded-full border"
                         style={{ backgroundColor: selectedPrimary ?? '#c2674a' }}
                       />
                     </div>
@@ -1246,9 +1253,9 @@ function SettingsPageInner() {
 
                   {/* Accent Color */}
                   <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-foreground">
+                    <h3 className="text-foreground text-sm font-medium">
                       Accent Color{' '}
-                      <span className="font-normal text-muted-foreground">
+                      <span className="text-muted-foreground font-normal">
                         (headings, body text, dark elements)
                       </span>
                     </h3>
@@ -1274,14 +1281,14 @@ function SettingsPageInner() {
                               <Check className="h-3 w-3 text-white" />
                             </div>
                           )}
-                          <span className="text-[10px] leading-tight text-muted-foreground">
+                          <span className="text-muted-foreground text-[10px] leading-tight">
                             {preset.name}
                           </span>
                         </button>
                       ))}
                     </div>
                     <div className="flex items-center gap-3">
-                      <Label className="text-xs text-muted-foreground">Custom hex:</Label>
+                      <Label className="text-muted-foreground text-xs">Custom hex:</Label>
                       <Input
                         type="text"
                         value={selectedAccent ?? '#1a1a1a'}
@@ -1295,7 +1302,7 @@ function SettingsPageInner() {
                         placeholder="#1a1a1a"
                       />
                       <div
-                        className="h-6 w-6 rounded-full border border-border"
+                        className="border-border h-6 w-6 rounded-full border"
                         style={{ backgroundColor: selectedAccent ?? '#1a1a1a' }}
                       />
                     </div>
@@ -1305,8 +1312,8 @@ function SettingsPageInner() {
 
                   {/* Preview */}
                   <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-foreground">Preview</h3>
-                    <div className="rounded-xl border border-border p-4">
+                    <h3 className="text-foreground text-sm font-medium">Preview</h3>
+                    <div className="border-border rounded-xl border p-4">
                       <div className="flex items-center gap-4">
                         <div
                           className="flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white"
@@ -1456,8 +1463,8 @@ function SettingsPageInner() {
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">Email</Label>
-                <p className="font-medium text-foreground">
+                <Label className="text-muted-foreground text-xs">Email</Label>
+                <p className="text-foreground font-medium">
                   {user?.primaryEmailAddress?.emailAddress ?? 'Unknown'}
                 </p>
               </div>

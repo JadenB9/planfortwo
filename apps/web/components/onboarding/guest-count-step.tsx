@@ -20,8 +20,10 @@ export function GuestCountStep({ data, onUpdate, onNext, onBack }: GuestCountSte
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-foreground">How many guests?</h2>
-        <p className="mt-2 text-muted-foreground">A rough estimate helps us tailor your planning tools.</p>
+        <h2 className="text-foreground font-serif text-3xl font-bold">How many guests?</h2>
+        <p className="text-muted-foreground mt-2">
+          A rough estimate helps us tailor your planning tools.
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -35,8 +37,8 @@ export function GuestCountStep({ data, onUpdate, onNext, onBack }: GuestCountSte
                 : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-border'
             }`}
           >
-            <span className="block text-lg font-semibold text-foreground">{option.label}</span>
-            <span className="mt-1 block text-sm text-muted-foreground">{option.range}</span>
+            <span className="text-foreground block text-lg font-semibold">{option.label}</span>
+            <span className="text-muted-foreground mt-1 block text-sm">{option.range}</span>
           </button>
         ))}
       </div>
@@ -44,7 +46,7 @@ export function GuestCountStep({ data, onUpdate, onNext, onBack }: GuestCountSte
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
+          className="border-border text-foreground hover:bg-muted flex-1 rounded-xl border px-6 py-3 text-sm font-semibold shadow-sm transition-colors"
         >
           Back
         </button>

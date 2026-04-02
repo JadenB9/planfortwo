@@ -177,15 +177,15 @@ export function RsvpForm({
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Household status banner */}
       {isBatch && (
-        <div className="rounded-xl border border-border bg-muted p-4">
-          <p className="text-sm font-medium text-foreground">
+        <div className="border-border bg-muted rounded-xl border p-4">
+          <p className="text-foreground text-sm font-medium">
             RSVPing for the {lookupResult.household?.name || 'Family'} household
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-xs">
             {guestsToRsvp.length} family member{guestsToRsvp.length !== 1 ? 's' : ''}
           </p>
           {alreadyResponded.length > 0 && (
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-xs">
               {alreadyResponded.length} of {guestsToRsvp.length} member
               {alreadyResponded.length !== 1 ? 's have' : ' has'} previously responded. You can
               update any responses below.
@@ -202,20 +202,22 @@ export function RsvpForm({
         return (
           <div
             key={form.guestId}
-            className="rounded-2xl border border-border bg-white p-6 shadow-sm"
+            className="border-border bg-background rounded-2xl border p-6 shadow-sm"
           >
-            <h3 className="font-serif text-xl font-semibold text-foreground">
+            <h3 className="text-foreground font-serif text-xl font-semibold">
               {guest.firstName} {guest.lastName}
-              {isChild && <span className="ml-2 text-xs font-normal text-muted-foreground">(child)</span>}
+              {isChild && (
+                <span className="text-muted-foreground ml-2 text-xs font-normal">(child)</span>
+              )}
             </h3>
             {guest.rsvpRespondedAt && (
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-xs">
                 Previously responded: {formatRsvpStatus(guest.rsvpStatus ?? 'pending')}
               </p>
             )}
 
             <div className="mt-6">
-              <p className="mb-3 text-sm font-medium text-foreground">
+              <p className="text-foreground mb-3 text-sm font-medium">
                 {isChild ? 'Will they be attending?' : 'Your Response'}
               </p>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -245,7 +247,7 @@ export function RsvpForm({
               <div className="mt-6 space-y-5">
                 {showEmailField && !isChild && (
                   <div>
-                    <label className="block text-sm font-medium text-foreground">
+                    <label className="text-foreground block text-sm font-medium">
                       Email Address (preferred)
                     </label>
                     <input
@@ -253,9 +255,9 @@ export function RsvpForm({
                       value={form.rsvpEmail}
                       onChange={(e) => updateForm(index, { rsvpEmail: e.target.value })}
                       placeholder="your@email.com"
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-2 w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                     />
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="text-muted-foreground mt-1 text-xs">
                       So the couple can keep in touch with updates.
                     </p>
                   </div>
@@ -263,23 +265,25 @@ export function RsvpForm({
 
                 {showDietary && (
                   <div>
-                    <label className="block text-sm font-medium text-foreground">
+                    <label className="text-foreground block text-sm font-medium">
                       {isChild ? 'Allergies' : 'Allergies'}{' '}
-                      <span className="font-normal text-muted-foreground">(leave blank for none)</span>
+                      <span className="text-muted-foreground font-normal">
+                        (leave blank for none)
+                      </span>
                     </label>
                     <input
                       type="text"
                       value={form.dietary.notes ?? ''}
                       onChange={(e) => updateDietary(index, 'notes', e.target.value)}
                       placeholder="e.g. peanuts, shellfish, dairy..."
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-2 w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                     />
                   </div>
                 )}
 
                 {!isChild && (
                   <div>
-                    <label className="block text-sm font-medium text-foreground">
+                    <label className="text-foreground block text-sm font-medium">
                       Additional Notes
                     </label>
                     <textarea
@@ -287,14 +291,14 @@ export function RsvpForm({
                       onChange={(e) => updateForm(index, { rsvpNotes: e.target.value })}
                       placeholder="Anything else the couple should know?"
                       rows={3}
-                      className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                      className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-2 w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                     />
                   </div>
                 )}
 
                 {showPlusOne && (
-                  <div className="rounded-xl border border-border bg-muted p-5">
-                    <h4 className="font-serif text-lg font-semibold text-foreground">Plus One</h4>
+                  <div className="border-border bg-muted rounded-xl border p-5">
+                    <h4 className="text-foreground font-serif text-lg font-semibold">Plus One</h4>
 
                     <div className="mt-3 space-y-4">
                       <label className="flex items-center gap-2">
@@ -304,15 +308,15 @@ export function RsvpForm({
                           onChange={(e) =>
                             updateForm(index, { plusOneConfirmed: e.target.checked })
                           }
-                          className="text-wedding-600 focus:ring-wedding-600 h-4 w-4 rounded border-border"
+                          className="text-wedding-600 focus:ring-wedding-600 border-border h-4 w-4 rounded"
                         />
-                        <span className="text-sm text-foreground">I&apos;m bringing a guest</span>
+                        <span className="text-foreground text-sm">I&apos;m bringing a guest</span>
                       </label>
 
                       {form.plusOneConfirmed && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-foreground">
+                            <label className="text-foreground block text-sm font-medium">
                               Guest Name
                             </label>
                             <input
@@ -320,15 +324,15 @@ export function RsvpForm({
                               value={form.plusOneName}
                               onChange={(e) => updateForm(index, { plusOneName: e.target.value })}
                               placeholder="Full name"
-                              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                              className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-1 w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                             />
                           </div>
 
                           {showDietary && (
                             <div>
-                              <label className="block text-sm font-medium text-foreground">
+                              <label className="text-foreground block text-sm font-medium">
                                 Their Allergies{' '}
-                                <span className="font-normal text-muted-foreground">
+                                <span className="text-muted-foreground font-normal">
                                   (leave blank for none)
                                 </span>
                               </label>
@@ -339,7 +343,7 @@ export function RsvpForm({
                                   updatePlusOneDietary(index, 'notes', e.target.value)
                                 }
                                 placeholder="e.g. peanuts, shellfish, dairy..."
-                                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                                className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-2 w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
                               />
                             </div>
                           )}

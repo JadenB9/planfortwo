@@ -30,9 +30,9 @@ export function ScheduleEditor({ content, onChange }: ScheduleEditorProps) {
   return (
     <div className="space-y-5">
       {items.map((item, index) => (
-        <div key={index} className="rounded-lg border border-border p-4">
+        <div key={index} className="border-border rounded-lg border p-4">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-semibold text-foreground">Event {index + 1}</span>
+            <span className="text-foreground text-sm font-semibold">Event {index + 1}</span>
             <button
               type="button"
               onClick={() => removeItem(index)}
@@ -47,7 +47,7 @@ export function ScheduleEditor({ content, onChange }: ScheduleEditorProps) {
               <div>
                 <label
                   htmlFor={`schedule-time-${index}`}
-                  className="text-sm font-medium text-foreground"
+                  className="text-foreground text-sm font-medium"
                 >
                   Time
                 </label>
@@ -57,13 +57,13 @@ export function ScheduleEditor({ content, onChange }: ScheduleEditorProps) {
                   value={item.time}
                   onChange={(e) => updateItem(index, { time: e.target.value })}
                   placeholder="3:00 PM"
-                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
               <div>
                 <label
                   htmlFor={`schedule-title-${index}`}
-                  className="text-sm font-medium text-foreground"
+                  className="text-foreground text-sm font-medium"
                 >
                   Title
                 </label>
@@ -73,7 +73,7 @@ export function ScheduleEditor({ content, onChange }: ScheduleEditorProps) {
                   value={item.title}
                   onChange={(e) => updateItem(index, { title: e.target.value })}
                   placeholder="Ceremony Begins"
-                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -81,9 +81,9 @@ export function ScheduleEditor({ content, onChange }: ScheduleEditorProps) {
             <div>
               <label
                 htmlFor={`schedule-desc-${index}`}
-                className="text-sm font-medium text-foreground"
+                className="text-foreground text-sm font-medium"
               >
-                Description <span className="font-normal text-muted-foreground">(optional)</span>
+                Description <span className="text-muted-foreground font-normal">(optional)</span>
               </label>
               <textarea
                 id={`schedule-desc-${index}`}
@@ -91,16 +91,16 @@ export function ScheduleEditor({ content, onChange }: ScheduleEditorProps) {
                 value={item.description ?? ''}
                 onChange={(e) => updateItem(index, { description: e.target.value })}
                 placeholder="Additional details about this part of the day"
-                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
             <div>
               <label
                 htmlFor={`schedule-loc-${index}`}
-                className="text-sm font-medium text-foreground"
+                className="text-foreground text-sm font-medium"
               >
-                Location <span className="font-normal text-muted-foreground">(optional)</span>
+                Location <span className="text-muted-foreground font-normal">(optional)</span>
               </label>
               <input
                 id={`schedule-loc-${index}`}
@@ -108,7 +108,7 @@ export function ScheduleEditor({ content, onChange }: ScheduleEditorProps) {
                 value={item.location ?? ''}
                 onChange={(e) => updateItem(index, { location: e.target.value })}
                 placeholder="Main Chapel, Rose Garden"
-                className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>

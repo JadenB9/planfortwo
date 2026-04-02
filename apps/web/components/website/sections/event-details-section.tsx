@@ -43,7 +43,7 @@ export function EventDetailsSection({ title, content }: EventDetailsSectionProps
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="rounded-2xl bg-white p-6 shadow-sm"
+              className="bg-background rounded-2xl p-6 shadow-sm"
             >
               <h3
                 className={`text-xl font-semibold ${headingClass}`}

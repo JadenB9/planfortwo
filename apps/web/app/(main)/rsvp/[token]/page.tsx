@@ -62,7 +62,7 @@ export default function RsvpTokenPage() {
 
         {/* Error */}
         {state === 'error' && (
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <div className="bg-background rounded-2xl border border-gray-200 p-8 text-center shadow-sm">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
               <svg
                 className="h-8 w-8 text-red-600"

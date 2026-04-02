@@ -41,7 +41,7 @@ function CashFundCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
-      className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+      className="bg-background w-full max-w-sm rounded-2xl p-6 text-center shadow-sm transition-shadow hover:shadow-md"
     >
       <h3
         className={`mb-2 text-lg font-semibold ${headingClass}`}
@@ -59,7 +59,7 @@ function CashFundCard({
       )}
       {progress !== null && (
         <div className="mb-3">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
             <div
               className="h-full rounded-full transition-all"
               style={{ width: `${progress}%`, backgroundColor: colors.accent }}
@@ -147,7 +147,7 @@ export function RegistrySection({ title, content }: RegistrySectionProps) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="w-full max-w-sm cursor-pointer rounded-2xl bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+                  className="bg-background w-full max-w-sm cursor-pointer rounded-2xl p-6 text-center shadow-sm transition-shadow hover:shadow-md"
                 >
                   {registry.logoUrl && /^https?:\/\//i.test(registry.logoUrl) && (
                     // eslint-disable-next-line @next/next/no-img-element

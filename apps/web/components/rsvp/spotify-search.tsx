@@ -84,7 +84,7 @@ export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
 
   if (selected) {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-border bg-muted px-3 py-2">
+      <div className="border-border bg-muted flex items-center gap-3 rounded-xl border px-3 py-2">
         {selected.albumArt ? (
           <Image
             src={selected.albumArt}
@@ -94,18 +94,18 @@ export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
             className="h-10 w-10 rounded-md object-cover"
           />
         ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted">
-            <Music className="h-5 w-5 text-muted-foreground" />
+          <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-md">
+            <Music className="text-muted-foreground h-5 w-5" />
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-foreground">{selected.title}</p>
-          <p className="truncate text-xs text-muted-foreground">{selected.artist}</p>
+          <p className="text-foreground truncate text-sm font-medium">{selected.title}</p>
+          <p className="text-muted-foreground truncate text-xs">{selected.artist}</p>
         </div>
         <button
           type="button"
           onClick={clearSelection}
-          className="shrink-0 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-muted-foreground"
+          className="text-muted-foreground hover:bg-muted hover:text-muted-foreground shrink-0 rounded-md p-1"
         >
           <X className="h-4 w-4" />
         </button>
@@ -116,30 +116,30 @@ export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
   return (
     <div ref={containerRef} className="relative">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
         <input
           type="text"
           value={query}
           onChange={(e) => handleInput(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="Search for a song on Spotify..."
-          className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border py-2.5 pl-9 pr-4 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+          className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground w-full rounded-xl border py-2.5 pl-9 pr-4 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
         />
         {loading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-gray-600" />
+            <div className="border-border h-4 w-4 animate-spin rounded-full border-2 border-t-gray-600" />
           </div>
         )}
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute z-20 mt-1 w-full rounded-xl border border-border bg-white shadow-lg">
+        <div className="border-border bg-background absolute z-20 mt-1 w-full rounded-xl border shadow-lg">
           {results.map((track) => (
             <button
               key={track.spotifyTrackId}
               type="button"
               onClick={() => selectTrack(track)}
-              className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-muted"
+              className="hover:bg-muted flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-xl last:rounded-b-xl"
             >
               {track.albumArt ? (
                 <Image
@@ -150,13 +150,13 @@ export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
                   className="h-10 w-10 shrink-0 rounded-md object-cover"
                 />
               ) : (
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted">
-                  <Music className="h-5 w-5 text-muted-foreground" />
+                <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
+                  <Music className="text-muted-foreground h-5 w-5" />
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">{track.title}</p>
-                <p className="truncate text-xs text-muted-foreground">{track.artist}</p>
+                <p className="text-foreground truncate text-sm font-medium">{track.title}</p>
+                <p className="text-muted-foreground truncate text-xs">{track.artist}</p>
               </div>
             </button>
           ))}
@@ -164,8 +164,8 @@ export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
       )}
 
       {open && query.length >= 2 && !loading && results.length === 0 && (
-        <div className="absolute z-20 mt-1 w-full rounded-xl border border-border bg-white p-3 text-center shadow-lg">
-          <p className="text-sm text-muted-foreground">No songs found</p>
+        <div className="border-border bg-background absolute z-20 mt-1 w-full rounded-xl border p-3 text-center shadow-lg">
+          <p className="text-muted-foreground text-sm">No songs found</p>
         </div>
       )}
     </div>

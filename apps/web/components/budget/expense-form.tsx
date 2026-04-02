@@ -110,9 +110,9 @@ export function ExpenseForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+      <div className="bg-background w-full max-w-lg rounded-2xl p-6 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="font-serif text-xl font-semibold text-foreground">
+          <h2 className="text-foreground font-serif text-xl font-semibold">
             {isEditing ? 'Edit Expense' : 'Add Expense'}
           </h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
@@ -130,11 +130,11 @@ export function ExpenseForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="mb-1 block text-sm font-medium text-foreground">Category</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">Category</label>
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -145,30 +145,32 @@ export function ExpenseForm({
             </div>
 
             <div className="col-span-2">
-              <label className="mb-1 block text-sm font-medium text-foreground">Vendor Name</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">Vendor Name</label>
               <input
                 type="text"
                 value={vendorName}
                 onChange={(e) => setVendorName(e.target.value)}
                 placeholder="e.g. The Grand Ballroom"
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               />
             </div>
 
             <div className="col-span-2">
-              <label className="mb-1 block text-sm font-medium text-foreground">Description *</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">
+                Description *
+              </label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="e.g. Venue rental fee"
                 required
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-foreground">Amount *</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">Amount *</label>
               <input
                 type="number"
                 value={amount}
@@ -177,12 +179,12 @@ export function ExpenseForm({
                 min="0"
                 step="0.01"
                 required
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-foreground">Paid Amount</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">Paid Amount</label>
               <input
                 type="number"
                 value={paidAmount}
@@ -190,16 +192,18 @@ export function ExpenseForm({
                 placeholder="0"
                 min="0"
                 step="0.01"
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-foreground">Payment Status</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">
+                Payment Status
+              </label>
               <select
                 value={paymentStatus}
                 onChange={(e) => setPaymentStatus(e.target.value as typeof paymentStatus)}
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               >
                 {STATUS_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -210,11 +214,11 @@ export function ExpenseForm({
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-foreground">Payer</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">Payer</label>
               <select
                 value={payer}
                 onChange={(e) => setPayer(e.target.value as typeof payer)}
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               >
                 {PAYER_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -225,22 +229,22 @@ export function ExpenseForm({
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-foreground">Due Date</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">Due Date</label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               />
             </div>
 
             <div className="col-span-2">
-              <label className="mb-1 block text-sm font-medium text-foreground">Notes</label>
+              <label className="text-foreground mb-1 block text-sm font-medium">Notes</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-foreground"
+                className="border-border text-foreground w-full rounded-xl border px-3 py-2.5 text-sm"
               />
             </div>
           </div>
@@ -251,7 +255,7 @@ export function ExpenseForm({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+              className="border-border text-foreground hover:bg-muted rounded-xl border px-4 py-2.5 text-sm font-medium"
             >
               Cancel
             </button>

@@ -34,18 +34,20 @@ export function PaymentCalendar({ payments, onMarkPaid }: PaymentCalendarProps) 
 
   if (payments.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-6">
-        <h3 className="text-sm font-semibold text-foreground">Payment Schedule</h3>
-        <p className="mt-2 text-sm text-muted-foreground">No payments scheduled yet.</p>
+      <div className="border-border bg-background rounded-2xl border p-6">
+        <h3 className="text-foreground text-sm font-semibold">Payment Schedule</h3>
+        <p className="text-muted-foreground mt-2 text-sm">No payments scheduled yet.</p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-6">
-      <h3 className="mb-4 text-sm font-semibold text-foreground">Upcoming Payments</h3>
+    <div className="border-border bg-background rounded-2xl border p-6">
+      <h3 className="text-foreground mb-4 text-sm font-semibold">Upcoming Payments</h3>
 
-      {sorted.length === 0 && <p className="text-sm text-muted-foreground">All payments are up to date.</p>}
+      {sorted.length === 0 && (
+        <p className="text-muted-foreground text-sm">All payments are up to date.</p>
+      )}
 
       <div className="space-y-2">
         {sorted.map((payment) => {
@@ -55,14 +57,16 @@ export function PaymentCalendar({ payments, onMarkPaid }: PaymentCalendarProps) 
             <div
               key={payment.id}
               className={`flex items-center justify-between rounded-xl border px-4 py-3 ${
-                overdue ? 'border-red-200 bg-red-50' : 'border-border bg-white'
+                overdue ? 'border-red-200 bg-red-50' : 'border-border bg-background'
               }`}
             >
               <div className="min-w-0 flex-1">
-                <p className={`text-sm font-medium ${overdue ? 'text-red-900' : 'text-foreground'}`}>
+                <p
+                  className={`text-sm font-medium ${overdue ? 'text-red-900' : 'text-foreground'}`}
+                >
                   {payment.title}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {payment.budgetItem.vendorName ?? payment.budgetItem.description}
                 </p>
               </div>
@@ -81,7 +85,7 @@ export function PaymentCalendar({ payments, onMarkPaid }: PaymentCalendarProps) 
                 </div>
                 <button
                   onClick={() => onMarkPaid(payment.id)}
-                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                  className="border-border text-foreground hover:bg-muted rounded-lg border px-3 py-1.5 text-xs font-medium"
                 >
                   Mark Paid
                 </button>
@@ -93,14 +97,14 @@ export function PaymentCalendar({ payments, onMarkPaid }: PaymentCalendarProps) 
 
       {paidPayments.length > 0 && (
         <div className="mt-4">
-          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wider">
             Paid ({paidPayments.length})
           </p>
           <div className="space-y-1">
             {paidPayments.slice(0, 5).map((payment) => (
               <div
                 key={payment.id}
-                className="flex items-center justify-between rounded-lg px-4 py-2 text-muted-foreground"
+                className="text-muted-foreground flex items-center justify-between rounded-lg px-4 py-2"
               >
                 <p className="text-sm line-through">{payment.title}</p>
                 <p className="text-sm">{formatCurrency(payment.amount)}</p>

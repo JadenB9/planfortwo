@@ -34,8 +34,8 @@ export function GuestStatsBar({ stats }: GuestStatsBarProps) {
       <div className="flex flex-wrap gap-5">
         {secondary.map((item) => (
           <div key={item.label} className="text-center">
-            <p className="text-base font-semibold text-foreground">{item.value}</p>
-            <p className="text-[11px] font-medium text-muted-foreground">{item.label}</p>
+            <p className="text-foreground text-base font-semibold">{item.value}</p>
+            <p className="text-muted-foreground text-[11px] font-medium">{item.label}</p>
           </div>
         ))}
       </div>

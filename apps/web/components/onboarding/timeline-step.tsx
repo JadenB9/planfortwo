@@ -29,8 +29,10 @@ export function TimelineStep({
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-foreground">Choose your timeline</h2>
-        <p className="mt-2 text-muted-foreground">We&apos;ll build a checklist tailored to your pace.</p>
+        <h2 className="text-foreground font-serif text-3xl font-bold">Choose your timeline</h2>
+        <p className="text-muted-foreground mt-2">
+          We&apos;ll build a checklist tailored to your pace.
+        </p>
       </div>
 
       <div className="space-y-3">
@@ -44,8 +46,8 @@ export function TimelineStep({
                 : 'hover:border-wedding-300 hover:bg-wedding-50/50 border-border'
             }`}
           >
-            <span className="block text-base font-semibold text-foreground">{option.label}</span>
-            <span className="mt-0.5 block text-sm text-muted-foreground">{option.description}</span>
+            <span className="text-foreground block text-base font-semibold">{option.label}</span>
+            <span className="text-muted-foreground mt-0.5 block text-sm">{option.description}</span>
           </button>
         ))}
       </div>
@@ -54,7 +56,7 @@ export function TimelineStep({
         <button
           onClick={onBack}
           disabled={isSubmitting}
-          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-50"
+          className="border-border text-foreground hover:bg-muted flex-1 rounded-xl border px-6 py-3 text-sm font-semibold shadow-sm transition-colors disabled:opacity-50"
         >
           Back
         </button>

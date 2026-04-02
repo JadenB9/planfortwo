@@ -17,7 +17,7 @@ const config: ModerationPageConfig<Prayer> = {
   emptyDescription:
     'When guests submit prayers through your wedding website, they will appear here for you to review and approve.',
   emptyExtra: (
-    <p className="mx-auto mt-3 max-w-md text-xs italic text-muted-foreground">
+    <p className="text-muted-foreground mx-auto mt-3 max-w-md text-xs italic">
       &ldquo;For where two or three gather in my name, there am I with them.&rdquo; — Matthew 18:20
     </p>
   ),

@@ -43,8 +43,8 @@ export function Paywall({ children }: { children: React.ReactNode }) {
         <Lock className="h-8 w-8 text-amber-600" />
       </div>
 
-      <h2 className="mt-6 font-serif text-2xl font-bold text-foreground">Full Plan Required</h2>
-      <p className="mt-3 max-w-sm text-muted-foreground">
+      <h2 className="text-foreground mt-6 font-serif text-2xl font-bold">Full Plan Required</h2>
+      <p className="text-muted-foreground mt-3 max-w-sm">
         This feature is part of the Premium plan. Upgrade for a one-time payment of $10 to unlock
         website customization, seating charts, inbox, music integration, photo gallery, and more.
       </p>

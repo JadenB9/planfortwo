@@ -61,11 +61,11 @@ export function GuestDetail({
   }
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md border-l border-border bg-white shadow-xl">
+    <div className="border-border bg-background fixed inset-y-0 right-0 z-50 w-full max-w-md border-l shadow-xl">
       <div className="flex h-full flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="font-serif text-lg font-semibold text-foreground">
+        <div className="border-border flex items-center justify-between border-b px-6 py-4">
+          <h2 className="text-foreground font-serif text-lg font-semibold">
             {guest.firstName} {guest.lastName}
           </h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
@@ -85,7 +85,7 @@ export function GuestDetail({
           <div className="space-y-5">
             {/* RSVP Status */}
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wider">
                 RSVP Status
               </p>
               <div className="flex flex-wrap gap-2">
@@ -126,7 +126,7 @@ export function GuestDetail({
                 })}
               </div>
               {guest.rsvpRespondedAt && (
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="text-muted-foreground mt-2 text-xs">
                   Responded {new Date(guest.rsvpRespondedAt).toLocaleDateString()}
                 </p>
               )}
@@ -134,19 +134,21 @@ export function GuestDetail({
 
             {/* Contact */}
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <h3 className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 Contact
               </h3>
-              <div className="mt-2 space-y-1 text-sm text-foreground">
+              <div className="text-foreground mt-2 space-y-1 text-sm">
                 {guest.email && <p>{guest.email}</p>}
                 {guest.phone && <p>{guest.phone}</p>}
-                {!guest.email && !guest.phone && <p className="text-muted-foreground">No contact info</p>}
+                {!guest.email && !guest.phone && (
+                  <p className="text-muted-foreground">No contact info</p>
+                )}
               </div>
             </div>
 
             {/* Details */}
             <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <h3 className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 Details
               </h3>
               <div className="mt-2 space-y-2 text-sm">
@@ -156,7 +158,7 @@ export function GuestDetail({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Side</span>
-                  <span className="capitalize text-foreground">{guest.side ?? '--'}</span>
+                  <span className="text-foreground capitalize">{guest.side ?? '--'}</span>
                 </div>
                 {guest.dietary?.notes && (
                   <div className="flex justify-between">
@@ -202,7 +204,7 @@ export function GuestDetail({
             {/* Tags */}
             {guest.tags.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <h3 className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   Tags
                 </h3>
                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -217,7 +219,7 @@ export function GuestDetail({
 
         {/* Actions */}
         {(canEdit || canDelete) && (
-          <div className="flex gap-3 border-t border-border px-6 py-4">
+          <div className="border-border flex gap-3 border-t px-6 py-4">
             {canEdit && (
               <button
                 onClick={() => setEditing(true)}

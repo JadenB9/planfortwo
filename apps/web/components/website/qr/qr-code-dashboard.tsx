@@ -139,10 +139,10 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
 
   if (!canAccess) {
     return (
-      <div className="rounded-xl border border-dashed border-border bg-muted p-8 text-center">
-        <QrCode className="mx-auto h-8 w-8 text-muted-foreground" />
-        <p className="mt-2 text-sm font-medium text-foreground">QR Code Generator</p>
-        <p className="mt-1 text-xs text-muted-foreground">
+      <div className="border-border bg-muted rounded-xl border border-dashed p-8 text-center">
+        <QrCode className="text-muted-foreground mx-auto h-8 w-8" />
+        <p className="text-foreground mt-2 text-sm font-medium">QR Code Generator</p>
+        <p className="text-muted-foreground mt-1 text-xs">
           Upgrade to Full Access to generate QR codes with scan tracking.
         </p>
       </div>
@@ -151,10 +151,10 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
 
   if (!subdomain) {
     return (
-      <div className="rounded-xl border border-dashed border-border bg-muted p-8 text-center">
-        <QrCode className="mx-auto h-8 w-8 text-muted-foreground" />
-        <p className="mt-2 text-sm font-medium text-foreground">QR Code Generator</p>
-        <p className="mt-1 text-xs text-muted-foreground">
+      <div className="border-border bg-muted rounded-xl border border-dashed p-8 text-center">
+        <QrCode className="text-muted-foreground mx-auto h-8 w-8" />
+        <p className="text-foreground mt-2 text-sm font-medium">QR Code Generator</p>
+        <p className="text-muted-foreground mt-1 text-xs">
           Set up your website subdomain in Settings first to generate a QR code.
         </p>
       </div>
@@ -167,8 +167,10 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total QR Scans</CardTitle>
-            <ScanLine className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-muted-foreground text-sm font-medium">
+              Total QR Scans
+            </CardTitle>
+            <ScanLine className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{qrScanCount?.total?.toLocaleString() ?? '0'}</p>
@@ -176,8 +178,10 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Unique Scanners</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-muted-foreground text-sm font-medium">
+              Unique Scanners
+            </CardTitle>
+            <Users className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{qrScanCount?.unique?.toLocaleString() ?? '0'}</p>
@@ -194,10 +198,12 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
           <CardContent className="flex flex-col items-center gap-4">
             <div
               ref={qrRef}
-              className="flex items-center justify-center rounded-lg border bg-white p-4"
+              className="bg-background flex items-center justify-center rounded-lg border p-4"
               style={{ minHeight: 308, minWidth: 308 }}
             />
-            <p className="break-all text-center text-xs text-muted-foreground">Points to: {qrUrl}</p>
+            <p className="text-muted-foreground break-all text-center text-xs">
+              Points to: {qrUrl}
+            </p>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => handleDownload('png')}>
                 <Download className="mr-1.5 h-3.5 w-3.5" />
@@ -261,7 +267,7 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
                     className={`rounded-md border px-2 py-1.5 text-xs transition-colors ${
                       dotType === style.value
                         ? 'border-gray-900 bg-gray-900 text-white'
-                        : 'border-border bg-white text-foreground hover:border-border'
+                        : 'border-border bg-background text-foreground hover:border-border'
                     }`}
                   >
                     {style.label}

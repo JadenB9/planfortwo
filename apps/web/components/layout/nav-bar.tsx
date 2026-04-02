@@ -14,8 +14,8 @@ export function NavBar() {
   return (
     <nav className="fixed top-0 z-50 w-full">
       <div className="mx-auto max-w-6xl px-5 py-4 sm:px-8">
-        <div className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/70 px-5 py-2.5 shadow-sm backdrop-blur-lg">
-          <Link href="/" className="font-serif text-lg font-bold tracking-tight text-foreground">
+        <div className="border-border/60 bg-background/70 flex items-center justify-between rounded-2xl border px-5 py-2.5 shadow-sm backdrop-blur-lg">
+          <Link href="/" className="text-foreground font-serif text-lg font-bold tracking-tight">
             PlanForTwo
           </Link>
 
@@ -23,13 +23,13 @@ export function NavBar() {
           <div className="hidden items-center gap-8 sm:flex">
             <Link
               href="/features"
-              className="text-[13px] font-medium tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground text-[13px] font-medium tracking-wide transition-colors"
             >
               Features
             </Link>
             <Link
               href="/features#pricing"
-              className="text-[13px] font-medium tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground text-[13px] font-medium tracking-wide transition-colors"
             >
               Pricing
             </Link>
@@ -37,7 +37,7 @@ export function NavBar() {
               <Button
                 asChild
                 size="sm"
-                className="rounded-lg bg-gray-900 px-4 text-xs font-medium text-white hover:bg-gray-800"
+                className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-4 text-xs font-medium"
               >
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
@@ -45,14 +45,14 @@ export function NavBar() {
               <>
                 <Link
                   href="/sign-in"
-                  className="text-[13px] font-medium tracking-wide text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground text-[13px] font-medium tracking-wide transition-colors"
                 >
                   Sign in
                 </Link>
                 <Button
                   asChild
                   size="sm"
-                  className="rounded-lg bg-gray-900 px-4 text-xs font-medium text-white hover:bg-gray-800"
+                  className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-4 text-xs font-medium"
                 >
                   <Link href="/sign-up">Start planning</Link>
                 </Button>
@@ -63,7 +63,7 @@ export function NavBar() {
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted sm:hidden"
+            className="text-muted-foreground hover:bg-muted rounded-lg p-1.5 transition-colors sm:hidden"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -77,27 +77,27 @@ export function NavBar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="mt-2 rounded-2xl border border-white/60 bg-white/95 p-4 shadow-lg backdrop-blur-lg sm:hidden"
+            className="border-border/60 bg-background/95 mt-2 rounded-2xl border p-4 shadow-lg backdrop-blur-lg sm:hidden"
           >
             <div className="flex flex-col gap-3">
               <Link
                 href="/features"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                className="text-muted-foreground hover:bg-muted rounded-lg px-3 py-2 text-sm font-medium transition-colors"
               >
                 Features
               </Link>
               <Link
                 href="/features#pricing"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                className="text-muted-foreground hover:bg-muted rounded-lg px-3 py-2 text-sm font-medium transition-colors"
               >
                 Pricing
               </Link>
               {isSignedIn ? (
                 <Button
                   asChild
-                  className="mt-1 rounded-lg bg-gray-900 text-white hover:bg-gray-800"
+                  className="bg-foreground text-background hover:bg-foreground/90 mt-1 rounded-lg"
                 >
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
                     Dashboard
@@ -108,13 +108,13 @@ export function NavBar() {
                   <Link
                     href="/sign-in"
                     onClick={() => setMobileOpen(false)}
-                    className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                    className="text-muted-foreground hover:bg-muted rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                   >
                     Sign in
                   </Link>
                   <Button
                     asChild
-                    className="mt-1 rounded-lg bg-gray-900 text-white hover:bg-gray-800"
+                    className="bg-foreground text-background hover:bg-foreground/90 mt-1 rounded-lg"
                   >
                     <Link href="/sign-up" onClick={() => setMobileOpen(false)}>
                       Start planning

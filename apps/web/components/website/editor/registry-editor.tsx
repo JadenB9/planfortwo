@@ -156,7 +156,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
     <div className="space-y-5">
       {/* Message */}
       <div>
-        <label htmlFor="registry-message" className="text-sm font-medium text-foreground">
+        <label htmlFor="registry-message" className="text-foreground text-sm font-medium">
           Message
         </label>
         <textarea
@@ -165,28 +165,28 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
           onChange={(e) => onChange({ ...content, message: e.target.value })}
           placeholder="Your presence is the greatest gift, but if you'd like to honor us with something special..."
           rows={3}
-          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
 
       {/* Import from existing registries */}
-      <div className="border-t border-border pt-4">
-        <h3 className="text-sm font-medium text-foreground">Import from your registries</h3>
-        <p className="mt-1 text-xs text-muted-foreground">
+      <div className="border-border border-t pt-4">
+        <h3 className="text-foreground text-sm font-medium">Import from your registries</h3>
+        <p className="text-muted-foreground mt-1 text-xs">
           Select registries and cash funds from your dashboard to display on your website.
         </p>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Loading registries...</span>
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+            <span className="text-muted-foreground ml-2 text-sm">Loading registries...</span>
           </div>
         ) : links.length === 0 && funds.length === 0 ? (
-          <div className="mt-3 flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-muted p-8 text-center">
-            <Gift className="h-8 w-8 text-muted-foreground" />
+          <div className="border-border bg-muted mt-3 flex flex-col items-center gap-3 rounded-lg border border-dashed p-8 text-center">
+            <Gift className="text-muted-foreground h-8 w-8" />
             <div>
-              <p className="text-sm font-medium text-foreground">No registries found</p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-foreground text-sm font-medium">No registries found</p>
+              <p className="text-muted-foreground mt-1 text-xs">
                 Add registry links or cash funds in the{' '}
                 <a
                   href="/registry"
@@ -204,8 +204,8 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
             {links.length > 0 && (
               <div>
                 <div className="mb-2 flex items-center gap-1.5">
-                  <Gift className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <Gift className="text-muted-foreground h-4 w-4" />
+                  <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
                     Your Registries
                   </span>
                 </div>
@@ -220,13 +220,13 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                         className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
                           selected
                             ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-200'
-                            : 'border-border bg-white hover:border-border hover:bg-muted'
+                            : 'border-border bg-background hover:border-border hover:bg-muted'
                         }`}
                       >
                         {/* Toggle indicator */}
                         <div
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
-                            selected ? 'border-blue-500 bg-blue-500' : 'border-border bg-white'
+                            selected ? 'border-blue-500 bg-blue-500' : 'border-border bg-background'
                           }`}
                         >
                           {selected && (
@@ -263,10 +263,10 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
 
                         {/* Info */}
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-foreground">
+                          <p className="text-foreground truncate text-sm font-medium">
                             {link.storeName}
                           </p>
-                          <p className="truncate text-xs text-muted-foreground">{link.url}</p>
+                          <p className="text-muted-foreground truncate text-xs">{link.url}</p>
                         </div>
                       </button>
                     )
@@ -279,8 +279,8 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
             {funds.length > 0 && (
               <div>
                 <div className="mb-2 flex items-center gap-1.5">
-                  <Banknote className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <Banknote className="text-muted-foreground h-4 w-4" />
+                  <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
                     Cash Funds
                   </span>
                 </div>
@@ -304,7 +304,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                             className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
                               selected
                                 ? 'rounded-b-none border-blue-500 bg-blue-50 ring-1 ring-blue-200'
-                                : 'border-border bg-white hover:border-border hover:bg-muted'
+                                : 'border-border bg-background hover:border-border hover:bg-muted'
                             }`}
                           >
                             {/* Toggle indicator */}
@@ -312,7 +312,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                               className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
                                 selected
                                   ? 'border-blue-500 bg-blue-500'
-                                  : 'border-border bg-white'
+                                  : 'border-border bg-background'
                               }`}
                             >
                               {selected && (
@@ -335,16 +335,16 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                             {/* Info */}
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-2">
-                                <p className="truncate text-sm font-medium text-foreground">
+                                <p className="text-foreground truncate text-sm font-medium">
                                   {fund.name}
                                 </p>
-                                <span className="shrink-0 text-xs text-muted-foreground">
+                                <span className="text-muted-foreground shrink-0 text-xs">
                                   {formatCurrency(fund.currentAmount)} /{' '}
                                   {formatCurrency(fund.goalAmount)}
                                 </span>
                               </div>
                               {fund.goalAmount > 0 && (
-                                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                <div className="bg-muted mt-1.5 h-1.5 w-full overflow-hidden rounded-full">
                                   <div
                                     className="h-full rounded-full bg-green-500 transition-all"
                                     style={{ width: `${progress}%` }}
@@ -352,7 +352,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                                 </div>
                               )}
                               {fund.description && (
-                                <p className="mt-1 truncate text-xs text-muted-foreground">
+                                <p className="text-muted-foreground mt-1 truncate text-xs">
                                   {fund.description}
                                 </p>
                               )}
@@ -360,9 +360,9 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                           </button>
                           {selected && (
                             <div className="rounded-b-lg border border-t-0 border-blue-500 bg-blue-50 px-4 pb-3 pt-2">
-                              <label className="text-xs font-medium text-muted-foreground">
+                              <label className="text-muted-foreground text-xs font-medium">
                                 Payment Link{' '}
-                                <span className="font-normal text-muted-foreground">
+                                <span className="text-muted-foreground font-normal">
                                   (Venmo, PayPal, CashApp, etc.)
                                 </span>
                               </label>
@@ -372,7 +372,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={(e) => updateFundUrl(fund.name, e.target.value)}
                                 placeholder="https://venmo.com/yourname"
-                                className="mt-1 block w-full rounded-md border border-border bg-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="border-border bg-background mt-1 block w-full rounded-md border px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
                             </div>
                           )}
@@ -387,9 +387,9 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
       </div>
 
       {/* Custom Registries */}
-      <div className="border-t border-border pt-4">
+      <div className="border-border border-t pt-4">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-foreground">Custom Registries</label>
+          <label className="text-foreground text-sm font-medium">Custom Registries</label>
           <button
             type="button"
             onClick={addCustomRegistry}
@@ -401,14 +401,14 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
         </div>
 
         {customRegistries.length === 0 && (
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-2 text-sm">
             Add registries not listed above by entering the name and URL manually.
           </p>
         )}
 
         <div className="mt-3 space-y-4">
           {customRegistries.map(({ reg, index }) => (
-            <div key={index} className="relative rounded-lg border border-border p-4">
+            <div key={index} className="border-border relative rounded-lg border p-4">
               <button
                 type="button"
                 onClick={() => removeRegistry(index)}
@@ -422,7 +422,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                 <div>
                   <label
                     htmlFor={`reg-name-${index}`}
-                    className="text-sm font-medium text-foreground"
+                    className="text-foreground text-sm font-medium"
                   >
                     Registry Name
                   </label>
@@ -432,12 +432,15 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                     value={reg.name}
                     onChange={(e) => updateCustomRegistry(index, 'name', e.target.value)}
                     placeholder="e.g. Amazon, Crate & Barrel, Zola"
-                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor={`reg-url-${index}`} className="text-sm font-medium text-foreground">
+                  <label
+                    htmlFor={`reg-url-${index}`}
+                    className="text-foreground text-sm font-medium"
+                  >
                     Registry URL
                   </label>
                   <input
@@ -446,16 +449,16 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                     value={reg.url}
                     onChange={(e) => updateCustomRegistry(index, 'url', e.target.value)}
                     placeholder="https://www.amazon.com/wedding/your-registry"
-                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor={`reg-logo-${index}`}
-                    className="text-sm font-medium text-foreground"
+                    className="text-foreground text-sm font-medium"
                   >
-                    Logo URL <span className="font-normal text-muted-foreground">(optional)</span>
+                    Logo URL <span className="text-muted-foreground font-normal">(optional)</span>
                   </label>
                   <input
                     id={`reg-logo-${index}`}
@@ -463,7 +466,7 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
                     value={reg.logoUrl ?? ''}
                     onChange={(e) => updateCustomRegistry(index, 'logoUrl', e.target.value)}
                     placeholder="https://example.com/logo.png"
-                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -474,8 +477,8 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
 
       {/* Summary */}
       {registries.length > 0 && (
-        <div className="rounded-lg bg-muted px-4 py-3">
-          <p className="text-xs text-muted-foreground">
+        <div className="bg-muted rounded-lg px-4 py-3">
+          <p className="text-muted-foreground text-xs">
             {registries.length} {registries.length === 1 ? 'registry' : 'registries'} will be shown
             on your website.
           </p>

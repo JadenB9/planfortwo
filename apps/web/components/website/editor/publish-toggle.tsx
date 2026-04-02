@@ -37,16 +37,16 @@ export function PublishToggle({
   }
 
   return (
-    <div className="rounded-xl border bg-white p-4">
+    <div className="bg-background rounded-xl border p-4">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           {isPublished ? (
             <Globe className="h-5 w-5 text-green-600" />
           ) : (
-            <GlobeLock className="h-5 w-5 text-muted-foreground" />
+            <GlobeLock className="text-muted-foreground h-5 w-5" />
           )}
           <div>
-            <p className="text-sm font-semibold text-foreground">
+            <p className="text-foreground text-sm font-semibold">
               {isPublished ? 'Published' : 'Unpublished'}
             </p>
             {isPublished && siteUrl && (
@@ -94,7 +94,9 @@ export function PublishToggle({
         )}
       </div>
       {!subdomain && !isPublished && (
-        <p className="mt-2 text-xs text-muted-foreground">Set a subdomain in Settings before publishing.</p>
+        <p className="text-muted-foreground mt-2 text-xs">
+          Set a subdomain in Settings before publishing.
+        </p>
       )}
     </div>
   )

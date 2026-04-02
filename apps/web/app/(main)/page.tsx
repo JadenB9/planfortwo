@@ -64,24 +64,26 @@ function DashboardPreview() {
       transition={{ duration: 0.8, delay: 0.6, ...springSmooth }}
       className="mx-auto mt-16 max-w-4xl"
     >
-      <div className="rounded-2xl border border-gray-200/80 bg-white p-3 shadow-2xl shadow-gray-900/5 sm:p-4">
+      <div className="border-border bg-card rounded-2xl border p-3 shadow-2xl shadow-gray-900/5 sm:p-4 dark:shadow-black/20">
         {/* Browser chrome */}
         <div className="mb-3 flex items-center gap-2 px-1">
           <div className="flex gap-1.5">
-            <div className="h-2.5 w-2.5 rounded-full bg-gray-200" />
-            <div className="h-2.5 w-2.5 rounded-full bg-gray-200" />
-            <div className="h-2.5 w-2.5 rounded-full bg-gray-200" />
+            <div className="bg-muted h-2.5 w-2.5 rounded-full" />
+            <div className="bg-muted h-2.5 w-2.5 rounded-full" />
+            <div className="bg-muted h-2.5 w-2.5 rounded-full" />
           </div>
-          <div className="ml-4 h-5 flex-1 rounded-md bg-gray-50 px-3">
-            <span className="text-[10px] leading-5 text-gray-300">planfortwo.com/dashboard</span>
+          <div className="bg-muted ml-4 h-5 flex-1 rounded-md px-3">
+            <span className="text-muted-foreground/50 text-[10px] leading-5">
+              planfortwo.com/dashboard
+            </span>
           </div>
         </div>
         {/* Dashboard mockup */}
-        <div className="overflow-hidden rounded-xl bg-[#FAFAF8]">
+        <div className="bg-background overflow-hidden rounded-xl">
           <div className="flex min-h-[280px] sm:min-h-[340px]">
             {/* Sidebar */}
-            <div className="hidden w-48 border-r border-gray-100 bg-white p-4 sm:block">
-              <div className="font-serif text-sm font-bold text-gray-900">PlanForTwo</div>
+            <div className="border-border bg-card hidden w-48 border-r p-4 sm:block">
+              <div className="text-foreground font-serif text-sm font-bold">PlanForTwo</div>
               <div className="mt-6 space-y-1">
                 {[
                   { label: 'Dashboard', active: true },
@@ -93,7 +95,7 @@ function DashboardPreview() {
                   <div
                     key={item.label}
                     className={`rounded-lg px-3 py-1.5 text-xs ${
-                      item.active ? 'bg-sage-50 text-sage-700 font-medium' : 'text-gray-400'
+                      item.active ? 'bg-sage-50 text-sage-700 font-medium' : 'text-muted-foreground'
                     }`}
                   >
                     {item.label}
@@ -103,8 +105,8 @@ function DashboardPreview() {
             </div>
             {/* Main content */}
             <div className="flex-1 p-4 sm:p-6">
-              <div className="text-sm font-medium text-gray-900">Welcome back</div>
-              <div className="mt-1 text-xs text-gray-400">142 days until your wedding</div>
+              <div className="text-foreground text-sm font-medium">Welcome back</div>
+              <div className="text-muted-foreground mt-1 text-xs">142 days until your wedding</div>
               {/* Stat cards */}
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
@@ -113,16 +115,16 @@ function DashboardPreview() {
                   { label: 'Budget left', value: '$8,420', color: 'bg-cream-600' },
                   { label: 'RSVPs', value: '64', color: 'bg-sage-400' },
                 ].map((stat) => (
-                  <div key={stat.label} className="rounded-xl bg-white p-3 shadow-sm">
+                  <div key={stat.label} className="bg-card rounded-xl p-3 shadow-sm">
                     <div className={`mb-1.5 h-1 w-6 rounded-full ${stat.color}`} />
-                    <div className="text-sm font-semibold text-gray-900">{stat.value}</div>
-                    <div className="text-[10px] text-gray-400">{stat.label}</div>
+                    <div className="text-foreground text-sm font-semibold">{stat.value}</div>
+                    <div className="text-muted-foreground text-[10px]">{stat.label}</div>
                   </div>
                 ))}
               </div>
               {/* Checklist preview */}
-              <div className="mt-4 rounded-xl bg-white p-3 shadow-sm">
-                <div className="mb-2 text-xs font-medium text-gray-700">Upcoming tasks</div>
+              <div className="bg-card mt-4 rounded-xl p-3 shadow-sm">
+                <div className="text-foreground/80 mb-2 text-xs font-medium">Upcoming tasks</div>
                 {[
                   { done: true, text: 'Book photographer' },
                   { done: true, text: 'Send save-the-dates' },
@@ -132,7 +134,7 @@ function DashboardPreview() {
                   <div key={task.text} className="flex items-center gap-2 py-1">
                     <div
                       className={`h-3.5 w-3.5 rounded border ${
-                        task.done ? 'border-sage-500 bg-sage-500' : 'border-gray-200 bg-white'
+                        task.done ? 'border-sage-500 bg-sage-500' : 'border-border bg-card'
                       }`}
                     >
                       {task.done && (
@@ -150,7 +152,9 @@ function DashboardPreview() {
                     </div>
                     <span
                       className={`text-[11px] ${
-                        task.done ? 'text-gray-300 line-through' : 'text-gray-600'
+                        task.done
+                          ? 'text-muted-foreground/50 line-through'
+                          : 'text-muted-foreground'
                       }`}
                     >
                       {task.text}
@@ -203,19 +207,19 @@ function FeatureShowcase({
       <div className="flex-1">
         <div className={`relative overflow-hidden rounded-3xl ${accent} p-8 sm:p-12`}>
           <Icon className="h-16 w-16 text-white/90 sm:h-20 sm:w-20" strokeWidth={1.2} />
-          <div className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-white/10" />
-          <div className="absolute -top-4 right-12 h-16 w-16 rounded-full bg-white/5" />
+          <div className="bg-background/10 absolute -bottom-6 -right-6 h-32 w-32 rounded-full" />
+          <div className="bg-background/5 absolute -top-4 right-12 h-16 w-16 rounded-full" />
         </div>
       </div>
       <div className="flex-1">
         <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
           {label}
         </span>
-        <h3 className="font-serif text-2xl font-bold text-gray-900 sm:text-3xl">{title}</h3>
-        <p className="mt-3 text-base leading-relaxed text-gray-500">{description}</p>
+        <h3 className="text-foreground font-serif text-2xl font-bold sm:text-3xl">{title}</h3>
+        <p className="text-muted-foreground mt-3 text-base leading-relaxed">{description}</p>
         <ul className="mt-6 space-y-2.5">
           {details.map((detail) => (
-            <li key={detail} className="flex items-start gap-3 text-sm text-gray-600">
+            <li key={detail} className="text-muted-foreground flex items-start gap-3 text-sm">
               <span className="bg-sage-400 mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" />
               {detail}
             </li>
@@ -275,14 +279,14 @@ function CoupleSearch() {
       <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
         Find a couple
       </span>
-      <h2 className="font-serif text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+      <h2 className="text-foreground font-serif text-2xl font-bold tracking-tight sm:text-3xl">
         Looking for someone&apos;s wedding?
       </h2>
-      <p className="mt-3 text-sm leading-relaxed text-gray-500">
+      <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
         Enter both partners&apos; first names to find their wedding website.
       </p>
       <div className="relative mt-6">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
         <Input
           type="text"
           placeholder="e.g. Sarah and Michael"
@@ -292,10 +296,10 @@ function CoupleSearch() {
         />
       </div>
 
-      {loading && <p className="mt-4 text-sm text-gray-400">Searching...</p>}
+      {loading && <p className="text-muted-foreground mt-4 text-sm">Searching...</p>}
 
       {searched && !loading && results.length === 0 && (
-        <p className="mt-4 text-sm text-gray-400">
+        <p className="text-muted-foreground mt-4 text-sm">
           No public wedding websites found for &quot;{query}&quot;
         </p>
       )}
@@ -306,12 +310,12 @@ function CoupleSearch() {
             <a
               key={r.slug}
               href={`https://${r.slug}.planfortwo.com`}
-              className="hover:border-wedding-300 hover:bg-wedding-50 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 text-left transition-colors"
+              className="hover:border-wedding-300 hover:bg-wedding-50 border-border bg-card flex items-center justify-between rounded-lg border px-4 py-3 text-left transition-colors"
             >
               <div>
-                <p className="font-medium text-gray-900">{r.name}</p>
+                <p className="text-foreground font-medium">{r.name}</p>
                 {r.date && (
-                  <p className="text-xs text-gray-400">
+                  <p className="text-muted-foreground text-xs">
                     {new Date(r.date).toLocaleDateString('en-US', {
                       month: 'long',
                       day: 'numeric',
@@ -320,7 +324,7 @@ function CoupleSearch() {
                   </p>
                 )}
               </div>
-              <ArrowRight className="h-4 w-4 text-gray-400" />
+              <ArrowRight className="text-muted-foreground h-4 w-4" />
             </a>
           ))}
         </div>
@@ -333,7 +337,7 @@ export default function HomePage() {
   const parallaxY = useParallax(80)
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#FAFAF8]">
+    <main className="bg-background min-h-screen overflow-hidden">
       <NavBar />
 
       {/* ─── Hero ─── */}
@@ -341,15 +345,15 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <motion.div
             style={{ y: parallaxY }}
-            className="bg-wedding-100/40 absolute -right-20 -top-20 h-[500px] w-[500px] rounded-full blur-3xl"
+            className="bg-wedding-100/40 dark:bg-wedding-900/20 absolute -right-20 -top-20 h-[500px] w-[500px] rounded-full blur-3xl"
           />
           <motion.div
             style={{ y: parallaxY }}
-            className="bg-sage-100/50 absolute -left-32 top-40 h-[400px] w-[400px] rounded-full blur-3xl"
+            className="bg-sage-100/50 dark:bg-sage-900/20 absolute -left-32 top-40 h-[400px] w-[400px] rounded-full blur-3xl"
           />
           <motion.div
             style={{ y: parallaxY }}
-            className="bg-cream-100/40 absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full blur-3xl"
+            className="bg-cream-100/40 dark:bg-cream-900/20 absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full blur-3xl"
           />
         </div>
 
@@ -364,13 +368,13 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="mb-6 text-sm font-medium tracking-wide text-gray-400"
+              className="text-muted-foreground mb-6 text-sm font-medium tracking-wide"
             >
               For the two of you
             </motion.p>
 
             <motion.h1
-              className="font-serif text-[2.75rem] leading-[1.1] tracking-tight text-gray-900 sm:text-6xl lg:text-7xl"
+              className="text-foreground font-serif text-[2.75rem] leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
@@ -381,7 +385,7 @@ export default function HomePage() {
             </motion.h1>
 
             <motion.p
-              className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-500"
+              className="text-muted-foreground mx-auto mt-6 max-w-xl text-lg leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -400,7 +404,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-xl bg-gray-900 px-8 text-sm font-medium text-white shadow-lg shadow-gray-900/10 hover:bg-gray-800"
+                  className="bg-foreground text-background shadow-foreground/10 hover:bg-foreground/90 rounded-xl px-8 text-sm font-medium shadow-lg"
                 >
                   <Link href="/sign-up">
                     Start planning — it&apos;s free
@@ -410,7 +414,7 @@ export default function HomePage() {
               </motion.div>
               <Link
                 href="/features"
-                className="group text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+                className="text-muted-foreground hover:text-foreground group text-sm font-medium transition-colors"
               >
                 See what&apos;s included{' '}
                 <span className="inline-block transition-transform group-hover:translate-x-0.5">
@@ -430,13 +434,13 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 0.6 }}
           >
-            <span className="flex items-center gap-1.5 text-xs text-gray-400">
+            <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
               <Heart className="h-3 w-3" /> Free to start
             </span>
-            <span className="flex items-center gap-1.5 text-xs text-gray-400">
+            <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
               <Sparkles className="h-3 w-3" /> No credit card needed
             </span>
-            <span className="flex items-center gap-1.5 text-xs text-gray-400">
+            <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
               <CheckSquare className="h-3 w-3" /> No monthly fees
             </span>
           </motion.div>
@@ -451,7 +455,7 @@ export default function HomePage() {
           whileInView="visible"
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="bg-sage-200 h-px w-full origin-left"
+          className="bg-border h-px w-full origin-left"
         />
       </div>
 
@@ -473,12 +477,12 @@ export default function HomePage() {
             <span className="text-sage-600 mb-3 inline-block text-xs font-semibold uppercase tracking-widest">
               What you get
             </span>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-foreground font-serif text-3xl font-bold tracking-tight sm:text-4xl">
               Everything you actually need.
               <br />
               Nothing you don&apos;t.
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-gray-500">
+            <p className="text-muted-foreground mt-4 text-base leading-relaxed">
               We kept the feature list tight on purpose. No venue directories, no vendor
               marketplaces, no algorithm recommending you things to buy. Just the tools that help
               two people plan a wedding together.
@@ -513,7 +517,7 @@ export default function HomePage() {
               ]}
               direction="right"
               accent="bg-wedding-600"
-              className="rounded-3xl bg-white/60 p-6 sm:p-10"
+              className="bg-card/60 rounded-3xl p-6 sm:p-10"
             />
             <FeatureShowcase
               icon={DollarSign}
@@ -542,14 +546,14 @@ export default function HomePage() {
               ]}
               direction="right"
               accent="bg-sage-700"
-              className="rounded-3xl bg-white/60 p-6 sm:p-10"
+              className="bg-card/60 rounded-3xl p-6 sm:p-10"
             />
           </div>
         </div>
       </section>
 
       {/* ─── Final CTA ─── */}
-      <section className="bg-gray-900 px-5 py-24 sm:px-8 lg:py-32">
+      <section className="bg-foreground px-5 py-24 sm:px-8 lg:py-32">
         <motion.div
           className="mx-auto max-w-3xl text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -557,14 +561,14 @@ export default function HomePage() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6 }}
         >
-          <p className="mb-4 text-xs italic text-gray-500">
+          <p className="text-background/50 mb-4 text-xs italic">
             &ldquo;And over all these virtues put on love, which binds them all together in perfect
             unity.&rdquo; — Colossians 3:14
           </p>
-          <h2 className="font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-background font-serif text-3xl font-bold tracking-tight sm:text-4xl">
             Your wedding deserves better than a spreadsheet.
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-gray-400">
+          <p className="text-background/60 mt-4 text-base leading-relaxed">
             Start organizing everything in one place. Free account, no credit card, takes about 30
             seconds.
           </p>
@@ -572,7 +576,7 @@ export default function HomePage() {
             <Button
               asChild
               size="lg"
-              className="rounded-xl bg-white px-8 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-100"
+              className="bg-background text-foreground hover:bg-background/90 rounded-xl px-8 text-sm font-medium shadow-lg"
             >
               <Link href="/sign-up">
                 Start planning together

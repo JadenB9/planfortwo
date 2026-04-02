@@ -74,7 +74,7 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-10 rounded-2xl bg-white p-6 shadow-sm"
+          className="bg-background mb-10 rounded-2xl p-6 shadow-sm"
         >
           <div className="mb-4">
             <input
@@ -140,7 +140,7 @@ export function GuestbookSection({ title, content, entries, onSubmit }: Guestboo
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05 }}
-                  className="rounded-2xl bg-white p-5 shadow-sm"
+                  className="bg-background rounded-2xl p-5 shadow-sm"
                 >
                   <p
                     className={`text-sm ${bodyClass}`}

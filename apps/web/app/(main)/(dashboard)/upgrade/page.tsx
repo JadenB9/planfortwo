@@ -159,7 +159,7 @@ function UpgradePageContent() {
           <ul className="mt-8 space-y-3">
             {FREE_FEATURES.map((feature) => (
               <li key={feature} className="text-foreground flex items-start gap-2.5 text-sm">
-                <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                <Check className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
                 {feature}
               </li>
             ))}

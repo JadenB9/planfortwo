@@ -181,7 +181,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-10 rounded-2xl bg-white p-6 shadow-sm"
+          className="bg-background mb-10 rounded-2xl p-6 shadow-sm"
         >
           {/* Guest name */}
           <div className="mb-4">
@@ -274,7 +274,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
 
                 {showResults && searchResults.length > 0 && (
                   <div
-                    className="absolute z-20 mt-1 w-full rounded-lg border bg-white shadow-lg"
+                    className="bg-background absolute z-20 mt-1 w-full rounded-lg border shadow-lg"
                     style={{ borderColor: colors.secondary }}
                   >
                     {searchResults.map((track) => (
@@ -282,7 +282,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
                         key={track.spotifyTrackId}
                         type="button"
                         onClick={() => selectTrack(track)}
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-muted"
+                        className="hover:bg-muted flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg"
                       >
                         {track.albumArt ? (
                           <Image
@@ -324,7 +324,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
                   !searchLoading &&
                   searchResults.length === 0 && (
                     <div
-                      className="absolute z-20 mt-1 w-full rounded-lg border bg-white p-3 text-center shadow-lg"
+                      className="bg-background absolute z-20 mt-1 w-full rounded-lg border p-3 text-center shadow-lg"
                       style={{ borderColor: colors.secondary }}
                     >
                       <p
@@ -386,7 +386,7 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05 }}
-                  className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm"
+                  className="bg-background flex items-center gap-3 rounded-2xl p-4 shadow-sm"
                 >
                   <Music className="h-5 w-5 shrink-0" style={{ color: colors.accent }} />
                   <div className="min-w-0 flex-1">

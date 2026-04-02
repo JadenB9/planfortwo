@@ -42,7 +42,7 @@ export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEdito
   return (
     <div className="space-y-5">
       <div>
-        <label htmlFor="hero-headline" className="text-sm font-medium text-foreground">
+        <label htmlFor="hero-headline" className="text-foreground text-sm font-medium">
           Headline
         </label>
         <input
@@ -51,12 +51,12 @@ export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEdito
           value={content.headline}
           onChange={(e) => update({ headline: e.target.value })}
           placeholder="Sarah & James"
-          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
 
       <div>
-        <label htmlFor="hero-subheadline" className="text-sm font-medium text-foreground">
+        <label htmlFor="hero-subheadline" className="text-foreground text-sm font-medium">
           Subheadline
         </label>
         <input
@@ -65,12 +65,12 @@ export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEdito
           value={content.subheadline}
           onChange={(e) => update({ subheadline: e.target.value })}
           placeholder="We're getting married!"
-          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
 
       <div>
-        <label className="text-sm font-medium text-foreground">Background Image</label>
+        <label className="text-foreground text-sm font-medium">Background Image</label>
 
         {/* URL Input */}
         <div className="mt-1">
@@ -80,17 +80,17 @@ export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEdito
             value={content.backgroundImageUrl ?? ''}
             onChange={(e) => update({ backgroundImageUrl: e.target.value || null })}
             placeholder="https://example.com/photo.jpg"
-            className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="border-border block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-xs">
             Paste a URL above, or select from your uploaded photos below.
           </p>
         </div>
 
         {/* Photo Picker from Gallery */}
-        <div className="mt-3 border-t border-border pt-3">
+        <div className="border-border mt-3 border-t pt-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Your Photos</span>
+            <span className="text-muted-foreground text-xs font-medium">Your Photos</span>
             {content.backgroundImageUrl && (
               <button
                 type="button"
@@ -104,12 +104,12 @@ export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEdito
 
           {loadingPhotos ? (
             <div className="flex items-center justify-center py-6">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-              <span className="ml-2 text-xs text-muted-foreground">Loading photos...</span>
+              <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+              <span className="text-muted-foreground ml-2 text-xs">Loading photos...</span>
             </div>
           ) : galleryPhotos.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border bg-muted p-6 text-center">
-              <p className="text-xs text-muted-foreground">
+            <div className="border-border bg-muted flex flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-center">
+              <p className="text-muted-foreground text-xs">
                 No photos uploaded yet.{' '}
                 <a
                   href="/photos"
@@ -135,7 +135,7 @@ export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEdito
                     className={`group relative aspect-square overflow-hidden rounded-md border-2 transition-all ${
                       selected
                         ? 'border-blue-500 ring-2 ring-blue-200'
-                        : 'border-transparent hover:border-border'
+                        : 'hover:border-border border-transparent'
                     }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -163,9 +163,9 @@ export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEdito
           type="checkbox"
           checked={content.showDate}
           onChange={(e) => update({ showDate: e.target.checked })}
-          className="h-4 w-4 rounded border-border text-blue-600 focus:ring-blue-500"
+          className="border-border h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
         />
-        <label htmlFor="hero-show-date" className="text-sm font-medium text-foreground">
+        <label htmlFor="hero-show-date" className="text-foreground text-sm font-medium">
           Show wedding date
         </label>
       </div>
@@ -176,9 +176,9 @@ export function HeroEditor({ content, onChange, getToken, weddingId }: HeroEdito
           type="checkbox"
           checked={content.showCountdown}
           onChange={(e) => update({ showCountdown: e.target.checked })}
-          className="h-4 w-4 rounded border-border text-blue-600 focus:ring-blue-500"
+          className="border-border h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
         />
-        <label htmlFor="hero-show-countdown" className="text-sm font-medium text-foreground">
+        <label htmlFor="hero-show-countdown" className="text-foreground text-sm font-medium">
           Show countdown timer
         </label>
       </div>

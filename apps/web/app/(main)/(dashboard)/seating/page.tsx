@@ -1361,7 +1361,7 @@ export default function SeatingPage() {
         {/* Canvas */}
         <div
           ref={canvasContainerRef}
-          className="relative flex-1 overflow-hidden bg-muted"
+          className="bg-muted relative flex-1 overflow-hidden"
           style={{ cursor: isPanningRef.current ? 'grabbing' : 'grab' }}
           onMouseDown={handleCanvasMouseDown}
           onMouseMove={handleCanvasMouseMove}

@@ -507,7 +507,7 @@ export default function VendorsPage() {
             {editingVendor && (
               <div className="border-t pt-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-foreground">Communication Log</h3>
+                  <h3 className="text-foreground text-sm font-semibold">Communication Log</h3>
                   <Button variant="outline" size="sm" onClick={() => setShowCommForm(true)}>
                     Log Communication
                   </Button>
@@ -524,10 +524,7 @@ export default function VendorsPage() {
                           new Date(b.contactDate).getTime() - new Date(a.contactDate).getTime(),
                       )
                       .map((comm) => (
-                        <div
-                          key={comm.id}
-                          className="border-border bg-muted rounded-lg border p-3"
-                        >
+                        <div key={comm.id} className="border-border bg-muted rounded-lg border p-3">
                           <div className="flex items-center justify-between">
                             <span className="bg-background text-foreground rounded-full border px-2 py-0.5 text-xs font-medium capitalize">
                               {comm.type}
@@ -541,7 +538,9 @@ export default function VendorsPage() {
                             </span>
                           </div>
                           {comm.subject && (
-                            <p className="text-foreground mt-1 text-sm font-medium">{comm.subject}</p>
+                            <p className="text-foreground mt-1 text-sm font-medium">
+                              {comm.subject}
+                            </p>
                           )}
                           {comm.content && (
                             <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs">

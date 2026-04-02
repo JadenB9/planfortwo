@@ -15,35 +15,35 @@ function formatCurrency(amount: number): string {
 export function TipCalculator({ tips }: TipCalculatorProps) {
   if (tips.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-white p-6">
-        <h3 className="text-sm font-semibold text-foreground">Tip Suggestions</h3>
-        <p className="mt-2 text-sm text-muted-foreground">Add vendors to see tip suggestions.</p>
+      <div className="border-border bg-background rounded-2xl border p-6">
+        <h3 className="text-foreground text-sm font-semibold">Tip Suggestions</h3>
+        <p className="text-muted-foreground mt-2 text-sm">Add vendors to see tip suggestions.</p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-6">
-      <h3 className="mb-4 text-sm font-semibold text-foreground">Tip Suggestions</h3>
+    <div className="border-border bg-background rounded-2xl border p-6">
+      <h3 className="text-foreground mb-4 text-sm font-semibold">Tip Suggestions</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-border">
-              <th className="pb-2 font-medium text-muted-foreground">Vendor Type</th>
-              <th className="pb-2 text-right font-medium text-muted-foreground">Suggested</th>
-              <th className="pb-2 text-right font-medium text-muted-foreground">%</th>
-              <th className="pb-2 text-right font-medium text-muted-foreground">Range</th>
+            <tr className="border-border border-b">
+              <th className="text-muted-foreground pb-2 font-medium">Vendor Type</th>
+              <th className="text-muted-foreground pb-2 text-right font-medium">Suggested</th>
+              <th className="text-muted-foreground pb-2 text-right font-medium">%</th>
+              <th className="text-muted-foreground pb-2 text-right font-medium">Range</th>
             </tr>
           </thead>
           <tbody>
             {tips.map((tip) => (
-              <tr key={tip.vendorType} className="border-b border-border">
-                <td className="py-2.5 font-medium text-foreground">{tip.vendorType}</td>
-                <td className="py-2.5 text-right text-foreground">
+              <tr key={tip.vendorType} className="border-border border-b">
+                <td className="text-foreground py-2.5 font-medium">{tip.vendorType}</td>
+                <td className="text-foreground py-2.5 text-right">
                   {formatCurrency(tip.suggestedAmount)}
                 </td>
-                <td className="py-2.5 text-right text-muted-foreground">{tip.suggestedPercent}%</td>
-                <td className="py-2.5 text-right text-muted-foreground">
+                <td className="text-muted-foreground py-2.5 text-right">{tip.suggestedPercent}%</td>
+                <td className="text-muted-foreground py-2.5 text-right">
                   {formatCurrency(tip.min)} - {formatCurrency(tip.max)}
                 </td>
               </tr>

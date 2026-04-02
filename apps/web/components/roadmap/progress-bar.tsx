@@ -11,7 +11,7 @@ export function ProgressBar({ progress, className = '' }: ProgressBarProps) {
   const clampedProgress = Math.min(100, Math.max(0, progress))
 
   return (
-    <div className={`h-2 w-full overflow-hidden rounded-full bg-muted ${className}`}>
+    <div className={`bg-muted h-2 w-full overflow-hidden rounded-full ${className}`}>
       <motion.div
         className="bg-wedding-500 h-full rounded-full"
         initial={{ width: 0 }}

@@ -38,7 +38,7 @@ export function GuestFilters({ filters, tags, onFilterChange, onSearchChange }: 
     <div className="flex flex-wrap items-center gap-3">
       <div className="relative min-w-[200px] flex-1">
         <svg
-          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -55,7 +55,7 @@ export function GuestFilters({ filters, tags, onFilterChange, onSearchChange }: 
           value={searchValue}
           onChange={(e) => handleSearchInput(e.target.value)}
           placeholder="Search guests..."
-          className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border py-2 pl-9 pr-4 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+          className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground w-full rounded-xl border py-2 pl-9 pr-4 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
         />
       </div>
 
@@ -64,7 +64,7 @@ export function GuestFilters({ filters, tags, onFilterChange, onSearchChange }: 
         onChange={(e) =>
           onFilterChange({ rsvpStatus: (e.target.value as RsvpStatus) || undefined })
         }
-        className="focus:border-wedding-600 focus:ring-wedding-600/20 rounded-xl border border-border px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2"
+        className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground rounded-xl border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
       >
         {RSVP_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -76,7 +76,7 @@ export function GuestFilters({ filters, tags, onFilterChange, onSearchChange }: 
       <select
         value={filters.side ?? ''}
         onChange={(e) => onFilterChange({ side: (e.target.value as GuestSide) || undefined })}
-        className="focus:border-wedding-600 focus:ring-wedding-600/20 rounded-xl border border-border px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2"
+        className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground rounded-xl border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
       >
         {SIDE_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -89,7 +89,7 @@ export function GuestFilters({ filters, tags, onFilterChange, onSearchChange }: 
         <select
           value={filters.tagId ?? ''}
           onChange={(e) => onFilterChange({ tagId: e.target.value || undefined })}
-          className="focus:border-wedding-600 focus:ring-wedding-600/20 rounded-xl border border-border px-3 py-2 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2"
+          className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground rounded-xl border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
         >
           <option value="">All Tags</option>
           {tags.map((tag) => (
@@ -100,22 +100,22 @@ export function GuestFilters({ filters, tags, onFilterChange, onSearchChange }: 
         </select>
       )}
 
-      <label className="flex items-center gap-1.5 text-sm text-foreground">
+      <label className="text-foreground flex items-center gap-1.5 text-sm">
         <input
           type="checkbox"
           checked={filters.isChild ?? false}
           onChange={(e) => onFilterChange({ isChild: e.target.checked || undefined })}
-          className="text-wedding-600 focus:ring-wedding-600 rounded border-border"
+          className="text-wedding-600 focus:ring-wedding-600 border-border rounded"
         />
         Children
       </label>
 
-      <label className="flex items-center gap-1.5 text-sm text-foreground">
+      <label className="text-foreground flex items-center gap-1.5 text-sm">
         <input
           type="checkbox"
           checked={filters.isVip ?? false}
           onChange={(e) => onFilterChange({ isVip: e.target.checked || undefined })}
-          className="text-wedding-600 focus:ring-wedding-600 rounded border-border"
+          className="text-wedding-600 focus:ring-wedding-600 border-border rounded"
         />
         VIP
       </label>

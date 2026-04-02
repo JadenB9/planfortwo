@@ -89,7 +89,7 @@ function SortableNavItem({
               : isActive
                 ? 'bg-wedding-50 text-wedding-700 dark:bg-wedding-950 dark:text-wedding-300'
                 : item.comingSoon
-                  ? 'cursor-default text-muted-foreground dark:text-gray-600'
+                  ? 'text-muted-foreground cursor-default dark:text-gray-600'
                   : 'text-foreground hover:bg-muted hover:text-foreground dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
           }`}
           onClick={(e) => {

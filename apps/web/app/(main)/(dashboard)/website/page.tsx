@@ -451,7 +451,11 @@ function WebsitePageInner() {
           />
         )
       default:
-        return <p className="text-sm text-muted-foreground">No editor available for this section type.</p>
+        return (
+          <p className="text-muted-foreground text-sm">
+            No editor available for this section type.
+          </p>
+        )
     }
   }
 
@@ -471,8 +475,8 @@ function WebsitePageInner() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ...springSmooth }}
       >
-        <h1 className="font-serif text-3xl font-bold text-foreground">Wedding Website</h1>
-        <p className="mt-2 text-muted-foreground">Create your personalized wedding website</p>
+        <h1 className="text-foreground font-serif text-3xl font-bold">Wedding Website</h1>
+        <p className="text-muted-foreground mt-2">Create your personalized wedding website</p>
         <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
           <Button
             className="mt-6"
@@ -500,7 +504,7 @@ function WebsitePageInner() {
   return (
     <div className="flex h-full flex-col pt-2">
       <div className="mb-4 flex shrink-0 items-center justify-between">
-        <h1 className="font-serif text-2xl font-bold text-foreground">Wedding Website</h1>
+        <h1 className="text-foreground font-serif text-2xl font-bold">Wedding Website</h1>
         <PublishToggle
           isPublished={!!config.publishedAt}
           subdomain={config.subdomain}

@@ -21,7 +21,7 @@ export function CategoryFilter({ categories, selectedId, onSelect }: CategoryFil
         }`}
       >
         <span>All Tasks</span>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-muted-foreground text-xs">
           {totalCompleted}/{totalTasks}
         </span>
       </button>
@@ -41,7 +41,7 @@ export function CategoryFilter({ categories, selectedId, onSelect }: CategoryFil
             style={{ backgroundColor: category.color }}
           />
           <span className="flex-1 truncate">{category.name}</span>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground text-xs">
             {category.completedCount}/{category.taskCount}
           </span>
         </button>

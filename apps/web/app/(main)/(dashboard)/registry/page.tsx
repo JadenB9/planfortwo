@@ -430,8 +430,8 @@ function RegistryPageInner() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-serif text-3xl font-bold text-foreground">Registry</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <h1 className="text-foreground font-serif text-3xl font-bold">Registry</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
               Manage your registries, cash funds, and gift tracking.
             </p>
           </div>
@@ -462,16 +462,16 @@ function RegistryPageInner() {
             <motion.div variants={fadeInUp}>
               <Card>
                 <CardContent className="px-4 py-3">
-                  <p className="text-xs font-medium text-muted-foreground">Registries</p>
-                  <p className="text-2xl font-bold text-foreground">{links.length}</p>
+                  <p className="text-muted-foreground text-xs font-medium">Registries</p>
+                  <p className="text-foreground text-2xl font-bold">{links.length}</p>
                 </CardContent>
               </Card>
             </motion.div>
             <motion.div variants={fadeInUp}>
               <Card>
                 <CardContent className="px-4 py-3">
-                  <p className="text-xs font-medium text-muted-foreground">Funds Raised</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-muted-foreground text-xs font-medium">Funds Raised</p>
+                  <p className="text-foreground text-2xl font-bold">
                     ${totalFundsRaised.toLocaleString()}
                   </p>
                 </CardContent>
@@ -480,8 +480,8 @@ function RegistryPageInner() {
             <motion.div variants={fadeInUp}>
               <Card>
                 <CardContent className="px-4 py-3">
-                  <p className="text-xs font-medium text-muted-foreground">Gifts Value</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-muted-foreground text-xs font-medium">Gifts Value</p>
+                  <p className="text-foreground text-2xl font-bold">
                     ${totalGiftsValue.toLocaleString()}
                   </p>
                 </CardContent>
@@ -490,10 +490,13 @@ function RegistryPageInner() {
             <motion.div variants={fadeInUp}>
               <Card>
                 <CardContent className="px-4 py-3">
-                  <p className="text-xs font-medium text-muted-foreground">Thank Yous Sent</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-muted-foreground text-xs font-medium">Thank Yous Sent</p>
+                  <p className="text-foreground text-2xl font-bold">
                     {thankYouSent}
-                    <span className="text-sm font-normal text-muted-foreground"> / {gifts.length}</span>
+                    <span className="text-muted-foreground text-sm font-normal">
+                      {' '}
+                      / {gifts.length}
+                    </span>
                   </p>
                 </CardContent>
               </Card>
@@ -503,7 +506,7 @@ function RegistryPageInner() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="mb-6 border-b border-border">
+      <div className="border-border mb-6 border-b">
         <nav className="-mb-px flex gap-6">
           {TABS.map((tab) => {
             const Icon = tab.icon
@@ -514,7 +517,7 @@ function RegistryPageInner() {
                 className={`flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
                   activeTab === tab.key
                     ? 'border-wedding-600 text-wedding-600'
-                    : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
+                    : 'text-muted-foreground hover:border-border hover:text-foreground border-transparent'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -784,8 +787,8 @@ function LinksTab({
     <div className="space-y-8">
       {/* Popular Stores Grid */}
       <div>
-        <h2 className="font-serif text-lg font-semibold text-foreground">Popular Stores</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h2 className="text-foreground font-serif text-lg font-semibold">Popular Stores</h2>
+        <p className="text-muted-foreground mt-1 text-sm">
           Quick-add a registry from a popular store, or add a custom one.
         </p>
         <motion.div
@@ -801,7 +804,7 @@ function LinksTab({
                 key={store.name}
                 variants={fadeInUp}
                 onClick={() => onAddStore(store.name)}
-                className="border-border bg-background group flex flex-col items-center gap-2.5 rounded-xl border p-4 shadow-sm transition-all hover:border-border hover:shadow-md"
+                className="border-border bg-background hover:border-border group flex flex-col items-center gap-2.5 rounded-xl border p-4 shadow-sm transition-all hover:shadow-md"
               >
                 <div
                   className="flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform group-hover:scale-110"
@@ -809,19 +812,19 @@ function LinksTab({
                 >
                   <Icon className="h-5 w-5" />
                 </div>
-                <span className="text-xs font-medium text-foreground">{store.name}</span>
+                <span className="text-foreground text-xs font-medium">{store.name}</span>
               </motion.button>
             )
           })}
           <motion.button
             variants={fadeInUp}
             onClick={onAddCustom}
-            className="border-border bg-background group flex flex-col items-center gap-2.5 rounded-xl border border-dashed p-4 transition-all hover:border-border hover:shadow-md"
+            className="border-border bg-background hover:border-border group flex flex-col items-center gap-2.5 rounded-xl border border-dashed p-4 transition-all hover:shadow-md"
           >
             <div className="bg-wedding-50 text-wedding-600 flex h-12 w-12 items-center justify-center rounded-full transition-transform group-hover:scale-110">
               <Plus className="h-5 w-5" />
             </div>
-            <span className="text-xs font-medium text-muted-foreground">Custom</span>
+            <span className="text-muted-foreground text-xs font-medium">Custom</span>
           </motion.button>
         </motion.div>
       </div>
@@ -834,10 +837,10 @@ function LinksTab({
               <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
                 <Link2 className="text-wedding-600 h-8 w-8" />
               </div>
-              <h2 className="font-serif text-xl font-semibold text-foreground">
+              <h2 className="text-foreground font-serif text-xl font-semibold">
                 No Registry Links Yet
               </h2>
-              <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
                 Click a store above to add your first registry link, or add a custom one.
               </p>
             </CardContent>
@@ -845,7 +848,7 @@ function LinksTab({
         </motion.div>
       ) : (
         <div>
-          <h2 className="font-serif text-lg font-semibold text-foreground">
+          <h2 className="text-foreground font-serif text-lg font-semibold">
             Your Registries ({links.length})
           </h2>
           <motion.div
@@ -873,28 +876,30 @@ function LinksTab({
                           {link.storeName.charAt(0).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="truncate font-semibold text-foreground">{link.storeName}</h3>
+                          <h3 className="text-foreground truncate font-semibold">
+                            {link.storeName}
+                          </h3>
                           <div className="mt-0.5 flex items-center gap-3">
                             <a
                               href={/^https?:\/\//i.test(link.url) ? link.url : '#'}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-muted-foreground"
+                              className="text-muted-foreground hover:text-muted-foreground inline-flex items-center gap-1 text-xs"
                             >
                               Open
                               <ExternalLink className="h-3 w-3" />
                             </a>
                           </div>
-                          <p className="mt-1 text-xs text-muted-foreground">
+                          <p className="text-muted-foreground mt-1 text-xs">
                             {link.clickCount} click{link.clickCount !== 1 ? 's' : ''}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center justify-end gap-1 border-t border-border bg-muted/50 px-4 py-2">
+                      <div className="border-border bg-muted/50 flex items-center justify-end gap-1 border-t px-4 py-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                          className="text-muted-foreground hover:text-foreground h-8 px-2"
                           onClick={() => onCopy(link.url)}
                         >
                           <Copy className="mr-1 h-3.5 w-3.5" />
@@ -903,7 +908,7 @@ function LinksTab({
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                          className="text-muted-foreground hover:text-foreground h-8 px-2"
                           onClick={() => {
                             void navigator.share?.({ url: link.url, title: link.storeName })
                           }}
@@ -955,8 +960,8 @@ function FundsTab({
             <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
               <Banknote className="text-wedding-600 h-8 w-8" />
             </div>
-            <h2 className="font-serif text-xl font-semibold text-foreground">No Cash Funds</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            <h2 className="text-foreground font-serif text-xl font-semibold">No Cash Funds</h2>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
               Create funds for your honeymoon, house, or any goal.
             </p>
             <Button className="mt-6" onClick={onCreate}>
@@ -992,16 +997,16 @@ function FundsTab({
                         <FundIcon className="h-5 w-5" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">{fund.name}</h3>
+                        <h3 className="text-foreground font-semibold">{fund.name}</h3>
                         {fund.description && (
-                          <p className="mt-0.5 text-sm text-muted-foreground">{fund.description}</p>
+                          <p className="text-muted-foreground mt-0.5 text-sm">{fund.description}</p>
                         )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => onEdit(fund)}
-                        className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
+                        className="text-muted-foreground hover:bg-muted hover:text-muted-foreground rounded-md p-1.5 transition-colors"
                         title="Edit fund"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -1019,15 +1024,15 @@ function FundsTab({
                   {/* Progress */}
                   <div className="mt-5">
                     <div className="flex items-end justify-between text-sm">
-                      <span className="font-semibold text-foreground">
+                      <span className="text-foreground font-semibold">
                         ${fund.currentAmount.toLocaleString()}{' '}
-                        <span className="font-normal text-muted-foreground">raised</span>
+                        <span className="text-muted-foreground font-normal">raised</span>
                       </span>
                       <span className="text-muted-foreground">
                         of ${fund.goalAmount.toLocaleString()} goal
                       </span>
                     </div>
-                    <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-muted">
+                    <div className="bg-muted mt-2 h-3 w-full overflow-hidden rounded-full">
                       <motion.div
                         className="bg-wedding-500 h-full rounded-full"
                         initial={{ width: 0 }}
@@ -1035,14 +1040,14 @@ function FundsTab({
                         transition={springSmooth}
                       />
                     </div>
-                    <p className="mt-1.5 text-xs font-medium text-muted-foreground">
+                    <p className="text-muted-foreground mt-1.5 text-xs font-medium">
                       {Math.round(pct)}% of goal
                     </p>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between border-t border-border bg-muted/50 px-5 py-2.5">
+                <div className="border-border bg-muted/50 flex items-center justify-between border-t px-5 py-2.5">
                   <button
                     onClick={() => onToggle(fund)}
                     className={`text-xs font-medium ${
@@ -1093,8 +1098,8 @@ function GiftsTab({
             <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
               <GiftIcon className="text-wedding-600 h-8 w-8" />
             </div>
-            <h2 className="font-serif text-xl font-semibold text-foreground">No Gifts Logged</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            <h2 className="text-foreground font-serif text-xl font-semibold">No Gifts Logged</h2>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
               Track gifts you receive and manage thank-you notes.
             </p>
             <Button className="mt-6" onClick={onLog}>
@@ -1127,29 +1132,31 @@ function GiftsTab({
                       <GiftIcon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-foreground">{gift.description}</h3>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                      <h3 className="text-foreground font-semibold">{gift.description}</h3>
+                      <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                         {gift.guestName && <span>From {gift.guestName}</span>}
                         {gift.estimatedValue != null && (
-                          <span className="font-medium text-foreground">
+                          <span className="text-foreground font-medium">
                             ${gift.estimatedValue.toLocaleString()}
                           </span>
                         )}
                         {gift.receivedAt && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-muted-foreground text-xs">
                             {new Date(gift.receivedAt).toLocaleDateString()}
                           </span>
                         )}
                       </div>
                       {gift.notes && (
-                        <p className="mt-2 text-xs italic text-muted-foreground">{gift.notes}</p>
+                        <p className="text-muted-foreground mt-2 text-xs italic">{gift.notes}</p>
                       )}
                     </div>
                   </div>
 
                   {/* Thank-You Progress Dots */}
                   <div className="mt-4">
-                    <p className="mb-2 text-xs font-medium text-muted-foreground">Thank-You Status</p>
+                    <p className="text-muted-foreground mb-2 text-xs font-medium">
+                      Thank-You Status
+                    </p>
                     <div className="flex items-center gap-2">
                       {THANK_YOU_STEPS.map((step, idx) => {
                         const stepNum = idx === 0 ? 0 : idx === 1 ? 2 : 3
@@ -1189,13 +1196,13 @@ function GiftsTab({
                             </div>
                             <span
                               className={`text-xs ${
-                                isCurrent ? 'font-medium text-foreground' : 'text-muted-foreground'
+                                isCurrent ? 'text-foreground font-medium' : 'text-muted-foreground'
                               }`}
                             >
                               {step.label}
                             </span>
                             {idx < THANK_YOU_STEPS.length - 1 && (
-                              <div className="ml-1 h-px w-4 bg-muted" />
+                              <div className="bg-muted ml-1 h-px w-4" />
                             )}
                           </button>
                         )
@@ -1205,11 +1212,11 @@ function GiftsTab({
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end gap-1 border-t border-border bg-muted/50 px-4 py-2">
+                <div className="border-border bg-muted/50 flex items-center justify-end gap-1 border-t px-4 py-2">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground h-8 px-2"
                     onClick={() => onEdit(gift)}
                   >
                     <Pencil className="mr-1 h-3.5 w-3.5" />

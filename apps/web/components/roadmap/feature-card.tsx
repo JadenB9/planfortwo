@@ -71,7 +71,7 @@ export function FeatureCard({
           <div className="bg-wedding-50 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg">
             <Icon className="text-wedding-600 h-5 w-5" />
           </div>
-          <h3 className="truncate text-sm font-semibold text-foreground">{feature.label}</h3>
+          <h3 className="text-foreground truncate text-sm font-semibold">{feature.label}</h3>
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
           {isSettingsMode && (
@@ -82,7 +82,7 @@ export function FeatureCard({
                 e.stopPropagation()
                 onHiddenToggle?.(feature.key)
               }}
-              className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
+              className="text-muted-foreground hover:bg-muted hover:text-muted-foreground rounded-lg p-1.5 transition-colors"
               title={feature.isHidden ? 'Show feature' : 'Hide feature'}
             >
               {feature.isHidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -96,7 +96,7 @@ export function FeatureCard({
         </div>
       </div>
 
-      <p className="mb-3 text-xs text-muted-foreground">{feature.description}</p>
+      <p className="text-muted-foreground mb-3 text-xs">{feature.description}</p>
 
       {isSettingsMode ? (
         <div className="mb-1">
@@ -107,19 +107,21 @@ export function FeatureCard({
             step={5}
             value={feature.progress}
             onChange={(e) => onProgressChange?.(feature.key, Number(e.target.value))}
-            className="accent-wedding-600 h-2 w-full cursor-pointer appearance-none rounded-full bg-muted"
+            className="accent-wedding-600 bg-muted h-2 w-full cursor-pointer appearance-none rounded-full"
           />
-          <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+          <div className="text-muted-foreground mt-1 flex items-center justify-between text-xs">
             <span>Auto: {feature.autoProgress}%</span>
-            <span className="font-medium text-muted-foreground">{Math.round(feature.progress)}%</span>
+            <span className="text-muted-foreground font-medium">
+              {Math.round(feature.progress)}%
+            </span>
           </div>
         </div>
       ) : (
         <>
           <ProgressBar progress={feature.progress} />
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">{feature.itemCount} items</span>
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-muted-foreground text-xs">{feature.itemCount} items</span>
+            <span className="text-muted-foreground text-xs font-medium">
               {Math.round(feature.progress)}%
             </span>
           </div>
@@ -133,7 +135,7 @@ export function FeatureCard({
       <motion.div
         variants={scaleIn}
         transition={springSmooth}
-        className={`rounded-2xl border border-border bg-white p-5 shadow-sm transition-opacity ${
+        className={`border-border bg-background rounded-2xl border p-5 shadow-sm transition-opacity ${
           feature.isHidden ? 'opacity-50' : ''
         }`}
       >
@@ -150,7 +152,7 @@ export function FeatureCard({
     >
       <Link
         href={feature.href}
-        className="hover:border-wedding-200 block rounded-2xl border border-border bg-white p-5 shadow-sm transition-colors"
+        className="hover:border-wedding-200 border-border bg-background block rounded-2xl border p-5 shadow-sm transition-colors"
       >
         {cardContent}
       </Link>

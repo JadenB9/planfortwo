@@ -109,10 +109,10 @@ export function WebsitePreview({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b bg-muted/80 px-4 py-2">
+      <div className="bg-muted/80 flex items-center justify-between border-b px-4 py-2">
         <div className="flex items-center gap-2">
-          <Monitor className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="text-xs font-medium text-muted-foreground">Live Preview</span>
+          <Monitor className="text-muted-foreground h-3.5 w-3.5" />
+          <span className="text-muted-foreground text-xs font-medium">Live Preview</span>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -139,11 +139,11 @@ export function WebsitePreview({
           >
             <Monitor className="h-3.5 w-3.5" />
           </button>
-          <span className="ml-1 text-[10px] text-muted-foreground">{Math.round(scale * 100)}%</span>
+          <span className="text-muted-foreground ml-1 text-[10px]">{Math.round(scale * 100)}%</span>
         </div>
       </div>
 
-      <div ref={containerRef} className="flex-1 overflow-y-auto bg-muted">
+      <div ref={containerRef} className="bg-muted flex-1 overflow-y-auto">
         {previewSections.length > 0 ? (
           <div style={{ height: `${scaledHeight}px`, position: 'relative', overflow: 'hidden' }}>
             <div
@@ -181,9 +181,11 @@ export function WebsitePreview({
         ) : (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
-              <Monitor className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
-              <p className="text-sm text-muted-foreground">No visible sections</p>
-              <p className="mt-1 text-xs text-muted-foreground/50">Enable sections to see your preview</p>
+              <Monitor className="text-muted-foreground/50 mx-auto mb-3 h-10 w-10" />
+              <p className="text-muted-foreground text-sm">No visible sections</p>
+              <p className="text-muted-foreground/50 mt-1 text-xs">
+                Enable sections to see your preview
+              </p>
             </div>
           </div>
         )}

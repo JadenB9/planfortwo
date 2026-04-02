@@ -179,7 +179,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
-                className="flex-1 rounded-lg border border-border bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2"
+                className="border-border bg-background flex-1 rounded-lg border px-4 py-3 text-sm focus:outline-none focus:ring-2"
                 style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
               />
               <input
@@ -188,7 +188,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
-                className="flex-1 rounded-lg border border-border bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2"
+                className="border-border bg-background flex-1 rounded-lg border px-4 py-3 text-sm focus:outline-none focus:ring-2"
                 style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
               />
             </div>
@@ -206,10 +206,10 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
         {state === 'loading' && (
           <div className="flex flex-col items-center py-12">
             <div
-              className="h-8 w-8 animate-spin rounded-full border-4 border-border"
+              className="border-border h-8 w-8 animate-spin rounded-full border-4"
               style={{ borderTopColor: colors.primary }}
             />
-            <p className="mt-4 text-sm text-muted-foreground">Looking you up...</p>
+            <p className="text-muted-foreground mt-4 text-sm">Looking you up...</p>
           </div>
         )}
 
@@ -226,7 +226,7 @@ export function RsvpSection({ title, content, slug }: RsvpSectionProps) {
               <button
                 key={guest.id}
                 onClick={() => handleSelectGuest(guest.id)}
-                className="w-full rounded-lg border border-border bg-white p-4 text-left transition-shadow hover:shadow-md"
+                className="border-border bg-background w-full rounded-lg border p-4 text-left transition-shadow hover:shadow-md"
               >
                 <span
                   className={`font-medium ${bodyClass}`}

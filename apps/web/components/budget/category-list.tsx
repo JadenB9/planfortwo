@@ -31,11 +31,11 @@ export function CategoryList({
         className={`rounded-2xl border p-4 text-left transition-colors ${
           selectedCategoryId === null
             ? 'border-wedding-300 bg-wedding-50'
-            : 'border-border bg-white hover:border-border'
+            : 'border-border bg-background hover:border-border'
         }`}
       >
-        <p className="text-sm font-medium text-foreground">All Categories</p>
-        <p className="mt-1 text-xs text-muted-foreground">{categories.length} categories</p>
+        <p className="text-foreground text-sm font-medium">All Categories</p>
+        <p className="text-muted-foreground mt-1 text-xs">{categories.length} categories</p>
       </button>
 
       {categories.map((cat) => {
@@ -52,15 +52,15 @@ export function CategoryList({
             className={`rounded-2xl border p-4 text-left transition-colors ${
               isActive
                 ? 'border-wedding-300 bg-wedding-50'
-                : 'border-border bg-white hover:border-border'
+                : 'border-border bg-background hover:border-border'
             }`}
           >
             <div className="flex items-center gap-2">
               <span className="text-lg">{cat.icon}</span>
-              <p className="text-sm font-medium text-foreground">{cat.name}</p>
+              <p className="text-foreground text-sm font-medium">{cat.name}</p>
             </div>
             <div className="mt-3 flex items-baseline justify-between">
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {formatCurrency(spent)} / {formatCurrency(allocated)}
               </p>
               <p
@@ -69,7 +69,7 @@ export function CategoryList({
                 {percent}%
               </p>
             </div>
-            <div className="mt-1.5 h-1.5 w-full rounded-full bg-muted">
+            <div className="bg-muted mt-1.5 h-1.5 w-full rounded-full">
               <div
                 className="h-1.5 rounded-full transition-all"
                 style={{

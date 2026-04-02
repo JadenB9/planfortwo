@@ -366,8 +366,8 @@ export default function PhotosPage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-foreground">Photos</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-foreground font-serif text-3xl font-bold">Photos</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
             Manage your wedding photo gallery.
             {pendingCount > 0 && (
               <span className="ml-2 font-medium text-amber-600">{pendingCount} pending review</span>
@@ -426,7 +426,7 @@ export default function PhotosPage() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  className="relative aspect-square overflow-hidden rounded-lg border bg-muted"
+                  className="bg-muted relative aspect-square overflow-hidden rounded-lg border"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -497,8 +497,8 @@ export default function PhotosPage() {
             <div className="bg-wedding-50 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
               <Camera className="text-wedding-600 h-8 w-8" />
             </div>
-            <h2 className="font-serif text-xl font-semibold text-foreground">No Photos Yet</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            <h2 className="text-foreground font-serif text-xl font-semibold">No Photos Yet</h2>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
               Upload your first photos to build your wedding gallery.
             </p>
             <Button className="mt-6" onClick={() => fileInputRef.current?.click()}>
@@ -511,16 +511,16 @@ export default function PhotosPage() {
               onClick={() => fileInputRef.current?.click()}
               className="border-wedding-200 hover:border-wedding-400 hover:bg-wedding-50 mx-auto mt-6 flex max-w-sm cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-8 transition-colors"
             >
-              <Upload className="h-8 w-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Drag photos here or click to browse</p>
-              <p className="text-xs text-muted-foreground">Supports JPG, PNG, WebP, and more</p>
+              <Upload className="text-muted-foreground h-8 w-8" />
+              <p className="text-muted-foreground text-sm">Drag photos here or click to browse</p>
+              <p className="text-muted-foreground text-xs">Supports JPG, PNG, WebP, and more</p>
             </div>
           </CardContent>
         </Card>
       ) : filteredPhotos.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center">
-            <p className="text-sm text-muted-foreground">No photos match this filter.</p>
+            <p className="text-muted-foreground text-sm">No photos match this filter.</p>
           </CardContent>
         </Card>
       ) : (
@@ -538,14 +538,14 @@ export default function PhotosPage() {
             >
               <Upload className="text-wedding-400 h-8 w-8" />
               <p className="text-wedding-600 text-sm font-medium">Add Photos</p>
-              <p className="text-xs text-muted-foreground">Drag or click</p>
+              <p className="text-muted-foreground text-xs">Drag or click</p>
             </div>
           </motion.div>
 
           {filteredPhotos.map((photo, index) => (
             <motion.div key={photo.id} variants={fadeInUp} className="mb-4 break-inside-avoid">
               <Card className="group cursor-pointer overflow-hidden">
-                <div className="relative bg-muted" onClick={() => openLightbox(index)}>
+                <div className="bg-muted relative" onClick={() => openLightbox(index)}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photo.url}
@@ -573,7 +573,7 @@ export default function PhotosPage() {
                       className={`rounded-full p-1.5 transition-colors ${
                         photo.isFavorite
                           ? 'bg-yellow-400 text-white'
-                          : 'bg-white/90 text-foreground hover:bg-yellow-100'
+                          : 'bg-background/90 text-foreground hover:bg-yellow-100'
                       }`}
                       title={photo.isFavorite ? 'Unfavorite' : 'Favorite'}
                     >
@@ -584,7 +584,7 @@ export default function PhotosPage() {
                         e.stopPropagation()
                         setDeletingPhotoId(photo.id)
                       }}
-                      className="rounded-full bg-white/90 p-1.5 text-red-600 transition-colors hover:bg-red-100"
+                      className="bg-background/90 rounded-full p-1.5 text-red-600 transition-colors hover:bg-red-100"
                       title="Delete"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -647,7 +647,7 @@ export default function PhotosPage() {
             {/* Close button */}
             <button
               onClick={() => setLightboxIndex(null)}
-              className="absolute right-4 top-4 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+              className="bg-background/10 hover:bg-background/20 absolute right-4 top-4 z-10 rounded-full p-2 text-white transition-colors"
             >
               <X className="h-6 w-6" />
             </button>
@@ -659,7 +659,7 @@ export default function PhotosPage() {
                   e.stopPropagation()
                   lightboxPrev()
                 }}
-                className="absolute left-4 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                className="bg-background/10 hover:bg-background/20 absolute left-4 z-10 rounded-full p-2 text-white transition-colors"
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
@@ -672,7 +672,7 @@ export default function PhotosPage() {
                   e.stopPropagation()
                   lightboxNext()
                 }}
-                className="absolute right-4 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                className="bg-background/10 hover:bg-background/20 absolute right-4 z-10 rounded-full p-2 text-white transition-colors"
               >
                 <ChevronRight className="h-6 w-6" />
               </button>
@@ -706,7 +706,7 @@ export default function PhotosPage() {
                       value={captionDraft}
                       onChange={(e) => setCaptionDraft(e.target.value)}
                       placeholder="Add a caption..."
-                      className="flex-1 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/30"
+                      className="bg-background/10 flex-1 rounded-lg px-3 py-1.5 text-sm text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/30"
                       autoFocus
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') void handleSaveCaption()
@@ -719,7 +719,7 @@ export default function PhotosPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="text-white hover:bg-white/10"
+                      className="hover:bg-background/10 text-white"
                       onClick={() => setEditingCaption(false)}
                     >
                       Cancel
@@ -744,7 +744,7 @@ export default function PhotosPage() {
                     className={`rounded-full p-2 transition-colors ${
                       lightboxPhoto.isFavorite
                         ? 'bg-yellow-400 text-white'
-                        : 'bg-white/10 text-white hover:bg-white/20'
+                        : 'bg-background/10 hover:bg-background/20 text-white'
                     }`}
                     title={lightboxPhoto.isFavorite ? 'Unfavorite' : 'Favorite'}
                   >
@@ -785,7 +785,7 @@ export default function PhotosPage() {
 
                   <button
                     onClick={() => setDeletingPhotoId(lightboxPhoto.id)}
-                    className="rounded-full bg-white/10 p-2 text-red-400 transition-colors hover:bg-red-600/30"
+                    className="bg-background/10 rounded-full p-2 text-red-400 transition-colors hover:bg-red-600/30"
                     title="Delete"
                   >
                     <Trash2 className="h-5 w-5" />
@@ -813,7 +813,7 @@ export default function PhotosPage() {
           <DialogHeader>
             <DialogTitle>Delete Photo</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Are you sure you want to delete this photo? This action cannot be undone.
           </p>
           <DialogFooter>

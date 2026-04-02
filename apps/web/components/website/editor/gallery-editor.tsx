@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import NextImage from 'next/image'
-import { Image as ImageIcon, Check, Loader2, ExternalLink } from 'lucide-react'
+import { Image, Check, Loader2, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import type { GalleryContent, GalleryPhoto, WebsitePhoto } from '@planfortwo/types'
@@ -101,7 +100,7 @@ export function GalleryEditor({
   return (
     <div className="space-y-5">
       <div>
-        <label htmlFor="gallery-layout" className="text-sm font-medium text-foreground">
+        <label htmlFor="gallery-layout" className="text-foreground text-sm font-medium">
           Layout
         </label>
         <select
@@ -113,7 +112,7 @@ export function GalleryEditor({
               layout: e.target.value as GalleryContent['layout'],
             })
           }
-          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           <option value="grid">Grid</option>
           <option value="masonry">Masonry</option>
@@ -123,7 +122,7 @@ export function GalleryEditor({
 
       {content.layout === 'grid' && (
         <div>
-          <label htmlFor="gallery-columns" className="text-sm font-medium text-foreground">
+          <label htmlFor="gallery-columns" className="text-foreground text-sm font-medium">
             Columns
           </label>
           <input
@@ -136,31 +135,31 @@ export function GalleryEditor({
               const value = Math.min(6, Math.max(2, Number(e.target.value) || 2))
               onChange({ ...content, columns: value })
             }}
-            className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="border-border mt-1 block w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <p className="mt-1 text-xs text-muted-foreground">Between 2 and 6 columns.</p>
+          <p className="text-muted-foreground mt-1 text-xs">Between 2 and 6 columns.</p>
         </div>
       )}
 
-      <div className="border-t border-border pt-4">
+      <div className="border-border border-t pt-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-medium text-foreground">Photos</h3>
+          <h3 className="text-foreground text-sm font-medium">Photos</h3>
           {websitePhotos.length > 0 && (
-            <span className="text-xs text-muted-foreground">{websitePhotos.length} selected</span>
+            <span className="text-muted-foreground text-xs">{websitePhotos.length} selected</span>
           )}
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Loading photos...</span>
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+            <span className="text-muted-foreground ml-2 text-sm">Loading photos...</span>
           </div>
         ) : galleryPhotos.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-muted p-8 text-center">
-            <ImageIcon className="h-8 w-8 text-muted-foreground" />
+          <div className="border-border bg-muted flex flex-col items-center gap-3 rounded-lg border border-dashed p-8 text-center">
+            <Image className="text-muted-foreground h-8 w-8" />
             <div>
-              <p className="text-sm font-medium text-foreground">No photos uploaded yet</p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-foreground text-sm font-medium">No photos uploaded yet</p>
+              <p className="text-muted-foreground mt-1 text-xs">
                 Upload photos in the{' '}
                 <a
                   href="/photos"
@@ -187,15 +186,13 @@ export function GalleryEditor({
                   className={`group relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
                     isSelected
                       ? 'border-blue-500 ring-2 ring-blue-200'
-                      : 'border-transparent hover:border-border'
+                      : 'hover:border-border border-transparent'
                   } ${isToggling ? 'opacity-60' : ''}`}
                 >
-                  <NextImage
+                  <img
                     src={photo.thumbnailUrl ?? photo.url}
                     alt={photo.caption ?? 'Gallery photo'}
-                    fill
-                    sizes="(min-width: 640px) 25vw, 33vw"
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
 
                   {isToggling && (

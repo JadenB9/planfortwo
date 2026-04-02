@@ -99,9 +99,9 @@ export function RsvpEntry() {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-8 shadow-sm">
+    <div className="border-border bg-background rounded-2xl border p-8 shadow-sm">
       {/* Tab Switcher */}
-      <div className="mb-8 flex rounded-xl bg-muted p-1">
+      <div className="bg-muted mb-8 flex rounded-xl p-1">
         <button
           onClick={() => {
             setActiveTab('code')
@@ -110,7 +110,7 @@ export function RsvpEntry() {
           }}
           className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
             activeTab === 'code'
-              ? 'bg-white text-foreground shadow-sm'
+              ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -123,7 +123,7 @@ export function RsvpEntry() {
           }}
           className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
             activeTab === 'name'
-              ? 'bg-white text-foreground shadow-sm'
+              ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -135,17 +135,19 @@ export function RsvpEntry() {
       {activeTab === 'code' && (
         <form onSubmit={handleCodeSubmit} className="space-y-4">
           <div>
-            <label htmlFor="rsvp-code" className="block text-sm font-medium text-foreground">
+            <label htmlFor="rsvp-code" className="text-foreground block text-sm font-medium">
               RSVP Code
             </label>
-            <p className="mt-1 text-xs text-muted-foreground">Enter the code from your invitation</p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Enter the code from your invitation
+            </p>
             <input
               id="rsvp-code"
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="e.g. SMITH2025"
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-3 text-center text-lg tracking-wider text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-2 w-full rounded-xl border px-4 py-3 text-center text-lg tracking-wider shadow-sm transition-colors focus:outline-none focus:ring-2"
               autoComplete="off"
             />
           </div>
@@ -175,10 +177,10 @@ export function RsvpEntry() {
       {activeTab === 'name' && (
         <form onSubmit={handleNameSubmit} className="space-y-4">
           <div>
-            <label htmlFor="rsvp-slug" className="block text-sm font-medium text-foreground">
+            <label htmlFor="rsvp-slug" className="text-foreground block text-sm font-medium">
               Wedding Website URL
             </label>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-xs">
               The couple&apos;s wedding website name (e.g. &quot;smith-jones&quot;)
             </p>
             <input
@@ -187,13 +189,16 @@ export function RsvpEntry() {
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="e.g. smith-jones"
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="rsvp-first-name" className="block text-sm font-medium text-foreground">
+              <label
+                htmlFor="rsvp-first-name"
+                className="text-foreground block text-sm font-medium"
+              >
                 First Name
               </label>
               <input
@@ -202,11 +207,11 @@ export function RsvpEntry() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Jane"
-                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
               />
             </div>
             <div>
-              <label htmlFor="rsvp-last-name" className="block text-sm font-medium text-foreground">
+              <label htmlFor="rsvp-last-name" className="text-foreground block text-sm font-medium">
                 Last Name
               </label>
               <input
@@ -215,7 +220,7 @@ export function RsvpEntry() {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Doe"
-                className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-2 w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+                className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-colors focus:outline-none focus:ring-2"
               />
             </div>
           </div>
@@ -241,7 +246,7 @@ export function RsvpEntry() {
 
           {nameResults && nameResults.length > 0 && (
             <div className="mt-4 space-y-2">
-              <p className="text-sm font-medium text-foreground">
+              <p className="text-foreground text-sm font-medium">
                 We found {nameResults.length} match{nameResults.length !== 1 ? 'es' : ''}:
               </p>
               <div className="space-y-2">
@@ -250,12 +255,12 @@ export function RsvpEntry() {
                     key={guest.id}
                     onClick={() => handleGuestSelect(guest)}
                     disabled={!guest.rsvpToken}
-                    className="hover:border-wedding-300 hover:bg-wedding-50 flex w-full items-center justify-between rounded-xl border border-border bg-muted px-4 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                    className="hover:border-wedding-300 hover:bg-wedding-50 border-border bg-muted flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <span className="text-sm font-medium text-foreground">
+                    <span className="text-foreground text-sm font-medium">
                       {guest.firstName} {guest.lastName}
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-muted-foreground text-xs">
                       {guest.rsvpToken ? 'Select' : 'No RSVP link'}
                     </span>
                   </button>

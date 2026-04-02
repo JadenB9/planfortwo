@@ -26,8 +26,8 @@ export function StyleStep({ data, onUpdate, onNext, onBack }: StyleStepProps) {
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-foreground">What&apos;s your style?</h2>
-        <p className="mt-2 text-muted-foreground">Pick the vibe that feels most like you two.</p>
+        <h2 className="text-foreground font-serif text-3xl font-bold">What&apos;s your style?</h2>
+        <p className="text-muted-foreground mt-2">Pick the vibe that feels most like you two.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -42,7 +42,7 @@ export function StyleStep({ data, onUpdate, onNext, onBack }: StyleStepProps) {
             }`}
           >
             <span className="block text-2xl">{option.emoji}</span>
-            <span className="mt-1 block text-sm font-semibold text-foreground">{option.label}</span>
+            <span className="text-foreground mt-1 block text-sm font-semibold">{option.label}</span>
           </button>
         ))}
       </div>
@@ -50,7 +50,7 @@ export function StyleStep({ data, onUpdate, onNext, onBack }: StyleStepProps) {
       <div className="flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
+          className="border-border text-foreground hover:bg-muted flex-1 rounded-xl border px-6 py-3 text-sm font-semibold shadow-sm transition-colors"
         >
           Back
         </button>

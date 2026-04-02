@@ -468,7 +468,7 @@ function MusicPageInner() {
         setRefreshingSpotify(null)
       }
     },
-    [weddingId, getToken, loadPlaylistSongs, loadData],
+    [weddingId, getToken, loadPlaylistSongs],
   )
 
   const formatDuration = (ms: number) => {
@@ -1231,7 +1231,7 @@ function MusicPageInner() {
                                           <motion.div
                                             key={song.id}
                                             variants={fadeInUp}
-                                            className="group flex items-center gap-3 rounded-lg border border-border bg-muted/50 px-3 py-2 transition-colors hover:bg-muted"
+                                            className="border-border bg-muted/50 hover:bg-muted group flex items-center gap-3 rounded-lg border px-3 py-2 transition-colors"
                                           >
                                             {/* Track number or album art */}
                                             {song.albumArt ? (
@@ -1244,13 +1244,13 @@ function MusicPageInner() {
                                                 unoptimized
                                               />
                                             ) : (
-                                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-muted text-xs font-medium text-muted-foreground">
+                                              <div className="bg-muted text-muted-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded text-xs font-medium">
                                                 {idx + 1}
                                               </div>
                                             )}
                                             <div className="min-w-0 flex-1">
                                               <div className="flex items-center gap-1.5">
-                                                <p className="truncate text-sm font-medium text-foreground">
+                                                <p className="text-foreground truncate text-sm font-medium">
                                                   {song.title}
                                                 </p>
                                                 {song.spotifyTrackId && (
@@ -1266,7 +1266,7 @@ function MusicPageInner() {
                                                   </a>
                                                 )}
                                               </div>
-                                              <p className="truncate text-xs text-muted-foreground">
+                                              <p className="text-muted-foreground truncate text-xs">
                                                 {song.artist}
                                                 {song.album && (
                                                   <span className="text-muted-foreground">
@@ -1277,7 +1277,7 @@ function MusicPageInner() {
                                               </p>
                                             </div>
                                             {song.durationMs && (
-                                              <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+                                              <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
                                                 <Clock className="h-3 w-3" />
                                                 {formatDuration(song.durationMs)}
                                               </span>
@@ -1292,7 +1292,7 @@ function MusicPageInner() {
                                             <Button
                                               variant="ghost"
                                               size="icon"
-                                              className="h-7 w-7 shrink-0 text-muted-foreground/50 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                                              className="text-muted-foreground/50 h-7 w-7 shrink-0 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                                               onClick={() => handleDeleteSong(song.id, pl.id)}
                                             >
                                               <Trash2 className="h-3.5 w-3.5" />
@@ -1357,7 +1357,7 @@ function MusicPageInner() {
                                                         category: e.target.value,
                                                       })
                                                     }
-                                                    className="border-border bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm focus:border-border focus:outline-none focus:ring-1 focus:ring-border"
+                                                    className="border-border bg-background focus:border-border focus:ring-border mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1"
                                                   >
                                                     <option value="">None</option>
                                                     {Object.entries(CATEGORY_LABELS).map(
@@ -1454,10 +1454,10 @@ function MusicPageInner() {
               transition={{ duration: 0.2 }}
             >
               <div className="mb-6">
-                <h2 className="font-serif text-lg font-semibold text-foreground">
+                <h2 className="text-foreground font-serif text-lg font-semibold">
                   Song Requests
                   {requests.length > 0 && (
-                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                    <span className="text-muted-foreground ml-2 text-sm font-normal">
                       ({requests.length})
                     </span>
                   )}
@@ -1471,10 +1471,10 @@ function MusicPageInner() {
                       <div className="bg-wedding-50 mb-4 flex h-14 w-14 items-center justify-center rounded-full">
                         <ListMusic className="text-wedding-400 h-7 w-7" />
                       </div>
-                      <h3 className="font-serif text-lg font-semibold text-foreground">
+                      <h3 className="text-foreground font-serif text-lg font-semibold">
                         No Song Requests
                       </h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="text-muted-foreground mt-1 text-sm">
                         Guest requests will appear here once they submit them.
                       </p>
                     </CardContent>
@@ -1507,10 +1507,10 @@ function MusicPageInner() {
                                 {/* Song info */}
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="min-w-0">
-                                    <p className="truncate font-medium text-foreground">
+                                    <p className="text-foreground truncate font-medium">
                                       {req.title}
                                     </p>
-                                    <p className="truncate text-sm text-muted-foreground">
+                                    <p className="text-muted-foreground truncate text-sm">
                                       by {req.artist}
                                     </p>
                                   </div>
@@ -1522,14 +1522,16 @@ function MusicPageInner() {
                                 </div>
 
                                 {/* Guest name */}
-                                <p className="mt-1.5 text-xs text-muted-foreground">
+                                <p className="text-muted-foreground mt-1.5 text-xs">
                                   Requested by{' '}
-                                  <span className="font-medium text-muted-foreground">{req.guestName}</span>
+                                  <span className="text-muted-foreground font-medium">
+                                    {req.guestName}
+                                  </span>
                                 </p>
 
                                 {/* Notes */}
                                 {req.notes && (
-                                  <p className="mt-1 text-xs italic text-muted-foreground">
+                                  <p className="text-muted-foreground mt-1 text-xs italic">
                                     &ldquo;{req.notes}&rdquo;
                                   </p>
                                 )}
@@ -1636,8 +1638,8 @@ function MusicPageInner() {
               />
             </div>
 
-            <div className="space-y-3 rounded-lg border border-border bg-muted/50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <div className="border-border bg-muted/50 space-y-3 rounded-lg border p-4">
+              <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
                 Streaming Links
               </p>
               <div>
@@ -1726,17 +1728,17 @@ function MusicPageInner() {
             {loadingSpotifyPlaylists ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-[#1DB954]" />
-                <span className="ml-2 text-sm text-muted-foreground">
+                <span className="text-muted-foreground ml-2 text-sm">
                   Loading your Spotify playlists...
                 </span>
               </div>
             ) : spotifyUserPlaylists.length === 0 ? (
               <div className="py-6 text-center">
-                <p className="text-sm text-muted-foreground">No Spotify playlists found.</p>
+                <p className="text-muted-foreground text-sm">No Spotify playlists found.</p>
               </div>
             ) : (
               <div className="max-h-80 space-y-1.5 overflow-y-auto">
-                <p className="mb-2 text-xs text-muted-foreground">
+                <p className="text-muted-foreground mb-2 text-xs">
                   Select a Spotify playlist to add{' '}
                   {showExportDialog
                     ? (playlistSongs[showExportDialog] ?? []).filter((s) => s.spotifyTrackId).length
@@ -1746,7 +1748,7 @@ function MusicPageInner() {
                 {spotifyUserPlaylists.map((sp) => (
                   <button
                     key={sp.id}
-                    className="flex w-full items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-left transition-colors hover:border-[#1DB954]/20 hover:bg-[#1DB954]/5"
+                    className="border-border flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors hover:border-[#1DB954]/20 hover:bg-[#1DB954]/5"
                     disabled={exportingToSpotify === sp.id}
                     onClick={() => handleAddToSpotifyPlaylist(sp.id)}
                   >
@@ -1760,18 +1762,18 @@ function MusicPageInner() {
                         unoptimized
                       />
                     ) : (
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-muted">
-                        <Music className="h-4 w-4 text-muted-foreground" />
+                      <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded">
+                        <Music className="text-muted-foreground h-4 w-4" />
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-foreground">{sp.name}</p>
-                      <p className="text-xs text-muted-foreground">{sp.trackCount} songs</p>
+                      <p className="text-foreground truncate text-sm font-medium">{sp.name}</p>
+                      <p className="text-muted-foreground text-xs">{sp.trackCount} songs</p>
                     </div>
                     {exportingToSpotify === sp.id ? (
                       <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#1DB954]" />
                     ) : (
-                      <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <Plus className="text-muted-foreground h-4 w-4 shrink-0" />
                     )}
                   </button>
                 ))}

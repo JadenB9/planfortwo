@@ -51,15 +51,15 @@ export function BasicsStep({ data, onUpdate, onSubmit, onBack, isSubmitting }: B
   return (
     <div className="animate-fade-in space-y-6">
       <div className="text-center">
-        <h2 className="font-serif text-3xl font-bold text-foreground">Wedding Basics</h2>
-        <p className="mt-2 text-muted-foreground">
+        <h2 className="text-foreground font-serif text-3xl font-bold">Wedding Basics</h2>
+        <p className="text-muted-foreground mt-2">
           Fill in what you know — everything here is optional and can be changed later.
         </p>
       </div>
 
       {/* Date */}
       <div>
-        <label htmlFor="weddingDate" className="block text-sm font-medium text-foreground">
+        <label htmlFor="weddingDate" className="text-foreground block text-sm font-medium">
           Wedding Date
         </label>
         <input
@@ -68,13 +68,13 @@ export function BasicsStep({ data, onUpdate, onSubmit, onBack, isSubmitting }: B
           value={dateValue}
           onChange={(e) => handleDateChange(e.target.value)}
           min={new Date().toISOString().split('T')[0]}
-          className="focus:border-wedding-600 focus:ring-wedding-600/20 mt-1 w-full rounded-xl border border-border px-4 py-3 text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+          className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground mt-1 w-full rounded-xl border px-4 py-3 shadow-sm transition-colors focus:outline-none focus:ring-2"
         />
       </div>
 
       {/* Guest count */}
       <div>
-        <p className="mb-2 text-sm font-medium text-foreground">Estimated Guest Count</p>
+        <p className="text-foreground mb-2 text-sm font-medium">Estimated Guest Count</p>
         <div className="grid grid-cols-4 gap-2">
           {GUEST_OPTIONS.map((option) => (
             <button
@@ -87,8 +87,8 @@ export function BasicsStep({ data, onUpdate, onSubmit, onBack, isSubmitting }: B
                   : 'hover:border-wedding-300 border-border'
               }`}
             >
-              <span className="block text-sm font-semibold text-foreground">{option.label}</span>
-              <span className="block text-xs text-muted-foreground">{option.range}</span>
+              <span className="text-foreground block text-sm font-semibold">{option.label}</span>
+              <span className="text-muted-foreground block text-xs">{option.range}</span>
             </button>
           ))}
         </div>
@@ -96,7 +96,7 @@ export function BasicsStep({ data, onUpdate, onSubmit, onBack, isSubmitting }: B
 
       {/* Budget */}
       <div>
-        <p className="mb-2 text-sm font-medium text-foreground">Budget</p>
+        <p className="text-foreground mb-2 text-sm font-medium">Budget</p>
         <div className="grid grid-cols-4 gap-2">
           {BUDGET_OPTIONS.map((option) => (
             <button
@@ -112,7 +112,7 @@ export function BasicsStep({ data, onUpdate, onSubmit, onBack, isSubmitting }: B
                   : 'hover:border-wedding-300 border-border'
               }`}
             >
-              <span className="block text-sm font-semibold text-foreground">{option.label}</span>
+              <span className="text-foreground block text-sm font-semibold">{option.label}</span>
             </button>
           ))}
         </div>
@@ -128,14 +128,16 @@ export function BasicsStep({ data, onUpdate, onSubmit, onBack, isSubmitting }: B
         </button>
         {showCustomBudget && (
           <div className="relative mt-2">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+            <span className="text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2">
+              $
+            </span>
             <input
               type="number"
               min={0}
               step={1000}
               value={data.budgetTotal && !isPreset ? data.budgetTotal : ''}
               onChange={(e) => handleCustomBudgetChange(e.target.value)}
-              className="focus:border-wedding-600 focus:ring-wedding-600/20 w-full rounded-xl border border-border py-3 pl-8 pr-4 text-foreground shadow-sm transition-colors focus:outline-none focus:ring-2"
+              className="focus:border-wedding-600 focus:ring-wedding-600/20 border-border text-foreground w-full rounded-xl border py-3 pl-8 pr-4 shadow-sm transition-colors focus:outline-none focus:ring-2"
               placeholder="30000"
             />
           </div>
@@ -146,7 +148,7 @@ export function BasicsStep({ data, onUpdate, onSubmit, onBack, isSubmitting }: B
         <button
           type="button"
           onClick={onBack}
-          className="flex-1 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
+          className="border-border text-foreground hover:bg-muted flex-1 rounded-xl border px-6 py-3 text-sm font-semibold shadow-sm transition-colors"
         >
           Back
         </button>
