@@ -32,7 +32,6 @@ stripeWebhookRoute.post('/', async (c) => {
     const session = event.data.object as Stripe.Checkout.Session
     try {
       await purchaseService.handleCheckoutCompleted(session)
-      console.log(`Checkout completed for wedding ${session.metadata?.weddingId}`)
     } catch (err) {
       console.error('Failed to process checkout completion:', err)
       return c.json({ error: 'Processing failed' }, 500)

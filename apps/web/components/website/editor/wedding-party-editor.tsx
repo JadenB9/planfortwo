@@ -17,9 +17,10 @@ type MemberDraft = {
 }
 
 const emptyDraft: MemberDraft = { name: '', role: '', description: '', imageUrl: '' }
+const EMPTY_MEMBERS: WeddingPartyContent['members'] = []
 
 export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPartyEditorProps) {
-  const content = { ...rawContent, members: rawContent.members ?? [] }
+  const members = rawContent.members ?? EMPTY_MEMBERS
   const [showAddForm, setShowAddForm] = useState(false)
   const [draft, setDraft] = useState<MemberDraft>({ ...emptyDraft })
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
@@ -36,16 +37,16 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
       description: draft.description.trim() || undefined,
       imageUrl: draft.imageUrl.trim() || undefined,
     }
-    onChange({ ...content, members: [...content.members, newMember] })
+    onChange({ ...rawContent, members: [...members, newMember] })
     setDraft({ ...emptyDraft })
     setShowAddForm(false)
-  }, [canSaveDraft, draft, content, onChange])
+  }, [canSaveDraft, draft, members, onChange, rawContent])
 
   const removeMember = useCallback(
     (index: number) => {
       onChange({
-        ...content,
-        members: content.members.filter((_, i) => i !== index),
+        ...rawContent,
+        members: members.filter((_, i) => i !== index),
       })
       if (editingIndex === index) {
         setEditingIndex(null)
@@ -53,12 +54,12 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
         setEditingIndex(editingIndex - 1)
       }
     },
-    [content, onChange, editingIndex],
+    [editingIndex, members, onChange, rawContent],
   )
 
   const startEdit = useCallback(
     (index: number) => {
-      const member = content.members[index]
+      const member = members[index]
       if (!member) return
       setEditDraft({
         name: member.name,
@@ -68,12 +69,12 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
       })
       setEditingIndex(index)
     },
-    [content.members],
+    [members],
   )
 
   const saveEdit = useCallback(() => {
     if (editingIndex === null || !canSaveEdit) return
-    const updated = content.members.map((member, i) =>
+    const updated = members.map((member, i) =>
       i === editingIndex
         ? {
             name: editDraft.name.trim(),
@@ -83,9 +84,9 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
           }
         : member,
     )
-    onChange({ ...content, members: updated })
+    onChange({ ...rawContent, members: updated })
     setEditingIndex(null)
-  }, [editingIndex, canSaveEdit, editDraft, content, onChange])
+  }, [editingIndex, canSaveEdit, editDraft, members, onChange, rawContent])
 
   const cancelEdit = useCallback(() => {
     setEditingIndex(null)
@@ -94,33 +95,33 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
   const moveUp = useCallback(
     (index: number) => {
       if (index === 0) return
-      const members = [...content.members]
-      const prev = members[index - 1]
-      const curr = members[index]
+      const nextMembers = [...members]
+      const prev = nextMembers[index - 1]
+      const curr = nextMembers[index]
       if (!prev || !curr) return
-      members[index - 1] = curr
-      members[index] = prev
-      onChange({ ...content, members })
+      nextMembers[index - 1] = curr
+      nextMembers[index] = prev
+      onChange({ ...rawContent, members: nextMembers })
       if (editingIndex === index) setEditingIndex(index - 1)
       else if (editingIndex === index - 1) setEditingIndex(index)
     },
-    [content, onChange, editingIndex],
+    [editingIndex, members, onChange, rawContent],
   )
 
   const moveDown = useCallback(
     (index: number) => {
-      if (index >= content.members.length - 1) return
-      const members = [...content.members]
-      const next = members[index + 1]
-      const curr = members[index]
+      if (index >= members.length - 1) return
+      const nextMembers = [...members]
+      const next = nextMembers[index + 1]
+      const curr = nextMembers[index]
       if (!next || !curr) return
-      members[index + 1] = curr
-      members[index] = next
-      onChange({ ...content, members })
+      nextMembers[index + 1] = curr
+      nextMembers[index] = next
+      onChange({ ...rawContent, members: nextMembers })
       if (editingIndex === index) setEditingIndex(index + 1)
       else if (editingIndex === index + 1) setEditingIndex(index)
     },
-    [content, onChange, editingIndex],
+    [editingIndex, members, onChange, rawContent],
   )
 
   return (
@@ -230,7 +231,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
       )}
 
       {/* Empty state */}
-      {content.members.length === 0 && !showAddForm && (
+      {members.length === 0 && !showAddForm && (
         <p className="mt-3 text-sm text-muted-foreground">
           No members yet. Add your bridesmaids, groomsmen, flower girls, ring bearers, and anyone
           else in the wedding party.
@@ -238,9 +239,9 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
       )}
 
       {/* Members Grid */}
-      {content.members.length > 0 && (
+      {members.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
-          {content.members.map((member, index) =>
+          {members.map((member, index) =>
             editingIndex === index ? (
               /* Expanded edit form (replaces card) */
               <div
@@ -364,7 +365,7 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                       e.stopPropagation()
                       moveDown(index)
                     }}
-                    disabled={index === content.members.length - 1}
+                    disabled={index === members.length - 1}
                     className="rounded p-0.5 text-muted-foreground hover:text-muted-foreground disabled:invisible"
                     title="Move down"
                   >
@@ -393,9 +394,15 @@ export function WeddingPartyEditor({ content: rawContent, onChange }: WeddingPar
                 >
                   {/* Avatar */}
                   {member.imageUrl ? (
+                    // Wedding party photos are user-supplied remote URLs from arbitrary domains.
+                    // Keep native img rendering instead of routing them through Next's image proxy.
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={member.imageUrl}
                       alt={member.name}
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
                       className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
                     />
                   ) : (

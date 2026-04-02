@@ -1,9 +1,8 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { useAuth } from '@clerk/nextjs'
-import { api } from '@/lib/api'
 import type { ThemeColors } from '@planfortwo/types'
+import { useWedding } from '@/hooks/use-wedding'
 
 interface ThemeContextValue {
   themeColors: ThemeColors | null
@@ -126,7 +125,7 @@ function applyThemeToDocument(colors: ThemeColors | null) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { getToken } = useAuth()
+  const { data, loading: weddingLoading } = useWedding()
   const [themeColors, setThemeColorsState] = useState<ThemeColors | null>(null)
   const [loaded, setLoaded] = useState(false)
   const [isDark, setIsDark] = useState(false)
@@ -159,39 +158,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    let mounted = true
-    async function loadTheme() {
-      try {
-        const token = await getToken()
-        if (!mounted) return
-        if (!token) {
-          setLoaded(true)
-          return
-        }
-        const { data } = await api.weddings.mine(token)
-        if (!mounted) return
-        if (data.wedding.themeColors) {
-          setThemeColors(data.wedding.themeColors)
-        }
-      } catch {
-        // No wedding or failed to load — use defaults
-      } finally {
-        if (mounted) setLoaded(true)
-      }
-    }
-    void loadTheme()
-    return () => {
-      mounted = false
-    }
-  }, [getToken, setThemeColors])
+    if (weddingLoading) return
 
-  // Apply theme when state changes
+    setThemeColorsState(data?.wedding.themeColors ?? null)
+    setLoaded(true)
+  }, [data?.wedding.themeColors, weddingLoading])
+
   useEffect(() => {
-    if (loaded) {
-      applyThemeToDocument(themeColors)
-    }
+    if (!loaded) return
+
+    applyThemeToDocument(themeColors)
   }, [themeColors, loaded])
 
+  // Apply theme when state changes
   return (
     <ThemeContext.Provider value={{ themeColors, setThemeColors, isDark, toggleDark }}>
       {children}

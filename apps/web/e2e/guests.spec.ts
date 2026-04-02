@@ -7,12 +7,12 @@ test.describe('Guest List Page', () => {
     expect(page.url()).toContain('/sign-in')
   })
 
-  test('guest list page loads with auth', async ({ page }) => {
+  test('guest list page loads with auth', async ({ page: _page }) => {
     // Requires Clerk test auth setup — placeholder for authenticated flow
     test.skip()
   })
 
-  test('add guest button visible when authenticated', async ({ page }) => {
+  test('add guest button visible when authenticated', async ({ page: _page }) => {
     // Requires Clerk test auth setup — placeholder for authenticated flow
     test.skip()
   })

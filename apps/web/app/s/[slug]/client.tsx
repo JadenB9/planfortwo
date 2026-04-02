@@ -5,22 +5,9 @@ import type { CustomColors, GuestbookEntry, Prayer, WebsiteSectionType } from '@
 import { TemplateProvider } from '@/components/website/template-context'
 import { SectionRenderer } from '@/components/website/sections/section-renderer'
 import { AnalyticsTracker } from '@/components/website/public/analytics-tracker'
-import { fontPairs } from '@/lib/fonts'
+import { getGoogleFontsUrl } from '@/lib/fonts'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
-
-// Build Google Fonts URL for all font pairs
-const GOOGLE_FONTS_URL = (() => {
-  const families = fontPairs
-    .flatMap((fp) => [fp.heading, fp.body])
-    .filter((v, i, a) => a.indexOf(v) === i)
-    .map(
-      (name) =>
-        `family=${name.replace(/\s+/g, '+')}:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700`,
-    )
-    .join('&')
-  return `https://fonts.googleapis.com/css2?${families}&display=swap`
-})()
 
 /** Sections that use sectionBackground; all others use background */
 const SECTION_BG_TYPES = new Set([
@@ -83,6 +70,8 @@ interface PublicWebsiteClientProps {
   sections: PublicSection[]
   photos: PublicPhoto[]
   guestPhotos?: PublicGuestPhoto[]
+  initialGuestbookEntries?: GuestbookEntry[]
+  initialPrayerEntries?: Prayer[]
   weddingName: string
   weddingDate: string | null
   ceremonyDate: string | null
@@ -117,35 +106,34 @@ export function PublicWebsiteClient({
   sections,
   photos,
   guestPhotos,
+  initialGuestbookEntries = [],
+  initialPrayerEntries = [],
   weddingName,
   weddingDate,
   ceremonyDate,
   ceremonyStartTime,
 }: PublicWebsiteClientProps) {
-  const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>([])
-  const [prayerEntries, setPrayerEntries] = useState<Prayer[]>([])
+  const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>(initialGuestbookEntries)
+  const [prayerEntries, setPrayerEntries] = useState<Prayer[]>(initialPrayerEntries)
 
-  // Load Google Fonts for all font pairs
+  // Load only the selected Google font pair
   useEffect(() => {
     if (typeof document === 'undefined') return
-    if (document.getElementById('public-gfonts')) return
+    const href = getGoogleFontsUrl(config.fontPair)
+    const existing = document.getElementById('public-gfonts') as HTMLLinkElement | null
+    if (existing?.href === href) return
+
+    if (existing) {
+      existing.href = href
+      return
+    }
+
     const link = document.createElement('link')
     link.id = 'public-gfonts'
     link.rel = 'stylesheet'
-    link.href = GOOGLE_FONTS_URL
+    link.href = href
     document.head.appendChild(link)
-  }, [])
-
-  useEffect(() => {
-    fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/guestbook`)
-      .then((res) => (res.ok ? res.json() : { data: [] }))
-      .then((json) => setGuestbookEntries(json.data ?? []))
-      .catch(() => {})
-    fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/prayers`)
-      .then((res) => (res.ok ? res.json() : { data: [] }))
-      .then((json) => setPrayerEntries(json.data ?? []))
-      .catch(() => {})
-  }, [slug])
+  }, [config.fontPair])
 
   const handlePrayerSubmit = async (authorName: string, prayerText: string, website?: string) => {
     const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/prayers`, {

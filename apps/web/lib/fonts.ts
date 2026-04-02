@@ -121,8 +121,18 @@ export const fontPairs: FontPairConfig[] = [
   },
 ]
 
+function buildGoogleFontFamily(name: string): string {
+  return `family=${name.replace(/\s+/g, '+')}:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700`
+}
+
 export function getFontPair(fontPairId: string): FontPairConfig {
   const found = fontPairs.find((f) => f.id === fontPairId)
   if (!found) return fontPairs[0] as FontPairConfig
   return found
+}
+
+export function getGoogleFontsUrl(fontPairId: string): string {
+  const fontPair = getFontPair(fontPairId)
+  const families = Array.from(new Set([fontPair.heading, fontPair.body])).map(buildGoogleFontFamily)
+  return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`
 }

@@ -20,7 +20,8 @@ import { playlistService } from '../services/playlists.js'
 import { storageClient } from '@planfortwo/storage'
 import { createHash, randomUUID } from 'node:crypto'
 import { z } from 'zod'
-import { rateLimit } from '../middleware/rate-limit.js'
+import { consumeRateLimit, rateLimit } from '../middleware/rate-limit.js'
+import { getClientIp } from '../utils/request-client.js'
 
 export const websitePublicRoute = new Hono()
 
@@ -233,15 +234,7 @@ async function resolvePublicConfig(slug: string) {
   return config
 }
 
-// Simple in-memory dedup cache for analytics (visitorId:path -> timestamp)
-const analyticsDedup = new Map<string, number>()
 const DEDUP_WINDOW_MS = 30_000
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, ts] of analyticsDedup) {
-    if (now - ts > DEDUP_WINDOW_MS * 2) analyticsDedup.delete(key)
-  }
-}, 60_000)
 
 // POST /website-public/:slug/track — record analytics event (NO auth)
 websitePublicRoute.post(
@@ -264,19 +257,20 @@ websitePublicRoute.post(
     }
 
     const data = c.req.valid('json')
-    const realIp = c.req.header('x-real-ip')
-    const xff = c.req.header('x-forwarded-for')
-    const ip = realIp ? realIp : xff ? (xff.split(',')[0]?.trim() ?? 'unknown') : 'unknown'
+    const ip = getClientIp(c) ?? 'unknown'
     const ua = c.req.header('user-agent') ?? ''
     const country = c.req.header('cf-ipcountry') ?? null
     const visitorId = createHash('sha256').update(`${ip}:${ua}`).digest('hex').slice(0, 16)
 
     const dedupKey = `${visitorId}:${data.path}:${data.sectionViewed ?? ''}`
-    const lastTracked = analyticsDedup.get(dedupKey)
-    if (lastTracked && Date.now() - lastTracked < DEDUP_WINDOW_MS) {
-      return c.json({ data: { success: true } })
+    try {
+      const dedupResult = await consumeRateLimit(`analytics:${dedupKey}`, DEDUP_WINDOW_MS, 1)
+      if (dedupResult.limited) {
+        return c.json({ data: { success: true } })
+      }
+    } catch (err) {
+      console.warn('Analytics dedupe failed, continuing without dedupe', err)
     }
-    analyticsDedup.set(dedupKey, Date.now())
 
     await websiteAnalyticsService.track(
       config.weddingId,

@@ -5,12 +5,10 @@ import { TemplateProvider } from '@/components/website/template-context'
 import { SectionRenderer } from '@/components/website/sections/section-renderer'
 import type { WebsiteSection, WebsitePhoto, CustomColors } from '@planfortwo/types'
 import { Monitor, Smartphone } from 'lucide-react'
+import { getGoogleFontsUrl } from '@/lib/fonts'
 
 const DESKTOP_VIEWPORT_WIDTH = 1280
 const PHONE_VIEWPORT_WIDTH = 390
-
-const GOOGLE_FONTS_URL =
-  'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Fira+Sans:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Great+Vibes&family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Josefin+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Dancing+Script:wght@400;700&family=Nunito:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Abril+Fatface&family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Sacramento&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Quicksand:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap'
 
 export type PreviewMode = 'phone' | 'desktop'
 
@@ -53,13 +51,21 @@ export function WebsitePreview({
   // Load Google Fonts for section rendering
   useEffect(() => {
     if (typeof document === 'undefined') return
-    if (document.getElementById('preview-gfonts')) return
+    const href = getGoogleFontsUrl(fontPair)
+    const existing = document.getElementById('preview-gfonts') as HTMLLinkElement | null
+    if (existing?.href === href) return
+
+    if (existing) {
+      existing.href = href
+      return
+    }
+
     const link = document.createElement('link')
     link.id = 'preview-gfonts'
     link.rel = 'stylesheet'
-    link.href = GOOGLE_FONTS_URL
+    link.href = href
     document.head.appendChild(link)
-  }, [])
+  }, [fontPair])
 
   // Compute scale from container width
   useEffect(() => {

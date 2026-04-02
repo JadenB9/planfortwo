@@ -14,12 +14,14 @@ interface RegistryEditorProps {
   weddingId: string
 }
 
+const EMPTY_REGISTRIES: RegistryLink[] = []
+
 export function RegistryEditor({ content, onChange, getToken, weddingId }: RegistryEditorProps) {
   const [links, setLinks] = useState<RegistryLink[]>([])
   const [funds, setFunds] = useState<CashFund[]>([])
   const [loading, setLoading] = useState(true)
 
-  const registries = content.registries ?? []
+  const registries = content.registries ?? EMPTY_REGISTRIES
 
   const fetchData = useCallback(async () => {
     try {
@@ -246,9 +248,15 @@ export function RegistryEditor({ content, onChange, getToken, weddingId }: Regis
 
                         {/* Logo */}
                         {link.logoUrl && (
+                          // Registry logos are third-party assets from arbitrary domains.
+                          // Keep native img rendering instead of proxying them through Next's optimizer.
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={link.logoUrl}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
+                            referrerPolicy="no-referrer"
                             className="h-8 w-8 shrink-0 rounded-md object-contain"
                           />
                         )}

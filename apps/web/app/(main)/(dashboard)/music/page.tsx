@@ -468,7 +468,7 @@ function MusicPageInner() {
         setRefreshingSpotify(null)
       }
     },
-    [weddingId, getToken, loadPlaylistSongs],
+    [weddingId, getToken, loadPlaylistSongs, loadData],
   )
 
   const formatDuration = (ms: number) => {

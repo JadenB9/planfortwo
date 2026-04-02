@@ -19,6 +19,7 @@ export { websiteSections, websiteSectionTypeEnum } from './website-sections'
 export { websitePhotos } from './website-photos'
 export { websitePageViews } from './website-analytics'
 export { guestbookEntries } from './guestbook-entries'
+export { rateLimitBuckets } from './rate-limit-buckets'
 
 // Phase 6: Seating Chart
 export {

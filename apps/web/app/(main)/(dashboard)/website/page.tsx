@@ -5,35 +5,13 @@ import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import dynamic from 'next/dynamic'
 import { useWebsite } from '@/hooks/use-website'
 import { useWedding } from '@/hooks/use-wedding'
 import { springSmooth } from '@/lib/animations'
 import { api } from '@/lib/api'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { TemplateSelector } from '@/components/website/editor/template-selector'
-import { SectionManager } from '@/components/website/editor/section-manager'
-import { SettingsPanel } from '@/components/website/editor/settings-panel'
-import { PublishToggle } from '@/components/website/editor/publish-toggle'
-import { AnalyticsDashboard } from '@/components/website/analytics/analytics-dashboard'
-import { QrCodeDashboard } from '@/components/website/qr/qr-code-dashboard'
-import { SectionEditorModal } from '@/components/website/editor/section-editor-modal'
-import dynamic from 'next/dynamic'
-import { HeroEditor } from '@/components/website/editor/hero-editor'
-import { OurStoryEditor } from '@/components/website/editor/our-story-editor'
-import { EventDetailsEditor } from '@/components/website/editor/event-details-editor'
-import { WeddingPartyEditor } from '@/components/website/editor/wedding-party-editor'
-import { GalleryEditor } from '@/components/website/editor/gallery-editor'
-import { TravelEditor } from '@/components/website/editor/travel-editor'
-import { RegistryEditor } from '@/components/website/editor/registry-editor'
-import { RsvpEditor } from '@/components/website/editor/rsvp-editor'
-import { ScheduleEditor } from '@/components/website/editor/schedule-editor'
-import { GuestbookEditor } from '@/components/website/editor/guestbook-editor'
-import { CustomEditor } from '@/components/website/editor/custom-editor'
-import { FaqEditor } from '@/components/website/editor/faq-editor'
-import { ThingsToDoEditor } from '@/components/website/editor/things-to-do-editor'
-import { SongRequestsEditor } from '@/components/website/editor/song-requests-editor'
-import { PrayersEditor } from '@/components/website/editor/prayers-editor'
 import { useTabParam } from '@/hooks/use-tab-param'
 import type { PreviewMode } from '@/components/website/editor/website-preview'
 import type { WebsiteSection } from '@planfortwo/types'
@@ -55,6 +33,72 @@ import type {
   PrayersSectionContent,
 } from '@planfortwo/types'
 
+const TemplateSelector = dynamic(() =>
+  import('@/components/website/editor/template-selector').then((mod) => mod.TemplateSelector),
+)
+const SectionManager = dynamic(() =>
+  import('@/components/website/editor/section-manager').then((mod) => mod.SectionManager),
+)
+const SettingsPanel = dynamic(() =>
+  import('@/components/website/editor/settings-panel').then((mod) => mod.SettingsPanel),
+)
+const PublishToggle = dynamic(() =>
+  import('@/components/website/editor/publish-toggle').then((mod) => mod.PublishToggle),
+)
+const AnalyticsDashboard = dynamic(() =>
+  import('@/components/website/analytics/analytics-dashboard').then((mod) => mod.AnalyticsDashboard),
+)
+const QrCodeDashboard = dynamic(() =>
+  import('@/components/website/qr/qr-code-dashboard').then((mod) => mod.QrCodeDashboard),
+)
+const SectionEditorModal = dynamic(() =>
+  import('@/components/website/editor/section-editor-modal').then((mod) => mod.SectionEditorModal),
+)
+const HeroEditor = dynamic(() =>
+  import('@/components/website/editor/hero-editor').then((mod) => mod.HeroEditor),
+)
+const OurStoryEditor = dynamic(() =>
+  import('@/components/website/editor/our-story-editor').then((mod) => mod.OurStoryEditor),
+)
+const EventDetailsEditor = dynamic(() =>
+  import('@/components/website/editor/event-details-editor').then((mod) => mod.EventDetailsEditor),
+)
+const WeddingPartyEditor = dynamic(() =>
+  import('@/components/website/editor/wedding-party-editor').then((mod) => mod.WeddingPartyEditor),
+)
+const GalleryEditor = dynamic(() =>
+  import('@/components/website/editor/gallery-editor').then((mod) => mod.GalleryEditor),
+)
+const TravelEditor = dynamic(() =>
+  import('@/components/website/editor/travel-editor').then((mod) => mod.TravelEditor),
+)
+const RegistryEditor = dynamic(() =>
+  import('@/components/website/editor/registry-editor').then((mod) => mod.RegistryEditor),
+)
+const RsvpEditor = dynamic(() =>
+  import('@/components/website/editor/rsvp-editor').then((mod) => mod.RsvpEditor),
+)
+const ScheduleEditor = dynamic(() =>
+  import('@/components/website/editor/schedule-editor').then((mod) => mod.ScheduleEditor),
+)
+const GuestbookEditor = dynamic(() =>
+  import('@/components/website/editor/guestbook-editor').then((mod) => mod.GuestbookEditor),
+)
+const CustomEditor = dynamic(() =>
+  import('@/components/website/editor/custom-editor').then((mod) => mod.CustomEditor),
+)
+const FaqEditor = dynamic(() =>
+  import('@/components/website/editor/faq-editor').then((mod) => mod.FaqEditor),
+)
+const ThingsToDoEditor = dynamic(() =>
+  import('@/components/website/editor/things-to-do-editor').then((mod) => mod.ThingsToDoEditor),
+)
+const SongRequestsEditor = dynamic(() =>
+  import('@/components/website/editor/song-requests-editor').then((mod) => mod.SongRequestsEditor),
+)
+const PrayersEditor = dynamic(() =>
+  import('@/components/website/editor/prayers-editor').then((mod) => mod.PrayersEditor),
+)
 const WebsitePreview = dynamic(
   () => import('@/components/website/editor/website-preview').then((m) => m.WebsitePreview),
   { ssr: false },

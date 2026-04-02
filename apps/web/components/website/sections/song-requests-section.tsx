@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import type { SongRequestsSectionContent } from '@planfortwo/types'
 import {
@@ -204,9 +205,11 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
                 style={{ borderColor: colors.secondary, backgroundColor: `${colors.primary}08` }}
               >
                 {selectedTrack.albumArt ? (
-                  <img
+                  <Image
                     src={selectedTrack.albumArt}
                     alt={selectedTrack.album}
+                    width={40}
+                    height={40}
                     className="h-10 w-10 rounded-md object-cover"
                   />
                 ) : (
@@ -282,9 +285,11 @@ export function SongRequestsSection({ title, content, slug }: SongRequestsSectio
                         className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-muted"
                       >
                         {track.albumArt ? (
-                          <img
+                          <Image
                             src={track.albumArt}
                             alt={track.album}
+                            width={40}
+                            height={40}
                             className="h-10 w-10 shrink-0 rounded-md object-cover"
                           />
                         ) : (

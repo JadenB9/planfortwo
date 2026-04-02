@@ -10,7 +10,6 @@ import type { GuestWithTags, RsvpStatus } from '@planfortwo/types'
 import { api } from '@/lib/api'
 import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
-import { useFeatures } from '@/hooks/use-features'
 import { useGuests } from '@/hooks/use-guests'
 import { GuestStatsBar } from '@/components/guests/guest-stats'
 import { GuestFilters } from '@/components/guests/guest-filters'
@@ -41,9 +40,13 @@ export default function GuestsPage() {
 
 function GuestsPageInner() {
   const { getToken } = useAuth()
-  const { data: weddingData, loading: weddingLoading, error: weddingError } = useWedding()
+  const {
+    data: weddingData,
+    features,
+    loading: weddingLoading,
+    error: weddingError,
+  } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
-  const { features, loading: featuresLoading, error: featuresError } = useFeatures(weddingId)
   const {
     guests,
     stats,
@@ -251,7 +254,7 @@ function GuestsPageInner() {
     }
   }, [weddingId, getToken, refetch])
 
-  const apiError = weddingError || featuresError
+  const apiError = weddingError
 
   if (apiError) {
     return (
@@ -272,7 +275,7 @@ function GuestsPageInner() {
     )
   }
 
-  if (weddingLoading || featuresLoading) {
+  if (weddingLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />

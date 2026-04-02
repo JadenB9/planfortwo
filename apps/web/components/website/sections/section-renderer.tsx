@@ -1,6 +1,7 @@
 'use client'
 
 import type { WebsiteSection, WebsitePhoto, GuestbookEntry } from '@planfortwo/types'
+import dynamic from 'next/dynamic'
 import type {
   HeroContent,
   OurStoryContent,
@@ -19,21 +20,36 @@ import type {
   PrayersSectionContent,
   Prayer,
 } from '@planfortwo/types'
-import { HeroSection } from './hero-section'
-import { OurStorySection } from './our-story-section'
-import { EventDetailsSection } from './event-details-section'
-import { WeddingPartySection } from './wedding-party-section'
-import { GallerySection } from './gallery-section'
-import { TravelSection } from './travel-section'
-import { ThingsToDoSection } from './things-to-do-section'
-import { RegistrySection } from './registry-section'
-import { FaqSection } from './faq-section'
-import { RsvpSection } from './rsvp-section'
-import { ScheduleSection } from './schedule-section'
-import { GuestbookSection } from './guestbook-section'
-import { CustomSection } from './custom-section'
-import { SongRequestsSection } from './song-requests-section'
-import { PrayersSection } from './prayers-section'
+
+const HeroSection = dynamic(() => import('./hero-section').then((mod) => mod.HeroSection))
+const OurStorySection = dynamic(() => import('./our-story-section').then((mod) => mod.OurStorySection))
+const EventDetailsSection = dynamic(() =>
+  import('./event-details-section').then((mod) => mod.EventDetailsSection),
+)
+const WeddingPartySection = dynamic(() =>
+  import('./wedding-party-section').then((mod) => mod.WeddingPartySection),
+)
+const GallerySection = dynamic(() => import('./gallery-section').then((mod) => mod.GallerySection))
+const TravelSection = dynamic(() => import('./travel-section').then((mod) => mod.TravelSection))
+const ThingsToDoSection = dynamic(() =>
+  import('./things-to-do-section').then((mod) => mod.ThingsToDoSection),
+)
+const RegistrySection = dynamic(() =>
+  import('./registry-section').then((mod) => mod.RegistrySection),
+)
+const FaqSection = dynamic(() => import('./faq-section').then((mod) => mod.FaqSection))
+const RsvpSection = dynamic(() => import('./rsvp-section').then((mod) => mod.RsvpSection))
+const ScheduleSection = dynamic(() =>
+  import('./schedule-section').then((mod) => mod.ScheduleSection),
+)
+const GuestbookSection = dynamic(() =>
+  import('./guestbook-section').then((mod) => mod.GuestbookSection),
+)
+const CustomSection = dynamic(() => import('./custom-section').then((mod) => mod.CustomSection))
+const SongRequestsSection = dynamic(() =>
+  import('./song-requests-section').then((mod) => mod.SongRequestsSection),
+)
+const PrayersSection = dynamic(() => import('./prayers-section').then((mod) => mod.PrayersSection))
 
 interface GuestPhoto {
   id: string

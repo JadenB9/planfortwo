@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
-import type { CustomColors } from '@planfortwo/types'
+import { cache } from 'react'
+import type { CustomColors, GuestbookEntry, Prayer } from '@planfortwo/types'
 import { notFound } from 'next/navigation'
 import { PublicWebsiteClient } from './client'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
+const PUBLIC_SITE_REVALIDATE_SECONDS = 60
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -72,9 +74,9 @@ interface PublicWebsiteData {
   ceremonyStartTime: string | null
 }
 
-async function getWebsiteData(slug: string): Promise<PublicWebsiteData | null> {
+const getWebsiteData = cache(async (slug: string): Promise<PublicWebsiteData | null> => {
   const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}`, {
-    cache: 'no-store',
+    next: { revalidate: PUBLIC_SITE_REVALIDATE_SECONDS },
   })
   if (!res.ok) {
     if (res.status === 404) return null
@@ -82,7 +84,20 @@ async function getWebsiteData(slug: string): Promise<PublicWebsiteData | null> {
   }
   const json = (await res.json()) as { data: PublicWebsiteData }
   return json.data
-}
+})
+
+const getPublicModerationEntries = cache(
+  async <T extends GuestbookEntry | Prayer>(slug: string, resource: 'guestbook' | 'prayers') => {
+    const res = await fetch(`${API_URL}/website-public/${encodeURIComponent(slug)}/${resource}`, {
+      next: { revalidate: PUBLIC_SITE_REVALIDATE_SECONDS },
+    })
+
+    if (!res.ok) return []
+
+    const json = (await res.json()) as { data: T[] }
+    return json.data ?? []
+  },
+)
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
@@ -113,6 +128,16 @@ export default async function PublicWebsitePage({ params }: PageProps) {
     return <PasswordGate slug={slug} weddingName={data.weddingName} />
   }
 
+  const visibleSectionTypes = new Set(data.sections.filter((section) => section.isVisible).map((section) => section.sectionType))
+  const [initialGuestbookEntries, initialPrayerEntries] = await Promise.all([
+    visibleSectionTypes.has('guestbook')
+      ? getPublicModerationEntries<GuestbookEntry>(slug, 'guestbook')
+      : Promise.resolve([]),
+    visibleSectionTypes.has('prayers')
+      ? getPublicModerationEntries<Prayer>(slug, 'prayers')
+      : Promise.resolve([]),
+  ])
+
   return (
     <PublicWebsiteClient
       slug={slug}
@@ -120,6 +145,8 @@ export default async function PublicWebsitePage({ params }: PageProps) {
       sections={data.sections}
       photos={data.photos}
       guestPhotos={data.guestPhotos}
+      initialGuestbookEntries={initialGuestbookEntries}
+      initialPrayerEntries={initialPrayerEntries}
       weddingName={data.weddingName}
       weddingDate={data.weddingDate}
       ceremonyDate={data.ceremonyDate}

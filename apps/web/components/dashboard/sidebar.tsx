@@ -153,50 +153,25 @@ const ROLE_ICONS: Record<string, typeof Crown> = {
 export function Sidebar() {
   const pathname = usePathname()
   const { getToken } = useAuth()
-  const { data: weddingData, loading: weddingLoading } = useWedding()
+  const {
+    data: weddingData,
+    loading: weddingLoading,
+    allWeddings,
+    websiteSubdomain,
+  } = useWedding()
   const badges = useNotificationBadges()
   const { isDark, toggleDark } = useTheme()
   const tier = weddingData?.wedding.tier
   const weddingId = weddingData?.wedding.id ?? null
-  const [websiteSubdomain, setWebsiteSubdomain] = useState<string | null>(null)
   const { orderedGroups, reorderGroup } = useSidebarOrder()
   const dragEndTimeRef = useRef(0)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
     Details: false,
     More: false,
   })
-  const [allWeddings, setAllWeddings] = useState<
-    Array<{
-      id: string
-      name: string
-      date: string | null
-      tier: string
-      role: string
-      onboardingCompleted: boolean
-      joinedAt: string | null
-    }>
-  >([])
   const [switcherOpen, setSwitcherOpen] = useState(false)
   const [switching, setSwitching] = useState(false)
   const switcherRef = useRef<HTMLDivElement>(null)
-
-  // Load all weddings for the switcher
-  useEffect(() => {
-    let cancelled = false
-    void (async () => {
-      try {
-        const token = await getToken()
-        if (!token || cancelled) return
-        const { data } = await api.weddings.all(token)
-        if (!cancelled) setAllWeddings(data)
-      } catch {
-        /* silent */
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [getToken, weddingId])
 
   // Close switcher when clicking outside
   useEffect(() => {
@@ -230,24 +205,6 @@ export function Sidebar() {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
-
-  useEffect(() => {
-    if (!weddingId) return
-    let cancelled = false
-    void (async () => {
-      try {
-        const token = await getToken()
-        if (!token || cancelled) return
-        const { data } = await api.websiteConfig.get(weddingId, token)
-        if (!cancelled) setWebsiteSubdomain(data?.subdomain ?? null)
-      } catch {
-        /* silent — website config may not exist yet */
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [weddingId, getToken])
 
   const toggleGroup = (label: string) => {
     setCollapsed((prev) => ({ ...prev, [label]: !prev[label] }))

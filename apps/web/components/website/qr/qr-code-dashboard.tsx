@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -238,9 +239,12 @@ export function QrCodeDashboard({ subdomain, canAccess, qrScanCount }: QrCodeDas
                 onChange={handleLogoUpload}
               />
               {logoDataUrl && (
-                <img
+                <Image
                   src={logoDataUrl}
                   alt="QR logo"
+                  width={48}
+                  height={48}
+                  unoptimized
                   className="h-12 w-12 rounded border object-contain"
                 />
               )}

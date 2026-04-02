@@ -801,27 +801,27 @@ export default function SeatingPage() {
   }
 
   // --- Copy / Cut / Paste ---
-  const handleCopyTable = () => {
+  const handleCopyTable = useCallback(() => {
     if (!selectedTableId || !selectedChart) return
     const table = selectedChart.tables.find((t) => t.id === selectedTableId)
     if (!table) return
     setClipboard({ table, isCut: false })
     pasteCountRef.current = 0
     toast.success('Table copied')
-  }
+  }, [selectedChart, selectedTableId])
 
-  const handleCutTable = () => {
+  const handleCutTable = useCallback(() => {
     if (!selectedTableId || !selectedChart) return
     const table = selectedChart.tables.find((t) => t.id === selectedTableId)
     if (!table) return
     setClipboard({ table, isCut: true })
     pasteCountRef.current = 0
     toast.success('Table cut')
-  }
+  }, [selectedChart, selectedTableId])
 
   const pasteCountRef = useRef(0)
 
-  const handlePasteTable = async () => {
+  const handlePasteTable = useCallback(async () => {
     if (!clipboard || !selectedChart || !weddingId) return
     const { table: src, isCut } = clipboard
     const existingLabels = selectedChart.tables.map((t) => t.label)
@@ -897,7 +897,7 @@ export default function SeatingPage() {
     } catch {
       toast.error('Failed to paste table')
     }
-  }
+  }, [clipboard, getToken, loadChartDetail, panX, panY, selectedChart, weddingId, zoom])
 
   // --- Round table resize ---
   const handleResizeRoundTable = async (tableId: string, delta: number) => {
@@ -1092,7 +1092,15 @@ export default function SeatingPage() {
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [selectedChart, selectedTableId, clipboard, editingTableId])
+  }, [
+    clipboard,
+    editingTableId,
+    handleCopyTable,
+    handleCutTable,
+    handlePasteTable,
+    selectedChart,
+    selectedTableId,
+  ])
 
   const handleSeatClick = (e: React.MouseEvent, tableId: string, seatIndex: number) => {
     e.stopPropagation()

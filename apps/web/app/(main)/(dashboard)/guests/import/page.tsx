@@ -7,15 +7,13 @@ import { useRouter } from 'next/navigation'
 import type { CsvImportResult } from '@planfortwo/types'
 import { api } from '@/lib/api'
 import { useWedding } from '@/hooks/use-wedding'
-import { useFeatures } from '@/hooks/use-features'
 import { ImportWizard } from '@/components/guests/import-wizard'
 
 export default function GuestImportPage() {
   const { getToken } = useAuth()
   const router = useRouter()
-  const { data: weddingData, loading: weddingLoading } = useWedding()
+  const { data: weddingData, features, loading: weddingLoading } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
-  const { features, loading: featuresLoading } = useFeatures(weddingId)
 
   const handleImport = useCallback(
     async (file: File): Promise<CsvImportResult> => {
@@ -28,7 +26,7 @@ export default function GuestImportPage() {
     [weddingId, getToken],
   )
 
-  if (weddingLoading || featuresLoading) {
+  if (weddingLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="border-wedding-200 border-t-wedding-600 h-8 w-8 animate-spin rounded-full border-4" />

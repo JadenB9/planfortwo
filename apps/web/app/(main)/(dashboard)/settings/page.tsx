@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useAuth, useUser } from '@clerk/nextjs'
+import Image from 'next/image'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
 import { springSmooth } from '@/lib/animations'
@@ -793,7 +794,13 @@ function SettingsPageInner() {
                     >
                       <div className="flex items-center gap-3">
                         {memberUser.avatarUrl ? (
-                          <img src={memberUser.avatarUrl} alt="" className="h-8 w-8 rounded-full" />
+                          <Image
+                            src={memberUser.avatarUrl}
+                            alt=""
+                            width={32}
+                            height={32}
+                            className="h-8 w-8 rounded-full object-cover"
+                          />
                         ) : (
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium text-muted-foreground">
                             {memberUser.firstName?.[0]}
@@ -865,10 +872,12 @@ function SettingsPageInner() {
                             <div className="flex items-center justify-between rounded-xl border border-pink-200 bg-pink-50 px-4 py-3">
                               <div className="flex items-center gap-3">
                                 {partnerUser.avatarUrl ? (
-                                  <img
+                                  <Image
                                     src={partnerUser.avatarUrl}
                                     alt=""
-                                    className="h-8 w-8 rounded-full"
+                                    width={32}
+                                    height={32}
+                                    className="h-8 w-8 rounded-full object-cover"
                                   />
                                 ) : (
                                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-100 text-sm font-medium text-pink-600">

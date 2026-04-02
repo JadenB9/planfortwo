@@ -7,7 +7,7 @@ test.describe('Checklist Page', () => {
     expect(page.url()).toContain('/sign-in')
   })
 
-  test('checklist page loads with auth', async ({ page }) => {
+  test('checklist page loads with auth', async ({ page: _page }) => {
     // Requires Clerk test auth setup — placeholder for authenticated flow
     test.skip()
   })

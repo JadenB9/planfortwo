@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Image, Check, Loader2, ExternalLink } from 'lucide-react'
+import NextImage from 'next/image'
+import { Image as ImageIcon, Check, Loader2, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import type { GalleryContent, GalleryPhoto, WebsitePhoto } from '@planfortwo/types'
@@ -156,7 +157,7 @@ export function GalleryEditor({
           </div>
         ) : galleryPhotos.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-muted p-8 text-center">
-            <Image className="h-8 w-8 text-muted-foreground" />
+            <ImageIcon className="h-8 w-8 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium text-foreground">No photos uploaded yet</p>
               <p className="mt-1 text-xs text-muted-foreground">
@@ -189,10 +190,12 @@ export function GalleryEditor({
                       : 'border-transparent hover:border-border'
                   } ${isToggling ? 'opacity-60' : ''}`}
                 >
-                  <img
+                  <NextImage
                     src={photo.thumbnailUrl ?? photo.url}
                     alt={photo.caption ?? 'Gallery photo'}
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(min-width: 640px) 25vw, 33vw"
+                    className="object-cover"
                   />
 
                   {isToggling && (

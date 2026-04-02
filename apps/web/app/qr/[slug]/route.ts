@@ -6,6 +6,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { slug } = await params
 
   // Fire-and-forget: track this QR scan via the existing analytics endpoint
+  const cfConnectingIp = request.headers.get('cf-connecting-ip') ?? ''
+  const realIp = request.headers.get('x-real-ip') ?? ''
   const xff = request.headers.get('x-forwarded-for') ?? ''
   const ua = request.headers.get('user-agent') ?? ''
 
@@ -13,6 +15,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'cf-connecting-ip': cfConnectingIp,
+      'x-real-ip': realIp,
       'x-forwarded-for': xff,
       'user-agent': ua,
     },

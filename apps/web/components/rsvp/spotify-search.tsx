@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { Music, X, Search } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
@@ -85,9 +86,11 @@ export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
     return (
       <div className="flex items-center gap-3 rounded-xl border border-border bg-muted px-3 py-2">
         {selected.albumArt ? (
-          <img
+          <Image
             src={selected.albumArt}
             alt={selected.album}
+            width={40}
+            height={40}
             className="h-10 w-10 rounded-md object-cover"
           />
         ) : (
@@ -139,9 +142,11 @@ export function SpotifySearch({ value, onChange }: SpotifySearchProps) {
               className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-muted"
             >
               {track.albumArt ? (
-                <img
+                <Image
                   src={track.albumArt}
                   alt={track.album}
+                  width={40}
+                  height={40}
                   className="h-10 w-10 shrink-0 rounded-md object-cover"
                 />
               ) : (

@@ -59,7 +59,7 @@ export const emailService = {
 
     const html = await render(PartnerInviteEmail({ inviterName, inviteUrl }))
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `${inviterName} invited you to plan your wedding on PlanForTwo`,
@@ -70,8 +70,6 @@ export const emailService = {
       console.error('[email] Failed to send partner invite:', { to: maskEmail(email), error })
       throw new Error(`Failed to send invitation email: ${error.message}`)
     }
-
-    console.log('[email] Partner invite sent:', { to: maskEmail(email), emailId: data?.id })
   },
 
   async sendTeamMemberInvite(
@@ -91,7 +89,7 @@ export const emailService = {
 
     const html = await render(TeamMemberInviteEmail({ inviterName, roleLabel, inviteUrl }))
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: `${inviterName} invited you to join their wedding planning team`,
@@ -102,8 +100,6 @@ export const emailService = {
       console.error('[email] Failed to send team member invite:', { to: maskEmail(email), error })
       throw new Error(`Failed to send invitation email: ${error.message}`)
     }
-
-    console.log('[email] Team member invite sent:', { to: maskEmail(email), emailId: data?.id })
   },
 
   async sendRsvpInvite(

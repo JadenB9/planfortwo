@@ -7,22 +7,22 @@ test.describe('Budget Page', () => {
     expect(page.url()).toContain('/sign-in')
   })
 
-  test('budget page loads with auth', async ({ page }) => {
+  test('budget page loads with auth', async ({ page: _page }) => {
     // Requires Clerk test auth setup — placeholder for authenticated flow
     test.skip()
   })
 
-  test('shows upgrade prompt for free tier', async ({ page }) => {
+  test('shows upgrade prompt for free tier', async ({ page: _page }) => {
     // Requires Clerk test auth with free-tier wedding — placeholder
     test.skip()
   })
 
-  test('displays budget overview stats', async ({ page }) => {
+  test('displays budget overview stats', async ({ page: _page }) => {
     // Requires seeded budget data — placeholder for authenticated flow
     test.skip()
   })
 
-  test('shows expense table', async ({ page }) => {
+  test('shows expense table', async ({ page: _page }) => {
     // Requires seeded budget items — placeholder for authenticated flow
     test.skip()
   })

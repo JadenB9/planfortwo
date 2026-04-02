@@ -6,6 +6,8 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
+const MAX_FETCH_UPLOAD_BYTES = 25 * 1024 * 1024
+
 function getR2Client(): S3Client {
   const accountId = process.env.R2_ACCOUNT_ID
   if (!accountId) throw new Error('R2_ACCOUNT_ID is required')
@@ -31,6 +33,8 @@ function getBucket(): string {
 
 function isAllowedUploadSource(sourceUrl: string): boolean {
   const parsed = new URL(sourceUrl)
+  if (parsed.protocol !== 'https:' || parsed.username || parsed.password) return false
+
   const allowedHosts = ['attachments.resend.com', 'resend.dev']
   const isAllowed = allowedHosts.some(
     (h) => parsed.hostname === h || parsed.hostname.endsWith('.' + h),
@@ -151,9 +155,22 @@ export const storageClient = {
       throw new Error('Upload source URL not from allowed host')
     }
 
-    const response = await fetch(sourceUrl)
+    const response = await fetch(sourceUrl, { redirect: 'manual' })
+    if (response.status >= 300 && response.status < 400) {
+      throw new Error('Redirected upload URLs are not allowed')
+    }
     if (!response.ok) throw new Error(`Failed to download: ${response.status}`)
+
+    const contentLength = Number(response.headers.get('content-length') ?? '0')
+    if (contentLength > MAX_FETCH_UPLOAD_BYTES) {
+      throw new Error('Attachment exceeds maximum allowed size')
+    }
+
     const buffer = Buffer.from(await response.arrayBuffer())
+    if (buffer.byteLength > MAX_FETCH_UPLOAD_BYTES) {
+      throw new Error('Attachment exceeds maximum allowed size')
+    }
+
     const client = getR2Client()
     await client.send(
       new PutObjectCommand({

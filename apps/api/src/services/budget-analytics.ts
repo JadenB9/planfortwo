@@ -246,7 +246,11 @@ export const budgetAnalyticsService = {
     return Papa.unparse(rows)
   },
 
-  async importCsv(weddingId: string, csvContent: string, userId: string): Promise<CsvImportResult> {
+  async importCsv(
+    weddingId: string,
+    csvContent: string,
+    _userId: string,
+  ): Promise<CsvImportResult> {
     const result: CsvImportResult = { imported: 0, skipped: 0, errors: [] }
 
     const parsed = Papa.parse<Record<string, string>>(csvContent, {

@@ -49,6 +49,8 @@ export const websiteConfigService = {
       })
       .returning()
 
+    await db.update(weddings).set({ websiteSlug: subdomain }).where(eq(weddings.id, data.weddingId))
+
     // Seed default sections
     const sectionValues = defaultWebsiteSections.map((s) => ({
       weddingId: data.weddingId,
@@ -111,6 +113,13 @@ export const websiteConfigService = {
       .where(and(eq(websiteConfigs.id, id), eq(websiteConfigs.weddingId, weddingId)))
       .returning()
 
+    if (updated && data.subdomain !== undefined) {
+      await db
+        .update(weddings)
+        .set({ websiteSlug: updated.subdomain })
+        .where(eq(weddings.id, weddingId))
+    }
+
     return updated ? stripSensitiveFields(updated) : null
   },
 
@@ -134,7 +143,10 @@ export const websiteConfigService = {
 
     if (updated) {
       // Sync the legacy websitePublished flag on the weddings table (used by search)
-      await db.update(weddings).set({ websitePublished: true }).where(eq(weddings.id, weddingId))
+      await db
+        .update(weddings)
+        .set({ websitePublished: true, websiteSlug: updated.subdomain })
+        .where(eq(weddings.id, weddingId))
 
       await activityService.log({
         weddingId,

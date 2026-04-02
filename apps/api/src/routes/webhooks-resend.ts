@@ -53,8 +53,6 @@ resendWebhookRoute.post('/', async (c) => {
   }
 
   const eventType = payload.type as string
-  console.log(`[resend-webhook] Received event: ${String(eventType).replace(/[\r\n\t]/g, '_')}`)
-
   if (eventType === 'email.received') {
     const data = payload.data as Record<string, unknown>
     const toAddresses = (data.to as string[]) ?? []
@@ -74,9 +72,6 @@ resendWebhookRoute.post('/', async (c) => {
 
       const address = await inboxService.findAddressByLocalPart(localPart)
       if (!address) {
-        console.log(
-          `[resend-webhook] No claimed address found for ${localPart.replace(/[\r\n\t]/g, '_')}`,
-        )
         continue
       }
 
@@ -105,9 +100,6 @@ resendWebhookRoute.post('/', async (c) => {
           } else if (emailContent) {
             textBody = emailContent.text ?? undefined
             htmlBody = emailContent.html ? sanitizeHtml(emailContent.html) : undefined
-            console.log(
-              `[resend-webhook] Fetched content: text=${textBody ? textBody.length : 0}chars, html=${htmlBody ? htmlBody.length : 0}chars`,
-            )
           }
         } catch (err) {
           console.error('[resend-webhook] Exception fetching email content:', err)
@@ -163,7 +155,6 @@ resendWebhookRoute.post('/', async (c) => {
           .where(eq(emails.resendEmailId, emailId))
           .limit(1)
         if (existing) {
-          console.log(`[resend-webhook] Duplicate email ${emailId} — skipping`)
           continue
         }
       }
@@ -181,10 +172,6 @@ resendWebhookRoute.post('/', async (c) => {
         replyTo,
         attachments: attachmentsMeta,
       })
-
-      console.log(
-        `[resend-webhook] Stored inbound email for ${localPart.replace(/[\r\n\t]/g, '_')} from ${fromAddress.replace(/[\r\n\t]/g, '_')}`,
-      )
     }
   }
 

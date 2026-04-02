@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss'
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const preset = require('../../packages/config/tailwind.preset.js')
+import tailwindcssAnimate from 'tailwindcss-animate'
+import preset from '../../packages/config/tailwind.preset.js'
 
 const config: Config = {
   darkMode: ['class'],
@@ -72,7 +71,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [tailwindcssAnimate],
 }
 
 export default config

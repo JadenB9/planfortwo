@@ -7,7 +7,6 @@ import type { ChecklistTask, CategoryWithCount } from '@planfortwo/types'
 import { api } from '@/lib/api'
 import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
-import { useFeatures } from '@/hooks/use-features'
 import { ProgressBar } from '@/components/checklist/progress-bar'
 import { CategoryFilter } from '@/components/checklist/category-filter'
 import { TaskList } from '@/components/checklist/task-list'
@@ -18,9 +17,13 @@ import { toast } from 'sonner'
 
 export default function ChecklistPage() {
   const { getToken } = useAuth()
-  const { data: weddingData, loading: weddingLoading, error: weddingError } = useWedding()
+  const {
+    data: weddingData,
+    features,
+    loading: weddingLoading,
+    error: weddingError,
+  } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
-  const { features, loading: featuresLoading, error: featuresError } = useFeatures(weddingId)
 
   const [categories, setCategories] = useState<CategoryWithCount[]>([])
   const [tasks, setTasks] = useState<ChecklistTask[]>([])
@@ -91,9 +94,9 @@ export default function ChecklistPage() {
     }
   }
 
-  const isLoading = weddingLoading || featuresLoading || loadingTasks
+  const isLoading = weddingLoading || loadingTasks
 
-  const apiError = weddingError || featuresError
+  const apiError = weddingError
 
   if (apiError) {
     return (

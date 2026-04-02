@@ -4,22 +4,33 @@ import { useState, useCallback, Suspense } from 'react'
 import { useAuth } from '@clerk/nextjs'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { springSmooth } from '@/lib/animations'
 import { useWedding } from '@/hooks/use-wedding'
-import { useFeatures } from '@/hooks/use-features'
 import { useBudget } from '@/hooks/use-budget'
 import { api } from '@/lib/api'
 import type { BudgetItemWithCategory } from '@planfortwo/types'
 import { BudgetOverview } from '@/components/budget/budget-overview'
 import { CategoryList } from '@/components/budget/category-list'
 import { ExpenseTable } from '@/components/budget/expense-table'
-import { ExpenseForm } from '@/components/budget/expense-form'
-import { BudgetCharts } from '@/components/budget/budget-charts'
-import { PaymentCalendar } from '@/components/budget/payment-calendar'
-import { TipCalculator } from '@/components/budget/tip-calculator'
-import { SplitCosts } from '@/components/budget/split-costs'
-import { BudgetSetupWizard } from '@/components/budget/budget-setup-wizard'
 import { useTabParam } from '@/hooks/use-tab-param'
+
+const ExpenseForm = dynamic(
+  () => import('@/components/budget/expense-form').then((mod) => mod.ExpenseForm),
+)
+const BudgetCharts = dynamic(
+  () => import('@/components/budget/budget-charts').then((mod) => mod.BudgetCharts),
+)
+const PaymentCalendar = dynamic(
+  () => import('@/components/budget/payment-calendar').then((mod) => mod.PaymentCalendar),
+)
+const TipCalculator = dynamic(
+  () => import('@/components/budget/tip-calculator').then((mod) => mod.TipCalculator),
+)
+const SplitCosts = dynamic(() => import('@/components/budget/split-costs').then((mod) => mod.SplitCosts))
+const BudgetSetupWizard = dynamic(
+  () => import('@/components/budget/budget-setup-wizard').then((mod) => mod.BudgetSetupWizard),
+)
 
 type Tab = 'overview' | 'expenses' | 'payments' | 'analytics' | 'tips'
 const VALID_TAB_KEYS: Tab[] = ['overview', 'expenses', 'payments', 'analytics', 'tips']
@@ -48,9 +59,8 @@ export default function BudgetPage() {
 
 function BudgetPageInner() {
   const { getToken } = useAuth()
-  const { data: weddingData, loading: weddingLoading } = useWedding()
+  const { data: weddingData, features, loading: weddingLoading } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
-  const { features, loading: featuresLoading } = useFeatures(weddingId)
 
   const {
     categories,
@@ -141,7 +151,7 @@ function BudgetPageInner() {
     }
   }, [weddingId, getToken])
 
-  const isLoading = weddingLoading || featuresLoading || budgetLoading
+  const isLoading = weddingLoading || budgetLoading
 
   if (isLoading && categories.length === 0) {
     return (

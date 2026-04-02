@@ -17,6 +17,50 @@ const isPublicRoute = createRouteMatcher([
 // Subdomains that are NOT wedding websites (i.e. part of the app itself)
 const RESERVED_SUBDOMAINS = new Set(['www', 'app', 'api', 'mail', 'admin', ''])
 
+function getOrigin(value: string | undefined): string | null {
+  if (!value) return null
+  try {
+    return new URL(value).origin
+  } catch {
+    return null
+  }
+}
+
+function compact(values: Array<string | null | undefined>): string[] {
+  return values.filter((value): value is string => Boolean(value))
+}
+
+const apiOrigin = getOrigin(process.env.NEXT_PUBLIC_API_URL)
+const appOrigin = getOrigin(process.env.NEXT_PUBLIC_APP_URL)
+
+const additionalCspDirectives: Partial<Record<CspDirective, string[]>> = {
+  'base-uri': ["'self'"],
+  'connect-src': compact([apiOrigin, appOrigin]),
+  'font-src': ['data:', 'https://fonts.gstatic.com'],
+  'frame-ancestors': ["'none'"],
+  'frame-src': compact(['https://www.google.com', 'https://maps.google.com']),
+  'img-src': ['data:', 'blob:', 'https:', 'https://img.clerk.com'],
+  'media-src': ['data:', 'blob:', 'https:'],
+  'object-src': ["'none'"],
+  'style-src': ['https://fonts.googleapis.com'],
+}
+
+const publicWebsiteCsp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"}`,
+  `connect-src 'self' ${compact([apiOrigin]).join(' ')}`.trim(),
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "frame-src 'self' https://www.google.com https://maps.google.com",
+  "worker-src 'self' blob:",
+  "media-src 'self' data: blob: https:",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+].join('; ')
+
 /**
  * Detect wedding website subdomain from the X-Wedding-Host header
  * (set by the Cloudflare Worker for *.planfortwo.com requests).
@@ -37,6 +81,11 @@ const clerkHandler = clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect()
   }
+}, {
+  contentSecurityPolicy: {
+    strict: true,
+    directives: additionalCspDirectives,
+  },
 })
 
 export default function middleware(request: NextRequest, event: NextFetchEvent) {
@@ -46,7 +95,9 @@ export default function middleware(request: NextRequest, event: NextFetchEvent) 
   const subdomain = getWeddingSubdomain(request)
   if (subdomain) {
     const url = new URL(`/s/${subdomain}`, request.url)
-    return NextResponse.rewrite(url)
+    const response = NextResponse.rewrite(url)
+    response.headers.set('Content-Security-Policy', publicWebsiteCsp)
+    return response
   }
 
   // All other requests go through Clerk auth
@@ -59,3 +110,13 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 }
+type CspDirective =
+  | 'base-uri'
+  | 'connect-src'
+  | 'font-src'
+  | 'frame-ancestors'
+  | 'frame-src'
+  | 'img-src'
+  | 'media-src'
+  | 'object-src'
+  | 'style-src'
