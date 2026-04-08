@@ -99,8 +99,13 @@ export function MapSection({ title, content, eventMaps }: MapSectionProps) {
                     {m.name}
                   </h3>
                   {content.showAddresses && m.address && (
-                    <div
-                      className={`mt-2 flex items-start gap-2 text-sm ${bodyClass}`}
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        m.address,
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`mt-2 flex items-start gap-2 text-sm underline-offset-2 hover:underline ${bodyClass}`}
                       style={{ ...bodyFont, color: `${colors.primary}BB` }}
                     >
                       <MapPin
@@ -108,7 +113,7 @@ export function MapSection({ title, content, eventMaps }: MapSectionProps) {
                         style={{ color: colors.accent }}
                       />
                       <span>{m.address}</span>
-                    </div>
+                    </a>
                   )}
                 </div>
               </motion.div>

@@ -12,7 +12,7 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { toPng } from 'html-to-image'
-import { Crop, Loader2, MapPin, Save, Search, Spline, Square, X } from 'lucide-react'
+import { Crop, Loader2, MapPin, MapPinned, Save, Search, Spline, Square, X } from 'lucide-react'
 import { toast } from 'sonner'
 import type {
   GeocodeResult,
@@ -63,8 +63,6 @@ const DEFAULT_BOX_SIZE = { width: 22, height: 10 }
 const MIN_CROP_SIZE = 15
 const MIN_BOX_SIZE = 4
 const SEARCH_DEBOUNCE_MS = 350
-
-type Tool = 'pan' | 'line'
 
 // Ensure overlays loaded from the DB have every field the editor expects —
 // the `boxes` array was added after the initial release, so existing rows
@@ -134,8 +132,11 @@ async function cropDataUrl(dataUrl: string, crop: MapCropBox): Promise<string> {
   return canvas.toDataURL('image/png')
 }
 
+type Tool = 'pan' | 'line' | 'pin'
+
 export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMapEditorProps) {
   const captureRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const mapInstanceRef = useRef<L.Map | null>(null)
 
   const initialOverlays: MapOverlaysData = useMemo(
@@ -176,6 +177,38 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     mapInstanceRef.current = map
   }, [])
 
+  // ── Coordinate helpers ──────────────────────────────────────────────────
+  // Detect "lat, lng" coordinate pairs in the search bar so the user can
+  // paste exact coordinates from Apple Maps / Google Maps / a GPS app
+  // instead of relying on the geocoder. Accepts "41.83225, -88.15740",
+  // "41.83225° N, 88.15740° W", "41.83225N 88.15740W", etc.
+  const parseCoordinates = useCallback((raw: string): [number, number] | null => {
+    // Strip degree/compass chars so we can work with plain numbers
+    const cleaned = raw.replace(/[°º]/g, '').replace(/\s+/g, ' ').trim()
+    // Matches <signed float> [N/S] [,| ] <signed float> [E/W]
+    const match = cleaned.match(
+      /^(-?\d+(?:\.\d+)?)\s*([NS])?\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*([EW])?$/i,
+    )
+    if (!match) return null
+    let lat = parseFloat(match[1]!)
+    let lng = parseFloat(match[3]!)
+    if (Number.isNaN(lat) || Number.isNaN(lng)) return null
+    if (match[2]?.toUpperCase() === 'S') lat = -Math.abs(lat)
+    if (match[2]?.toUpperCase() === 'N') lat = Math.abs(lat)
+    if (match[4]?.toUpperCase() === 'W') lng = -Math.abs(lng)
+    if (match[4]?.toUpperCase() === 'E') lng = Math.abs(lng)
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null
+    return [lat, lng]
+  }, [])
+
+  const jumpToCoordinates = useCallback((lat: number, lng: number, zoom: number = 17) => {
+    setMarkerPos([lat, lng])
+    setShowResults(false)
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView([lat, lng], zoom, { animate: true })
+    }
+  }, [])
+
   // ── Geocode (through our Hono API so CSP + User-Agent are handled) ──────
   const abortRef = useRef<AbortController | null>(null)
   const runSearch = useCallback(
@@ -183,6 +216,15 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       const trimmed = query.trim()
       if (trimmed.length < 3) {
         setResults([])
+        return
+      }
+      // Short-circuit on raw coordinate input so "41.83225, -88.15740"
+      // works without a geocode round-trip.
+      const coords = parseCoordinates(trimmed)
+      if (coords) {
+        jumpToCoordinates(coords[0], coords[1])
+        setResults([])
+        toast.success(`Jumped to ${coords[0].toFixed(5)}, ${coords[1].toFixed(5)}`)
         return
       }
       abortRef.current?.abort()
@@ -201,7 +243,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         setResults(data)
         setShowResults(opts.keepDropdown ?? true)
         if (data.length === 0) {
-          toast.info('No locations found — try a more specific query')
+          toast.info('No locations found. Try a more specific query or paste raw lat, lng.')
         }
       } catch (err) {
         if ((err as Error).name === 'AbortError') return
@@ -211,7 +253,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         if (!controller.signal.aborted) setSearching(false)
       }
     },
-    [getToken],
+    [getToken, parseCoordinates, jumpToCoordinates],
   )
 
   // Debounced typeahead
@@ -250,6 +292,31 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     setTool((t) => (t === 'line' ? 'pan' : 'line'))
     setPendingLine([])
     setCursor(null)
+  }, [])
+
+  // ── Pin (click-to-drop on the map) ───────────────────────────────────────
+  const togglePinTool = useCallback(() => {
+    setTool((t) => (t === 'pin' ? 'pan' : 'pin'))
+    setPendingLine([])
+    setCursor(null)
+  }, [])
+
+  // When a pin click is committed we need the lat/lng at that pixel. Leaflet
+  // exposes containerPointToLatLng for exactly this, so we translate the
+  // cursor position (relative to the capture div) into the map's own pixel
+  // coordinate system and ask Leaflet to convert it.
+  const handlePinDrop = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    const map = mapInstanceRef.current
+    const container = map?.getContainer()
+    if (!map || !container) return
+    const rect = container.getBoundingClientRect()
+    const px = e.clientX - rect.left
+    const py = e.clientY - rect.top
+    const latlng = map.containerPointToLatLng([px, py])
+    setMarkerPos([latlng.lat, latlng.lng])
+    setSearchQuery(`${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}`)
+    setTool('pan')
+    toast.success('Pin dropped')
   }, [])
 
   const commitPendingLine = useCallback(() => {
@@ -328,20 +395,23 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     return () => window.removeEventListener('keydown', onKey)
   }, [tool, cancelPendingLine, commitPendingLine])
 
-  // Read coordinates from the element that received the event (the drawing
-  // capture layer), NOT the captureRef. Any border/padding/transform on
-  // ancestor elements can make their bounding rects disagree — using
-  // currentTarget guarantees clicks land exactly where the user pressed.
+  // Convert a pointer event into SVG viewBox coordinates (0-100 percentage
+  // space) using the SVG's own screen-to-viewport transform. This is the
+  // canonical SVG API — unlike percentage-of-bounding-rect, it stays
+  // pixel-accurate under any combination of borders, padding, CSS
+  // transforms, scroll, and preserveAspectRatio. Previously the points
+  // landed a few pixels below the cursor on certain layouts.
   const pointFromEvent = useCallback(
     (e: ReactPointerEvent<HTMLDivElement>): { x: number; y: number } | null => {
-      const el = e.currentTarget
-      if (!el) return null
-      const rect = el.getBoundingClientRect()
-      if (rect.width === 0 || rect.height === 0) return null
-      return {
-        x: ((e.clientX - rect.left) / rect.width) * 100,
-        y: ((e.clientY - rect.top) / rect.height) * 100,
-      }
+      const svg = svgRef.current
+      if (!svg) return null
+      const ctm = svg.getScreenCTM()
+      if (!ctm) return null
+      const pt = svg.createSVGPoint()
+      pt.x = e.clientX
+      pt.y = e.clientY
+      const local = pt.matrixTransform(ctm.inverse())
+      return { x: local.x, y: local.y }
     },
     [],
   )
@@ -391,14 +461,16 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       // 10 MB body limit even when the user has the whole satellite view
       // inside the crop frame.
       //
-      // `filter` strips any cross-origin <img> that would taint the canvas
-      // (Leaflet default-marker icons, external attribution images, etc.).
-      // Without this the whole promise rejects with a bare DOM Event which
-      // stringifies to "[object Event]" — zero signal for the user.
+      // The tile layers (OSM + ArcGIS) set CORS headers so they capture
+      // cleanly. The only images known to taint the canvas are Leaflet's
+      // default marker icons from unpkg.com (used by the search result
+      // marker). We filter those specific URLs out — leaving tiles intact
+      // so the saved PNG actually contains the map the user designed.
       //
-      // `cacheBust: false` because the tile servers only return CORS headers
-      // on the cached responses; appending ?v=... forces a fresh fetch that
-      // the browser then blocks.
+      // `cacheBust: false` because the tile servers only return CORS
+      // headers on the cached responses; appending ?v=... forces a fresh
+      // fetch that the browser then blocks.
+      const TAINTED_SRC_PATTERNS = ['unpkg.com/leaflet', 'cdn.jsdelivr.net/npm/leaflet']
       const fullDataUrl = await toPng(captureRef.current, {
         cacheBust: false,
         pixelRatio: 1.5,
@@ -407,13 +479,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           if (!(node instanceof HTMLImageElement)) return true
           const src = node.currentSrc || node.src
           if (!src) return true
-          // Keep same-origin and data: images; drop anything else.
-          try {
-            const url = new URL(src, window.location.href)
-            return url.origin === window.location.origin || src.startsWith('data:')
-          } catch {
-            return false
-          }
+          return !TAINTED_SRC_PATTERNS.some((p) => src.includes(p))
         },
       })
       setCapturing(false)
@@ -521,7 +587,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
                 void runSearch(searchQuery, { keepDropdown: true })
               }
             }}
-            placeholder="Start typing a venue or address..."
+            placeholder="Venue, address, or coordinates (41.83225, -88.15740)"
             className="pl-9"
           />
           <Search className="text-muted-foreground absolute left-2.5 top-2.5 h-4 w-4" />
@@ -627,6 +693,15 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           <Square className="mr-1 h-3.5 w-3.5" />
           Add Box
         </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={tool === 'pin' ? 'default' : 'outline'}
+          onClick={togglePinTool}
+        >
+          <MapPinned className="mr-1 h-3.5 w-3.5" />
+          {tool === 'pin' ? 'Click map to drop pin' : 'Drop Pin'}
+        </Button>
 
         <div className="ml-auto flex items-center gap-2">
           {(event.mapImageUrl || cropBox || lines.length > 0) && (
@@ -695,9 +770,12 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           {markerPos && !capturing && <Marker position={markerPos} icon={DEFAULT_ICON} />}
         </MapContainer>
 
-        {/* SVG layer for lines — above Leaflet panes via z-index 650 */}
+        {/* SVG layer for lines — above Leaflet panes via z-index 650. The
+            svgRef is used by pointFromEvent() for pixel-accurate coordinate
+            transforms via getScreenCTM(). */}
         <svg
-          className="pointer-events-none absolute inset-0"
+          ref={svgRef}
+          className="pointer-events-none absolute inset-0 h-full w-full"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
           style={{ zIndex: 650 }}
@@ -821,12 +899,29 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
             }}
           />
         )}
+
+        {/* Pin drop capture layer — only active in pin mode. Uses a
+            separate layer so it can't interfere with pan/zoom or line
+            drawing, and so the click always lands on something that knows
+            about Leaflet. */}
+        {tool === 'pin' && (
+          <div
+            className="absolute inset-0"
+            style={{ zIndex: 700, cursor: 'crosshair' }}
+            onPointerDown={(e) => {
+              e.stopPropagation()
+              handlePinDrop(e)
+            }}
+          />
+        )}
       </div>
 
       <p className="text-muted-foreground text-xs">
-        Search for the venue, frame the area you want to show, then drop labeled boxes on spots like
-        the ceremony, reception, parking, or photo walls. Draw colored routes for how guests should
-        walk or drive. Only whatever sits inside the crop frame is saved.
+        Search an address, paste coordinates like{' '}
+        <code className="bg-muted rounded px-1">41.83225, -88.15740</code>, or hit Drop Pin and
+        click anywhere on the map. Frame the area with the crop box, drop labeled boxes on spots
+        like the ceremony or parking, and draw colored routes for how guests should walk or drive.
+        Only whatever sits inside the crop frame is saved.
       </p>
     </div>
   )
