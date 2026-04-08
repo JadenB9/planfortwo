@@ -42,6 +42,7 @@ import type {
   VendorCommunication,
   WeddingEvent,
   TimelineEntry,
+  MapOverlay,
   GalleryPhoto,
   RegistryLink,
   CashFund,
@@ -1266,15 +1267,7 @@ export const api = {
       weddingId: string,
       data: {
         imageDataUrl: string
-        overlays: {
-          id: string
-          x: number
-          y: number
-          width: number
-          height: number
-          color: string
-          text: string
-        }[]
+        overlays: MapOverlay[]
         center: { lat: number; lng: number; zoom: number }
         style: 'street' | 'satellite'
       },

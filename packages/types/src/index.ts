@@ -647,7 +647,8 @@ export interface PrayersSectionContent {
 
 export type MapStyle = 'street' | 'satellite'
 
-export interface MapOverlay {
+export interface MapBoxOverlay {
+  kind: 'box'
   id: string
   x: number
   y: number
@@ -656,6 +657,21 @@ export interface MapOverlay {
   color: string
   text: string
 }
+
+export interface MapLinePoint {
+  x: number
+  y: number
+}
+
+export interface MapLineOverlay {
+  kind: 'line'
+  id: string
+  color: string
+  strokeWidth: number
+  points: MapLinePoint[]
+}
+
+export type MapOverlay = MapBoxOverlay | MapLineOverlay
 
 export interface MapCenter {
   lat: number

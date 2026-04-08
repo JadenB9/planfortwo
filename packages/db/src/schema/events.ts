@@ -1,21 +1,12 @@
 import { integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import type { MapCenter, MapOverlay } from '@planfortwo/types'
 import { weddings } from './weddings'
 
-export interface EventMapOverlay {
-  id: string
-  x: number
-  y: number
-  width: number
-  height: number
-  color: string
-  text: string
-}
-
-export interface EventMapCenter {
-  lat: number
-  lng: number
-  zoom: number
-}
+// Re-exports for historical consumers — the canonical types live in
+// @planfortwo/types. The jsonb column accepts a discriminated union of
+// box + line overlays (see packages/types/src/index.ts).
+export type EventMapOverlay = MapOverlay
+export type EventMapCenter = MapCenter
 
 export const events = pgTable('events', {
   id: uuid('id').primaryKey().defaultRandom(),

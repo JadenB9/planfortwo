@@ -60,7 +60,8 @@ export type UpdateTimelineEntryInput = z.infer<typeof updateTimelineEntrySchema>
 // ── Event Map ──
 const hexColorRegex = /^#[0-9a-fA-F]{6}$/
 
-export const mapOverlaySchema = z.object({
+export const mapBoxOverlaySchema = z.object({
+  kind: z.literal('box'),
   id: z.string().min(1).max(64),
   x: z.number().min(0).max(100),
   y: z.number().min(0).max(100),
@@ -69,6 +70,27 @@ export const mapOverlaySchema = z.object({
   color: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
   text: z.string().max(120),
 })
+
+export const mapLineOverlaySchema = z.object({
+  kind: z.literal('line'),
+  id: z.string().min(1).max(64),
+  color: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
+  strokeWidth: z.number().min(1).max(24),
+  points: z
+    .array(
+      z.object({
+        x: z.number().min(-10).max(110),
+        y: z.number().min(-10).max(110),
+      }),
+    )
+    .min(2)
+    .max(500),
+})
+
+export const mapOverlaySchema = z.discriminatedUnion('kind', [
+  mapBoxOverlaySchema,
+  mapLineOverlaySchema,
+])
 export type MapOverlayInput = z.infer<typeof mapOverlaySchema>
 
 export const mapCenterSchema = z.object({

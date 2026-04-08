@@ -12,9 +12,16 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { toPng } from 'html-to-image'
-import { Loader2, MapPin, Plus, Save, Search, X } from 'lucide-react'
+import { Loader2, MapPin, Plus, Save, Search, Spline, Square, X } from 'lucide-react'
 import { toast } from 'sonner'
-import type { MapCenter, MapOverlay, MapStyle, WeddingEvent } from '@planfortwo/types'
+import type {
+  MapBoxOverlay,
+  MapCenter,
+  MapLineOverlay,
+  MapOverlay,
+  MapStyle,
+  WeddingEvent,
+} from '@planfortwo/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
@@ -48,6 +55,9 @@ const TILE_LAYERS: Record<
 }
 
 const PRESET_COLORS = ['#dc2626', '#ea580c', '#d97706', '#16a34a', '#0ea5e9', '#7c3aed', '#db2777']
+const DEFAULT_STROKE_WIDTH = 4
+
+type Tool = 'pan' | 'line'
 
 interface EventMapEditorProps {
   event: WeddingEvent
@@ -56,12 +66,42 @@ interface EventMapEditorProps {
   onSaved: (updated: WeddingEvent) => void
 }
 
-interface SearchResult {
-  display_name: string
-  lat: string
-  lon: string
+interface PhotonFeature {
+  geometry: { coordinates: [number, number]; type: 'Point' }
+  properties: {
+    name?: string
+    housenumber?: string
+    street?: string
+    city?: string
+    state?: string
+    country?: string
+    postcode?: string
+    osm_id?: number
+  }
 }
 
+interface SearchResult {
+  label: string
+  lat: number
+  lng: number
+  key: string
+}
+
+function formatPhoton(f: PhotonFeature, idx: number): SearchResult {
+  const p = f.properties
+  const line1 = [p.housenumber, p.street].filter(Boolean).join(' ') || p.name || ''
+  const line2 = [p.city, p.state, p.postcode].filter(Boolean).join(', ')
+  const line3 = p.country ?? ''
+  const label = [line1, line2, line3].filter(Boolean).join(' · ')
+  return {
+    label: label || p.name || 'Unknown location',
+    lat: f.geometry.coordinates[1],
+    lng: f.geometry.coordinates[0],
+    key: `${f.geometry.coordinates[0]}-${f.geometry.coordinates[1]}-${p.osm_id ?? idx}`,
+  }
+}
+
+// Map bridge — exposes the Leaflet instance and recenters when restoring a saved map
 function MapBridge({ setMap, center }: { setMap: (map: L.Map) => void; center: MapCenter | null }) {
   const map = useMap()
   useEffect(() => {
@@ -69,31 +109,66 @@ function MapBridge({ setMap, center }: { setMap: (map: L.Map) => void; center: M
     if (center) {
       map.setView([center.lat, center.lng], center.zoom, { animate: false })
     }
-    // Force tile redraw after mount so html-to-image captures fully painted tiles
     setTimeout(() => map.invalidateSize(), 100)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return null
 }
 
+function makeId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID()
+  return `o_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+}
+
+// Split saved overlays into box + line lists, migrating legacy (pre-discriminated) records
+function normalizeOverlays(raw: MapOverlay[] | null | undefined): {
+  boxes: MapBoxOverlay[]
+  lines: MapLineOverlay[]
+} {
+  const boxes: MapBoxOverlay[] = []
+  const lines: MapLineOverlay[] = []
+  for (const o of raw ?? []) {
+    if ((o as MapOverlay).kind === 'line') {
+      lines.push(o as MapLineOverlay)
+    } else if ((o as MapOverlay).kind === 'box') {
+      boxes.push(o as MapBoxOverlay)
+    } else {
+      // Legacy shape — assume it was a box
+      const legacy = o as unknown as Omit<MapBoxOverlay, 'kind'>
+      boxes.push({ kind: 'box', ...legacy })
+    }
+  }
+  return { boxes, lines }
+}
+
 export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMapEditorProps) {
   const captureRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<L.Map | null>(null)
 
+  const initial = useMemo(() => normalizeOverlays(event.mapOverlays), [event.mapOverlays])
+
   const [style, setStyle] = useState<MapStyle>(event.mapStyle ?? 'street')
-  const [overlays, setOverlays] = useState<MapOverlay[]>(event.mapOverlays ?? [])
+  const [boxes, setBoxes] = useState<MapBoxOverlay[]>(initial.boxes)
+  const [lines, setLines] = useState<MapLineOverlay[]>(initial.lines)
   const [selectedColor, setSelectedColor] = useState<string>(PRESET_COLORS[0]!)
-  const [selectedOverlayId, setSelectedOverlayId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [tool, setTool] = useState<Tool>('pan')
+  const [pendingLine, setPendingLine] = useState<{ x: number; y: number }[]>([])
+  const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null)
+
+  // Search state
   const [searchQuery, setSearchQuery] = useState(event.address ?? '')
   const [searching, setSearching] = useState(false)
   const [results, setResults] = useState<SearchResult[]>([])
+  const [showResults, setShowResults] = useState(false)
   const [markerPos, setMarkerPos] = useState<[number, number] | null>(null)
+
   const [saving, setSaving] = useState(false)
   const [clearing, setClearing] = useState(false)
 
   const initialCenter: [number, number] = useMemo(() => {
     if (event.mapCenter) return [event.mapCenter.lat, event.mapCenter.lng]
-    return [40.7128, -74.006] // NYC fallback
+    return [40.7128, -74.006]
   }, [event.mapCenter])
   const initialZoom = event.mapCenter?.zoom ?? 13
 
@@ -101,44 +176,61 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     mapInstanceRef.current = map
   }, [])
 
-  const handleSearch = useCallback(async () => {
-    const query = searchQuery.trim()
-    if (!query) return
+  // ── Search (Photon + debounced typeahead) ────────────────────────────────
+  const abortRef = useRef<AbortController | null>(null)
+  const runSearch = useCallback(async (query: string) => {
+    const trimmed = query.trim()
+    if (trimmed.length < 3) {
+      setResults([])
+      return
+    }
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
     setSearching(true)
-    setResults([])
     try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(query)}`
-      const res = await fetch(url, { headers: { Accept: 'application/json' } })
-      if (!res.ok) throw new Error('Search failed')
-      const data = (await res.json()) as SearchResult[]
-      setResults(data)
-      if (data.length === 0) toast.info('No locations found')
+      const url = `https://photon.komoot.io/api/?limit=6&q=${encodeURIComponent(trimmed)}`
+      const res = await fetch(url, { signal: controller.signal })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = (await res.json()) as { features: PhotonFeature[] }
+      if (controller.signal.aborted) return
+      setResults(data.features.map(formatPhoton))
+      setShowResults(true)
     } catch (err) {
+      if ((err as Error).name === 'AbortError') return
       console.error('Geocode error:', err)
       toast.error('Search failed — try again')
     } finally {
-      setSearching(false)
+      if (!controller.signal.aborted) setSearching(false)
     }
-  }, [searchQuery])
-
-  const selectResult = useCallback((r: SearchResult) => {
-    const lat = parseFloat(r.lat)
-    const lng = parseFloat(r.lon)
-    setMarkerPos([lat, lng])
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.setView([lat, lng], 16, { animate: true })
-    }
-    setResults([])
   }, [])
 
-  const addOverlay = useCallback(() => {
-    const id = (
-      typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? crypto.randomUUID()
-        : `o_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-    ) as string
-    const overlay: MapOverlay = {
-      id,
+  // Debounce typeahead
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setResults([])
+      return
+    }
+    const timer = setTimeout(() => {
+      void runSearch(searchQuery)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery, runSearch])
+
+  const selectResult = useCallback((r: SearchResult) => {
+    setMarkerPos([r.lat, r.lng])
+    setSearchQuery(r.label)
+    setShowResults(false)
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView([r.lat, r.lng], 17, { animate: true })
+    }
+  }, [])
+
+  // ── Boxes ────────────────────────────────────────────────────────────────
+  const addBox = useCallback(() => {
+    const overlay: MapBoxOverlay = {
+      kind: 'box',
+      id: makeId(),
       x: 35,
       y: 35,
       width: 30,
@@ -146,24 +238,113 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       color: selectedColor,
       text: 'Label',
     }
-    setOverlays((prev) => [...prev, overlay])
-    setSelectedOverlayId(id)
+    setBoxes((prev) => [...prev, overlay])
+    setSelectedId(overlay.id)
+    setTool('pan')
   }, [selectedColor])
 
-  const updateOverlay = useCallback((id: string, updates: Partial<MapOverlay>) => {
-    setOverlays((prev) => prev.map((o) => (o.id === id ? { ...o, ...updates } : o)))
+  const updateBox = useCallback((id: string, updates: Partial<MapBoxOverlay>) => {
+    setBoxes((prev) => prev.map((b) => (b.id === id ? { ...b, ...updates } : b)))
   }, [])
 
-  const deleteOverlay = useCallback((id: string) => {
-    setOverlays((prev) => prev.filter((o) => o.id !== id))
-    setSelectedOverlayId((prev) => (prev === id ? null : prev))
+  const deleteBox = useCallback((id: string) => {
+    setBoxes((prev) => prev.filter((b) => b.id !== id))
+    setSelectedId((prev) => (prev === id ? null : prev))
   }, [])
 
+  // ── Lines (click-to-add polyline) ────────────────────────────────────────
+  const toggleLineTool = useCallback(() => {
+    setTool((t) => (t === 'line' ? 'pan' : 'line'))
+    setPendingLine([])
+    setCursor(null)
+  }, [])
+
+  const commitPendingLine = useCallback(() => {
+    if (pendingLine.length < 2) {
+      setPendingLine([])
+      setTool('pan')
+      return
+    }
+    const line: MapLineOverlay = {
+      kind: 'line',
+      id: makeId(),
+      color: selectedColor,
+      strokeWidth: DEFAULT_STROKE_WIDTH,
+      points: pendingLine,
+    }
+    setLines((prev) => [...prev, line])
+    setSelectedId(line.id)
+    setPendingLine([])
+    setCursor(null)
+    setTool('pan')
+  }, [pendingLine, selectedColor])
+
+  const cancelPendingLine = useCallback(() => {
+    setPendingLine([])
+    setCursor(null)
+    setTool('pan')
+  }, [])
+
+  const updateLine = useCallback((id: string, updates: Partial<MapLineOverlay>) => {
+    setLines((prev) => prev.map((l) => (l.id === id ? { ...l, ...updates } : l)))
+  }, [])
+
+  const deleteLine = useCallback((id: string) => {
+    setLines((prev) => prev.filter((l) => l.id !== id))
+    setSelectedId((prev) => (prev === id ? null : prev))
+  }, [])
+
+  // Keyboard shortcuts for line drawing
+  useEffect(() => {
+    if (tool !== 'line') return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        cancelPendingLine()
+      } else if (e.key === 'Enter') {
+        e.preventDefault()
+        commitPendingLine()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [tool, cancelPendingLine, commitPendingLine])
+
+  const pointFromEvent = useCallback(
+    (e: ReactPointerEvent<HTMLDivElement>): { x: number; y: number } | null => {
+      const el = captureRef.current
+      if (!el) return null
+      const rect = el.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      const y = ((e.clientY - rect.top) / rect.height) * 100
+      return { x, y }
+    },
+    [],
+  )
+
+  const handleDrawClick = useCallback(
+    (e: ReactPointerEvent<HTMLDivElement>) => {
+      const pt = pointFromEvent(e)
+      if (!pt) return
+      setPendingLine((prev) => [...prev, pt])
+    },
+    [pointFromEvent],
+  )
+
+  const handleDrawMove = useCallback(
+    (e: ReactPointerEvent<HTMLDivElement>) => {
+      if (pendingLine.length === 0) return
+      const pt = pointFromEvent(e)
+      if (pt) setCursor(pt)
+    },
+    [pendingLine.length, pointFromEvent],
+  )
+
+  // ── Save / Clear ─────────────────────────────────────────────────────────
   const handleSave = useCallback(async () => {
     if (!captureRef.current) return
     setSaving(true)
     try {
-      // Wait a tick so any in-flight tile loads paint
       await new Promise((r) => setTimeout(r, 250))
       const dataUrl = await toPng(captureRef.current, {
         cacheBust: true,
@@ -181,15 +362,11 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         toast.error('Please sign in again')
         return
       }
+      const overlays: MapOverlay[] = [...boxes, ...lines]
       const { data: updated } = await api.events.setMap(
         event.id,
         weddingId,
-        {
-          imageDataUrl: dataUrl,
-          overlays,
-          center,
-          style,
-        },
+        { imageDataUrl: dataUrl, overlays, center, style },
         token,
       )
       toast.success('Map saved')
@@ -201,7 +378,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     } finally {
       setSaving(false)
     }
-  }, [event.id, weddingId, overlays, style, initialCenter, initialZoom, getToken, onSaved])
+  }, [event.id, weddingId, boxes, lines, style, initialCenter, initialZoom, getToken, onSaved])
 
   const handleClear = useCallback(async () => {
     setClearing(true)
@@ -209,7 +386,8 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       const token = await getToken()
       if (!token) return
       const { data: updated } = await api.events.clearMap(event.id, weddingId, token)
-      setOverlays([])
+      setBoxes([])
+      setLines([])
       setMarkerPos(null)
       toast.success('Map cleared')
       onSaved(updated)
@@ -220,45 +398,61 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     }
   }, [event.id, weddingId, getToken, onSaved])
 
+  // Selected-color synchronisation — apply to whichever shape is selected
+  const applyColor = useCallback(
+    (c: string) => {
+      setSelectedColor(c)
+      if (!selectedId) return
+      if (boxes.some((b) => b.id === selectedId)) updateBox(selectedId, { color: c })
+      else if (lines.some((l) => l.id === selectedId)) updateLine(selectedId, { color: c })
+    },
+    [selectedId, boxes, lines, updateBox, updateLine],
+  )
+
+  const isDrawingLine = tool === 'line'
+  const linePreviewPoints = cursor ? [...pendingLine, cursor] : pendingLine
+
   return (
     <div className="space-y-4">
       {/* Search bar */}
-      <div className="flex gap-2">
+      <div className="relative flex gap-2">
         <div className="relative flex-1">
           <Input
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                void handleSearch()
-              }
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              setShowResults(true)
             }}
-            placeholder="Search venue address (e.g. 350 5th Ave, New York)"
+            onFocus={() => results.length > 0 && setShowResults(true)}
+            onBlur={() => setTimeout(() => setShowResults(false), 150)}
+            placeholder="Start typing a venue or address..."
             className="pl-9"
           />
           <Search className="text-muted-foreground absolute left-2.5 top-2.5 h-4 w-4" />
-        </div>
-        <Button type="button" onClick={() => void handleSearch()} disabled={searching}>
-          {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Search'}
-        </Button>
-      </div>
+          {searching && (
+            <Loader2 className="text-muted-foreground absolute right-2.5 top-2.5 h-4 w-4 animate-spin" />
+          )}
 
-      {results.length > 0 && (
-        <div className="border-border bg-background max-h-48 overflow-y-auto rounded-md border">
-          {results.map((r, i) => (
-            <button
-              key={`${r.lat}-${r.lon}-${i}`}
-              type="button"
-              onClick={() => selectResult(r)}
-              className="hover:bg-muted flex w-full items-start gap-2 border-b px-3 py-2 text-left text-sm last:border-b-0"
-            >
-              <MapPin className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
-              <span className="text-foreground">{r.display_name}</span>
-            </button>
-          ))}
+          {showResults && results.length > 0 && (
+            <div className="border-border bg-background absolute left-0 right-0 top-full z-[1100] mt-1 max-h-64 overflow-y-auto rounded-md border shadow-lg">
+              {results.map((r) => (
+                <button
+                  key={r.key}
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    selectResult(r)
+                  }}
+                  className="hover:bg-muted flex w-full items-start gap-2 border-b px-3 py-2 text-left text-sm last:border-b-0"
+                >
+                  <MapPin className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
+                  <span className="text-foreground">{r.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Toolbar */}
       <div className="border-border bg-muted/40 flex flex-wrap items-center gap-3 rounded-lg border px-3 py-2">
@@ -294,10 +488,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
             <button
               key={c}
               type="button"
-              onClick={() => {
-                setSelectedColor(c)
-                if (selectedOverlayId) updateOverlay(selectedOverlayId, { color: c })
-              }}
+              onClick={() => applyColor(c)}
               aria-label={`Color ${c}`}
               className={`h-5 w-5 rounded-full border-2 transition ${
                 selectedColor === c ? 'border-foreground scale-110' : 'border-transparent'
@@ -309,13 +500,22 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
 
         <div className="bg-border h-6 w-px" />
 
-        <Button type="button" size="sm" variant="outline" onClick={addOverlay}>
-          <Plus className="mr-1 h-3.5 w-3.5" />
+        <Button type="button" size="sm" variant="outline" onClick={addBox}>
+          <Square className="mr-1 h-3.5 w-3.5" />
           Add Box
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={isDrawingLine ? 'default' : 'outline'}
+          onClick={toggleLineTool}
+        >
+          <Spline className="mr-1 h-3.5 w-3.5" />
+          {isDrawingLine ? 'Finish (Enter)' : 'Draw Line'}
         </Button>
 
         <div className="ml-auto flex items-center gap-2">
-          {(event.mapImageUrl || overlays.length > 0) && (
+          {(event.mapImageUrl || boxes.length > 0 || lines.length > 0) && (
             <Button
               type="button"
               size="sm"
@@ -337,11 +537,23 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         </div>
       </div>
 
+      {isDrawingLine && (
+        <p className="text-muted-foreground flex items-center gap-2 text-xs">
+          <Plus className="h-3 w-3" />
+          Click to add points · <kbd className="bg-muted rounded border px-1">Enter</kbd> or
+          double-click to finish · <kbd className="bg-muted rounded border px-1">Esc</kbd> to cancel
+        </p>
+      )}
+
       {/* Map + overlay canvas */}
       <div
         ref={captureRef}
         className="border-border relative overflow-hidden rounded-xl border"
         style={{ height: 480 }}
+        onClick={() => {
+          // Clicking the empty canvas deselects
+          if (tool === 'pan') setSelectedId(null)
+        }}
       >
         <MapContainer
           center={initialCenter}
@@ -363,50 +575,155 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           {markerPos && <Marker position={markerPos} icon={DEFAULT_ICON} />}
         </MapContainer>
 
-        {/* Overlay layer — sits above the map */}
-        <div className="pointer-events-none absolute inset-0">
-          {overlays.map((o) => (
-            <OverlayBox
-              key={o.id}
-              overlay={o}
-              selected={selectedOverlayId === o.id}
+        {/* SVG layer for lines — sits above Leaflet panes via z-index 650 */}
+        <svg
+          className="pointer-events-none absolute inset-0"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          style={{ zIndex: 650 }}
+        >
+          {lines.map((line) => {
+            const isSelected = selectedId === line.id
+            const pts = line.points.map((p) => `${p.x},${p.y}`).join(' ')
+            return (
+              <g key={line.id} className="pointer-events-auto cursor-pointer">
+                {/* Wide invisible hit area */}
+                <polyline
+                  points={pts}
+                  stroke="transparent"
+                  strokeWidth={12}
+                  fill="none"
+                  vectorEffect="non-scaling-stroke"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setSelectedId(line.id)
+                    setSelectedColor(line.color)
+                  }}
+                />
+                {isSelected && (
+                  <polyline
+                    points={pts}
+                    stroke="#ffffff"
+                    strokeWidth={line.strokeWidth + 3}
+                    fill="none"
+                    vectorEffect="non-scaling-stroke"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                )}
+                <polyline
+                  points={pts}
+                  stroke={line.color}
+                  strokeWidth={line.strokeWidth}
+                  fill="none"
+                  vectorEffect="non-scaling-stroke"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+            )
+          })}
+
+          {/* Pending line preview */}
+          {pendingLine.length > 0 && (
+            <>
+              <polyline
+                points={linePreviewPoints.map((p) => `${p.x},${p.y}`).join(' ')}
+                stroke={selectedColor}
+                strokeWidth={DEFAULT_STROKE_WIDTH}
+                strokeDasharray="3 3"
+                fill="none"
+                vectorEffect="non-scaling-stroke"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {pendingLine.map((p, i) => (
+                <circle
+                  key={`pt-${i}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={0.8}
+                  fill={selectedColor}
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+            </>
+          )}
+        </svg>
+
+        {/* Box overlay layer — z-index 650 */}
+        <div className="pointer-events-none absolute inset-0" style={{ zIndex: 650 }}>
+          {boxes.map((b) => (
+            <BoxOverlay
+              key={b.id}
+              overlay={b}
+              selected={selectedId === b.id}
               onSelect={() => {
-                setSelectedOverlayId(o.id)
-                setSelectedColor(o.color)
+                setSelectedId(b.id)
+                setSelectedColor(b.color)
               }}
-              onChange={(updates) => updateOverlay(o.id, updates)}
-              onDelete={() => deleteOverlay(o.id)}
+              onChange={(updates) => updateBox(b.id, updates)}
+              onDelete={() => deleteBox(b.id)}
               containerRef={captureRef}
             />
           ))}
         </div>
+
+        {/* Delete button for selected line (overlay, not inside SVG) */}
+        {selectedId && lines.find((l) => l.id === selectedId) && (
+          <LineControls
+            line={lines.find((l) => l.id === selectedId)!}
+            onDelete={() => deleteLine(selectedId)}
+            containerRef={captureRef}
+          />
+        )}
+
+        {/* Line drawing capture layer — only visible/clickable in line mode */}
+        {isDrawingLine && (
+          <div
+            className="absolute inset-0"
+            style={{ zIndex: 700, cursor: 'crosshair' }}
+            onPointerDown={handleDrawClick}
+            onPointerMove={handleDrawMove}
+            onDoubleClick={(e) => {
+              e.preventDefault()
+              commitPendingLine()
+            }}
+          />
+        )}
       </div>
 
       <p className="text-muted-foreground text-xs">
-        Search for the venue, frame the map, and drop colored boxes with labels. The saved snapshot
-        will appear in your wedding website&apos;s Map section.
+        Search for the venue, frame the map, and add colored boxes or draw routes. The saved
+        snapshot will appear in your wedding website&apos;s Map section.
       </p>
     </div>
   )
 }
 
-interface OverlayBoxProps {
-  overlay: MapOverlay
+// ─────────────────────────────────────────────────────────────────────────
+// Box overlay component
+// ─────────────────────────────────────────────────────────────────────────
+
+interface BoxOverlayProps {
+  overlay: MapBoxOverlay
   selected: boolean
   onSelect: () => void
-  onChange: (updates: Partial<MapOverlay>) => void
+  onChange: (updates: Partial<MapBoxOverlay>) => void
   onDelete: () => void
   containerRef: React.RefObject<HTMLDivElement | null>
 }
 
-function OverlayBox({
+function BoxOverlay({
   overlay,
   selected,
   onSelect,
   onChange,
   onDelete,
   containerRef,
-}: OverlayBoxProps) {
+}: BoxOverlayProps) {
   const [editingText, setEditingText] = useState(false)
 
   const beginDrag = useCallback(
@@ -492,7 +809,6 @@ function OverlayBox({
 
       {selected && (
         <>
-          {/* Delete button */}
           <button
             type="button"
             onPointerDown={(e) => e.stopPropagation()}
@@ -505,13 +821,50 @@ function OverlayBox({
           >
             <X className="h-3 w-3" />
           </button>
-          {/* Resize handle */}
           <div
             onPointerDown={(e) => beginDrag(e, 'resize')}
             className="absolute -bottom-1 -right-1 h-3 w-3 cursor-se-resize rounded-sm bg-white shadow ring-1 ring-black/10"
           />
         </>
       )}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Line controls (floating delete button when a line is selected)
+// ─────────────────────────────────────────────────────────────────────────
+
+interface LineControlsProps {
+  line: MapLineOverlay
+  onDelete: () => void
+  containerRef: React.RefObject<HTMLDivElement | null>
+}
+
+function LineControls({ line, onDelete }: LineControlsProps) {
+  // Place control near the midpoint of the line
+  const mid = line.points[Math.floor(line.points.length / 2)] ?? line.points[0]!
+  return (
+    <div
+      className="pointer-events-auto absolute"
+      style={{
+        left: `${mid.x}%`,
+        top: `${mid.y}%`,
+        transform: 'translate(-50%, -50%)',
+        zIndex: 680,
+      }}
+    >
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          onDelete()
+        }}
+        className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-red-500 shadow ring-1 ring-black/10 transition hover:scale-110"
+        aria-label="Delete line"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
     </div>
   )
 }
