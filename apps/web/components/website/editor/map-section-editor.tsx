@@ -21,6 +21,11 @@ export function MapSectionEditor({ content, onChange, weddingId }: MapSectionEdi
   const message = content.message ?? ''
   const showAddresses = content.showAddresses ?? true
   const selectedEventIds = content.selectedEventIds ?? null
+  // Explicit mode: "all" shows every event with a saved map, "selected"
+  // limits the list to whatever is in `selectedEventIds`. We store "all"
+  // as `selectedEventIds === null` and "selected" as an array (possibly
+  // empty while the user is still picking).
+  const mode: 'all' | 'selected' = selectedEventIds === null ? 'all' : 'selected'
 
   const loadEvents = useCallback(async () => {
     if (!weddingId) return
@@ -41,7 +46,10 @@ export function MapSectionEditor({ content, onChange, weddingId }: MapSectionEdi
   }, [loadEvents])
 
   const eventsWithMaps = events.filter((e) => e.mapImageUrl)
-  const usingAll = selectedEventIds === null || selectedEventIds.length === 0
+
+  const setMode = (next: 'all' | 'selected') => {
+    onChange({ ...content, selectedEventIds: next === 'all' ? null : (selectedEventIds ?? []) })
+  }
 
   const toggleEvent = (id: string) => {
     const current = selectedEventIds ?? []
@@ -100,36 +108,84 @@ export function MapSectionEditor({ content, onChange, weddingId }: MapSectionEdi
             </p>
           </div>
         ) : (
-          <div className="mt-3 space-y-2">
-            <p className="text-muted-foreground text-xs">
-              {usingAll
-                ? 'Showing all event maps. Tick boxes below to display only some.'
-                : 'Showing only the selected maps below.'}
-            </p>
-            {eventsWithMaps.map((e) => {
-              const checked = selectedEventIds?.includes(e.id) ?? false
-              return (
-                <label
-                  key={e.id}
-                  className="border-border bg-background hover:bg-muted/40 flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition"
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggleEvent(e.id)}
-                    className="h-4 w-4"
-                  />
-                  <div className="flex-1">
-                    <div className="text-foreground font-medium">{e.name}</div>
-                    {e.address && <div className="text-muted-foreground text-xs">{e.address}</div>}
+          <div className="mt-3 space-y-3">
+            {/* Explicit mode toggle so it's obvious whether the site shows
+                every event map or only a curated subset. */}
+            <div className="border-border bg-background flex flex-col gap-2 rounded-md border p-3 text-sm">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="radio"
+                  name="map-mode"
+                  checked={mode === 'all'}
+                  onChange={() => setMode('all')}
+                  className="mt-0.5 h-4 w-4"
+                />
+                <div>
+                  <div className="text-foreground font-medium">
+                    Show all event maps ({eventsWithMaps.length})
                   </div>
-                  {e.mapImageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={e.mapImageUrl} alt="" className="h-10 w-14 rounded object-cover" />
-                  )}
-                </label>
-              )
-            })}
+                  <div className="text-muted-foreground text-xs">
+                    Every event with a saved map appears on the site, in the order you arranged them
+                    on the Events page.
+                  </div>
+                </div>
+              </label>
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="radio"
+                  name="map-mode"
+                  checked={mode === 'selected'}
+                  onChange={() => setMode('selected')}
+                  className="mt-0.5 h-4 w-4"
+                />
+                <div>
+                  <div className="text-foreground font-medium">Only show the events I pick</div>
+                  <div className="text-muted-foreground text-xs">
+                    Useful if you want guests to see just the ceremony and reception.
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            {mode === 'selected' && (
+              <div className="space-y-2">
+                {eventsWithMaps.map((e) => {
+                  const checked = selectedEventIds?.includes(e.id) ?? false
+                  return (
+                    <label
+                      key={e.id}
+                      className="border-border bg-background hover:bg-muted/40 flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleEvent(e.id)}
+                        className="h-4 w-4"
+                      />
+                      <div className="flex-1">
+                        <div className="text-foreground font-medium">{e.name}</div>
+                        {e.address && (
+                          <div className="text-muted-foreground text-xs">{e.address}</div>
+                        )}
+                      </div>
+                      {e.mapImageUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={e.mapImageUrl}
+                          alt=""
+                          className="h-10 w-14 rounded object-cover"
+                        />
+                      )}
+                    </label>
+                  )
+                })}
+                {selectedEventIds && selectedEventIds.length === 0 && (
+                  <p className="text-xs text-amber-600">
+                    Pick at least one event or your Map section will show an empty state.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

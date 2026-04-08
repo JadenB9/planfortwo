@@ -12,10 +12,11 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { toPng } from 'html-to-image'
-import { Crop, Loader2, MapPin, Save, Search, Spline, X } from 'lucide-react'
+import { Crop, Loader2, MapPin, Save, Search, Spline, Square, X } from 'lucide-react'
 import { toast } from 'sonner'
 import type {
   GeocodeResult,
+  MapBoxOverlay,
   MapCenter,
   MapCropBox,
   MapLineOverlay,
@@ -58,10 +59,24 @@ const TILE_LAYERS: Record<
 const PRESET_COLORS = ['#dc2626', '#ea580c', '#d97706', '#16a34a', '#0ea5e9', '#7c3aed', '#db2777']
 const DEFAULT_STROKE_WIDTH = 4
 const DEFAULT_CROP: MapCropBox = { x: 10, y: 10, width: 80, height: 80 }
+const DEFAULT_BOX_SIZE = { width: 22, height: 10 }
 const MIN_CROP_SIZE = 15
+const MIN_BOX_SIZE = 4
 const SEARCH_DEBOUNCE_MS = 350
 
 type Tool = 'pan' | 'line'
+
+// Ensure overlays loaded from the DB have every field the editor expects —
+// the `boxes` array was added after the initial release, so existing rows
+// may be missing it entirely.
+function normalizeOverlays(raw: MapOverlaysData | null | undefined): MapOverlaysData {
+  if (!raw) return { cropBox: null, lines: [], boxes: [] }
+  return {
+    cropBox: raw.cropBox ?? null,
+    lines: Array.isArray(raw.lines) ? raw.lines : [],
+    boxes: Array.isArray(raw.boxes) ? raw.boxes : [],
+  }
+}
 
 interface EventMapEditorProps {
   event: WeddingEvent
@@ -124,15 +139,17 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
   const mapInstanceRef = useRef<L.Map | null>(null)
 
   const initialOverlays: MapOverlaysData = useMemo(
-    () => event.mapOverlays ?? { cropBox: null, lines: [] },
+    () => normalizeOverlays(event.mapOverlays),
     [event.mapOverlays],
   )
 
   const [style, setStyle] = useState<MapStyle>(event.mapStyle ?? 'street')
   const [cropBox, setCropBox] = useState<MapCropBox | null>(initialOverlays.cropBox)
   const [lines, setLines] = useState<MapLineOverlay[]>(initialOverlays.lines)
+  const [boxes, setBoxes] = useState<MapBoxOverlay[]>(initialOverlays.boxes)
   const [selectedColor, setSelectedColor] = useState<string>(PRESET_COLORS[0]!)
   const [selectedLineId, setSelectedLineId] = useState<string | null>(null)
+  const [selectedBoxId, setSelectedBoxId] = useState<string | null>(null)
   const [tool, setTool] = useState<Tool>('pan')
   const [pendingLine, setPendingLine] = useState<{ x: number; y: number }[]>([])
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null)
@@ -270,6 +287,31 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     setLines((prev) => prev.map((l) => (l.id === id ? { ...l, color } : l)))
   }, [])
 
+  // ── Boxes (labeled annotation rectangles) ────────────────────────────────
+  const addBox = useCallback(() => {
+    const newBox: MapBoxOverlay = {
+      id: makeId(),
+      label: 'Label',
+      color: selectedColor,
+      x: 50 - DEFAULT_BOX_SIZE.width / 2,
+      y: 50 - DEFAULT_BOX_SIZE.height / 2,
+      width: DEFAULT_BOX_SIZE.width,
+      height: DEFAULT_BOX_SIZE.height,
+    }
+    setBoxes((prev) => [...prev, newBox])
+    setSelectedBoxId(newBox.id)
+    setSelectedLineId(null)
+  }, [selectedColor])
+
+  const updateBox = useCallback((id: string, updates: Partial<MapBoxOverlay>) => {
+    setBoxes((prev) => prev.map((b) => (b.id === id ? { ...b, ...updates } : b)))
+  }, [])
+
+  const deleteBox = useCallback((id: string) => {
+    setBoxes((prev) => prev.filter((b) => b.id !== id))
+    setSelectedBoxId((prev) => (prev === id ? null : prev))
+  }, [])
+
   // Keyboard shortcuts
   useEffect(() => {
     if (tool !== 'line') return
@@ -322,13 +364,15 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     [pendingLine.length, pointFromEvent],
   )
 
-  // Apply current palette colour to the selected line (if any)
+  // Apply current palette colour to the currently-selected overlay (line or
+  // box) so the palette doubles as a quick recolor tool.
   const applyColor = useCallback(
     (c: string) => {
       setSelectedColor(c)
       if (selectedLineId) updateLineColor(selectedLineId, c)
+      if (selectedBoxId) updateBox(selectedBoxId, { color: c })
     },
-    [selectedLineId, updateLineColor],
+    [selectedLineId, updateLineColor, selectedBoxId, updateBox],
   )
 
   // ── Save / Clear ─────────────────────────────────────────────────────────
@@ -346,10 +390,31 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       // Capture at a modest pixel ratio to keep the PNG under the API's
       // 10 MB body limit even when the user has the whole satellite view
       // inside the crop frame.
+      //
+      // `filter` strips any cross-origin <img> that would taint the canvas
+      // (Leaflet default-marker icons, external attribution images, etc.).
+      // Without this the whole promise rejects with a bare DOM Event which
+      // stringifies to "[object Event]" — zero signal for the user.
+      //
+      // `cacheBust: false` because the tile servers only return CORS headers
+      // on the cached responses; appending ?v=... forces a fresh fetch that
+      // the browser then blocks.
       const fullDataUrl = await toPng(captureRef.current, {
-        cacheBust: true,
+        cacheBust: false,
         pixelRatio: 1.5,
         skipFonts: true,
+        filter: (node) => {
+          if (!(node instanceof HTMLImageElement)) return true
+          const src = node.currentSrc || node.src
+          if (!src) return true
+          // Keep same-origin and data: images; drop anything else.
+          try {
+            const url = new URL(src, window.location.href)
+            return url.origin === window.location.origin || src.startsWith('data:')
+          } catch {
+            return false
+          }
+        },
       })
       setCapturing(false)
 
@@ -375,7 +440,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         return
       }
       stage = 'upload'
-      const overlays: MapOverlaysData = { cropBox, lines }
+      const overlays: MapOverlaysData = { cropBox, lines, boxes }
       const { data: updated } = await api.events.setMap(
         event.id,
         weddingId,
@@ -385,14 +450,33 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       toast.success('Map saved')
       onSaved(updated)
     } catch (err) {
-      const baseMsg = err instanceof Error ? err.message : String(err)
+      // html-to-image rejects with a DOM Event (not an Error) when an image
+      // taints the canvas — `String(err)` on an Event is "[object Event]"
+      // which is useless. Pull something readable out of whatever we got.
+      const baseMsg =
+        err instanceof Error
+          ? err.message
+          : err && typeof err === 'object' && 'type' in err
+            ? `Capture blocked (${(err as Event).type}). A cross-origin image in the map tainted the canvas.`
+            : String(err)
       console.error(`Map save error at stage "${stage}":`, err)
-      toast.error(`Save failed (${stage}): ${baseMsg.slice(0, 200)}`)
+      toast.error(`Save failed (${stage}): ${baseMsg.slice(0, 240)}`)
     } finally {
       setCapturing(false)
       setSaving(false)
     }
-  }, [event.id, weddingId, cropBox, lines, style, initialCenter, initialZoom, getToken, onSaved])
+  }, [
+    event.id,
+    weddingId,
+    cropBox,
+    lines,
+    boxes,
+    style,
+    initialCenter,
+    initialZoom,
+    getToken,
+    onSaved,
+  ])
 
   const handleClear = useCallback(async () => {
     setClearing(true)
@@ -402,6 +486,9 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       const { data: updated } = await api.events.clearMap(event.id, weddingId, token)
       setCropBox(null)
       setLines([])
+      setBoxes([])
+      setSelectedLineId(null)
+      setSelectedBoxId(null)
       setMarkerPos(null)
       toast.success('Map cleared')
       onSaved(updated)
@@ -536,6 +623,10 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           <Spline className="mr-1 h-3.5 w-3.5" />
           {isDrawingLine ? 'Finish (Enter)' : 'Draw Line'}
         </Button>
+        <Button type="button" size="sm" variant="outline" onClick={addBox}>
+          <Square className="mr-1 h-3.5 w-3.5" />
+          Add Box
+        </Button>
 
         <div className="ml-auto flex items-center gap-2">
           {(event.mapImageUrl || cropBox || lines.length > 0) && (
@@ -573,7 +664,10 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         className="border-border relative overflow-hidden rounded-xl border"
         style={{ height: 480 }}
         onClick={() => {
-          if (tool === 'pan') setSelectedLineId(null)
+          if (tool === 'pan') {
+            setSelectedLineId(null)
+            setSelectedBoxId(null)
+          }
         }}
       >
         <MapContainer
@@ -593,7 +687,12 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
               : {})}
             crossOrigin=""
           />
-          {markerPos && <Marker position={markerPos} icon={DEFAULT_ICON} />}
+          {/* The search-result marker is a cross-origin image from unpkg
+              (Leaflet's default marker). If it's in the DOM when html-to-image
+              runs, the captured canvas becomes tainted and toPng rejects
+              with a DOM Event (not an Error), hence the "[object Event]"
+              error users were seeing. Hide it during capture. */}
+          {markerPos && !capturing && <Marker position={markerPos} icon={DEFAULT_ICON} />}
         </MapContainer>
 
         {/* SVG layer for lines — above Leaflet panes via z-index 650 */}
@@ -674,6 +773,28 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           )}
         </svg>
 
+        {/* Labeled annotation boxes — rendered below the crop frame so the
+            crop frame still visually wraps around them, but above the Leaflet
+            tile layers. The BoxOverlay component itself hides all handles
+            and chrome while `capturing` is true so the saved PNG only shows
+            the clean colored rectangle + label. */}
+        {boxes.map((box) => (
+          <BoxOverlay
+            key={box.id}
+            box={box}
+            selected={selectedBoxId === box.id}
+            capturing={capturing}
+            containerRef={captureRef}
+            onSelect={() => {
+              setSelectedBoxId(box.id)
+              setSelectedLineId(null)
+              setSelectedColor(box.color)
+            }}
+            onChange={(updates) => updateBox(box.id, updates)}
+            onDelete={() => deleteBox(box.id)}
+          />
+        ))}
+
         {/* Crop frame — thin black border, transparent centre. Hidden during capture. */}
         {cropBox && !capturing && (
           <CropFrame crop={cropBox} onChange={updateCrop} containerRef={captureRef} />
@@ -703,9 +824,9 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       </div>
 
       <p className="text-muted-foreground text-xs">
-        Search for the venue, frame the area with the crop box, and draw colored routes. Only the
-        contents inside the crop box are saved — the outline itself is hidden. If you skip the crop
-        box the full map is captured.
+        Search for the venue, frame the area you want to show, then drop labeled boxes on spots like
+        the ceremony, reception, parking, or photo walls. Draw colored routes for how guests should
+        walk or drive. Only whatever sits inside the crop frame is saved.
       </p>
     </div>
   )
@@ -863,6 +984,212 @@ function LineDeleteControl({
       >
         <X className="h-3.5 w-3.5" />
       </button>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Labeled annotation box: colored rectangle with centred label. When
+// selected, shows resize handles, inline label editor, and a floating X.
+// When `capturing` is true, ALL chrome is hidden so the saved PNG only
+// shows the rectangle + text.
+// ─────────────────────────────────────────────────────────────────────────
+
+interface BoxOverlayProps {
+  box: MapBoxOverlay
+  selected: boolean
+  capturing: boolean
+  containerRef: React.RefObject<HTMLDivElement | null>
+  onSelect: () => void
+  onChange: (updates: Partial<MapBoxOverlay>) => void
+  onDelete: () => void
+}
+
+function BoxOverlay({
+  box,
+  selected,
+  capturing,
+  containerRef,
+  onSelect,
+  onChange,
+  onDelete,
+}: BoxOverlayProps) {
+  const [editingLabel, setEditingLabel] = useState(false)
+
+  const beginDrag = useCallback(
+    (
+      e: ReactPointerEvent<HTMLElement>,
+      mode: 'move' | 'resize-nw' | 'resize-ne' | 'resize-sw' | 'resize-se',
+    ) => {
+      e.stopPropagation()
+      e.preventDefault()
+      const startX = e.clientX
+      const startY = e.clientY
+      const start = { ...box }
+      const container = containerRef.current
+      if (!container) return
+      const rect = container.getBoundingClientRect()
+
+      const onMove = (ev: PointerEvent) => {
+        const dxPct = ((ev.clientX - startX) / rect.width) * 100
+        const dyPct = ((ev.clientY - startY) / rect.height) * 100
+        if (mode === 'move') {
+          onChange({
+            x: clamp(start.x + dxPct, 0, 100 - start.width),
+            y: clamp(start.y + dyPct, 0, 100 - start.height),
+          })
+          return
+        }
+        let nx = start.x
+        let ny = start.y
+        let nw = start.width
+        let nh = start.height
+        if (mode === 'resize-se') {
+          nw = clamp(start.width + dxPct, MIN_BOX_SIZE, 100 - start.x)
+          nh = clamp(start.height + dyPct, MIN_BOX_SIZE, 100 - start.y)
+        } else if (mode === 'resize-sw') {
+          const newX = clamp(start.x + dxPct, 0, start.x + start.width - MIN_BOX_SIZE)
+          nw = start.x + start.width - newX
+          nx = newX
+          nh = clamp(start.height + dyPct, MIN_BOX_SIZE, 100 - start.y)
+        } else if (mode === 'resize-ne') {
+          nw = clamp(start.width + dxPct, MIN_BOX_SIZE, 100 - start.x)
+          const newY = clamp(start.y + dyPct, 0, start.y + start.height - MIN_BOX_SIZE)
+          nh = start.y + start.height - newY
+          ny = newY
+        } else if (mode === 'resize-nw') {
+          const newX = clamp(start.x + dxPct, 0, start.x + start.width - MIN_BOX_SIZE)
+          const newY = clamp(start.y + dyPct, 0, start.y + start.height - MIN_BOX_SIZE)
+          nw = start.x + start.width - newX
+          nh = start.y + start.height - newY
+          nx = newX
+          ny = newY
+        }
+        onChange({ x: nx, y: ny, width: nw, height: nh })
+      }
+      const onUp = () => {
+        window.removeEventListener('pointermove', onMove)
+        window.removeEventListener('pointerup', onUp)
+      }
+      window.addEventListener('pointermove', onMove)
+      window.addEventListener('pointerup', onUp)
+    },
+    [box, onChange, containerRef],
+  )
+
+  // Scale label font size with box height so the label is always readable
+  // but doesn't overflow on tiny boxes. Percentages are 0-100 of the frame,
+  // so convert to a rough pixel size against the 480-tall container.
+  const fontSize = Math.max(10, Math.min(18, Math.round((box.height / 100) * 480 * 0.32)))
+
+  const handleStyle: React.CSSProperties = {
+    background: '#ffffff',
+    border: `1px solid ${box.color}`,
+    borderRadius: 2,
+  }
+
+  return (
+    <div
+      className="absolute"
+      style={{
+        left: `${box.x}%`,
+        top: `${box.y}%`,
+        width: `${box.width}%`,
+        height: `${box.height}%`,
+        zIndex: 660,
+        pointerEvents: 'auto',
+      }}
+      onPointerDown={(e) => {
+        // Only start drag from the body, not from handles/input (which stop
+        // propagation themselves)
+        if (!capturing) {
+          onSelect()
+          beginDrag(e, 'move')
+        }
+      }}
+      onDoubleClick={(e) => {
+        e.stopPropagation()
+        if (!capturing) setEditingLabel(true)
+      }}
+    >
+      <div
+        className="flex h-full w-full items-center justify-center rounded-md px-1.5 text-center"
+        style={{
+          backgroundColor: box.color,
+          color: '#ffffff',
+          cursor: capturing ? 'default' : 'move',
+          boxShadow: capturing ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.25)',
+          border: selected && !capturing ? '2px solid #ffffff' : 'none',
+          outline: selected && !capturing ? `2px solid ${box.color}` : 'none',
+          fontWeight: 600,
+          fontSize: `${fontSize}px`,
+          lineHeight: 1.15,
+          overflow: 'hidden',
+          wordBreak: 'break-word',
+        }}
+      >
+        {editingLabel && !capturing ? (
+          <input
+            autoFocus
+            value={box.label}
+            onChange={(e) => onChange({ label: e.target.value.slice(0, 80) })}
+            onBlur={() => setEditingLabel(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === 'Escape') {
+                e.preventDefault()
+                setEditingLabel(false)
+              }
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="w-full bg-transparent text-center text-white outline-none placeholder:text-white/70"
+            style={{ fontSize: `${fontSize}px`, fontWeight: 600 }}
+            placeholder="Label"
+          />
+        ) : (
+          <span className="select-none">{box.label || ' '}</span>
+        )}
+      </div>
+
+      {selected && !capturing && (
+        <>
+          {/* Corner resize handles */}
+          <div
+            onPointerDown={(e) => beginDrag(e, 'resize-nw')}
+            className="absolute h-2.5 w-2.5 cursor-nwse-resize"
+            style={{ left: -5, top: -5, ...handleStyle }}
+          />
+          <div
+            onPointerDown={(e) => beginDrag(e, 'resize-ne')}
+            className="absolute h-2.5 w-2.5 cursor-nesw-resize"
+            style={{ right: -5, top: -5, ...handleStyle }}
+          />
+          <div
+            onPointerDown={(e) => beginDrag(e, 'resize-sw')}
+            className="absolute h-2.5 w-2.5 cursor-nesw-resize"
+            style={{ left: -5, bottom: -5, ...handleStyle }}
+          />
+          <div
+            onPointerDown={(e) => beginDrag(e, 'resize-se')}
+            className="absolute h-2.5 w-2.5 cursor-nwse-resize"
+            style={{ right: -5, bottom: -5, ...handleStyle }}
+          />
+
+          {/* Floating delete button above the top-right corner */}
+          <button
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete()
+            }}
+            className="absolute flex h-5 w-5 items-center justify-center rounded-full bg-white text-red-500 shadow ring-1 ring-black/10 transition hover:scale-110"
+            style={{ right: -9, top: -9 }}
+            aria-label="Delete box"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </>
+      )}
     </div>
   )
 }

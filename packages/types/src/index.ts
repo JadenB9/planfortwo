@@ -669,10 +669,25 @@ export interface MapLineOverlay {
   points: MapLinePoint[]
 }
 
+// Labeled rectangular callout placed on the map ("Ceremony", "Parking",
+// "Reception", etc.). Coordinates are percentages of the captured frame so
+// the overlay scales cleanly when the saved image is rendered on the
+// public wedding website.
+export interface MapBoxOverlay {
+  id: string
+  label: string
+  color: string
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 // Full payload stored in the events.map_overlays jsonb column.
 export interface MapOverlaysData {
   cropBox: MapCropBox | null
   lines: MapLineOverlay[]
+  boxes: MapBoxOverlay[]
 }
 
 // A single geocoded search hit, returned from the /events/geocode proxy.

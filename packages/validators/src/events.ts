@@ -84,9 +84,23 @@ export const mapLineOverlaySchema = z.object({
 })
 export type MapLineOverlayInput = z.infer<typeof mapLineOverlaySchema>
 
+export const mapBoxOverlaySchema = z.object({
+  id: z.string().min(1).max(64),
+  label: z.string().max(80),
+  color: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
+  x: z.number().min(-10).max(110),
+  y: z.number().min(-10).max(110),
+  width: z.number().min(2).max(110),
+  height: z.number().min(2).max(110),
+})
+export type MapBoxOverlayInput = z.infer<typeof mapBoxOverlaySchema>
+
+// `boxes` is optional with a default so map overlays saved before the
+// annotation-box feature still validate cleanly on load.
 export const mapOverlaysDataSchema = z.object({
   cropBox: mapCropBoxSchema.nullable(),
   lines: z.array(mapLineOverlaySchema).max(50),
+  boxes: z.array(mapBoxOverlaySchema).max(50).optional().default([]),
 })
 export type MapOverlaysDataInput = z.infer<typeof mapOverlaysDataSchema>
 

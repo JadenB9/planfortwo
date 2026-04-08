@@ -64,7 +64,7 @@ export function MapSection({ title, content, eventMaps }: MapSectionProps) {
               aria-hidden
             />
             <p className={`text-sm ${bodyClass}`} style={{ ...bodyFont, color: colors.primary }}>
-              The couple hasn&apos;t added any maps yet. Check back soon!
+              Maps are on the way. Check back soon!
             </p>
           </div>
         ) : (
@@ -80,12 +80,14 @@ export function MapSection({ title, content, eventMaps }: MapSectionProps) {
                 transition={{ delay: i * 0.1 }}
                 className="bg-background overflow-hidden rounded-2xl shadow-sm"
               >
-                <div className="relative aspect-[4/3] w-full bg-neutral-100">
+                {/* Auto-height container so the couple's crop frame dictates
+                    the aspect ratio — no forced 4:3 crop-out. */}
+                <div className="relative w-full bg-neutral-100">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={m.mapImageUrl}
                     alt={`Map for ${m.name}`}
-                    className="h-full w-full object-cover"
+                    className="block h-auto w-full"
                     loading="lazy"
                   />
                 </div>

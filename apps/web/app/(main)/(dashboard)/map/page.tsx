@@ -69,8 +69,9 @@ export default function MapPage() {
       <div className="mb-8">
         <h1 className="text-foreground font-serif text-3xl font-bold">Map</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Design a custom map for each event — search the venue, frame the view, and drop labeled
-          boxes. Saved maps appear automatically in your wedding website&apos;s Map section.
+          Build a map for each event. Search the venue, frame the view, drop labeled boxes for
+          things like the ceremony or parking, and sketch colored routes. Every saved map shows up
+          on your wedding website&apos;s Map section.
         </p>
       </div>
 
@@ -86,8 +87,8 @@ export default function MapPage() {
             </div>
             <h2 className="text-foreground font-serif text-xl font-semibold">No events yet</h2>
             <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
-              Maps are scoped per event so you can show guests how to reach each venue. Add your
-              ceremony, reception, or other events first, then come back here to design their maps.
+              Each event gets its own map so guests know exactly where to go. Add a ceremony,
+              reception, or anything else on the Events page, then come back here to build the maps.
             </p>
             <Button asChild className="mt-6">
               <Link href="/events">Go to Events</Link>
@@ -97,7 +98,7 @@ export default function MapPage() {
       ) : (
         <div className="space-y-6">
           {events.length > 1 && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="border-border bg-muted/30 flex flex-wrap items-center gap-3 rounded-lg border p-3">
               <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
                 Editing map for
               </span>
@@ -113,20 +114,30 @@ export default function MapPage() {
                       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
                         active
                           ? 'bg-wedding-600 text-white shadow-sm'
-                          : 'bg-muted text-foreground hover:bg-muted/70'
+                          : 'bg-background text-foreground hover:bg-muted'
                       }`}
                     >
-                      {hasMap && (
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${active ? 'bg-white' : 'bg-wedding-500'}`}
-                          aria-label="Has saved map"
-                        />
-                      )}
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          hasMap
+                            ? active
+                              ? 'bg-white'
+                              : 'bg-wedding-500'
+                            : active
+                              ? 'bg-white/50'
+                              : 'bg-muted-foreground/40'
+                        }`}
+                        aria-label={hasMap ? 'Has saved map' : 'No map yet'}
+                      />
                       {e.name}
                     </button>
                   )
                 })}
               </div>
+              <span className="text-muted-foreground ml-auto text-[11px]">
+                {events.filter((e) => e.mapImageUrl).length} / {events.length} events have a saved
+                map
+              </span>
             </div>
           )}
 
