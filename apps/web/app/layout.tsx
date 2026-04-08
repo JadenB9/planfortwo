@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import { ScrollLockGuard } from '@/components/scroll-lock-guard'
 import './globals.css'
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen font-sans">
         <ScrollLockGuard />
         {children}
+        <Analytics />
       </body>
     </html>
   )
