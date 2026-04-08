@@ -47,3 +47,44 @@ export const updateTimelineEntrySchema = z.object({
   sortOrder: z.number().int().min(0).optional(),
 })
 export type UpdateTimelineEntryInput = z.infer<typeof updateTimelineEntrySchema>
+
+// ── Event Map ──
+const hexColorRegex = /^#[0-9a-fA-F]{6}$/
+
+export const mapOverlaySchema = z.object({
+  id: z.string().min(1).max(64),
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
+  width: z.number().min(0).max(100),
+  height: z.number().min(0).max(100),
+  color: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
+  text: z.string().max(120),
+})
+export type MapOverlayInput = z.infer<typeof mapOverlaySchema>
+
+export const mapCenterSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+  zoom: z.number().min(0).max(22),
+})
+export type MapCenterInput = z.infer<typeof mapCenterSchema>
+
+const MAX_MAP_IMAGE_BYTES = 4 * 1024 * 1024 // 4 MB after base64 decode
+
+export const setEventMapSchema = z.object({
+  imageDataUrl: z
+    .string()
+    .startsWith('data:image/png;base64,')
+    .refine(
+      (val) => {
+        const base64 = val.slice('data:image/png;base64,'.length)
+        // Approximate decoded byte length: base64 chars * 3 / 4
+        return (base64.length * 3) / 4 <= MAX_MAP_IMAGE_BYTES
+      },
+      { message: 'Map image exceeds 4 MB' },
+    ),
+  overlays: z.array(mapOverlaySchema).max(50),
+  center: mapCenterSchema,
+  style: z.enum(['street', 'satellite']),
+})
+export type SetEventMapInput = z.infer<typeof setEventMapSchema>

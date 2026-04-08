@@ -494,6 +494,9 @@ export const websiteSectionTypeZodEnum = z.enum([
   'schedule',
   'guestbook',
   'custom',
+  'song_requests',
+  'prayers',
+  'map',
 ])
 export const fontPairZodEnum = z.enum([
   'playfair-lato',

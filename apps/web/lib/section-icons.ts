@@ -2,6 +2,7 @@ import {
   Heart,
   BookOpen,
   MapPin,
+  Map,
   Users,
   Image,
   Plane,
@@ -34,6 +35,7 @@ export const sectionIcons: Record<WebsiteSectionType, LucideIcon> = {
   custom: FileText,
   song_requests: Music,
   prayers: HandHeart,
+  map: Map,
 }
 
 export const sectionLabels: Record<WebsiteSectionType, string> = {
@@ -52,4 +54,5 @@ export const sectionLabels: Record<WebsiteSectionType, string> = {
   custom: 'Custom Section',
   song_requests: 'Song Requests',
   prayers: 'Prayers',
+  map: 'Map',
 }

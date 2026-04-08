@@ -110,6 +110,10 @@ export const storageClient = {
     return `email-attachments/${emailAddressId}/${attachmentId}.${ext}`
   },
 
+  buildEventMapKey(weddingId: string, eventId: string): string {
+    return `event-maps/${weddingId}/${eventId}.png`
+  },
+
   /**
    * Validates that an r2Key belongs to the expected wedding.
    * Each key type uses a known prefix pattern: `{type}/{weddingId}/...`
@@ -124,6 +128,7 @@ export const storageClient = {
       `website-photos/${weddingId}/`,
       `receipts/${weddingId}/`,
       `og-images/${weddingId}/`,
+      `event-maps/${weddingId}/`,
     ]
 
     return validPrefixes.some((prefix) => r2Key.startsWith(prefix))

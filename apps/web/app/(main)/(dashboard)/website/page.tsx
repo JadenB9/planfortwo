@@ -31,6 +31,7 @@ import type {
   CustomSectionContent,
   SongRequestsSectionContent,
   PrayersSectionContent,
+  MapSectionContent,
 } from '@planfortwo/types'
 
 const TemplateSelector = dynamic(() =>
@@ -100,6 +101,9 @@ const SongRequestsEditor = dynamic(() =>
 )
 const PrayersEditor = dynamic(() =>
   import('@/components/website/editor/prayers-editor').then((mod) => mod.PrayersEditor),
+)
+const MapSectionEditor = dynamic(() =>
+  import('@/components/website/editor/map-section-editor').then((mod) => mod.MapSectionEditor),
 )
 const WebsitePreview = dynamic(
   () => import('@/components/website/editor/website-preview').then((m) => m.WebsitePreview),
@@ -450,6 +454,14 @@ function WebsitePageInner() {
           <PrayersEditor
             content={content as unknown as PrayersSectionContent}
             onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+          />
+        )
+      case 'map':
+        return (
+          <MapSectionEditor
+            content={content as unknown as MapSectionContent}
+            onChange={(c) => onChange(c as unknown as Record<string, unknown>)}
+            weddingId={weddingId ?? ''}
           />
         )
       default:

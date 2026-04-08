@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { cache } from 'react'
-import type { CustomColors, GuestbookEntry, Prayer } from '@planfortwo/types'
+import type { CustomColors, GuestbookEntry, Prayer, PublicEventMap } from '@planfortwo/types'
 import { notFound } from 'next/navigation'
 import { PublicWebsiteClient } from './client'
 
@@ -40,6 +40,7 @@ interface PublicWebsiteData {
       | 'custom'
       | 'song_requests'
       | 'prayers'
+      | 'map'
     title: string
     content: Record<string, unknown>
     isVisible: boolean
@@ -68,6 +69,7 @@ interface PublicWebsiteData {
     uploaderName: string | null
     createdAt: Date
   }>
+  eventMaps?: PublicEventMap[]
   weddingName: string
   weddingDate: string | null
   ceremonyDate: string | null
@@ -147,6 +149,7 @@ export default async function PublicWebsitePage({ params }: PageProps) {
       sections={data.sections}
       photos={data.photos}
       guestPhotos={data.guestPhotos}
+      eventMaps={data.eventMaps ?? []}
       initialGuestbookEntries={initialGuestbookEntries}
       initialPrayerEntries={initialPrayerEntries}
       weddingName={data.weddingName}

@@ -414,6 +414,7 @@ export type WebsiteSectionType =
   | 'custom'
   | 'song_requests'
   | 'prayers'
+  | 'map'
 
 export type FontPair =
   | 'playfair-lato'
@@ -642,6 +643,39 @@ export interface SongRequestsSectionContent {
 export interface PrayersSectionContent {
   requireApproval: boolean
   message: string
+}
+
+export type MapStyle = 'street' | 'satellite'
+
+export interface MapOverlay {
+  id: string
+  x: number
+  y: number
+  width: number
+  height: number
+  color: string
+  text: string
+}
+
+export interface MapCenter {
+  lat: number
+  lng: number
+  zoom: number
+}
+
+export interface MapSectionContent {
+  message: string
+  showAddresses: boolean
+  selectedEventIds: string[] | null
+}
+
+// Trimmed event-map shape exposed publicly to /w/[slug] (no overlay/center data)
+export interface PublicEventMap {
+  id: string
+  name: string
+  address: string | null
+  mapImageUrl: string
+  mapStyle: MapStyle | null
 }
 
 export interface WebsiteWithSections extends WebsiteConfig {
@@ -1040,6 +1074,11 @@ export interface WeddingEvent {
   address: string | null
   description: string | null
   dressCode: string | null
+  mapImageUrl: string | null
+  mapImageKey: string | null
+  mapOverlays: MapOverlay[] | null
+  mapCenter: MapCenter | null
+  mapStyle: MapStyle | null
   sortOrder: number
   createdAt: Date
   updatedAt: Date

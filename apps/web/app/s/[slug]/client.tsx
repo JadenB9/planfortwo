@@ -1,7 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { CustomColors, GuestbookEntry, Prayer, WebsiteSectionType } from '@planfortwo/types'
+import type {
+  CustomColors,
+  GuestbookEntry,
+  Prayer,
+  PublicEventMap,
+  WebsiteSectionType,
+} from '@planfortwo/types'
 import { TemplateProvider } from '@/components/website/template-context'
 import { SectionRenderer } from '@/components/website/sections/section-renderer'
 import { AnalyticsTracker } from '@/components/website/public/analytics-tracker'
@@ -70,6 +76,7 @@ interface PublicWebsiteClientProps {
   sections: PublicSection[]
   photos: PublicPhoto[]
   guestPhotos?: PublicGuestPhoto[]
+  eventMaps?: PublicEventMap[]
   initialGuestbookEntries?: GuestbookEntry[]
   initialPrayerEntries?: Prayer[]
   weddingName: string
@@ -106,6 +113,7 @@ export function PublicWebsiteClient({
   sections,
   photos,
   guestPhotos,
+  eventMaps = [],
   initialGuestbookEntries = [],
   initialPrayerEntries = [],
   weddingName,
@@ -209,6 +217,7 @@ export function PublicWebsiteClient({
               guestPhotos={guestPhotos}
               guestbookEntries={guestbookEntries}
               prayerEntries={prayerEntries}
+              eventMaps={eventMaps}
               weddingName={weddingName}
               weddingDate={parsedDate}
               slug={slug}

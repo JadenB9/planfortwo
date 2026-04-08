@@ -5,7 +5,9 @@ import type {
   UpdateEventInput,
   CreateTimelineEntryInput,
   UpdateTimelineEntryInput,
+  SetEventMapInput,
 } from '@planfortwo/validators'
+import { storageClient } from '@planfortwo/storage'
 import { activityService } from './activity.js'
 
 export const eventService = {
@@ -138,5 +140,70 @@ export const eventService = {
       .where(eq(timelineEntries.id, entryId))
     if (!_entry || _entry.weddingId !== weddingId) return
     await db.delete(timelineEntries).where(eq(timelineEntries.id, entryId))
+  },
+
+  async setMap(eventId: string, weddingId: string, data: SetEventMapInput) {
+    const existing = await this.getById(eventId, weddingId)
+    if (!existing) return null
+
+    // Decode base64 PNG payload
+    const base64 = data.imageDataUrl.slice('data:image/png;base64,'.length)
+    const buffer = Buffer.from(base64, 'base64')
+
+    // Defense in depth: enforce max size after decode
+    const MAX_BYTES = 4 * 1024 * 1024
+    if (buffer.byteLength > MAX_BYTES) {
+      throw new Error('Map image exceeds 4 MB')
+    }
+
+    // PNG magic bytes: 89 50 4E 47 0D 0A 1A 0A
+    const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+    if (buffer.byteLength < PNG_MAGIC.length || !buffer.subarray(0, 8).equals(PNG_MAGIC)) {
+      throw new Error('Invalid PNG payload')
+    }
+
+    const r2Key = storageClient.buildEventMapKey(weddingId, eventId)
+    await storageClient.uploadBuffer(r2Key, buffer, 'image/png')
+    const url = await storageClient.getDownloadUrl(r2Key)
+
+    const [updated] = await db
+      .update(events)
+      .set({
+        mapImageUrl: url,
+        mapImageKey: r2Key,
+        mapOverlays: data.overlays,
+        mapCenter: data.center,
+        mapStyle: data.style,
+      })
+      .where(and(eq(events.id, eventId), eq(events.weddingId, weddingId)))
+      .returning()
+    return updated ?? null
+  },
+
+  async clearMap(eventId: string, weddingId: string) {
+    const existing = await this.getById(eventId, weddingId)
+    if (!existing) return null
+
+    if (existing.mapImageKey) {
+      try {
+        await storageClient.deleteObject(existing.mapImageKey)
+      } catch (err) {
+        // Best effort — log but continue clearing DB row
+        console.error('Failed to delete map image from R2:', err)
+      }
+    }
+
+    const [updated] = await db
+      .update(events)
+      .set({
+        mapImageUrl: null,
+        mapImageKey: null,
+        mapOverlays: null,
+        mapCenter: null,
+        mapStyle: null,
+      })
+      .where(and(eq(events.id, eventId), eq(events.weddingId, weddingId)))
+      .returning()
+    return updated ?? null
   },
 }

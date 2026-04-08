@@ -40,6 +40,15 @@ const ADDABLE_SECTIONS: { sectionType: string; title: string; content: Record<st
       content: { accommodations: [], directions: '', mapEmbed: null },
     },
     { sectionType: 'faq', title: 'FAQ', content: { questions: [] } },
+    {
+      sectionType: 'map',
+      title: 'Map',
+      content: {
+        message: 'Find your way to our venues.',
+        showAddresses: true,
+        selectedEventIds: null,
+      },
+    },
   ]
 
 function SortableSection({

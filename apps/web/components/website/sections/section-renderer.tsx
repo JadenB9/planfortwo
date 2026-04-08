@@ -1,6 +1,11 @@
 'use client'
 
-import type { WebsiteSection, WebsitePhoto, GuestbookEntry } from '@planfortwo/types'
+import type {
+  WebsiteSection,
+  WebsitePhoto,
+  GuestbookEntry,
+  PublicEventMap,
+} from '@planfortwo/types'
 import dynamic from 'next/dynamic'
 import type {
   HeroContent,
@@ -18,6 +23,7 @@ import type {
   CustomSectionContent,
   SongRequestsSectionContent,
   PrayersSectionContent,
+  MapSectionContent,
   Prayer,
 } from '@planfortwo/types'
 
@@ -52,6 +58,7 @@ const SongRequestsSection = dynamic(() =>
   import('./song-requests-section').then((mod) => mod.SongRequestsSection),
 )
 const PrayersSection = dynamic(() => import('./prayers-section').then((mod) => mod.PrayersSection))
+const MapSection = dynamic(() => import('./map-section').then((mod) => mod.MapSection))
 
 interface GuestPhoto {
   id: string
@@ -67,6 +74,7 @@ interface SectionRendererProps {
   guestPhotos?: GuestPhoto[]
   guestbookEntries: GuestbookEntry[]
   prayerEntries?: Prayer[]
+  eventMaps?: PublicEventMap[]
   weddingName: string
   weddingDate: Date | null
   slug: string
@@ -80,6 +88,7 @@ export function SectionRenderer({
   guestPhotos,
   guestbookEntries,
   prayerEntries,
+  eventMaps,
   weddingName,
   weddingDate,
   slug,
@@ -201,6 +210,14 @@ export function SectionRenderer({
           entries={prayerEntries ?? []}
           slug={slug}
           onSubmit={onPrayerSubmit}
+        />
+      )
+    case 'map':
+      return (
+        <MapSection
+          title={section.title}
+          content={section.content as unknown as MapSectionContent}
+          eventMaps={eventMaps ?? []}
         />
       )
     default:

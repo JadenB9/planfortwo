@@ -1,5 +1,21 @@
-import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { weddings } from './weddings'
+
+export interface EventMapOverlay {
+  id: string
+  x: number
+  y: number
+  width: number
+  height: number
+  color: string
+  text: string
+}
+
+export interface EventMapCenter {
+  lat: number
+  lng: number
+  zoom: number
+}
 
 export const events = pgTable('events', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -14,6 +30,11 @@ export const events = pgTable('events', {
   venue: text('venue'),
   address: text('address'),
   dressCode: text('dress_code'),
+  mapImageUrl: text('map_image_url'),
+  mapImageKey: text('map_image_key'),
+  mapOverlays: jsonb('map_overlays').$type<EventMapOverlay[]>(),
+  mapCenter: jsonb('map_center').$type<EventMapCenter>(),
+  mapStyle: text('map_style'),
   sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })

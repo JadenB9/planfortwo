@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import { springSmooth, staggerContainer, fadeInUp } from '@/lib/animations'
@@ -13,8 +14,21 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
+
+const EventMapEditor = dynamic(
+  () => import('@/components/events/event-map-editor').then((m) => m.EventMapEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center py-12">
+        <div className="border-wedding-200 border-t-wedding-600 h-6 w-6 animate-spin rounded-full border-2" />
+      </div>
+    ),
+  },
+)
 
 const EVENT_TYPES: { value: EventType; label: string }[] = [
   { value: 'ceremony', label: 'Ceremony' },
@@ -279,117 +293,154 @@ export default function EventsPage() {
                   selectedEvent.type}
               </Badge>
             </div>
-            <Button
-              onClick={() => {
-                setEditingTimeline(null)
-                setTlForm({ time: '', title: '', description: '', duration: '' })
-                setShowTimelineForm(true)
-              }}
-              variant="outline"
-            >
-              Add Timeline Entry
-            </Button>
           </div>
 
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="grid gap-4 sm:grid-cols-2">
-                {selectedEvent.date && (
-                  <div>
-                    <span className="text-muted-foreground text-xs font-medium">Date</span>
-                    <p className="text-sm">{new Date(selectedEvent.date).toLocaleDateString()}</p>
-                  </div>
-                )}
-                {selectedEvent.startTime && (
-                  <div>
-                    <span className="text-muted-foreground text-xs font-medium">Time</span>
-                    <p className="text-sm">
-                      {selectedEvent.startTime}
-                      {selectedEvent.endTime ? ` - ${selectedEvent.endTime}` : ''}
-                    </p>
-                  </div>
-                )}
-                {selectedEvent.venue && (
-                  <div>
-                    <span className="text-muted-foreground text-xs font-medium">Venue</span>
-                    <p className="text-sm">{selectedEvent.venue}</p>
-                  </div>
-                )}
-                {selectedEvent.address && (
-                  <div>
-                    <span className="text-muted-foreground text-xs font-medium">Address</span>
-                    <p className="text-sm">{selectedEvent.address}</p>
-                  </div>
-                )}
-                {selectedEvent.dressCode && (
-                  <div>
-                    <span className="text-muted-foreground text-xs font-medium">Dress Code</span>
-                    <p className="text-sm">{selectedEvent.dressCode}</p>
-                  </div>
-                )}
-              </div>
-              {selectedEvent.description && (
-                <p className="text-muted-foreground mt-4 text-sm">{selectedEvent.description}</p>
-              )}
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList>
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
+              <TabsTrigger value="map">Map</TabsTrigger>
+            </TabsList>
 
-          <h3 className="text-foreground mb-3 font-serif text-lg font-semibold">Timeline</h3>
-          {timeline.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center">
-                <p className="text-muted-foreground text-sm">
-                  No timeline entries yet. Add entries to plan the event flow.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {timeline
-                .sort((a, b) => a.time.localeCompare(b.time))
-                .map((entry) => (
-                  <Card key={entry.id}>
-                    <CardContent className="flex items-center justify-between py-3">
-                      <div className="flex items-center gap-4">
-                        <span className="text-wedding-600 font-mono text-sm font-medium">
-                          {entry.time}
+            <TabsContent value="details" className="mt-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {selectedEvent.date && (
+                      <div>
+                        <span className="text-muted-foreground text-xs font-medium">Date</span>
+                        <p className="text-sm">
+                          {new Date(selectedEvent.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                    {selectedEvent.startTime && (
+                      <div>
+                        <span className="text-muted-foreground text-xs font-medium">Time</span>
+                        <p className="text-sm">
+                          {selectedEvent.startTime}
+                          {selectedEvent.endTime ? ` - ${selectedEvent.endTime}` : ''}
+                        </p>
+                      </div>
+                    )}
+                    {selectedEvent.venue && (
+                      <div>
+                        <span className="text-muted-foreground text-xs font-medium">Venue</span>
+                        <p className="text-sm">{selectedEvent.venue}</p>
+                      </div>
+                    )}
+                    {selectedEvent.address && (
+                      <div>
+                        <span className="text-muted-foreground text-xs font-medium">Address</span>
+                        <p className="text-sm">{selectedEvent.address}</p>
+                      </div>
+                    )}
+                    {selectedEvent.dressCode && (
+                      <div>
+                        <span className="text-muted-foreground text-xs font-medium">
+                          Dress Code
                         </span>
-                        <div>
-                          <p className="text-foreground text-sm font-medium">{entry.title}</p>
-                          {entry.description && (
-                            <p className="text-muted-foreground text-xs">{entry.description}</p>
-                          )}
-                        </div>
-                        {entry.duration && <Badge variant="secondary">{entry.duration} min</Badge>}
+                        <p className="text-sm">{selectedEvent.dressCode}</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingTimeline(entry)
-                            setTlForm({
-                              time: entry.time,
-                              title: entry.title,
-                              description: entry.description ?? '',
-                              duration: entry.duration?.toString() ?? '',
-                            })
-                            setShowTimelineForm(true)
-                          }}
-                          className="text-wedding-600 hover:text-wedding-700 text-xs"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteTimeline(entry.id)}
-                          className="text-xs text-red-500 hover:text-red-700"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          )}
+                    )}
+                  </div>
+                  {selectedEvent.description && (
+                    <p className="text-muted-foreground mt-4 text-sm">
+                      {selectedEvent.description}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="timeline" className="mt-6">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-foreground font-serif text-lg font-semibold">Timeline</h3>
+                <Button
+                  onClick={() => {
+                    setEditingTimeline(null)
+                    setTlForm({ time: '', title: '', description: '', duration: '' })
+                    setShowTimelineForm(true)
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  Add Timeline Entry
+                </Button>
+              </div>
+              {timeline.length === 0 ? (
+                <Card>
+                  <CardContent className="py-8 text-center">
+                    <p className="text-muted-foreground text-sm">
+                      No timeline entries yet. Add entries to plan the event flow.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {timeline
+                    .sort((a, b) => a.time.localeCompare(b.time))
+                    .map((entry) => (
+                      <Card key={entry.id}>
+                        <CardContent className="flex items-center justify-between py-3">
+                          <div className="flex items-center gap-4">
+                            <span className="text-wedding-600 font-mono text-sm font-medium">
+                              {entry.time}
+                            </span>
+                            <div>
+                              <p className="text-foreground text-sm font-medium">{entry.title}</p>
+                              {entry.description && (
+                                <p className="text-muted-foreground text-xs">{entry.description}</p>
+                              )}
+                            </div>
+                            {entry.duration && (
+                              <Badge variant="secondary">{entry.duration} min</Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                setEditingTimeline(entry)
+                                setTlForm({
+                                  time: entry.time,
+                                  title: entry.title,
+                                  description: entry.description ?? '',
+                                  duration: entry.duration?.toString() ?? '',
+                                })
+                                setShowTimelineForm(true)
+                              }}
+                              className="text-wedding-600 hover:text-wedding-700 text-xs"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTimeline(entry.id)}
+                              className="text-xs text-red-500 hover:text-red-700"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="map" className="mt-6">
+              {weddingId && (
+                <EventMapEditor
+                  event={selectedEvent}
+                  weddingId={weddingId}
+                  getToken={getToken}
+                  onSaved={(updated) => {
+                    setSelectedEvent(updated)
+                    setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)))
+                  }}
+                />
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       ) : events.length === 0 ? (
         <Card>

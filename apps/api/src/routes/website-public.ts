@@ -160,6 +160,29 @@ websitePublicRoute.get('/:slug', async (c) => {
 
   const ceremonyEvent = weddingEvents[0] ?? null
 
+  // Public event maps — only events that have a saved map image
+  const eventMapRows = await db
+    .select({
+      id: events.id,
+      name: events.name,
+      address: events.address,
+      mapImageUrl: events.mapImageUrl,
+      mapStyle: events.mapStyle,
+    })
+    .from(events)
+    .where(and(eq(events.weddingId, config.weddingId), isNotNull(events.mapImageUrl)))
+    .orderBy(asc(events.sortOrder))
+
+  const eventMaps = eventMapRows
+    .filter((r) => r.mapImageUrl !== null)
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      address: r.address,
+      mapImageUrl: r.mapImageUrl as string,
+      mapStyle: r.mapStyle as 'street' | 'satellite' | null,
+    }))
+
   const rawSections = await db
     .select()
     .from(websiteSections)
@@ -208,6 +231,7 @@ websitePublicRoute.get('/:slug', async (c) => {
         sections,
         photos: websitePhotoList,
         guestPhotos: approvedGuestPhotos.map(({ weddingId: _w, ...rest }) => rest),
+        eventMaps,
         weddingName: wedding?.name ?? '',
         weddingDate: wedding?.date ?? null,
         ceremonyDate: ceremonyEvent?.date ?? wedding?.date ?? null,

@@ -1261,6 +1261,35 @@ export const api = {
           token,
         },
       ),
+    setMap: (
+      id: string,
+      weddingId: string,
+      data: {
+        imageDataUrl: string
+        overlays: {
+          id: string
+          x: number
+          y: number
+          width: number
+          height: number
+          color: string
+          text: string
+        }[]
+        center: { lat: number; lng: number; zoom: number }
+        style: 'street' | 'satellite'
+      },
+      token: string,
+    ) =>
+      fetchApi<{ data: WeddingEvent }>(`/events/${id}/map?weddingId=${weddingId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        token,
+      }),
+    clearMap: (id: string, weddingId: string, token: string) =>
+      fetchApi<{ data: WeddingEvent }>(`/events/${id}/map?weddingId=${weddingId}`, {
+        method: 'DELETE',
+        token,
+      }),
   },
   photoGallery: {
     list: (weddingId: string, token: string) =>

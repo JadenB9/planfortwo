@@ -170,6 +170,7 @@ export function WebsitePreview({
                     photos={photos}
                     guestbookEntries={[]}
                     prayerEntries={[]}
+                    eventMaps={[]}
                     weddingName={weddingName}
                     weddingDate={weddingDate}
                     slug={slug}
