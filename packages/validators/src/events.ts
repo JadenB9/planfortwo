@@ -1,10 +1,19 @@
 import { z } from 'zod'
 
+// Accepts either YYYY-MM-DD (from <input type="date">) or full ISO 8601
+// datetime. The service layer normalizes with new Date(...) before insert.
+const eventDateSchema = z
+  .string()
+  .max(64)
+  .refine((v) => !Number.isNaN(Date.parse(v)), {
+    message: 'Must be a valid date (YYYY-MM-DD or ISO 8601 datetime)',
+  })
+
 export const createEventSchema = z.object({
   weddingId: z.string().uuid(),
   name: z.string().min(1).max(200),
   description: z.string().max(2000).nullable().optional(),
-  date: z.string().datetime().nullable().optional(),
+  date: eventDateSchema.nullable().optional(),
   startTime: z.string().max(10).nullable().optional(),
   endTime: z.string().max(10).nullable().optional(),
   venue: z.string().max(200).nullable().optional(),
@@ -16,7 +25,7 @@ export type CreateEventInput = z.infer<typeof createEventSchema>
 export const updateEventSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   description: z.string().max(2000).nullable().optional(),
-  date: z.string().datetime().nullable().optional(),
+  date: eventDateSchema.nullable().optional(),
   startTime: z.string().max(10).nullable().optional(),
   endTime: z.string().max(10).nullable().optional(),
   venue: z.string().max(200).nullable().optional(),
