@@ -82,6 +82,91 @@ async function fetchPhoton(query: string): Promise<GeocodeResult[]> {
   }))
 }
 
+// Dedupe by rounded coordinate (4 decimals ≈ 11m) + label prefix.
+function dedupeResults(results: GeocodeResult[]): GeocodeResult[] {
+  const seen = new Set<string>()
+  const out: GeocodeResult[] = []
+  for (const r of results) {
+    const key = `${r.lat.toFixed(4)},${r.lng.toFixed(4)}|${r.label.slice(0, 40).toLowerCase()}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(r)
+  }
+  return out
+}
+
+// Query Nominatim + Photon in parallel and merge whichever succeed. Fires
+// both at the same time instead of Nominatim-first so we aren't starved
+// when Nominatim only finds a road and Photon would have found the POI.
+async function geocodeParallel(query: string): Promise<GeocodeResult[]> {
+  const [nom, pho] = await Promise.allSettled([fetchNominatim(query), fetchPhoton(query)])
+  const merged: GeocodeResult[] = []
+  if (nom.status === 'fulfilled') merged.push(...nom.value)
+  else console.warn('[geocode] nominatim failed:', nom.reason?.message ?? nom.reason)
+  if (pho.status === 'fulfilled') merged.push(...pho.value)
+  else console.warn('[geocode] photon failed:', pho.reason?.message ?? pho.reason)
+  return dedupeResults(merged).slice(0, 8)
+}
+
+// Build a list of progressively simpler variants of the raw query. Real
+// user input often contains parts that break OSM-backed geocoders:
+//  - Chicago-style fractional housenumbers ("2S541 Winfield Rd")
+//  - Punctuation-heavy POI names ("St. James Farm Forest Preserve")
+//  - Long comma-tailed full addresses
+// Stripping those parts lets the geocoder at least find the street/city.
+function buildQueryVariants(raw: string): string[] {
+  const variants: string[] = []
+  const seen = new Set<string>()
+  const push = (s: string) => {
+    const trimmed = s
+      .trim()
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\s*,\s*/g, ', ')
+      .replace(/,\s*,/g, ',')
+      .replace(/^,|,$/g, '')
+      .trim()
+    if (trimmed.length < 3) return
+    const key = trimmed.toLowerCase()
+    if (seen.has(key)) return
+    seen.add(key)
+    variants.push(trimmed)
+  }
+
+  push(raw)
+
+  // 1) Strip Chicago-style fractional housenumbers (e.g. 2S541, 1N200)
+  push(raw.replace(/\b\d+[NSEW]\d+\b/gi, ''))
+
+  // 2) Strip punctuation — periods and extra commas
+  push(raw.replace(/[.]/g, ' ').replace(/\s{2,}/g, ' '))
+
+  // 3) Drop the first comma-separated segment (usually the POI name that
+  //    the geocoder doesn't know) — keep street + city + state
+  const segments = raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+  if (segments.length >= 2) push(segments.slice(1).join(', '))
+
+  // 4) Keep only the first segment (just the POI name) — Photon's
+  //    place-name index is surprisingly good at this
+  if (segments.length >= 2) push(segments[0]!)
+
+  // 5) First segment + last two (name + city + state)
+  if (segments.length >= 3) {
+    const last2 = segments.slice(-2).join(', ')
+    push(`${segments[0]}, ${last2}`)
+  }
+
+  // 6) Strip common qualifiers that confuse indexes
+  push(raw.replace(/\s+(forest\s+preserve|preserve|park|farm|center|centre)\b/gi, ''))
+
+  // 7) Strip all housenumbers entirely, leaving just the street + city + state
+  push(raw.replace(/\b\d+[NSEW]?\d*\s+(?=[A-Za-z])/gi, ''))
+
+  return variants
+}
+
 export const eventService = {
   async list(weddingId: string) {
     return db
@@ -257,21 +342,23 @@ export const eventService = {
     if (query.length < 3) return []
     if (query.length > 200) return []
 
-    // Try Nominatim first — richer address data for US housenumbers.
-    try {
-      const hits = await fetchNominatim(query)
-      if (hits.length > 0) return hits
-    } catch (err) {
-      console.warn('[geocode] nominatim failed:', err instanceof Error ? err.message : err)
+    // Strategy: fire Nominatim + Photon in parallel on the original query,
+    // merge/dedupe their results. If that's empty, try progressively
+    // simpler variants of the query (strip Chicago fractional housenumbers,
+    // drop POI name segment, etc.) until something matches. This handles
+    // queries like "St. James Farm Forest Preserve, 2S541 Winfield Rd,
+    // Warrenville, IL 60555" that neither provider finds on its own with
+    // the full string.
+    const variants = buildQueryVariants(query)
+    for (const variant of variants) {
+      try {
+        const hits = await geocodeParallel(variant)
+        if (hits.length > 0) return hits
+      } catch (err) {
+        console.warn('[geocode] variant failed:', variant, err)
+      }
     }
-
-    // Fallback to Photon — better for typos and international coverage.
-    try {
-      return await fetchPhoton(query)
-    } catch (err) {
-      console.warn('[geocode] photon failed:', err instanceof Error ? err.message : err)
-      return []
-    }
+    return []
   },
 
   async clearMap(eventId: string, weddingId: string) {

@@ -286,11 +286,16 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     return () => window.removeEventListener('keydown', onKey)
   }, [tool, cancelPendingLine, commitPendingLine])
 
+  // Read coordinates from the element that received the event (the drawing
+  // capture layer), NOT the captureRef. Any border/padding/transform on
+  // ancestor elements can make their bounding rects disagree — using
+  // currentTarget guarantees clicks land exactly where the user pressed.
   const pointFromEvent = useCallback(
     (e: ReactPointerEvent<HTMLDivElement>): { x: number; y: number } | null => {
-      const el = captureRef.current
+      const el = e.currentTarget
       if (!el) return null
       const rect = el.getBoundingClientRect()
+      if (rect.width === 0 || rect.height === 0) return null
       return {
         x: ((e.clientX - rect.left) / rect.width) * 100,
         y: ((e.clientY - rect.top) / rect.height) * 100,
@@ -330,20 +335,34 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
   const handleSave = useCallback(async () => {
     if (!captureRef.current) return
     setSaving(true)
+    let stage = 'start'
     try {
       // Hide editor chrome (crop outline, line handles) during capture so
       // the saved image is clean. html-to-image reads live DOM styles.
       setCapturing(true)
-      await new Promise((r) => setTimeout(r, 120)) // let React paint
+      await new Promise((r) => setTimeout(r, 150))
 
+      stage = 'capture'
+      // Capture at a modest pixel ratio to keep the PNG under the API's
+      // 10 MB body limit even when the user has the whole satellite view
+      // inside the crop frame.
       const fullDataUrl = await toPng(captureRef.current, {
         cacheBust: true,
-        pixelRatio: 2,
+        pixelRatio: 1.5,
         skipFonts: true,
       })
       setCapturing(false)
 
+      stage = 'crop'
       const croppedDataUrl = cropBox ? await cropDataUrl(fullDataUrl, cropBox) : fullDataUrl
+
+      // Back-of-envelope payload size check — base64 ~= raw * 4/3
+      const approxBytes = Math.floor((croppedDataUrl.length * 3) / 4)
+      if (approxBytes > 9 * 1024 * 1024) {
+        throw new Error(
+          `Captured image is ${Math.round(approxBytes / 1024 / 1024)} MB — too large. Try a smaller crop box.`,
+        )
+      }
 
       const map = mapInstanceRef.current
       const center: MapCenter = map
@@ -355,6 +374,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         toast.error('Please sign in again')
         return
       }
+      stage = 'upload'
       const overlays: MapOverlaysData = { cropBox, lines }
       const { data: updated } = await api.events.setMap(
         event.id,
@@ -365,9 +385,9 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       toast.success('Map saved')
       onSaved(updated)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to save map'
-      console.error('Map save error:', err)
-      toast.error(msg)
+      const baseMsg = err instanceof Error ? err.message : String(err)
+      console.error(`Map save error at stage "${stage}":`, err)
+      toast.error(`Save failed (${stage}): ${baseMsg.slice(0, 200)}`)
     } finally {
       setCapturing(false)
       setSaving(false)

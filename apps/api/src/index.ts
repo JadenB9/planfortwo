@@ -98,9 +98,25 @@ app.use(
 )
 
 // ── Body Size Limits (must be registered BEFORE routes) ──
+// Routes with their own explicit limits run first with their looser cap;
+// the global default below is applied ONLY to paths that don't have a
+// specific override, so later generic handlers don't reject requests the
+// path-specific limit already approved.
 app.use('/website-public/*/photos/upload', bodyLimit({ maxSize: 25 * 1024 * 1024 }))
 app.use('/webhooks/*', bodyLimit({ maxSize: 5 * 1024 * 1024 }))
-app.use('*', bodyLimit({ maxSize: 1024 * 1024 })) // 1MB default
+app.use('/events/*/map', bodyLimit({ maxSize: 10 * 1024 * 1024 }))
+
+const PATHS_WITH_OWN_BODY_LIMIT = [
+  /^\/website-public\/[^/]+\/photos\/upload/,
+  /^\/webhooks\//,
+  /^\/events\/[^/]+\/map(\?|$)/,
+]
+const defaultBodyLimit = bodyLimit({ maxSize: 1024 * 1024 }) // 1MB default
+app.use('*', async (c, next) => {
+  const path = c.req.path
+  if (PATHS_WITH_OWN_BODY_LIMIT.some((re) => re.test(path))) return next()
+  return defaultBodyLimit(c, next)
+})
 
 // ── Rate Limiting (must be registered BEFORE routes) ──
 const publicRateLimit = rateLimit({ windowMs: 60_000, max: 30, prefix: 'pub' })
