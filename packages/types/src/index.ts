@@ -647,15 +647,13 @@ export interface PrayersSectionContent {
 
 export type MapStyle = 'street' | 'satellite'
 
-export interface MapBoxOverlay {
-  kind: 'box'
-  id: string
+// Single crop rectangle that defines the region of the map captured into
+// the saved PNG. Thin black outline, transparent centre in the editor.
+export interface MapCropBox {
   x: number
   y: number
   width: number
   height: number
-  color: string
-  text: string
 }
 
 export interface MapLinePoint {
@@ -663,15 +661,27 @@ export interface MapLinePoint {
   y: number
 }
 
+// Freehand polyline drawn on top of the map (routes, directions, etc.)
 export interface MapLineOverlay {
-  kind: 'line'
   id: string
   color: string
   strokeWidth: number
   points: MapLinePoint[]
 }
 
-export type MapOverlay = MapBoxOverlay | MapLineOverlay
+// Full payload stored in the events.map_overlays jsonb column.
+export interface MapOverlaysData {
+  cropBox: MapCropBox | null
+  lines: MapLineOverlay[]
+}
+
+// A single geocoded search hit, returned from the /events/geocode proxy.
+export interface GeocodeResult {
+  label: string
+  lat: number
+  lng: number
+  source: 'nominatim' | 'photon'
+}
 
 export interface MapCenter {
   lat: number
@@ -1092,7 +1102,7 @@ export interface WeddingEvent {
   dressCode: string | null
   mapImageUrl: string | null
   mapImageKey: string | null
-  mapOverlays: MapOverlay[] | null
+  mapOverlays: MapOverlaysData | null
   mapCenter: MapCenter | null
   mapStyle: MapStyle | null
   sortOrder: number

@@ -1,11 +1,12 @@
 import { integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import type { MapCenter, MapOverlay } from '@planfortwo/types'
+import type { MapCenter, MapOverlaysData } from '@planfortwo/types'
 import { weddings } from './weddings'
 
-// Re-exports for historical consumers — the canonical types live in
-// @planfortwo/types. The jsonb column accepts a discriminated union of
-// box + line overlays (see packages/types/src/index.ts).
-export type EventMapOverlay = MapOverlay
+// Re-exports for historical consumers — canonical types live in
+// @planfortwo/types. The map_overlays jsonb column stores a single
+// MapOverlaysData object containing an optional crop rectangle and the
+// list of drawn polylines.
+export type EventMapOverlays = MapOverlaysData
 export type EventMapCenter = MapCenter
 
 export const events = pgTable('events', {
@@ -23,7 +24,7 @@ export const events = pgTable('events', {
   dressCode: text('dress_code'),
   mapImageUrl: text('map_image_url'),
   mapImageKey: text('map_image_key'),
-  mapOverlays: jsonb('map_overlays').$type<EventMapOverlay[]>(),
+  mapOverlays: jsonb('map_overlays').$type<EventMapOverlays>(),
   mapCenter: jsonb('map_center').$type<EventMapCenter>(),
   mapStyle: text('map_style'),
   sortOrder: integer('sort_order').notNull().default(0),

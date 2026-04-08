@@ -42,7 +42,8 @@ import type {
   VendorCommunication,
   WeddingEvent,
   TimelineEntry,
-  MapOverlay,
+  MapOverlaysData,
+  GeocodeResult,
   GalleryPhoto,
   RegistryLink,
   CashFund,
@@ -1267,7 +1268,7 @@ export const api = {
       weddingId: string,
       data: {
         imageDataUrl: string
-        overlays: MapOverlay[]
+        overlays: MapOverlaysData
         center: { lat: number; lng: number; zoom: number }
         style: 'street' | 'satellite'
       },
@@ -1283,6 +1284,8 @@ export const api = {
         method: 'DELETE',
         token,
       }),
+    geocode: (q: string, token: string) =>
+      fetchApi<{ data: GeocodeResult[] }>(`/events/geocode?q=${encodeURIComponent(q)}`, { token }),
   },
   photoGallery: {
     list: (weddingId: string, token: string) =>

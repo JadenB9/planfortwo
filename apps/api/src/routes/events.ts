@@ -27,6 +27,15 @@ export const eventsRoute = new Hono<Env>()
 
 eventsRoute.use('*', authMiddleware, resolveUserMiddleware)
 
+// Geocode proxy — must be registered BEFORE /:id so the literal path wins.
+// Authenticated only (any signed-in wedding member can search); no wedding
+// scope required because search results are not wedding-specific.
+eventsRoute.get('/geocode', async (c) => {
+  const q = c.req.query('q') ?? ''
+  const results = await eventService.geocode(q)
+  return c.json({ data: results })
+})
+
 eventsRoute.get('/', resolveWeddingMiddleware, async (c) => {
   const weddingId = c.get('weddingId')
   const list = await eventService.list(weddingId)

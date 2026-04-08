@@ -7,8 +7,80 @@ import type {
   UpdateTimelineEntryInput,
   SetEventMapInput,
 } from '@planfortwo/validators'
+import type { GeocodeResult } from '@planfortwo/types'
 import { storageClient } from '@planfortwo/storage'
 import { activityService } from './activity.js'
+
+// ─── Geocode proxy ───────────────────────────────────────────────────────
+// The browser cannot hit Nominatim/Photon directly because the Next.js
+// middleware sets a CSP with `connect-src 'self' <apiOrigin>` that blocks
+// third-party fetches. The API proxies the search server-side so we can
+// (a) attach a proper User-Agent header that Nominatim requires, and
+// (b) fall back to Photon if Nominatim returns empty. Both services are
+// free and CORS-agnostic from server-side Node.
+
+const GEOCODE_UA = 'PlanForTwo/1.0 (https://planfortwo.com; contact: jadenbutler@cedarville.edu)'
+const GEOCODE_TIMEOUT_MS = 6000
+
+interface NominatimHit {
+  display_name: string
+  lat: string
+  lon: string
+}
+
+interface PhotonFeature {
+  geometry: { coordinates: [number, number] }
+  properties: {
+    name?: string
+    housenumber?: string
+    street?: string
+    city?: string
+    state?: string
+    country?: string
+    postcode?: string
+  }
+}
+
+function formatPhotonLabel(f: PhotonFeature): string {
+  const p = f.properties
+  const streetLine = [p.housenumber, p.street].filter(Boolean).join(' ')
+  const line1 = streetLine || p.name || ''
+  const line2 = [p.city, p.state, p.postcode].filter(Boolean).join(', ')
+  const parts = [line1, line2, p.country].filter(Boolean)
+  return parts.length > 0 ? parts.join(' · ') : p.name || 'Unknown location'
+}
+
+async function fetchNominatim(query: string): Promise<GeocodeResult[]> {
+  const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&addressdetails=1&q=${encodeURIComponent(query)}`
+  const res = await fetch(url, {
+    headers: { 'User-Agent': GEOCODE_UA, Accept: 'application/json' },
+    signal: AbortSignal.timeout(GEOCODE_TIMEOUT_MS),
+  })
+  if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`)
+  const data = (await res.json()) as NominatimHit[]
+  return data.map((r) => ({
+    label: r.display_name,
+    lat: parseFloat(r.lat),
+    lng: parseFloat(r.lon),
+    source: 'nominatim' as const,
+  }))
+}
+
+async function fetchPhoton(query: string): Promise<GeocodeResult[]> {
+  const url = `https://photon.komoot.io/api/?limit=6&q=${encodeURIComponent(query)}`
+  const res = await fetch(url, {
+    headers: { 'User-Agent': GEOCODE_UA, Accept: 'application/json' },
+    signal: AbortSignal.timeout(GEOCODE_TIMEOUT_MS),
+  })
+  if (!res.ok) throw new Error(`Photon HTTP ${res.status}`)
+  const data = (await res.json()) as { features: PhotonFeature[] }
+  return data.features.map((f) => ({
+    label: formatPhotonLabel(f),
+    lat: f.geometry.coordinates[1],
+    lng: f.geometry.coordinates[0],
+    source: 'photon' as const,
+  }))
+}
 
 export const eventService = {
   async list(weddingId: string) {
@@ -178,6 +250,28 @@ export const eventService = {
       .where(and(eq(events.id, eventId), eq(events.weddingId, weddingId)))
       .returning()
     return updated ?? null
+  },
+
+  async geocode(rawQuery: string): Promise<GeocodeResult[]> {
+    const query = rawQuery.trim()
+    if (query.length < 3) return []
+    if (query.length > 200) return []
+
+    // Try Nominatim first — richer address data for US housenumbers.
+    try {
+      const hits = await fetchNominatim(query)
+      if (hits.length > 0) return hits
+    } catch (err) {
+      console.warn('[geocode] nominatim failed:', err instanceof Error ? err.message : err)
+    }
+
+    // Fallback to Photon — better for typos and international coverage.
+    try {
+      return await fetchPhoton(query)
+    } catch (err) {
+      console.warn('[geocode] photon failed:', err instanceof Error ? err.message : err)
+      return []
+    }
   },
 
   async clearMap(eventId: string, weddingId: string) {

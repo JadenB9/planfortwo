@@ -12,13 +12,14 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { toPng } from 'html-to-image'
-import { Loader2, MapPin, Plus, Save, Search, Spline, Square, X } from 'lucide-react'
+import { Crop, Loader2, MapPin, Save, Search, Spline, X } from 'lucide-react'
 import { toast } from 'sonner'
 import type {
-  MapBoxOverlay,
+  GeocodeResult,
   MapCenter,
+  MapCropBox,
   MapLineOverlay,
-  MapOverlay,
+  MapOverlaysData,
   MapStyle,
   WeddingEvent,
 } from '@planfortwo/types'
@@ -26,7 +27,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
 
-// Fix Leaflet's default icon URLs for bundlers (Webpack/Turbopack don't resolve them)
+// ── Leaflet icon fix (bundlers don't resolve Leaflet's default marker) ──
 const DEFAULT_ICON = L.icon({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -56,6 +57,9 @@ const TILE_LAYERS: Record<
 
 const PRESET_COLORS = ['#dc2626', '#ea580c', '#d97706', '#16a34a', '#0ea5e9', '#7c3aed', '#db2777']
 const DEFAULT_STROKE_WIDTH = 4
+const DEFAULT_CROP: MapCropBox = { x: 10, y: 10, width: 80, height: 80 }
+const MIN_CROP_SIZE = 15
+const SEARCH_DEBOUNCE_MS = 350
 
 type Tool = 'pan' | 'line'
 
@@ -66,42 +70,7 @@ interface EventMapEditorProps {
   onSaved: (updated: WeddingEvent) => void
 }
 
-interface PhotonFeature {
-  geometry: { coordinates: [number, number]; type: 'Point' }
-  properties: {
-    name?: string
-    housenumber?: string
-    street?: string
-    city?: string
-    state?: string
-    country?: string
-    postcode?: string
-    osm_id?: number
-  }
-}
-
-interface SearchResult {
-  label: string
-  lat: number
-  lng: number
-  key: string
-}
-
-function formatPhoton(f: PhotonFeature, idx: number): SearchResult {
-  const p = f.properties
-  const line1 = [p.housenumber, p.street].filter(Boolean).join(' ') || p.name || ''
-  const line2 = [p.city, p.state, p.postcode].filter(Boolean).join(', ')
-  const line3 = p.country ?? ''
-  const label = [line1, line2, line3].filter(Boolean).join(' · ')
-  return {
-    label: label || p.name || 'Unknown location',
-    lat: f.geometry.coordinates[1],
-    lng: f.geometry.coordinates[0],
-    key: `${f.geometry.coordinates[0]}-${f.geometry.coordinates[1]}-${p.osm_id ?? idx}`,
-  }
-}
-
-// Map bridge — exposes the Leaflet instance and recenters when restoring a saved map
+// ── Leaflet bridge — expose map instance + recenter for restored state ──
 function MapBridge({ setMap, center }: { setMap: (map: L.Map) => void; center: MapCenter | null }) {
   const map = useMap()
   useEffect(() => {
@@ -120,38 +89,50 @@ function makeId(): string {
   return `o_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 }
 
-// Split saved overlays into box + line lists, migrating legacy (pre-discriminated) records
-function normalizeOverlays(raw: MapOverlay[] | null | undefined): {
-  boxes: MapBoxOverlay[]
-  lines: MapLineOverlay[]
-} {
-  const boxes: MapBoxOverlay[] = []
-  const lines: MapLineOverlay[] = []
-  for (const o of raw ?? []) {
-    if ((o as MapOverlay).kind === 'line') {
-      lines.push(o as MapLineOverlay)
-    } else if ((o as MapOverlay).kind === 'box') {
-      boxes.push(o as MapBoxOverlay)
-    } else {
-      // Legacy shape — assume it was a box
-      const legacy = o as unknown as Omit<MapBoxOverlay, 'kind'>
-      boxes.push({ kind: 'box', ...legacy })
-    }
-  }
-  return { boxes, lines }
+function clamp(v: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, v))
+}
+
+// Load an <img> element from a data URL.
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error('Failed to decode captured image'))
+    img.src = src
+  })
+}
+
+// Crop a PNG data URL to a rectangle expressed in 0-100 percent coords.
+async function cropDataUrl(dataUrl: string, crop: MapCropBox): Promise<string> {
+  const img = await loadImage(dataUrl)
+  const srcX = Math.round((crop.x / 100) * img.naturalWidth)
+  const srcY = Math.round((crop.y / 100) * img.naturalHeight)
+  const srcW = Math.round((crop.width / 100) * img.naturalWidth)
+  const srcH = Math.round((crop.height / 100) * img.naturalHeight)
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.max(1, srcW)
+  canvas.height = Math.max(1, srcH)
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Canvas 2D context unavailable')
+  ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, srcW, srcH)
+  return canvas.toDataURL('image/png')
 }
 
 export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMapEditorProps) {
   const captureRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<L.Map | null>(null)
 
-  const initial = useMemo(() => normalizeOverlays(event.mapOverlays), [event.mapOverlays])
+  const initialOverlays: MapOverlaysData = useMemo(
+    () => event.mapOverlays ?? { cropBox: null, lines: [] },
+    [event.mapOverlays],
+  )
 
   const [style, setStyle] = useState<MapStyle>(event.mapStyle ?? 'street')
-  const [boxes, setBoxes] = useState<MapBoxOverlay[]>(initial.boxes)
-  const [lines, setLines] = useState<MapLineOverlay[]>(initial.lines)
+  const [cropBox, setCropBox] = useState<MapCropBox | null>(initialOverlays.cropBox)
+  const [lines, setLines] = useState<MapLineOverlay[]>(initialOverlays.lines)
   const [selectedColor, setSelectedColor] = useState<string>(PRESET_COLORS[0]!)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedLineId, setSelectedLineId] = useState<string | null>(null)
   const [tool, setTool] = useState<Tool>('pan')
   const [pendingLine, setPendingLine] = useState<{ x: number; y: number }[]>([])
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null)
@@ -159,10 +140,12 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
   // Search state
   const [searchQuery, setSearchQuery] = useState(event.address ?? '')
   const [searching, setSearching] = useState(false)
-  const [results, setResults] = useState<SearchResult[]>([])
+  const [results, setResults] = useState<GeocodeResult[]>([])
   const [showResults, setShowResults] = useState(false)
   const [markerPos, setMarkerPos] = useState<[number, number] | null>(null)
 
+  // Capture state — used to temporarily hide chrome during html-to-image
+  const [capturing, setCapturing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [clearing, setClearing] = useState(false)
 
@@ -176,36 +159,45 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     mapInstanceRef.current = map
   }, [])
 
-  // ── Search (Photon + debounced typeahead) ────────────────────────────────
+  // ── Geocode (through our Hono API so CSP + User-Agent are handled) ──────
   const abortRef = useRef<AbortController | null>(null)
-  const runSearch = useCallback(async (query: string) => {
-    const trimmed = query.trim()
-    if (trimmed.length < 3) {
-      setResults([])
-      return
-    }
-    abortRef.current?.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
-    setSearching(true)
-    try {
-      const url = `https://photon.komoot.io/api/?limit=6&q=${encodeURIComponent(trimmed)}`
-      const res = await fetch(url, { signal: controller.signal })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = (await res.json()) as { features: PhotonFeature[] }
-      if (controller.signal.aborted) return
-      setResults(data.features.map(formatPhoton))
-      setShowResults(true)
-    } catch (err) {
-      if ((err as Error).name === 'AbortError') return
-      console.error('Geocode error:', err)
-      toast.error('Search failed — try again')
-    } finally {
-      if (!controller.signal.aborted) setSearching(false)
-    }
-  }, [])
+  const runSearch = useCallback(
+    async (query: string, opts: { keepDropdown?: boolean } = {}) => {
+      const trimmed = query.trim()
+      if (trimmed.length < 3) {
+        setResults([])
+        return
+      }
+      abortRef.current?.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+      setSearching(true)
+      try {
+        const token = await getToken()
+        if (!token) {
+          toast.error('Please sign in again')
+          return
+        }
+        if (controller.signal.aborted) return
+        const { data } = await api.events.geocode(trimmed, token)
+        if (controller.signal.aborted) return
+        setResults(data)
+        setShowResults(opts.keepDropdown ?? true)
+        if (data.length === 0) {
+          toast.info('No locations found — try a more specific query')
+        }
+      } catch (err) {
+        if ((err as Error).name === 'AbortError') return
+        console.error('Geocode error:', err)
+        toast.error('Search failed — try again')
+      } finally {
+        if (!controller.signal.aborted) setSearching(false)
+      }
+    },
+    [getToken],
+  )
 
-  // Debounce typeahead
+  // Debounced typeahead
   useEffect(() => {
     if (!searchQuery.trim()) {
       setResults([])
@@ -213,11 +205,11 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     }
     const timer = setTimeout(() => {
       void runSearch(searchQuery)
-    }, 300)
+    }, SEARCH_DEBOUNCE_MS)
     return () => clearTimeout(timer)
   }, [searchQuery, runSearch])
 
-  const selectResult = useCallback((r: SearchResult) => {
+  const selectResult = useCallback((r: GeocodeResult) => {
     setMarkerPos([r.lat, r.lng])
     setSearchQuery(r.label)
     setShowResults(false)
@@ -226,30 +218,14 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     }
   }, [])
 
-  // ── Boxes ────────────────────────────────────────────────────────────────
-  const addBox = useCallback(() => {
-    const overlay: MapBoxOverlay = {
-      kind: 'box',
-      id: makeId(),
-      x: 35,
-      y: 35,
-      width: 30,
-      height: 14,
-      color: selectedColor,
-      text: 'Label',
-    }
-    setBoxes((prev) => [...prev, overlay])
-    setSelectedId(overlay.id)
-    setTool('pan')
-  }, [selectedColor])
-
-  const updateBox = useCallback((id: string, updates: Partial<MapBoxOverlay>) => {
-    setBoxes((prev) => prev.map((b) => (b.id === id ? { ...b, ...updates } : b)))
+  // ── Crop frame ───────────────────────────────────────────────────────────
+  const addCrop = useCallback(() => {
+    setCropBox((prev) => prev ?? { ...DEFAULT_CROP })
   }, [])
+  const removeCrop = useCallback(() => setCropBox(null), [])
 
-  const deleteBox = useCallback((id: string) => {
-    setBoxes((prev) => prev.filter((b) => b.id !== id))
-    setSelectedId((prev) => (prev === id ? null : prev))
+  const updateCrop = useCallback((updates: Partial<MapCropBox>) => {
+    setCropBox((prev) => (prev ? { ...prev, ...updates } : prev))
   }, [])
 
   // ── Lines (click-to-add polyline) ────────────────────────────────────────
@@ -262,18 +238,18 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
   const commitPendingLine = useCallback(() => {
     if (pendingLine.length < 2) {
       setPendingLine([])
+      setCursor(null)
       setTool('pan')
       return
     }
     const line: MapLineOverlay = {
-      kind: 'line',
       id: makeId(),
       color: selectedColor,
       strokeWidth: DEFAULT_STROKE_WIDTH,
       points: pendingLine,
     }
     setLines((prev) => [...prev, line])
-    setSelectedId(line.id)
+    setSelectedLineId(line.id)
     setPendingLine([])
     setCursor(null)
     setTool('pan')
@@ -285,16 +261,16 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     setTool('pan')
   }, [])
 
-  const updateLine = useCallback((id: string, updates: Partial<MapLineOverlay>) => {
-    setLines((prev) => prev.map((l) => (l.id === id ? { ...l, ...updates } : l)))
-  }, [])
-
   const deleteLine = useCallback((id: string) => {
     setLines((prev) => prev.filter((l) => l.id !== id))
-    setSelectedId((prev) => (prev === id ? null : prev))
+    setSelectedLineId((prev) => (prev === id ? null : prev))
   }, [])
 
-  // Keyboard shortcuts for line drawing
+  const updateLineColor = useCallback((id: string, color: string) => {
+    setLines((prev) => prev.map((l) => (l.id === id ? { ...l, color } : l)))
+  }, [])
+
+  // Keyboard shortcuts
   useEffect(() => {
     if (tool !== 'line') return
     const onKey = (e: KeyboardEvent) => {
@@ -315,9 +291,10 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       const el = captureRef.current
       if (!el) return null
       const rect = el.getBoundingClientRect()
-      const x = ((e.clientX - rect.left) / rect.width) * 100
-      const y = ((e.clientY - rect.top) / rect.height) * 100
-      return { x, y }
+      return {
+        x: ((e.clientX - rect.left) / rect.width) * 100,
+        y: ((e.clientY - rect.top) / rect.height) * 100,
+      }
     },
     [],
   )
@@ -340,17 +317,33 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     [pendingLine.length, pointFromEvent],
   )
 
+  // Apply current palette colour to the selected line (if any)
+  const applyColor = useCallback(
+    (c: string) => {
+      setSelectedColor(c)
+      if (selectedLineId) updateLineColor(selectedLineId, c)
+    },
+    [selectedLineId, updateLineColor],
+  )
+
   // ── Save / Clear ─────────────────────────────────────────────────────────
   const handleSave = useCallback(async () => {
     if (!captureRef.current) return
     setSaving(true)
     try {
-      await new Promise((r) => setTimeout(r, 250))
-      const dataUrl = await toPng(captureRef.current, {
+      // Hide editor chrome (crop outline, line handles) during capture so
+      // the saved image is clean. html-to-image reads live DOM styles.
+      setCapturing(true)
+      await new Promise((r) => setTimeout(r, 120)) // let React paint
+
+      const fullDataUrl = await toPng(captureRef.current, {
         cacheBust: true,
         pixelRatio: 2,
         skipFonts: true,
       })
+      setCapturing(false)
+
+      const croppedDataUrl = cropBox ? await cropDataUrl(fullDataUrl, cropBox) : fullDataUrl
 
       const map = mapInstanceRef.current
       const center: MapCenter = map
@@ -362,11 +355,11 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         toast.error('Please sign in again')
         return
       }
-      const overlays: MapOverlay[] = [...boxes, ...lines]
+      const overlays: MapOverlaysData = { cropBox, lines }
       const { data: updated } = await api.events.setMap(
         event.id,
         weddingId,
-        { imageDataUrl: dataUrl, overlays, center, style },
+        { imageDataUrl: croppedDataUrl, overlays, center, style },
         token,
       )
       toast.success('Map saved')
@@ -376,9 +369,10 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       console.error('Map save error:', err)
       toast.error(msg)
     } finally {
+      setCapturing(false)
       setSaving(false)
     }
-  }, [event.id, weddingId, boxes, lines, style, initialCenter, initialZoom, getToken, onSaved])
+  }, [event.id, weddingId, cropBox, lines, style, initialCenter, initialZoom, getToken, onSaved])
 
   const handleClear = useCallback(async () => {
     setClearing(true)
@@ -386,7 +380,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       const token = await getToken()
       if (!token) return
       const { data: updated } = await api.events.clearMap(event.id, weddingId, token)
-      setBoxes([])
+      setCropBox(null)
       setLines([])
       setMarkerPos(null)
       toast.success('Map cleared')
@@ -398,24 +392,13 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     }
   }, [event.id, weddingId, getToken, onSaved])
 
-  // Selected-color synchronisation — apply to whichever shape is selected
-  const applyColor = useCallback(
-    (c: string) => {
-      setSelectedColor(c)
-      if (!selectedId) return
-      if (boxes.some((b) => b.id === selectedId)) updateBox(selectedId, { color: c })
-      else if (lines.some((l) => l.id === selectedId)) updateLine(selectedId, { color: c })
-    },
-    [selectedId, boxes, lines, updateBox, updateLine],
-  )
-
   const isDrawingLine = tool === 'line'
   const linePreviewPoints = cursor ? [...pendingLine, cursor] : pendingLine
 
   return (
     <div className="space-y-4">
-      {/* Search bar */}
-      <div className="relative flex gap-2">
+      {/* Search bar with manual Search button AND typeahead dropdown */}
+      <div className="flex gap-2">
         <div className="relative flex-1">
           <Input
             value={searchQuery}
@@ -424,7 +407,13 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
               setShowResults(true)
             }}
             onFocus={() => results.length > 0 && setShowResults(true)}
-            onBlur={() => setTimeout(() => setShowResults(false), 150)}
+            onBlur={() => setTimeout(() => setShowResults(false), 160)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                void runSearch(searchQuery, { keepDropdown: true })
+              }
+            }}
             placeholder="Start typing a venue or address..."
             className="pl-9"
           />
@@ -435,9 +424,9 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
 
           {showResults && results.length > 0 && (
             <div className="border-border bg-background absolute left-0 right-0 top-full z-[1100] mt-1 max-h-64 overflow-y-auto rounded-md border shadow-lg">
-              {results.map((r) => (
+              {results.map((r, i) => (
                 <button
-                  key={r.key}
+                  key={`${r.lat}-${r.lng}-${i}`}
                   type="button"
                   onMouseDown={(e) => {
                     e.preventDefault()
@@ -452,6 +441,13 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
             </div>
           )}
         </div>
+        <Button
+          type="button"
+          onClick={() => void runSearch(searchQuery, { keepDropdown: true })}
+          disabled={searching || searchQuery.trim().length < 3}
+        >
+          {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Search'}
+        </Button>
       </div>
 
       {/* Toolbar */}
@@ -500,10 +496,17 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
 
         <div className="bg-border h-6 w-px" />
 
-        <Button type="button" size="sm" variant="outline" onClick={addBox}>
-          <Square className="mr-1 h-3.5 w-3.5" />
-          Add Box
-        </Button>
+        {cropBox ? (
+          <Button type="button" size="sm" variant="outline" onClick={removeCrop}>
+            <Crop className="mr-1 h-3.5 w-3.5" />
+            Remove Crop
+          </Button>
+        ) : (
+          <Button type="button" size="sm" variant="outline" onClick={addCrop}>
+            <Crop className="mr-1 h-3.5 w-3.5" />
+            Set Crop Frame
+          </Button>
+        )}
         <Button
           type="button"
           size="sm"
@@ -515,7 +518,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         </Button>
 
         <div className="ml-auto flex items-center gap-2">
-          {(event.mapImageUrl || boxes.length > 0 || lines.length > 0) && (
+          {(event.mapImageUrl || cropBox || lines.length > 0) && (
             <Button
               type="button"
               size="sm"
@@ -539,7 +542,6 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
 
       {isDrawingLine && (
         <p className="text-muted-foreground flex items-center gap-2 text-xs">
-          <Plus className="h-3 w-3" />
           Click to add points · <kbd className="bg-muted rounded border px-1">Enter</kbd> or
           double-click to finish · <kbd className="bg-muted rounded border px-1">Esc</kbd> to cancel
         </p>
@@ -551,8 +553,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         className="border-border relative overflow-hidden rounded-xl border"
         style={{ height: 480 }}
         onClick={() => {
-          // Clicking the empty canvas deselects
-          if (tool === 'pan') setSelectedId(null)
+          if (tool === 'pan') setSelectedLineId(null)
         }}
       >
         <MapContainer
@@ -575,7 +576,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           {markerPos && <Marker position={markerPos} icon={DEFAULT_ICON} />}
         </MapContainer>
 
-        {/* SVG layer for lines — sits above Leaflet panes via z-index 650 */}
+        {/* SVG layer for lines — above Leaflet panes via z-index 650 */}
         <svg
           className="pointer-events-none absolute inset-0"
           viewBox="0 0 100 100"
@@ -583,11 +584,11 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           style={{ zIndex: 650 }}
         >
           {lines.map((line) => {
-            const isSelected = selectedId === line.id
+            const isSelected = selectedLineId === line.id
             const pts = line.points.map((p) => `${p.x},${p.y}`).join(' ')
             return (
               <g key={line.id} className="pointer-events-auto cursor-pointer">
-                {/* Wide invisible hit area */}
+                {/* Wide transparent hit area */}
                 <polyline
                   points={pts}
                   stroke="transparent"
@@ -598,11 +599,11 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
                   strokeLinejoin="round"
                   onClick={(e) => {
                     e.stopPropagation()
-                    setSelectedId(line.id)
+                    setSelectedLineId(line.id)
                     setSelectedColor(line.color)
                   }}
                 />
-                {isSelected && (
+                {isSelected && !capturing && (
                   <polyline
                     points={pts}
                     stroke="#ffffff"
@@ -626,8 +627,8 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
             )
           })}
 
-          {/* Pending line preview */}
-          {pendingLine.length > 0 && (
+          {/* Pending line preview (hidden during capture) */}
+          {!capturing && pendingLine.length > 0 && (
             <>
               <polyline
                 points={linePreviewPoints.map((p) => `${p.x},${p.y}`).join(' ')}
@@ -653,34 +654,20 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
           )}
         </svg>
 
-        {/* Box overlay layer — z-index 650 */}
-        <div className="pointer-events-none absolute inset-0" style={{ zIndex: 650 }}>
-          {boxes.map((b) => (
-            <BoxOverlay
-              key={b.id}
-              overlay={b}
-              selected={selectedId === b.id}
-              onSelect={() => {
-                setSelectedId(b.id)
-                setSelectedColor(b.color)
-              }}
-              onChange={(updates) => updateBox(b.id, updates)}
-              onDelete={() => deleteBox(b.id)}
-              containerRef={captureRef}
-            />
-          ))}
-        </div>
+        {/* Crop frame — thin black border, transparent centre. Hidden during capture. */}
+        {cropBox && !capturing && (
+          <CropFrame crop={cropBox} onChange={updateCrop} containerRef={captureRef} />
+        )}
 
-        {/* Delete button for selected line (overlay, not inside SVG) */}
-        {selectedId && lines.find((l) => l.id === selectedId) && (
-          <LineControls
-            line={lines.find((l) => l.id === selectedId)!}
-            onDelete={() => deleteLine(selectedId)}
-            containerRef={captureRef}
+        {/* Floating delete button for the currently selected line */}
+        {!capturing && selectedLineId && (
+          <LineDeleteControl
+            line={lines.find((l) => l.id === selectedLineId)}
+            onDelete={() => selectedLineId && deleteLine(selectedLineId)}
           />
         )}
 
-        {/* Line drawing capture layer — only visible/clickable in line mode */}
+        {/* Line drawing capture layer — only active in line mode */}
         {isDrawingLine && (
           <div
             className="absolute inset-0"
@@ -696,63 +683,75 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       </div>
 
       <p className="text-muted-foreground text-xs">
-        Search for the venue, frame the map, and add colored boxes or draw routes. The saved
-        snapshot will appear in your wedding website&apos;s Map section.
+        Search for the venue, frame the area with the crop box, and draw colored routes. Only the
+        contents inside the crop box are saved — the outline itself is hidden. If you skip the crop
+        box the full map is captured.
       </p>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Box overlay component
+// Crop frame: thin black outline, transparent interior, drag + resize
 // ─────────────────────────────────────────────────────────────────────────
 
-interface BoxOverlayProps {
-  overlay: MapBoxOverlay
-  selected: boolean
-  onSelect: () => void
-  onChange: (updates: Partial<MapBoxOverlay>) => void
-  onDelete: () => void
+interface CropFrameProps {
+  crop: MapCropBox
+  onChange: (updates: Partial<MapCropBox>) => void
   containerRef: React.RefObject<HTMLDivElement | null>
 }
 
-function BoxOverlay({
-  overlay,
-  selected,
-  onSelect,
-  onChange,
-  onDelete,
-  containerRef,
-}: BoxOverlayProps) {
-  const [editingText, setEditingText] = useState(false)
-
+function CropFrame({ crop, onChange, containerRef }: CropFrameProps) {
   const beginDrag = useCallback(
-    (e: ReactPointerEvent<HTMLDivElement>, mode: 'move' | 'resize') => {
-      if (editingText) return
+    (
+      e: ReactPointerEvent<HTMLDivElement>,
+      mode: 'move' | 'resize-nw' | 'resize-ne' | 'resize-sw' | 'resize-se',
+    ) => {
       e.stopPropagation()
       e.preventDefault()
-      onSelect()
       const startX = e.clientX
       const startY = e.clientY
-      const startOverlay = { ...overlay }
+      const start = { ...crop }
       const container = containerRef.current
       if (!container) return
       const rect = container.getBoundingClientRect()
 
       const onMove = (ev: PointerEvent) => {
-        const dx = ((ev.clientX - startX) / rect.width) * 100
-        const dy = ((ev.clientY - startY) / rect.height) * 100
+        const dxPct = ((ev.clientX - startX) / rect.width) * 100
+        const dyPct = ((ev.clientY - startY) / rect.height) * 100
         if (mode === 'move') {
           onChange({
-            x: clamp(startOverlay.x + dx, 0, 100 - startOverlay.width),
-            y: clamp(startOverlay.y + dy, 0, 100 - startOverlay.height),
+            x: clamp(start.x + dxPct, 0, 100 - start.width),
+            y: clamp(start.y + dyPct, 0, 100 - start.height),
           })
-        } else {
-          onChange({
-            width: clamp(startOverlay.width + dx, 6, 100 - startOverlay.x),
-            height: clamp(startOverlay.height + dy, 6, 100 - startOverlay.y),
-          })
+          return
         }
+        let nx = start.x
+        let ny = start.y
+        let nw = start.width
+        let nh = start.height
+        if (mode === 'resize-se') {
+          nw = clamp(start.width + dxPct, MIN_CROP_SIZE, 100 - start.x)
+          nh = clamp(start.height + dyPct, MIN_CROP_SIZE, 100 - start.y)
+        } else if (mode === 'resize-sw') {
+          const newX = clamp(start.x + dxPct, 0, start.x + start.width - MIN_CROP_SIZE)
+          nw = start.x + start.width - newX
+          nx = newX
+          nh = clamp(start.height + dyPct, MIN_CROP_SIZE, 100 - start.y)
+        } else if (mode === 'resize-ne') {
+          nw = clamp(start.width + dxPct, MIN_CROP_SIZE, 100 - start.x)
+          const newY = clamp(start.y + dyPct, 0, start.y + start.height - MIN_CROP_SIZE)
+          nh = start.y + start.height - newY
+          ny = newY
+        } else if (mode === 'resize-nw') {
+          const newX = clamp(start.x + dxPct, 0, start.x + start.width - MIN_CROP_SIZE)
+          const newY = clamp(start.y + dyPct, 0, start.y + start.height - MIN_CROP_SIZE)
+          nw = start.x + start.width - newX
+          nh = start.y + start.height - newY
+          nx = newX
+          ny = newY
+        }
+        onChange({ x: nx, y: ny, width: nw, height: nh })
       }
       const onUp = () => {
         window.removeEventListener('pointermove', onMove)
@@ -761,88 +760,67 @@ function BoxOverlay({
       window.addEventListener('pointermove', onMove)
       window.addEventListener('pointerup', onUp)
     },
-    [editingText, overlay, onChange, onSelect, containerRef],
+    [crop, onChange, containerRef],
   )
+
+  const handleStyle: React.CSSProperties = {
+    background: '#000000',
+    border: '1px solid #ffffff',
+    borderRadius: 2,
+  }
 
   return (
     <div
       className="pointer-events-auto absolute"
       style={{
-        left: `${overlay.x}%`,
-        top: `${overlay.y}%`,
-        width: `${overlay.width}%`,
-        height: `${overlay.height}%`,
+        left: `${crop.x}%`,
+        top: `${crop.y}%`,
+        width: `${crop.width}%`,
+        height: `${crop.height}%`,
+        border: '1.5px solid #000000',
+        boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.15)',
+        cursor: 'move',
+        zIndex: 670,
       }}
       onPointerDown={(e) => beginDrag(e, 'move')}
     >
+      {/* Corner handles */}
       <div
-        className={`flex h-full w-full items-center justify-center rounded-md border-2 px-2 text-center text-xs font-semibold leading-tight text-white shadow-md transition ${
-          selected ? 'ring-2 ring-white ring-offset-2' : ''
-        }`}
-        style={{ backgroundColor: overlay.color, borderColor: overlay.color }}
-      >
-        {editingText ? (
-          <input
-            autoFocus
-            value={overlay.text}
-            onChange={(e) => onChange({ text: e.target.value.slice(0, 120) })}
-            onBlur={() => setEditingText(false)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === 'Escape') setEditingText(false)
-              e.stopPropagation()
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="w-full bg-transparent text-center text-white outline-none placeholder:text-white/60"
-          />
-        ) : (
-          <span
-            onDoubleClick={(e) => {
-              e.stopPropagation()
-              setEditingText(true)
-            }}
-            className="truncate"
-          >
-            {overlay.text || 'Label'}
-          </span>
-        )}
-      </div>
-
-      {selected && (
-        <>
-          <button
-            type="button"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete()
-            }}
-            className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-white text-red-500 shadow ring-1 ring-black/10"
-            aria-label="Delete box"
-          >
-            <X className="h-3 w-3" />
-          </button>
-          <div
-            onPointerDown={(e) => beginDrag(e, 'resize')}
-            className="absolute -bottom-1 -right-1 h-3 w-3 cursor-se-resize rounded-sm bg-white shadow ring-1 ring-black/10"
-          />
-        </>
-      )}
+        onPointerDown={(e) => beginDrag(e, 'resize-nw')}
+        className="absolute h-2.5 w-2.5 cursor-nwse-resize"
+        style={{ left: -5, top: -5, ...handleStyle }}
+      />
+      <div
+        onPointerDown={(e) => beginDrag(e, 'resize-ne')}
+        className="absolute h-2.5 w-2.5 cursor-nesw-resize"
+        style={{ right: -5, top: -5, ...handleStyle }}
+      />
+      <div
+        onPointerDown={(e) => beginDrag(e, 'resize-sw')}
+        className="absolute h-2.5 w-2.5 cursor-nesw-resize"
+        style={{ left: -5, bottom: -5, ...handleStyle }}
+      />
+      <div
+        onPointerDown={(e) => beginDrag(e, 'resize-se')}
+        className="absolute h-2.5 w-2.5 cursor-nwse-resize"
+        style={{ right: -5, bottom: -5, ...handleStyle }}
+      />
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Line controls (floating delete button when a line is selected)
+// Floating delete button for the currently-selected line
 // ─────────────────────────────────────────────────────────────────────────
 
-interface LineControlsProps {
-  line: MapLineOverlay
+function LineDeleteControl({
+  line,
+  onDelete,
+}: {
+  line: MapLineOverlay | undefined
   onDelete: () => void
-  containerRef: React.RefObject<HTMLDivElement | null>
-}
-
-function LineControls({ line, onDelete }: LineControlsProps) {
-  // Place control near the midpoint of the line
+}) {
+  if (!line) return null
   const mid = line.points[Math.floor(line.points.length / 2)] ?? line.points[0]!
   return (
     <div
@@ -867,8 +845,4 @@ function LineControls({ line, onDelete }: LineControlsProps) {
       </button>
     </div>
   )
-}
-
-function clamp(v: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, v))
 }

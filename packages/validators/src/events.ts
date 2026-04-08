@@ -60,19 +60,15 @@ export type UpdateTimelineEntryInput = z.infer<typeof updateTimelineEntrySchema>
 // ── Event Map ──
 const hexColorRegex = /^#[0-9a-fA-F]{6}$/
 
-export const mapBoxOverlaySchema = z.object({
-  kind: z.literal('box'),
-  id: z.string().min(1).max(64),
+export const mapCropBoxSchema = z.object({
   x: z.number().min(0).max(100),
   y: z.number().min(0).max(100),
-  width: z.number().min(0).max(100),
-  height: z.number().min(0).max(100),
-  color: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
-  text: z.string().max(120),
+  width: z.number().min(5).max(100),
+  height: z.number().min(5).max(100),
 })
+export type MapCropBoxInput = z.infer<typeof mapCropBoxSchema>
 
 export const mapLineOverlaySchema = z.object({
-  kind: z.literal('line'),
   id: z.string().min(1).max(64),
   color: z.string().regex(hexColorRegex, 'Must be a valid hex color'),
   strokeWidth: z.number().min(1).max(24),
@@ -86,12 +82,13 @@ export const mapLineOverlaySchema = z.object({
     .min(2)
     .max(500),
 })
+export type MapLineOverlayInput = z.infer<typeof mapLineOverlaySchema>
 
-export const mapOverlaySchema = z.discriminatedUnion('kind', [
-  mapBoxOverlaySchema,
-  mapLineOverlaySchema,
-])
-export type MapOverlayInput = z.infer<typeof mapOverlaySchema>
+export const mapOverlaysDataSchema = z.object({
+  cropBox: mapCropBoxSchema.nullable(),
+  lines: z.array(mapLineOverlaySchema).max(50),
+})
+export type MapOverlaysDataInput = z.infer<typeof mapOverlaysDataSchema>
 
 export const mapCenterSchema = z.object({
   lat: z.number().min(-90).max(90),
@@ -114,7 +111,7 @@ export const setEventMapSchema = z.object({
       },
       { message: 'Map image exceeds 4 MB' },
     ),
-  overlays: z.array(mapOverlaySchema).max(50),
+  overlays: mapOverlaysDataSchema,
   center: mapCenterSchema,
   style: z.enum(['street', 'satellite']),
 })
