@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import dynamic from 'next/dynamic'
 import { useAuth } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
 import { springSmooth, staggerContainer, fadeInUp } from '@/lib/animations'
@@ -17,18 +16,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-
-const EventMapEditor = dynamic(
-  () => import('@/components/events/event-map-editor').then((m) => m.EventMapEditor),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center py-12">
-        <div className="border-wedding-200 border-t-wedding-600 h-6 w-6 animate-spin rounded-full border-2" />
-      </div>
-    ),
-  },
-)
 
 const EVENT_TYPES: { value: EventType; label: string }[] = [
   { value: 'ceremony', label: 'Ceremony' },
@@ -299,7 +286,6 @@ export default function EventsPage() {
             <TabsList>
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="timeline">Timeline</TabsTrigger>
-              <TabsTrigger value="map">Map</TabsTrigger>
             </TabsList>
 
             <TabsContent value="details" className="mt-6">
@@ -424,20 +410,6 @@ export default function EventsPage() {
                       </Card>
                     ))}
                 </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="map" className="mt-6">
-              {weddingId && (
-                <EventMapEditor
-                  event={selectedEvent}
-                  weddingId={weddingId}
-                  getToken={getToken}
-                  onSaved={(updated) => {
-                    setSelectedEvent(updated)
-                    setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)))
-                  }}
-                />
               )}
             </TabsContent>
           </Tabs>

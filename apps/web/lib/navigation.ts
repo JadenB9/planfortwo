@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Map,
+  MapPinned,
   CheckSquare,
   Users,
   DollarSign,
@@ -54,6 +55,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/vendors', label: 'Vendors', icon: Store, comingSoon: false },
       { href: '/events', label: 'Events', icon: CalendarDays, comingSoon: false },
+      { href: '/map', label: 'Map', icon: MapPinned, comingSoon: false },
       { href: '/registry', label: 'Registry', icon: Gift, comingSoon: false },
       { href: '/honeymoon', label: 'Honeymoon', icon: Plane, comingSoon: false },
       { href: '/music', label: 'Music', icon: Music, comingSoon: false },
