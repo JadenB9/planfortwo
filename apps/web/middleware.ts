@@ -77,16 +77,19 @@ function getWeddingSubdomain(request: NextRequest): string | null {
 }
 
 // Clerk middleware handler — only used for non-subdomain (app) requests
-const clerkHandler = clerkMiddleware(async (auth, request) => {
-  if (!isPublicRoute(request)) {
-    await auth.protect()
-  }
-}, {
-  contentSecurityPolicy: {
-    strict: true,
-    directives: additionalCspDirectives,
+const clerkHandler = clerkMiddleware(
+  async (auth, request) => {
+    if (!isPublicRoute(request)) {
+      await auth.protect()
+    }
   },
-})
+  {
+    contentSecurityPolicy: {
+      strict: true,
+      directives: additionalCspDirectives,
+    },
+  },
+)
 
 export default function middleware(request: NextRequest, event: NextFetchEvent) {
   // Wedding subdomain requests bypass Clerk entirely.

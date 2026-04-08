@@ -154,12 +154,7 @@ const ROLE_ICONS: Record<string, typeof Crown> = {
 export function Sidebar() {
   const pathname = usePathname()
   const { getToken } = useAuth()
-  const {
-    data: weddingData,
-    loading: weddingLoading,
-    allWeddings,
-    websiteSubdomain,
-  } = useWedding()
+  const { data: weddingData, loading: weddingLoading, allWeddings, websiteSubdomain } = useWedding()
   const badges = useNotificationBadges()
   const { isDark, toggleDark } = useTheme()
   const tier = weddingData?.wedding.tier

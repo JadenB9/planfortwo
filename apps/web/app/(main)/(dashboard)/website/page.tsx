@@ -46,7 +46,9 @@ const PublishToggle = dynamic(() =>
   import('@/components/website/editor/publish-toggle').then((mod) => mod.PublishToggle),
 )
 const AnalyticsDashboard = dynamic(() =>
-  import('@/components/website/analytics/analytics-dashboard').then((mod) => mod.AnalyticsDashboard),
+  import('@/components/website/analytics/analytics-dashboard').then(
+    (mod) => mod.AnalyticsDashboard,
+  ),
 )
 const QrCodeDashboard = dynamic(() =>
   import('@/components/website/qr/qr-code-dashboard').then((mod) => mod.QrCodeDashboard),

@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@planfortwo/types": "workspace:^",
-    "drizzle-orm": "^0.36.4",
+    "drizzle-orm": "^0.45.2",
     "postgres": "^3.4.8"
   },
   "devDependencies": {
@@ -28,7 +28,7 @@
     "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.58.0",
     "dotenv": "^16.6.1",
-    "drizzle-kit": "^0.30.6",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

@@ -99,9 +99,7 @@ function applyThemeToDocument(colors: ThemeColors | null) {
     // Accent color — foreground/text CSS variables
     // In dark mode, lighten the accent so text remains readable on dark backgrounds
     const [ah, as, al] = hexToHsl(colors.accent)
-    const accentHsl = isDark
-      ? `${ah} ${Math.min(as, 15)}% 90%`
-      : `${ah} ${as}% ${al}%`
+    const accentHsl = isDark ? `${ah} ${Math.min(as, 15)}% 90%` : `${ah} ${as}% ${al}%`
     root.style.setProperty('--foreground', accentHsl)
     root.style.setProperty('--card-foreground', accentHsl)
     root.style.setProperty('--popover-foreground', accentHsl)

@@ -1172,7 +1172,9 @@ function SettingsPageInner() {
             <CardContent className="space-y-6">
               {!isFull ? (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/30 dark:bg-amber-900/20">
-                  <p className="font-medium text-amber-800 dark:text-amber-200">Upgrade to customize your theme</p>
+                  <p className="font-medium text-amber-800 dark:text-amber-200">
+                    Upgrade to customize your theme
+                  </p>
                   <p className="mt-1 text-sm text-amber-600 dark:text-amber-300/80">
                     Custom theme colors are available on the full plan. Upgrade to personalize your
                     dashboard colors.
@@ -1218,7 +1220,7 @@ function SettingsPageInner() {
                             style={{ backgroundColor: preset.hex }}
                           />
                           {selectedPrimary === preset.hex && (
-                            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
+                            <div className="bg-foreground absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full">
                               <Check className="h-3 w-3 text-white" />
                             </div>
                           )}
@@ -1277,7 +1279,7 @@ function SettingsPageInner() {
                             style={{ backgroundColor: preset.hex }}
                           />
                           {selectedAccent === preset.hex && (
-                            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
+                            <div className="bg-foreground absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full">
                               <Check className="h-3 w-3 text-white" />
                             </div>
                           )}

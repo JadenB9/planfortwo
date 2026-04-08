@@ -113,7 +113,8 @@ export function PublicWebsiteClient({
   ceremonyDate,
   ceremonyStartTime,
 }: PublicWebsiteClientProps) {
-  const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>(initialGuestbookEntries)
+  const [guestbookEntries, setGuestbookEntries] =
+    useState<GuestbookEntry[]>(initialGuestbookEntries)
   const [prayerEntries, setPrayerEntries] = useState<Prayer[]>(initialPrayerEntries)
 
   // Load only the selected Google font pair

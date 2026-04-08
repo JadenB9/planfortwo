@@ -128,7 +128,9 @@ export default async function PublicWebsitePage({ params }: PageProps) {
     return <PasswordGate slug={slug} weddingName={data.weddingName} />
   }
 
-  const visibleSectionTypes = new Set(data.sections.filter((section) => section.isVisible).map((section) => section.sectionType))
+  const visibleSectionTypes = new Set(
+    data.sections.filter((section) => section.isVisible).map((section) => section.sectionType),
+  )
   const [initialGuestbookEntries, initialPrayerEntries] = await Promise.all([
     visibleSectionTypes.has('guestbook')
       ? getPublicModerationEntries<GuestbookEntry>(slug, 'guestbook')

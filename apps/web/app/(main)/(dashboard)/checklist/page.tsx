@@ -17,12 +17,7 @@ import { toast } from 'sonner'
 
 export default function ChecklistPage() {
   const { getToken } = useAuth()
-  const {
-    data: weddingData,
-    features,
-    loading: weddingLoading,
-    error: weddingError,
-  } = useWedding()
+  const { data: weddingData, features, loading: weddingLoading, error: weddingError } = useWedding()
   const weddingId = weddingData?.wedding.id ?? null
 
   const [categories, setCategories] = useState<CategoryWithCount[]>([])

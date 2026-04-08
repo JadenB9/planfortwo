@@ -132,9 +132,7 @@ function useWeddingState(enabled: boolean): WeddingState {
 
       setAllWeddings(allWeddingsRes?.data ?? [])
       setFeatures(featuresRes?.data ?? null)
-      setWebsiteSubdomain(
-        dashData.wedding.websiteSlug ?? websiteConfigRes?.data?.subdomain ?? null,
-      )
+      setWebsiteSubdomain(dashData.wedding.websiteSlug ?? websiteConfigRes?.data?.subdomain ?? null)
     } catch (err) {
       if (!mountedRef.current) return
 

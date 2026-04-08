@@ -22,7 +22,9 @@ import type {
 } from '@planfortwo/types'
 
 const HeroSection = dynamic(() => import('./hero-section').then((mod) => mod.HeroSection))
-const OurStorySection = dynamic(() => import('./our-story-section').then((mod) => mod.OurStorySection))
+const OurStorySection = dynamic(() =>
+  import('./our-story-section').then((mod) => mod.OurStorySection),
+)
 const EventDetailsSection = dynamic(() =>
   import('./event-details-section').then((mod) => mod.EventDetailsSection),
 )

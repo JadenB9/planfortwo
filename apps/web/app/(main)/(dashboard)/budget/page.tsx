@@ -15,21 +15,23 @@ import { CategoryList } from '@/components/budget/category-list'
 import { ExpenseTable } from '@/components/budget/expense-table'
 import { useTabParam } from '@/hooks/use-tab-param'
 
-const ExpenseForm = dynamic(
-  () => import('@/components/budget/expense-form').then((mod) => mod.ExpenseForm),
+const ExpenseForm = dynamic(() =>
+  import('@/components/budget/expense-form').then((mod) => mod.ExpenseForm),
 )
-const BudgetCharts = dynamic(
-  () => import('@/components/budget/budget-charts').then((mod) => mod.BudgetCharts),
+const BudgetCharts = dynamic(() =>
+  import('@/components/budget/budget-charts').then((mod) => mod.BudgetCharts),
 )
-const PaymentCalendar = dynamic(
-  () => import('@/components/budget/payment-calendar').then((mod) => mod.PaymentCalendar),
+const PaymentCalendar = dynamic(() =>
+  import('@/components/budget/payment-calendar').then((mod) => mod.PaymentCalendar),
 )
-const TipCalculator = dynamic(
-  () => import('@/components/budget/tip-calculator').then((mod) => mod.TipCalculator),
+const TipCalculator = dynamic(() =>
+  import('@/components/budget/tip-calculator').then((mod) => mod.TipCalculator),
 )
-const SplitCosts = dynamic(() => import('@/components/budget/split-costs').then((mod) => mod.SplitCosts))
-const BudgetSetupWizard = dynamic(
-  () => import('@/components/budget/budget-setup-wizard').then((mod) => mod.BudgetSetupWizard),
+const SplitCosts = dynamic(() =>
+  import('@/components/budget/split-costs').then((mod) => mod.SplitCosts),
+)
+const BudgetSetupWizard = dynamic(() =>
+  import('@/components/budget/budget-setup-wizard').then((mod) => mod.BudgetSetupWizard),
 )
 
 type Tab = 'overview' | 'expenses' | 'payments' | 'analytics' | 'tips'

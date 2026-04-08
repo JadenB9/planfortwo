@@ -48,7 +48,10 @@
       "flatted": "^3.4.0",
       "prismjs": "^1.30.0",
       "esbuild": ">=0.25.0",
-      "inngest>next": ">=16.1.7"
+      "inngest>next": ">=16.1.7",
+      "hono": "^4.12.12",
+      "@hono/node-server": "^1.19.13",
+      "vite": "^6.4.2"
     }
   }
 }
