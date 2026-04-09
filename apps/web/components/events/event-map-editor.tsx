@@ -11,7 +11,6 @@ import {
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { toPng } from 'html-to-image'
 import { Crop, Loader2, MapPin, MapPinned, Save, Search, Spline, Square, X } from 'lucide-react'
 import { toast } from 'sonner'
 import type {
@@ -129,6 +128,148 @@ async function cropDataUrl(dataUrl: string, crop: MapCropBox): Promise<string> {
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Canvas 2D context unavailable')
   ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, srcW, srcH)
+  return canvas.toDataURL('image/png')
+}
+
+// Draw a rounded rectangle path onto a 2D canvas context.
+function roundedRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  radius: number,
+) {
+  const r = Math.min(radius, w / 2, h / 2)
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+  ctx.closePath()
+}
+
+// Load a tile image with `crossOrigin="anonymous"` so the resulting canvas
+// stays CORS-clean when we call toDataURL(). Resolves to null on error
+// (we'd rather skip a missing tile than fail the whole capture).
+function loadTileCors(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
+    img.src = src
+  })
+}
+
+// Custom map capture pipeline. Bypasses html-to-image entirely because that
+// library loads tile imagery through its own DOM-clone + foreignObject
+// machinery, which inconsistently taints the canvas on certain tile
+// providers. Instead we:
+//   1. Create a canvas the exact size of the Leaflet map container.
+//   2. Reload every visible .leaflet-tile-loaded <img> with
+//      crossOrigin="anonymous" and drawImage() it at its live screen
+//      position (relative to the map container).
+//   3. Draw line and box overlays in 2D-context so they match whatever
+//      the editor was showing.
+// Returns a same-origin data URL that is always CORS-clean because every
+// source image was fetched with explicit CORS.
+async function captureMapToDataUrl({
+  mapInstance,
+  lines,
+  boxes,
+}: {
+  mapInstance: L.Map
+  lines: MapLineOverlay[]
+  boxes: MapBoxOverlay[]
+}): Promise<string> {
+  const mapEl = mapInstance.getContainer()
+  const mapRect = mapEl.getBoundingClientRect()
+  const width = mapEl.clientWidth
+  const height = mapEl.clientHeight
+  const dpr = Math.min(window.devicePixelRatio || 1, 2)
+
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(width * dpr)
+  canvas.height = Math.round(height * dpr)
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('Canvas 2D context unavailable')
+  ctx.scale(dpr, dpr)
+
+  // Neutral base in case of missing tiles
+  ctx.fillStyle = '#f3f4f6'
+  ctx.fillRect(0, 0, width, height)
+
+  // Gather all visible, already-loaded tile <img> elements across every
+  // TileLayer that Leaflet has rendered inside this map.
+  const tileElements = Array.from(
+    mapEl.querySelectorAll<HTMLImageElement>('img.leaflet-tile.leaflet-tile-loaded'),
+  )
+
+  // Load each tile with CORS in parallel, then draw.
+  await Promise.all(
+    tileElements.map(async (tile) => {
+      const src = tile.currentSrc || tile.src
+      if (!src) return
+      const corsImg = await loadTileCors(src)
+      if (!corsImg) return
+      const tileRect = tile.getBoundingClientRect()
+      const x = tileRect.left - mapRect.left
+      const y = tileRect.top - mapRect.top
+      // The tile's on-screen size may be fractional because of Leaflet's
+      // CSS transform; draw at float coords to avoid visible seams.
+      ctx.drawImage(corsImg, x, y, tileRect.width, tileRect.height)
+    }),
+  )
+
+  // Draw box overlays (underneath lines, same z-order as editor)
+  for (const box of boxes) {
+    const bx = (box.x / 100) * width
+    const by = (box.y / 100) * height
+    const bw = (box.width / 100) * width
+    const bh = (box.height / 100) * height
+
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.25)'
+    ctx.shadowBlur = 4
+    ctx.shadowOffsetY = 1
+    ctx.fillStyle = box.color
+    roundedRectPath(ctx, bx, by, bw, bh, 6)
+    ctx.fill()
+    ctx.restore()
+
+    if (box.label) {
+      const fontSize = Math.max(10, Math.min(18, Math.round(bh * 0.32)))
+      ctx.fillStyle = '#ffffff'
+      ctx.font = `600 ${fontSize}px -apple-system, system-ui, "Segoe UI", sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(box.label, bx + bw / 2, by + bh / 2, bw - 6)
+    }
+  }
+
+  // Draw polyline overlays
+  for (const line of lines) {
+    if (line.points.length < 2) continue
+    ctx.beginPath()
+    ctx.strokeStyle = line.color
+    ctx.lineWidth = line.strokeWidth
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    const first = line.points[0]!
+    ctx.moveTo((first.x / 100) * width, (first.y / 100) * height)
+    for (let i = 1; i < line.points.length; i++) {
+      const pt = line.points[i]!
+      ctx.lineTo((pt.x / 100) * width, (pt.y / 100) * height)
+    }
+    ctx.stroke()
+  }
+
   return canvas.toDataURL('image/png')
 }
 
@@ -451,36 +592,23 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
     setSaving(true)
     let stage = 'start'
     try {
-      // Hide editor chrome (crop outline, line handles) during capture so
-      // the saved image is clean. html-to-image reads live DOM styles.
+      // Hide editor chrome (crop outline, line handles, selection) during
+      // capture so the live DOM doesn't include our drag UI when we query
+      // tile positions in captureMapToDataUrl below.
       setCapturing(true)
       await new Promise((r) => setTimeout(r, 150))
 
       stage = 'capture'
-      // Capture at a modest pixel ratio to keep the PNG under the API's
-      // 10 MB body limit even when the user has the whole satellite view
-      // inside the crop frame.
-      //
-      // The tile layers (OSM + ArcGIS) set CORS headers so they capture
-      // cleanly. The only images known to taint the canvas are Leaflet's
-      // default marker icons from unpkg.com (used by the search result
-      // marker). We filter those specific URLs out — leaving tiles intact
-      // so the saved PNG actually contains the map the user designed.
-      //
-      // `cacheBust: false` because the tile servers only return CORS
-      // headers on the cached responses; appending ?v=... forces a fresh
-      // fetch that the browser then blocks.
-      const TAINTED_SRC_PATTERNS = ['unpkg.com/leaflet', 'cdn.jsdelivr.net/npm/leaflet']
-      const fullDataUrl = await toPng(captureRef.current, {
-        cacheBust: false,
-        pixelRatio: 1.5,
-        skipFonts: true,
-        filter: (node) => {
-          if (!(node instanceof HTMLImageElement)) return true
-          const src = node.currentSrc || node.src
-          if (!src) return true
-          return !TAINTED_SRC_PATTERNS.some((p) => src.includes(p))
-        },
+      // Custom canvas composition — see captureMapToDataUrl() above for why
+      // we don't use html-to-image. Each tile is re-fetched with an explicit
+      // crossOrigin="anonymous" Image, drawn onto a fresh canvas, and then
+      // the overlays are rendered in 2D-context. Guaranteed CORS-clean.
+      const map = mapInstanceRef.current
+      if (!map) throw new Error('Map is not ready yet')
+      const fullDataUrl = await captureMapToDataUrl({
+        mapInstance: map,
+        lines,
+        boxes,
       })
       setCapturing(false)
 
@@ -495,10 +623,11 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
         )
       }
 
-      const map = mapInstanceRef.current
-      const center: MapCenter = map
-        ? { lat: map.getCenter().lat, lng: map.getCenter().lng, zoom: map.getZoom() }
-        : { lat: initialCenter[0], lng: initialCenter[1], zoom: initialZoom }
+      const center: MapCenter = {
+        lat: map.getCenter().lat,
+        lng: map.getCenter().lng,
+        zoom: map.getZoom(),
+      }
 
       const token = await getToken()
       if (!token) {
@@ -516,14 +645,13 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       toast.success('Map saved')
       onSaved(updated)
     } catch (err) {
-      // html-to-image rejects with a DOM Event (not an Error) when an image
-      // taints the canvas — `String(err)` on an Event is "[object Event]"
-      // which is useless. Pull something readable out of whatever we got.
+      // Pull a readable message out of whatever we got — including bare
+      // DOM Events (which stringify to "[object Event]").
       const baseMsg =
         err instanceof Error
           ? err.message
           : err && typeof err === 'object' && 'type' in err
-            ? `Capture blocked (${(err as Event).type}). A cross-origin image in the map tainted the canvas.`
+            ? `Capture blocked (${(err as Event).type})`
             : String(err)
       console.error(`Map save error at stage "${stage}":`, err)
       toast.error(`Save failed (${stage}): ${baseMsg.slice(0, 240)}`)
@@ -531,18 +659,7 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
       setCapturing(false)
       setSaving(false)
     }
-  }, [
-    event.id,
-    weddingId,
-    cropBox,
-    lines,
-    boxes,
-    style,
-    initialCenter,
-    initialZoom,
-    getToken,
-    onSaved,
-  ])
+  }, [event.id, weddingId, cropBox, lines, boxes, style, getToken, onSaved])
 
   const handleClear = useCallback(async () => {
     setClearing(true)
@@ -762,11 +879,10 @@ export function EventMapEditor({ event, weddingId, getToken, onSaved }: EventMap
               : {})}
             crossOrigin=""
           />
-          {/* The search-result marker is a cross-origin image from unpkg
-              (Leaflet's default marker). If it's in the DOM when html-to-image
-              runs, the captured canvas becomes tainted and toPng rejects
-              with a DOM Event (not an Error), hence the "[object Event]"
-              error users were seeing. Hide it during capture. */}
+          {/* The search-result marker is a cross-origin image from unpkg —
+              hidden during capture so it doesn't leak into the saved PNG
+              (the capture pipeline skips it anyway, but hiding it in the
+              DOM also hides it behind the ongoing crop-frame preview). */}
           {markerPos && !capturing && <Marker position={markerPos} icon={DEFAULT_ICON} />}
         </MapContainer>
 
